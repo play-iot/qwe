@@ -10,4 +10,7 @@
 rootProject.name = "blueprint"
 include("base")
 include("cache")
-
+include("http")
+include("http:client")
+include("http:server")
+include("micro")

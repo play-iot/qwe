@@ -6,6 +6,7 @@ import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.dto.jpa.Pagination;
 import io.github.zero88.msa.bp.dto.jpa.Sort;
 import io.github.zero88.msa.bp.dto.msg.DataTransferObject.AbstractDTO;
+import io.github.zero88.msa.bp.event.EventMessage;
 import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -43,9 +44,9 @@ public final class RequestData extends AbstractDTO {
 
     public static Builder builder() { return new Builder(); }
 
-//    public static RequestData from(@NonNull EventMessage msg) {
-//        return builder().body(msg.getData()).build();
-//    }
+    public static RequestData from(@NonNull EventMessage msg) {
+        return builder().body(msg.getData()).build();
+    }
 
     @Override
     public JsonObject toJson() {

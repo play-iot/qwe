@@ -65,9 +65,15 @@ object VertxLibs {
     const val core = "io.vertx:vertx-core:${Version.vertx}"
     const val codegen = "io.vertx:vertx-codegen:${Version.vertx}"
     const val config = "io.vertx:vertx-config:${Version.vertx}"
+    const val web = "io.vertx:vertx-web:${Version.vertx}"
+    const val serviceDiscovery = "io.vertx:vertx-service-discovery:${Version.vertx}"
+    const val circuitBreaker = "io.vertx:vertx-circuit-breaker:${Version.vertx}"
+
     const val rx2 = "io.vertx:vertx-rx-java2:${Version.vertx}"
+
     const val junit = "io.vertx:vertx-unit:${Version.vertx}"
     const val junit5 = "io.vertx:vertx-junit5:${Version.vertx}"
+
 }
 
 object LogLibs {

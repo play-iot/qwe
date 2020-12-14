@@ -1,0 +1,36 @@
+package io.github.zero88.msa.bp.micro.transfomer;
+
+import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
+import io.github.zero88.msa.bp.http.event.EventMethodMapping;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.servicediscovery.Record;
+
+import io.github.zero88.msa.bp.dto.JsonData;
+import io.github.zero88.msa.bp.micro.type.EventMessageService;
+
+import lombok.NonNull;
+
+class EventServiceRecordTransformer implements RecordTransformer {
+
+    @Override
+    public @NonNull RecordOutput transform(@NonNull Record record) {
+        EventMethodDefinition definition = JsonData.convert(
+            record.getMetadata().getJsonObject(EventMessageService.EVENT_METHOD_CONFIG), EventMethodDefinition.class);
+        final JsonArray paths = definition.getMapping()
+                                          .stream()
+                                          .map(this::serializeEventMethod)
+                                          .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+        return RecordOutput.builder()
+                           .name(record.getName())
+                           .status(record.getStatus())
+                           .location(record.getLocation().getString(Record.ENDPOINT))
+                           .endpoints(paths)
+                           .build();
+    }
+
+    protected JsonObject serializeEventMethod(@NonNull EventMethodMapping map) {
+        return new JsonObject().put("method", map.getMethod()).put("path", map.getCapturePath());
+    }
+
+}
