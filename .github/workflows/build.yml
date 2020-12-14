@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - '.github/ISSUE_TEMPLATE/**'
       - 'CHANGELOG.md'
@@ -10,7 +10,7 @@ on:
       - 'LICENSE'
   pull_request:
     types: [ opened, synchronize, reopened, closed ]
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   context:
