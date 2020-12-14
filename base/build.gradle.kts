@@ -7,9 +7,9 @@ dependencies {
     api(UtilLibs.classgraph)
     api(ZeroLibs.utils)
     api(ZeroLibs.jpaExt)
+    api(VertxLibs.rx2)
 
     implementation(LogLibs.logback)
-    implementation(VertxLibs.rx2)
     implementation(VertxLibs.config)
 
     compileOnly(VertxLibs.codegen)
