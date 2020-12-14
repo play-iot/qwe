@@ -9,3 +9,5 @@
 
 rootProject.name = "blueprint"
 include("base")
+include("cache")
+
