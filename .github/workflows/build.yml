@@ -144,7 +144,7 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew clean build \
+          ./gradlew clean build -x test \
                           -Pversion=${{ needs.context.outputs.version }} \
                           -PsemanticVersion=${{needs.context.outputs.semanticVersion }} \
                           -PbuildBy="GitHub Action" -PbuildHash=${{ github.sha }}
