@@ -44,10 +44,12 @@ object TestLibs {
 
     object Version {
 
+        const val junit = "4.12"
         const val junit5 = "5.7.0"
         const val jsonAssert = "1.5.0"
     }
 
+    const val junit = "junit:junit:${Version.junit}"
     const val junit5Api = "org.junit.jupiter:junit-jupiter-api:${Version.junit5}"
     const val junit5Engine = "org.junit.jupiter:junit-jupiter-engine:${Version.junit5}"
     const val jsonAssert = "org.skyscreamer:jsonassert:${Version.jsonAssert}"
@@ -57,12 +59,15 @@ object VertxLibs {
 
     object Version {
 
-        const val vertx = "3.6.0"
+        const val vertx = "3.9.2"
     }
 
     const val core = "io.vertx:vertx-core:${Version.vertx}"
     const val codegen = "io.vertx:vertx-codegen:${Version.vertx}"
+    const val config = "io.vertx:vertx-config:${Version.vertx}"
+    const val rx2 = "io.vertx:vertx-rx-java2:${Version.vertx}"
     const val junit = "io.vertx:vertx-unit:${Version.vertx}"
+    const val junit5 = "io.vertx:vertx-junit5:${Version.vertx}"
 }
 
 object LogLibs {
@@ -108,7 +113,9 @@ object ZeroLibs {
     object Version {
 
         const val utils = "1.0.0"
+        const val jpaExt = "0.9.0"
     }
 
-    const val utils = "io.github.zero88.java-utils:${Version.utils}"
+    const val utils = "io.github.zero88:java-utils:${Version.utils}"
+    const val jpaExt = "io.github.zero88:jpa-ext:${Version.jpaExt}"
 }

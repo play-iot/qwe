@@ -19,8 +19,8 @@ allprojects {
 
     repositories {
         mavenLocal()
-        maven { url = uri("https://maven.pkg.github.com/zero88/java-utils") }
         maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
+        maven { url = uri("https://maven.pkg.github.com/zero88/java-utils") }
         mavenCentral()
         jcenter()
     }
@@ -37,18 +37,15 @@ subprojects {
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
         withJavadocJar()
         withSourcesJar()
     }
 
     dependencies {
-        compileOnlyApi(JacksonLibs.annotations)
         compileOnly(UtilLibs.lombok)
         annotationProcessor(UtilLibs.lombok)
 
-        testImplementation(TestLibs.jsonAssert)
-        testImplementation(TestLibs.junit5Api)
-        testRuntimeOnly(TestLibs.junit5Engine)
         testCompileOnly(UtilLibs.lombok)
         testAnnotationProcessor(UtilLibs.lombok)
     }
@@ -74,9 +71,9 @@ subprojects {
                                      "implNote:a:Implementation Note:")
             }
         }
-        test {
-            useJUnitPlatform()
-        }
+//        test {
+//            useJUnitPlatform()
+//        }
     }
 
     publishing {
@@ -181,7 +178,7 @@ nexusStaging {
     password = project.property("nexus.password") as String?
 }
 
-tasks.test {
-    // Use junit platform for unit tests.
-    useJUnitPlatform()
-}
+//tasks.test {
+//    // Use junit platform for unit tests.
+//    useJUnitPlatform()
+//}

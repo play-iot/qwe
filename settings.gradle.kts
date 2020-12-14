@@ -8,4 +8,4 @@
  */
 
 rootProject.name = "blueprint"
-include("lib")
+include("base")

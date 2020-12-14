@@ -1,0 +1,61 @@
+{
+  "__system__": {
+    "__cluster__": {
+      "active": false,
+      "ha": false,
+      "name": "",
+      "type": "HAZELCAST",
+      "listenerAddress": "",
+      "url": "",
+      "file": "",
+      "options": {}
+    },
+    "__eventBus__": {
+      "sendBufferSize": -1,
+      "receiveBufferSize": -1,
+      "trafficClass": -1,
+      "reuseAddress": true,
+      "logActivity": false,
+      "reusePort": false,
+      "tcpNoDelay": true,
+      "tcpKeepAlive": false,
+      "soLinger": -1,
+      "usePooledBuffers": false,
+      "idleTimeout": 0,
+      "idleTimeoutUnit": "SECONDS",
+      "ssl": false,
+      "useAlpn": false,
+      "enabledSecureTransportProtocols": [
+        "TLSv1",
+        "TLSv1.1",
+        "TLSv1.2"
+      ],
+      "tcpFastOpen": false,
+      "tcpCork": false,
+      "tcpQuickAck": false,
+      "clustered": false,
+      "clusterPublicPort": 0,
+      "clusterPingInterval": 20000,
+      "clusterPingReplyInterval": 20000,
+      "port": 0,
+      "host": "localhost",
+      "acceptBacklog": -1,
+      "clientAuth": "NONE",
+      "reconnectAttempts": 0,
+      "reconnectInterval": 1000,
+      "connectTimeout": 60000,
+      "trustAll": true
+    },
+    "__micro__": {}
+  },
+  "__deploy__": {
+    "worker": false,
+    "multiThreaded": false,
+    "workerPoolSize": 20,
+    "maxWorkerExecuteTime": 60000000000,
+    "ha": false,
+    "instances": 1,
+    "maxWorkerExecuteTimeUnit": "NANOSECONDS"
+  },
+  "__app__": {}
+}
