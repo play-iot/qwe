@@ -1,0 +1,27 @@
+{
+  "__app__": {
+    "__http__": {
+      "host": "0.0.0.0",
+      "port": 9999,
+      "__rest__": {
+        "enabled": false
+      },
+      "__files__": {
+        "enabled": true,
+        "dir": "files",
+        "__upload__": {
+          "enabled": true,
+          "path": "/u",
+          "maxBodySizeMB": 1,
+          "handlerClass": "io.github.zero88.msa.bp.http.server.handler.UploadFileHandler",
+          "listenerAddress": "blank.mean.using.container.class.name.upload",
+          "listenerClass": "io.github.zero88.msa.bp.http.server.handler.UploadListener"
+        },
+        "__download__": {
+          "enabled": true,
+          "path": "/f"
+        }
+      }
+    }
+  }
+}

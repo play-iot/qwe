@@ -1,0 +1,33 @@
+{
+  "__app__": {
+    "__micro__": {
+      "__gateway__": {
+        "enabled": true,
+        "indexAddress": "test.zbp.service.gateway.index",
+        "localAnnounceMonitorClass": "io.github.zero88.msa.bp.http.server.gateway.RouterAnnounceListener"
+      },
+      "__serviceDiscovery__": {
+        "enabled": false
+      },
+      "__localServiceDiscovery__": {
+        "enabled": true
+      },
+      "__circuitBreaker__": {
+        "enabled": true
+      }
+    },
+    "__http__": {
+      "__rest__": {
+        "__dynamic__": {
+          "enabled": true,
+          "path": "/s"
+        }
+      },
+      "__api_gateway__": {
+        "enabled": true,
+        "path": "/gw",
+        "address": "test.zbp.service.gateway.index"
+      }
+    }
+  }
+}
