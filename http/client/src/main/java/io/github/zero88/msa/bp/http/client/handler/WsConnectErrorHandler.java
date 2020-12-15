@@ -8,14 +8,14 @@ import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.HttpException;
 import io.github.zero88.msa.bp.exceptions.TimeoutException;
-import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.HostInfo;
+import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.client.HttpClientRegistry;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxException;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.WebsocketRejectedException;
+import io.vertx.core.http.UpgradeRejectedException;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -47,12 +47,12 @@ public abstract class WsConnectErrorHandler implements Handler<Throwable> {
         if (error instanceof VertxException && error.getMessage().equals("Connection was closed")) {
             throw new TimeoutException("Request timeout", error);
         }
-        if (error instanceof WebsocketRejectedException) {
-            final int status = ((WebsocketRejectedException) error).getStatus();
+        if (error instanceof UpgradeRejectedException) {
+            final int status = ((UpgradeRejectedException) error).getStatus();
             throw new HttpException(status, error.getMessage(),
                                     new BlueprintException(HttpStatusMapping.error(HttpMethod.GET, status), error));
         }
-        throw new HttpException("Failed when open websocket connection", error);
+        throw new HttpException("Failed when open WebSocket connection", error);
     }
 
 }

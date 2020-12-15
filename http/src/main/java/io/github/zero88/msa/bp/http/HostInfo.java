@@ -1,5 +1,7 @@
 package io.github.zero88.msa.bp.http;
 
+import java.util.Optional;
+
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.shareddata.Shareable;
@@ -39,7 +41,11 @@ public class HostInfo implements JsonData, Shareable {
     }
 
     public static HostInfo from(RequestOptions options) {
-        return HostInfo.builder().host(options.getHost()).port(options.getPort()).ssl(options.isSsl()).build();
+        return HostInfo.builder()
+                       .host(options.getHost())
+                       .port(options.getPort())
+                       .ssl(Optional.ofNullable(options.isSsl()).orElse(false))
+                       .build();
     }
 
     public RequestOptions to(String path) {
