@@ -22,7 +22,7 @@ import lombok.NonNull;
  *     "__micro__": {
  *       "__gateway__": {
  *         "enabled": true,
- *         "localAnnounceMonitorClass": "io.github.zero88.msa.bp.http.gateway.RouterAnnounceListener"
+ *         "localAnnounceMonitorClass": "io.github.zero88.msa.bp.http.server.gateway.RouterAnnounceListener"
  *       },
  *       "__serviceDiscovery__": {
  *         "enabled": false

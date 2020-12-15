@@ -94,10 +94,10 @@ public final class WebSocketEventBuilder {
         EventbusClient controller = SharedDataDelegate.getEventController(vertx, sharedKey);
         validate().forEach((path, socketMapping) -> {
             String fullPath = Urls.combinePath(rootWs, path, ApiConstants.WILDCARDS_ANY_PATH);
-            //FIXME
-            final Router bridge = sockJSHandler.bridge(createBridgeOptions(fullPath, socketMapping),
-                                                       createHandler(controller, socketMapping));
-            //            router.route(fullPath).handler(bridge);
+            sockJSHandler.bridge(createBridgeOptions(fullPath, socketMapping),
+                                 createHandler(controller, socketMapping));
+            //FIXME websocket handler??
+            router.route(fullPath).handler(sockJSHandler);
         });
         return router;
     }

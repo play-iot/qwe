@@ -11,6 +11,9 @@ dependencies {
 
     testImplementation(TestLibs.jsonAssert)
     testImplementation(TestLibs.junit)
+    testImplementation(TestLibs.junit5Vintage)
     testImplementation(VertxLibs.junit)
     testImplementation(testFixtures(project(":base")))
+    testImplementation(project(":micro"))
+    testImplementation(project(":http:client"))
 }

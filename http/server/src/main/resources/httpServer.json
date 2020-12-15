@@ -80,7 +80,7 @@
       "insertJSESSIONID": true,
       "heartbeatInterval": 25000,
       "maxBytesStreaming": 131072,
-      "libraryURL": "//cdn.jsdelivr.net/sockjs/1.1.5/sockjs.min.js",
+      "libraryURL": "//cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js",
       "disabledTransports": []
     },
     "__bridge__": {
@@ -123,7 +123,7 @@
       "enabled": false,
       "path": "/u",
       "maxBodySizeMB": 10,
-      "handlerClass": "io.github.zero88.msa.bp.http.handler.UploadFileHandler"
+      "handlerClass": "io.github.zero88.msa.bp.http.server.handler.UploadFileHandler"
     },
     "__download__": {
       "enabled": false,
