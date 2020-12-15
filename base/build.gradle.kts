@@ -18,8 +18,8 @@ dependencies {
     compileOnly(VertxLibs.codegen)
     compileOnlyApi(JacksonLibs.annotations)
 
-    testImplementation(TestLibs.jsonAssert)
     testImplementation(TestLibs.junit)
+    testImplementation(TestLibs.junit5Vintage)
     testImplementation(VertxLibs.junit)
     testImplementation(VertxLibs.junit5)
 

@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
 import io.github.zero88.msa.bp.IConfig;
+import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.client.handler.HttpClientWriter;
 import io.github.zero88.msa.bp.http.client.handler.HttpErrorHandler;
@@ -16,16 +17,19 @@ import io.github.zero88.msa.bp.http.client.handler.WsResponseErrorHandler;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpClientConfig implements IConfig {
 
     public static final int CONNECT_TIMEOUT_SECOND = 45;
@@ -41,11 +45,11 @@ public final class HttpClientConfig implements IConfig {
                                     .setIdleTimeoutUnit(TimeUnit.SECONDS)
                                     .setConnectTimeout(CONNECT_TIMEOUT_SECOND * 1000)
                                     .setTryUseCompression(true)
-                                    .setWebsocketCompressionAllowClientNoContext(true)
-                                    .setWebsocketCompressionRequestServerNoContext(true)
-                                    .setWebsocketCompressionLevel(6)
-                                    .setTryUsePerFrameWebsocketCompression(false)
-                                    .setTryUsePerMessageWebsocketCompression(true));
+                                    .setWebSocketCompressionLevel(6)
+                                    .setWebSocketCompressionAllowClientNoContext(true)
+                                    .setWebSocketCompressionRequestServerNoContext(true)
+                                    .setTryUsePerFrameWebSocketCompression(false)
+                                    .setTryUsePerMessageWebSocketCompression(true));
     }
 
     HttpClientConfig(@NonNull HttpClientOptions options) {
@@ -57,6 +61,14 @@ public final class HttpClientConfig implements IConfig {
         config.hostInfo = info;
         config.userAgent = Strings.isBlank(userAgent) ? config.userAgent : userAgent;
         return config;
+    }
+
+    @JsonCreator
+    static HttpClientConfig create(@JsonProperty("userAgent") String userAgent,
+                                   @JsonProperty("options") JsonObject options,
+                                   @JsonProperty("handlerConfig") JsonObject handlerConfig) {
+        return new HttpClientConfig(userAgent, null, new HttpClientOptions(options),
+                                    JsonData.convert(handlerConfig, HandlerConfig.class));
     }
 
     @Override
@@ -79,6 +91,13 @@ public final class HttpClientConfig implements IConfig {
                            .ssl(this.getOptions().isSsl())
                            .build();
         return hostInfo;
+    }
+
+    @Override
+    public JsonObject toJson() {
+        return new JsonObject().put("options", options.toJson())
+                               .put("handlerConfig", JsonData.tryParse(this.handlerConfig).toJson())
+                               .put("userAgent", this.userAgent);
     }
 
     @Getter
