@@ -8,7 +8,7 @@ import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.HttpException;
 import io.github.zero88.msa.bp.exceptions.TimeoutException;
-import io.github.zero88.msa.bp.exceptions.converter.HttpStatusMapping;
+import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.client.HttpClientRegistry;
 import io.github.zero88.utils.Reflections.ReflectionClass;

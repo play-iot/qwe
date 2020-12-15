@@ -1,4 +1,4 @@
-package io.github.zero88.msa.bp.exceptions.converter;
+package io.github.zero88.msa.bp.http;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public final class HttpStatusMapping {
         map.put(ErrorCode.BEING_USED, HttpResponseStatus.UNPROCESSABLE_ENTITY);
 
         map.put(ErrorCode.CONFLICT_ERROR, HttpResponseStatus.CONFLICT);
-        map.put(ErrorCode.STATE_ERROR, HttpResponseStatus.CONFLICT);
+        map.put(ErrorCode.UNSUPPORTED, HttpResponseStatus.CONFLICT);
 
         map.put(ErrorCode.AUTHENTICATION_ERROR, HttpResponseStatus.UNAUTHORIZED);
         map.put(ErrorCode.SECURITY_ERROR, HttpResponseStatus.FORBIDDEN);

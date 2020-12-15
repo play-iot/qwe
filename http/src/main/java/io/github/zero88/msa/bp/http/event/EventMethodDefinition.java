@@ -140,6 +140,7 @@ public final class EventMethodDefinition implements JsonData {
      *
      * @param servicePath Origin service path that represents for manipulating {@code resource} or {@code action job}
      * @param mapping     Mapping between {@code EventAction} and {@code HTTPMethod}
+     * @param useRequestData Use RequestData {@code RequestData}
      * @return new instance
      * @see ActionMethodMapping
      */
@@ -177,6 +178,7 @@ public final class EventMethodDefinition implements JsonData {
      * @param servicePath Origin service path that represents for manipulating {@code resource}
      * @param paramPath   Parameter path for manipulating {@code resource}
      * @param mapping     Mapping between {@code EventAction} and {@code HTTPMethod}
+     * @param useRequestData Use request data {@code RequestData}
      * @return new instance
      * @implNote {@code paramPath} will be append after {@code servicePath}. For example:
      *     <ul>

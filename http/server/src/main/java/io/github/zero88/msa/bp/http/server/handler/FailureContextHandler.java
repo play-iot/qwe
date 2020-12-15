@@ -3,7 +3,7 @@ package io.github.zero88.msa.bp.http.server.handler;
 import java.util.Objects;
 
 import io.github.zero88.msa.bp.dto.ErrorMessage;
-import io.github.zero88.msa.bp.exceptions.converter.HttpStatusMapping;
+import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;

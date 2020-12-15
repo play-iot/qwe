@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
-import io.github.zero88.msa.bp.exceptions.converter.HttpStatusMapping;
+import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;

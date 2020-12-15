@@ -1,4 +1,4 @@
-package io.github.zero88.msa.bp.exceptions;
+package io.github.zero88.msa.bp.http;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,7 +10,8 @@ import java.util.Map;
 import org.junit.Test;
 
 import io.github.zero88.exceptions.HiddenException;
-import io.github.zero88.msa.bp.exceptions.converter.HttpStatusMapping;
+import io.github.zero88.msa.bp.exceptions.ErrorCode;
+import io.github.zero88.msa.bp.exceptions.ServiceException;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
@@ -38,8 +39,7 @@ public class HttpStatusMappingTest {
 
     @Test
     public void test_error_bad_request() {
-        assertEquals(HttpResponseStatus.BAD_REQUEST,
-                     HttpStatusMapping.error(HttpMethod.DELETE, ErrorCode.HTTP_ERROR));
+        assertEquals(HttpResponseStatus.BAD_REQUEST, HttpStatusMapping.error(HttpMethod.DELETE, ErrorCode.HTTP_ERROR));
         assertEquals(HttpResponseStatus.BAD_REQUEST,
                      HttpStatusMapping.error(HttpMethod.POST, ErrorCode.INVALID_ARGUMENT));
     }

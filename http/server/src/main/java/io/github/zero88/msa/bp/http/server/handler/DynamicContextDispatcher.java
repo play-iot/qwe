@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import io.github.zero88.msa.bp.dto.ErrorMessage;
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
 import io.github.zero88.msa.bp.exceptions.HttpException;
-import io.github.zero88.msa.bp.exceptions.converter.HttpStatusMapping;
+import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.server.rest.DynamicEventRestApi;
 import io.github.zero88.msa.bp.http.server.rest.DynamicHttpRestApi;

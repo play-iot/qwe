@@ -3,7 +3,7 @@ package io.github.zero88.msa.bp.http.server.converter;
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.HttpException;
-import io.github.zero88.msa.bp.exceptions.converter.HttpStatusMapping;
+import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.server.handler.ResponseDataWriter;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
