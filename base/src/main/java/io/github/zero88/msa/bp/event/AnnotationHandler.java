@@ -95,7 +95,7 @@ final class AnnotationHandler<T extends EventListener> {
                 EventContractor contractor = method.getAnnotation(EventContractor.class);
                 return !ReflectionClass.assertDataType(method.getReturnType(), Void.class) &&
                        ReflectionClass.assertDataType(method.getReturnType(), contractor.returnType()) &&
-                       Stream.of(contractor.action()).anyMatch(eventType -> EventAction.parse(eventType).equals(action));
+                       Stream.of(contractor.action()).map(EventAction::parse).anyMatch(action::equals);
             });
     }
 
@@ -195,9 +195,8 @@ final class AnnotationHandler<T extends EventListener> {
         } else {
             logger.warn("Failed when handle event {}", throwable, action);
         }
-        Throwable t = BlueprintExceptionConverter.friendly(throwable, throwable instanceof ImplementationError ?
-                                                                      "No reply from event " + action : null);
-        return EventMessage.error(action, t);
+        final String overrideMsg = throwable instanceof ImplementationError ? "No reply from event " + action : "";
+        return EventMessage.error(action, BlueprintExceptionConverter.friendly(throwable, overrideMsg));
     }
 
 }

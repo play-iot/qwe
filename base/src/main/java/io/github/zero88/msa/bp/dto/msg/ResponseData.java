@@ -1,8 +1,10 @@
 package io.github.zero88.msa.bp.dto.msg;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import io.github.zero88.msa.bp.dto.msg.DataTransferObject.AbstractDTO;
+import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.json.JsonObject;
@@ -26,8 +28,10 @@ public final class ResponseData extends AbstractDTO {
     public static ResponseData from(@NonNull EventMessage message) {
         ResponseData responseData = new ResponseData();
         responseData.setHeaders(new JsonObject().put("status", message.getStatus())
-                                                .put("action", message.getAction())
-                                                .put("prevAction", message.getPrevAction()));
+                                                .put("action", message.getAction().action())
+                                                .put("prevAction", Optional.ofNullable(message.getPrevAction())
+                                                                           .map(EventAction::action)
+                                                                           .orElse(null)));
         if (message.isError()) {
             return responseData.setBody(message.getError().toJson());
         }

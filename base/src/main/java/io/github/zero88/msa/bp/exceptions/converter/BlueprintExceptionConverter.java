@@ -7,7 +7,6 @@ import java.util.function.Function;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.exceptions.ErrorCodeException;
 import io.github.zero88.exceptions.HiddenException;
-import io.github.zero88.exceptions.SneakyErrorCodeException;
 import io.github.zero88.msa.bp.dto.ErrorMessage;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.utils.Strings;
@@ -70,14 +69,18 @@ public class BlueprintExceptionConverter implements Function<Throwable, Blueprin
             List<Throwable> exceptions = ((CompositeException) throwable).getExceptions();
             t = exceptions.get(exceptions.size() - 1);
         }
+        final Throwable cause = t.getCause();
         if (t instanceof ErrorCodeException) {
-            boolean wrapperIsBlueprint = t instanceof BlueprintException;
-            return overrideMsg(friendly ? convert((ErrorCodeException) t, wrapperIsBlueprint) : (ErrorCodeException) t);
+            final ErrorCodeException e = (ErrorCodeException) t;
+            if (ErrorCode.REFLECTION_ERROR.equals(e.errorCode())) {
+                return apply(cause);
+            }
+            return overrideMsg(friendly ? convert(e, t instanceof BlueprintException) : e);
         }
-        if (t.getCause() instanceof BlueprintException) {
+        if (cause instanceof BlueprintException) {
             logger.debug("Wrapper Exception: ", t);
-            return overrideMsg(
-                friendly ? convert((BlueprintException) t.getCause(), false) : (BlueprintException) t.getCause());
+            final BlueprintException c = (BlueprintException) cause;
+            return overrideMsg(friendly ? convert(c, false) : c);
         }
         return convert(new BlueprintException(ErrorCode.UNKNOWN_ERROR, overrideMsg, t), false);
     }
@@ -86,8 +89,7 @@ public class BlueprintExceptionConverter implements Function<Throwable, Blueprin
         if (t instanceof BlueprintException && Strings.isBlank(overrideMsg)) {
             return (BlueprintException) t;
         }
-        return new BlueprintException(t.errorCode(), Strings.isBlank(overrideMsg) ? t.getMessage() : overrideMsg,
-                                      t.getCause());
+        return new BlueprintException(t.errorCode(), Strings.fallback(overrideMsg, t.getMessage()), t.getCause());
     }
 
     private BlueprintException convert(ErrorCodeException t, boolean wrapperIsBlueprint) {
@@ -105,15 +107,11 @@ public class BlueprintExceptionConverter implements Function<Throwable, Blueprin
             final Throwable rootCause = Objects.isNull(cause.getCause()) ? cause : cause.getCause();
             return new BlueprintException(ErrorCode.INVALID_ARGUMENT, msg, rootCause);
         }
-        if (cause instanceof SneakyErrorCodeException) {
-            return new BlueprintException(code, includeCauseMessage((ErrorCodeException) cause, msgOrCode), cause);
-        }
-        if (cause instanceof BlueprintException) {
-            if (!wrapperIsBlueprint) {
+        if (cause instanceof ErrorCodeException) {
+            if (!wrapperIsBlueprint && cause instanceof BlueprintException) {
                 return (BlueprintException) cause;
             }
-            return new BlueprintException(t.errorCode(), includeCauseMessage((ErrorCodeException) cause, msgOrCode),
-                                          cause);
+            return new BlueprintException(code, includeCauseMessage((ErrorCodeException) cause, msgOrCode), cause);
         }
         return new BlueprintException(code, includeCauseMessage(cause, msgOrCode), cause);
     }
@@ -122,7 +120,7 @@ public class BlueprintExceptionConverter implements Function<Throwable, Blueprin
         return Strings.isBlank(message) ? code.code() : message;
     }
 
-    private String includeCauseMessage(Throwable cause, @NonNull String message) {
+    private String includeCauseMessage(@NonNull Throwable cause, @NonNull String message) {
         if (Strings.isBlank(cause.getMessage())) {
             return message;
         }
@@ -130,8 +128,8 @@ public class BlueprintExceptionConverter implements Function<Throwable, Blueprin
         return Strings.format("{0} | Cause: {1}", message, mc);
     }
 
-    private String includeCauseMessage(ErrorCodeException cause, @NonNull String message) {
-        if (cause instanceof HiddenException) {
+    private String includeCauseMessage(@NonNull ErrorCodeException cause, @NonNull String message) {
+        if (ErrorCode.HIDDEN.equals(cause.errorCode()) || cause instanceof HiddenException) {
             return message;
         }
         ErrorCode code = cause.errorCode();
