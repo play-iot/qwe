@@ -1,7 +1,5 @@
 package io.github.zero88.msa.bp;
 
-import static org.junit.Assert.assertEquals;
-
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,7 +7,10 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
+import io.github.zero88.msa.bp.BlueprintConfig.DeployConfig;
 import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig;
+import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig.ClusterConfig;
+import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig.EventBusConfig;
 import io.github.zero88.msa.bp.cluster.ClusterType;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.utils.Configs;
@@ -17,38 +18,45 @@ import io.vertx.core.json.JsonObject;
 
 public class BlueprintConfigTest {
 
-//    @Test
-//    public void test_default() throws JSONException {
-//        BlueprintConfig from = IConfig.fromClasspath("system.json", BlueprintConfig.class);
-//        System.out.println(from.toJson());
-//        assertEquals(BlueprintConfig.DEFAULT_DATADIR, from.getDataDir());
-//        Assert.assertNotNull(from.getSystemConfig());
-//        System.out.println(from.getSystemConfig().getClusterConfig().toJson().encode());
-//        JSONAssert.assertEquals("{\"active\":true,\"ha\":false,\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\"," +
-//                                "\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}",
-//                                from.getSystemConfig().getClusterConfig().toJson().encode(), JSONCompareMode.STRICT);
-//        Assert.assertNotNull(from.getSystemConfig().getEventBusConfig());
-//        JSONAssert.assertEquals("{\"acceptBacklog\":-1,\"clientAuth\":\"NONE\",\"clusterPingInterval\":20000," +
-//                                "\"clusterPingReplyInterval\":20000,\"clusterPublicPort\":-1,\"clustered\":true," +
-//                                "\"connectTimeout\":60000,\"crlPaths\":[],\"crlValues\":[]," +
-//                                "\"enabledCipherSuites\":[],\"enabledSecureTransportProtocols\":[\"TLSv1\",\"TLSv1" +
-//                                ".1\",\"TLSv1.2\"],\"host\":\"0.0.0.0\",\"idleTimeout\":0," +
-//                                "\"idleTimeoutUnit\":\"SECONDS\",\"logActivity\":false,\"port\":5000," +
-//                                "\"receiveBufferSize\":-1,\"reconnectAttempts\":0,\"reconnectInterval\":1000," +
-//                                "\"reuseAddress\":true,\"reusePort\":false,\"sendBufferSize\":-1,\"soLinger\":-1," +
-//                                "\"ssl\":false,\"tcpCork\":false,\"tcpFastOpen\":false,\"tcpKeepAlive\":false," +
-//                                "\"tcpNoDelay\":true,\"tcpQuickAck\":false,\"trafficClass\":-1,\"trustAll\":true," +
-//                                "\"useAlpn\":false,\"usePooledBuffers\":false,\"__delivery__\":{\"timeout\":30000," +
-//                                "\"localOnly\":false}}\n", from.getSystemConfig().getEventBusConfig().toJson().encode(),
-//                                JSONCompareMode.STRICT);
-//        Assert.assertNotNull(from.getDeployConfig());
-//        JSONAssert.assertEquals("{\"ha\":false,\"instances\":1,\"maxWorkerExecuteTime\":60000000000," +
-//                                "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\",\"multiThreaded\":false," +
-//                                "\"worker\":false,\"workerPoolSize\":20}", from.getDeployConfig().toJson().encode(),
-//                                JSONCompareMode.STRICT);
-//        Assert.assertNotNull(from.getAppConfig());
-//        Assert.assertTrue(from.getAppConfig().isEmpty());
-//    }
+    @Test
+    public void test_default() throws JSONException {
+        BlueprintConfig from = IConfig.fromClasspath("system.json", BlueprintConfig.class);
+
+        Assert.assertEquals(BlueprintConfig.DEFAULT_DATADIR, from.getDataDir());
+        Assert.assertNotNull(from.getSystemConfig());
+
+        final ClusterConfig clusterConfig = from.getSystemConfig().getClusterConfig();
+        System.out.println(clusterConfig.toJson().encode());
+        JSONAssert.assertEquals("{\"active\":false,\"ha\":false,\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\"," +
+                                "\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}",
+                                clusterConfig.toJson().encode(), JSONCompareMode.STRICT);
+
+        final EventBusConfig eventBusConfig = from.getSystemConfig().getEventBusConfig();
+        Assert.assertNotNull(eventBusConfig);
+        System.out.println(eventBusConfig.toJson().encode());
+        JSONAssert.assertEquals("{\"acceptBacklog\":-1,\"clientAuth\":\"NONE\",\"clusterPingInterval\":20000," +
+                                "\"clusterPingReplyInterval\":20000,\"clusterPublicPort\":-1,\"clustered\":true," +
+                                "\"connectTimeout\":60000,\"crlPaths\":[],\"crlValues\":[]," +
+                                "\"enabledCipherSuites\":[],\"enabledSecureTransportProtocols\":[\"TLSv1\"," +
+                                "\"TLSv1.1\",\"TLSv1.2\"],\"host\":\"0.0.0.0\",\"idleTimeout\":0," +
+                                "\"idleTimeoutUnit\":\"SECONDS\",\"logActivity\":false,\"port\":5000," +
+                                "\"receiveBufferSize\":-1,\"reconnectAttempts\":0,\"reconnectInterval\":1000," +
+                                "\"reuseAddress\":true,\"reusePort\":false,\"sendBufferSize\":-1,\"soLinger\":-1," +
+                                "\"ssl\":false,\"sslHandshakeTimeout\":10,\"sslHandshakeTimeoutUnit\":\"SECONDS\"," +
+                                "\"tcpCork\":false,\"tcpFastOpen\":false,\"tcpKeepAlive\":false,\"tcpNoDelay\":true," +
+                                "\"tcpQuickAck\":false,\"trafficClass\":-1,\"trustAll\":true,\"useAlpn\":false," +
+                                "\"usePooledBuffers\":false,\"__delivery__\":{\"timeout\":30000,\"localOnly\":false}}",
+                                eventBusConfig.toJson().encode(), JSONCompareMode.STRICT);
+        final DeployConfig deployConfig = from.getDeployConfig();
+        Assert.assertNotNull(deployConfig);
+        JSONAssert.assertEquals("{\"ha\":false,\"instances\":1,\"maxWorkerExecuteTime\":60000000000," +
+                                "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\",\"multiThreaded\":false," +
+                                "\"worker\":false,\"workerPoolSize\":20}", deployConfig.toJson().encode(),
+                                JSONCompareMode.STRICT);
+
+        Assert.assertNotNull(from.getAppConfig());
+        Assert.assertTrue(from.getAppConfig().isEmpty());
+    }
 
     @Test
     public void test_init() {
@@ -93,7 +101,7 @@ public class BlueprintConfigTest {
                          "\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}";
         SystemConfig.ClusterConfig cfg = IConfig.from(jsonStr, SystemConfig.ClusterConfig.class);
         Assert.assertNotNull(cfg);
-        assertEquals(ClusterType.HAZELCAST, cfg.getType());
+        Assert.assertEquals(ClusterType.HAZELCAST, cfg.getType());
     }
 
     @Test
@@ -102,7 +110,7 @@ public class BlueprintConfigTest {
                          "\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}}";
         SystemConfig.ClusterConfig cfg = IConfig.from(jsonStr, SystemConfig.ClusterConfig.class);
         Assert.assertNotNull(cfg);
-        assertEquals(ClusterType.HAZELCAST, cfg.getType());
+        Assert.assertEquals(ClusterType.HAZELCAST, cfg.getType());
     }
 
     @Test
@@ -132,7 +140,7 @@ public class BlueprintConfigTest {
             "\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}}}";
         SystemConfig.ClusterConfig cfg = IConfig.from(jsonStr, SystemConfig.ClusterConfig.class);
         Assert.assertNotNull(cfg);
-        assertEquals(ClusterType.HAZELCAST, cfg.getType());
+        Assert.assertEquals(ClusterType.HAZELCAST, cfg.getType());
     }
 
     @Test
@@ -141,7 +149,7 @@ public class BlueprintConfigTest {
         BlueprintConfig cfg = IConfig.from(jsonStr, BlueprintConfig.class);
         Assert.assertNotNull(cfg);
         Assert.assertNotNull(cfg.getAppConfig());
-        assertEquals(8085, cfg.getAppConfig().get("http.port"));
+        Assert.assertEquals(8085, cfg.getAppConfig().get("http.port"));
         JSONAssert.assertEquals("{\"http.port\":8085}", cfg.getAppConfig().toJson().encode(), JSONCompareMode.STRICT);
         Assert.assertNotNull(cfg.getSystemConfig());
         Assert.assertNotNull(cfg.getSystemConfig().getClusterConfig());
@@ -155,8 +163,8 @@ public class BlueprintConfigTest {
         String jsonStr = "{\"__system__\":{},\"__app__\":{\"http.port\":8085}}";
         AppConfig cfg = IConfig.from(jsonStr, AppConfig.class);
         Assert.assertNotNull(cfg);
-        assertEquals(1, cfg.size());
-        assertEquals(8085, cfg.get("http.port"));
+        Assert.assertEquals(1, cfg.size());
+        Assert.assertEquals(8085, cfg.get("http.port"));
     }
 
     @Test(expected = BlueprintException.class)
@@ -230,8 +238,8 @@ public class BlueprintConfigTest {
         Assert.assertNotNull(blank);
         Assert.assertNotNull(blank.getDataDir());
         Assert.assertNotNull(blank.getAppConfig());
-        assertEquals(1, blank.getAppConfig().size());
-        assertEquals(1, blank.getAppConfig().get("hello"));
+        Assert.assertEquals(1, blank.getAppConfig().size());
+        Assert.assertEquals(1, blank.getAppConfig().get("hello"));
         Assert.assertNotNull(blank.getDeployConfig());
         JSONAssert.assertEquals("{\"worker\":false,\"multiThreaded\":false,\"workerPoolSize\":20," +
                                 "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
@@ -251,8 +259,8 @@ public class BlueprintConfigTest {
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\"},\"api.name\":\"edge-connector\"}}";
         BlueprintConfig input = IConfig.from(jsonInput, BlueprintConfig.class);
-        assertEquals("0.0.0.0", input.getSystemConfig().getEventBusConfig().getOptions().getHost());
-        assertEquals(5000, input.getSystemConfig().getEventBusConfig().getOptions().getPort());
+        Assert.assertEquals("0.0.0.0", input.getSystemConfig().getEventBusConfig().getOptions().getHost());
+        Assert.assertEquals(5000, input.getSystemConfig().getEventBusConfig().getOptions().getPort());
         JsonObject mergeJson = BlueprintConfig.toJson().mergeIn(input.toJson(), true);
         JsonObject mergeToJson = BlueprintConfig.mergeToJson(input);
 

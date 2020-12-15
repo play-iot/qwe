@@ -1,6 +1,7 @@
 package io.github.zero88.msa.bp.dto;
 
 import java.io.Serializable;
+import java.util.function.Function;
 
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
@@ -48,7 +49,11 @@ public final class ErrorMessage implements Serializable, JsonData {
     }
 
     public static ErrorMessage parse(@NonNull Throwable throwable) {
-        return new ErrorMessage(BlueprintExceptionConverter.friendly(throwable));
+        return parse(throwable, BlueprintExceptionConverter::friendly);
+    }
+
+    public static ErrorMessage parse(@NonNull Throwable throwable, @NonNull Function<Throwable, BlueprintException> c) {
+        return new ErrorMessage(c.apply(throwable));
     }
 
     public static ErrorMessage parse(@NonNull io.github.zero88.exceptions.ErrorCode code, @NonNull String message) {
@@ -69,7 +74,7 @@ public final class ErrorMessage implements Serializable, JsonData {
     public JsonObject toJson() {
         final JsonObject jsonObject = JsonData.super.toJson();
         try {
-            return jsonObject.put("message", message).put("code", this.code.code());
+            return jsonObject.put("message", message);
         } catch (DecodeException e) {
             return jsonObject;
         }

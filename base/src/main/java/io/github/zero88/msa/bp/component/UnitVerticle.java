@@ -29,6 +29,8 @@ public abstract class UnitVerticle<C extends IConfig, T extends UnitContext> ext
 
     /**
      * For test independent
+     * @param sharedKey shared key
+     * @param testDir test dir
      */
     protected void injectTest(String sharedKey, Path testDir) {
         this.registerSharedKey(Strings.isBlank(sharedKey) ? toString() : sharedKey);

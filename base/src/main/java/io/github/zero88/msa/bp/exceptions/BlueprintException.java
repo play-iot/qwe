@@ -1,6 +1,7 @@
 package io.github.zero88.msa.bp.exceptions;
 
 import io.github.zero88.exceptions.ErrorCode;
+import io.github.zero88.exceptions.ErrorCodeException;
 
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
@@ -12,7 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor
-public class BlueprintException extends RuntimeException {
+public class BlueprintException extends RuntimeException implements ErrorCodeException {
 
     @Include
     private final ErrorCode errorCode;

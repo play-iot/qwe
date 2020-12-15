@@ -21,7 +21,7 @@ import io.github.zero88.msa.bp.event.MockEventListener.MockParam;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.ImplementationError;
-import io.github.zero88.msa.bp.exceptions.StateException;
+import io.github.zero88.msa.bp.exceptions.UnsupportedException;
 import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 
@@ -56,7 +56,7 @@ public class AnnotationHandlerTest {
         Assert.assertEquals("install", r.blockingGet().getData().getString("key"));
     }
 
-    @Test(expected = StateException.class)
+    @Test(expected = UnsupportedException.class)
     public void test_get_super_method_but_cannot_execute() {
         Method method = AnnotationHandler.getMethodByAnnotation(MockChildEventListener.class, EventAction.UPDATE)
                                          .getMethod();
@@ -160,7 +160,7 @@ public class AnnotationHandlerTest {
         throw msg.getError().getThrowable();
     }
 
-    @Test(expected = StateException.class)
+    @Test(expected = UnsupportedException.class)
     public void test_execute_method_unsupported_event() {
         final EventMessage msg = MEH.get().execute(createMsgRequestData(EventAction.GET_LIST)).blockingGet();
         Assert.assertTrue(msg.isError());

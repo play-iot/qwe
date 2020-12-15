@@ -20,7 +20,7 @@ import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.DesiredException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.ImplementationError;
-import io.github.zero88.msa.bp.exceptions.StateException;
+import io.github.zero88.msa.bp.exceptions.UnsupportedException;
 import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Reflections;
@@ -109,7 +109,7 @@ final class AnnotationHandler<T extends EventListener> {
                     .debug("Executing action '{}' in listener '{}'", action, eventHandler.getClass().getName());
         try {
             if (!eventHandler.getAvailableEvents().contains(action)) {
-                throw new StateException("Unsupported event " + action);
+                throw new UnsupportedException("Unsupported event " + action);
             }
             MethodInfo methodInfo = getMethodByAnnotation(eventHandler.getClass(), action);
             Object response = ReflectionMethod.execute(eventHandler, methodInfo.getMethod(), methodInfo.getOutput(),

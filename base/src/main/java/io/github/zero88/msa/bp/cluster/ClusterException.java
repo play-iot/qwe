@@ -5,7 +5,7 @@ import io.github.zero88.msa.bp.exceptions.ErrorCode;
 
 public final class ClusterException extends EngineException {
 
-    public static final io.github.zero88.exceptions.ErrorCode CLUSTER_ERROR = new ErrorCode("CLUSTER_ERROR");
+    public static final ErrorCode CLUSTER_ERROR = new ErrorCode("CLUSTER_ERROR");
 
     public ClusterException(String message, Throwable e) {
         super(CLUSTER_ERROR, message, e);

@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+import io.github.zero88.exceptions.ErrorCode;
+import io.github.zero88.exceptions.ErrorCodeException;
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.exceptions.SneakyErrorCodeException;
 import io.github.zero88.msa.bp.dto.ErrorMessage;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
-import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.utils.Strings;
 import io.reactivex.exceptions.CompositeException;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -25,8 +25,8 @@ import lombok.NonNull;
  * @see ErrorMessage
  * @see BlueprintException
  */
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-public final class BlueprintExceptionConverter implements Function<Throwable, BlueprintException> {
+@AllArgsConstructor
+public class BlueprintExceptionConverter implements Function<Throwable, BlueprintException> {
 
     private static final Logger logger = LoggerFactory.getLogger(BlueprintExceptionConverter.class);
     private final boolean friendly;
@@ -70,15 +70,11 @@ public final class BlueprintExceptionConverter implements Function<Throwable, Bl
             List<Throwable> exceptions = ((CompositeException) throwable).getExceptions();
             t = exceptions.get(exceptions.size() - 1);
         }
-        if (t instanceof SneakyErrorCodeException) {
-            //TODO convert SneakyError
-            return apply(t.getCause());
-        }
-        if (t instanceof BlueprintException) {
-            return overrideMsg(friendly ? convert((BlueprintException) t, true) : (BlueprintException) t);
+        if (t instanceof ErrorCodeException) {
+            boolean wrapperIsBlueprint = t instanceof BlueprintException;
+            return overrideMsg(friendly ? convert((ErrorCodeException) t, wrapperIsBlueprint) : (ErrorCodeException) t);
         }
         if (t.getCause() instanceof BlueprintException) {
-            // Rarely case
             logger.debug("Wrapper Exception: ", t);
             return overrideMsg(
                 friendly ? convert((BlueprintException) t.getCause(), false) : (BlueprintException) t.getCause());
@@ -86,35 +82,43 @@ public final class BlueprintExceptionConverter implements Function<Throwable, Bl
         return convert(new BlueprintException(ErrorCode.UNKNOWN_ERROR, overrideMsg, t), false);
     }
 
-    private BlueprintException overrideMsg(BlueprintException t) {
-        if (Strings.isBlank(overrideMsg)) {
-            return t;
+    private BlueprintException overrideMsg(ErrorCodeException t) {
+        if (t instanceof BlueprintException && Strings.isBlank(overrideMsg)) {
+            return (BlueprintException) t;
         }
-        return new BlueprintException(t.errorCode(), overrideMsg, t.getCause());
+        return new BlueprintException(t.errorCode(), Strings.isBlank(overrideMsg) ? t.getMessage() : overrideMsg,
+                                      t.getCause());
     }
 
-    private BlueprintException convert(BlueprintException t, boolean wrapperIsblueprint) {
+    private BlueprintException convert(ErrorCodeException t, boolean wrapperIsBlueprint) {
         final Throwable cause = t.getCause();
-        final io.github.zero88.exceptions.ErrorCode code = t.errorCode();
-        final String message = originMessage(code, t.getMessage());
+        final ErrorCode code = t.errorCode();
         if (Objects.isNull(cause)) {
-            return t;
+            if (t instanceof BlueprintException) {
+                return (BlueprintException) t;
+            }
+            return new BlueprintException(code, t.getMessage());
         }
+        final String msgOrCode = originMessage(code, t.getMessage());
         if (cause instanceof IllegalArgumentException || cause instanceof NullPointerException) {
-            final String msg = Strings.isBlank(cause.getMessage()) ? message : cause.getMessage();
+            final String msg = Strings.isBlank(cause.getMessage()) ? msgOrCode : cause.getMessage();
             final Throwable rootCause = Objects.isNull(cause.getCause()) ? cause : cause.getCause();
             return new BlueprintException(ErrorCode.INVALID_ARGUMENT, msg, rootCause);
         }
+        if (cause instanceof SneakyErrorCodeException) {
+            return new BlueprintException(code, includeCauseMessage((ErrorCodeException) cause, msgOrCode), cause);
+        }
         if (cause instanceof BlueprintException) {
-            if (!wrapperIsblueprint) {
+            if (!wrapperIsBlueprint) {
                 return (BlueprintException) cause;
             }
-            return new BlueprintException(t.errorCode(), includeCauseMessage(cause, message), cause);
+            return new BlueprintException(t.errorCode(), includeCauseMessage((ErrorCodeException) cause, msgOrCode),
+                                          cause);
         }
-        return new BlueprintException(code, includeCauseMessage(cause, message), cause);
+        return new BlueprintException(code, includeCauseMessage(cause, msgOrCode), cause);
     }
 
-    private String originMessage(io.github.zero88.exceptions.ErrorCode code, String message) {
+    private String originMessage(ErrorCode code, String message) {
         return Strings.isBlank(message) ? code.code() : message;
     }
 
@@ -126,13 +130,11 @@ public final class BlueprintExceptionConverter implements Function<Throwable, Bl
         return Strings.format("{0} | Cause: {1}", message, mc);
     }
 
-    private String includeCauseMessage(Exception cause, @NonNull String message) {
+    private String includeCauseMessage(ErrorCodeException cause, @NonNull String message) {
         if (cause instanceof HiddenException) {
             return message;
         }
-        io.github.zero88.exceptions.ErrorCode code = cause instanceof BlueprintException
-                         ? ((BlueprintException) cause).errorCode()
-                         : ErrorCode.UNKNOWN_ERROR;
+        ErrorCode code = cause.errorCode();
         String causeMsg = Objects.isNull(cause.getMessage()) ? "" : cause.getMessage();
         return Strings.format("{0} | Cause: {1} - Error Code: {2}", message, causeMsg, code.code());
     }

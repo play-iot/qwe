@@ -1,11 +1,13 @@
 package io.github.zero88.msa.bp.event;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import io.github.zero88.msa.bp.dto.EnumType;
 import io.github.zero88.msa.bp.dto.EnumType.AbstractEnumType;
 import io.github.zero88.utils.Strings;
-import io.vertx.core.json.JsonObject;
+
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Getter;
 
@@ -47,9 +49,26 @@ public class EventAction extends AbstractEnumType implements EnumType, Serializa
         return Strings.isBlank(action) ? UNKNOWN : EnumType.factory(action.toUpperCase(), EventAction.class);
     }
 
-    @Override
-    public JsonObject toJson() {
-        return null;
+    @JsonValue
+    public String action() {
+        return this.type();
+    }
+
+    public int hashCode() {
+        return this.action().hashCode();
+    }
+
+    public boolean equals(final Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o instanceof String) {
+            return Objects.equals(this.action(), o);
+        }
+        if (!(o instanceof EventAction)) {
+            return false;
+        }
+        return Objects.equals(this.action(), ((EventAction) o).action());
     }
 
 }
