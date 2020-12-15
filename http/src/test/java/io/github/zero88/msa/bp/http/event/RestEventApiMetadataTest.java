@@ -3,14 +3,15 @@ package io.github.zero88.msa.bp.http.event;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventPattern;
+import io.github.zero88.msa.bp.micro.metadata.ActionMethodMapping;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpMethod;
-
 
 public class RestEventApiMetadataTest {
 
@@ -47,26 +48,26 @@ public class RestEventApiMetadataTest {
     @Test
     public void test_post() {
         RestEventApiMetadata metadata = createBuilder(EventAction.CREATE, HttpMethod.POST).build();
-        Assert.assertEquals(EventAction.CREATE, metadata.getDefinition().search("/api/golds", HttpMethod.POST));
-        Assert.assertEquals(1, metadata.getDefinition().getMapping().size());
+        Assertions.assertEquals(EventAction.CREATE, metadata.getDefinition().search("/api/golds", HttpMethod.POST));
+        Assertions.assertEquals(1, metadata.getDefinition().getMapping().size());
     }
 
     @Test
     public void test_get_list() {
         RestEventApiMetadata metadata = createBuilder(EventAction.GET_LIST, HttpMethod.GET).build();
-        Assert.assertEquals(EventAction.GET_LIST, metadata.getDefinition().search("/api/golds", HttpMethod.GET));
+        Assertions.assertEquals(EventAction.GET_LIST, metadata.getDefinition().search("/api/golds", HttpMethod.GET));
     }
 
     @Test
     public void test_get_one() {
         RestEventApiMetadata metadata = createBuilder("/api/golds", "gold_id").build();
-        Assert.assertEquals(EventAction.GET_ONE, metadata.getDefinition().search("/api/golds/xxx", HttpMethod.GET));
+        Assertions.assertEquals(EventAction.GET_ONE, metadata.getDefinition().search("/api/golds/xxx", HttpMethod.GET));
     }
 
     @Test
     public void test_custom_gen_path() {
         RestEventApiMetadata metadata = createBuilder(EventAction.CREATE, HttpMethod.POST, "/api/translate").build();
-        Assert.assertEquals(EventAction.CREATE, metadata.getDefinition().search("/api/translate", HttpMethod.POST));
+        Assertions.assertEquals(EventAction.CREATE, metadata.getDefinition().search("/api/translate", HttpMethod.POST));
     }
 
     @Test
@@ -79,8 +80,8 @@ public class RestEventApiMetadataTest {
                                                             .pattern(EventPattern.REQUEST_RESPONSE)
                                                             .definition(def)
                                                             .build();
-        Assert.assertEquals(EventAction.GET_ONE,
-                            metadata.getDefinition().search("/catalogue/products/123/456/777", HttpMethod.GET));
+        Assertions.assertEquals(EventAction.GET_ONE,
+                                metadata.getDefinition().search("/catalogue/products/123/456/777", HttpMethod.GET));
     }
 
     @Test
@@ -93,9 +94,9 @@ public class RestEventApiMetadataTest {
                                                             .pattern(EventPattern.REQUEST_RESPONSE)
                                                             .definition(def)
                                                             .build();
-        Assert.assertEquals(EventAction.GET_ONE, metadata.getDefinition()
-                                                         .search("/catalogue/123/products/type/456/product/xyz",
-                                                                 HttpMethod.GET));
+        Assertions.assertEquals(EventAction.GET_ONE, metadata.getDefinition()
+                                                             .search("/catalogue/123/products/type/456/product/xyz",
+                                                                     HttpMethod.GET));
     }
 
 }

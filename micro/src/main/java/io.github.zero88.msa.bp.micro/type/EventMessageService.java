@@ -2,7 +2,7 @@ package io.github.zero88.msa.bp.micro.type;
 
 import java.util.Objects;
 
-import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;

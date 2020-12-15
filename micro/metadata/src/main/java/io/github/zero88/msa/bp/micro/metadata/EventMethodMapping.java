@@ -1,10 +1,10 @@
-package io.github.zero88.msa.bp.http.event;
+package io.github.zero88.msa.bp.micro.metadata;
 
 import java.util.Objects;
 
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.event.EventAction;
-import io.github.zero88.msa.bp.http.HttpUtils.HttpMethods;
+import io.github.zero88.msa.bp.utils.HttpMethods;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpMethod;
 

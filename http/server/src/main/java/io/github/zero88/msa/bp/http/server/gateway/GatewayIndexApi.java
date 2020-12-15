@@ -1,10 +1,10 @@
 package io.github.zero88.msa.bp.http.server.gateway;
 
 import io.github.zero88.msa.bp.event.EventPattern;
-import io.github.zero88.msa.bp.http.event.ActionMethodMapping;
-import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
 import io.github.zero88.msa.bp.http.server.HttpServer;
 import io.github.zero88.msa.bp.http.server.rest.AbstractRestEventApi;
+import io.github.zero88.msa.bp.micro.metadata.ActionMethodMapping;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 
 public final class GatewayIndexApi extends AbstractRestEventApi {
 

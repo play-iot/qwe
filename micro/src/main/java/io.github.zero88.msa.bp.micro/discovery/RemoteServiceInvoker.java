@@ -5,7 +5,7 @@ import io.github.zero88.msa.bp.dto.msg.DataTransferObject.Headers;
 import io.github.zero88.msa.bp.dto.msg.RequestData;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
-import io.github.zero88.msa.bp.exceptions.ServiceNotFoundException;
+import io.github.zero88.msa.bp.micro.metadata.ServiceNotFoundException;
 import io.reactivex.Single;
 
 import lombok.NonNull;

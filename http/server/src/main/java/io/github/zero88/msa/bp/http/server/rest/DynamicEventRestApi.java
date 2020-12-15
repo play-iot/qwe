@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.zero88.msa.bp.dto.JsonData;
-import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
-import io.github.zero88.msa.bp.http.event.EventMethodMapping;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodMapping;
 import io.github.zero88.msa.bp.micro.type.EventMessageService;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;

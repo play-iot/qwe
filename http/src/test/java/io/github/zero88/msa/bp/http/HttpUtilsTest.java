@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -32,13 +32,13 @@ public class HttpUtilsTest {
         header.put("key5", Arrays.asList("a", "b", "c"));
         header.put("key6", new ArrayList<>(new HashSet<>(Arrays.asList("x", "y", "z", "x"))));
         final MultiMap entries = HttpHeaderUtils.deserializeHeaders(header);
-        Assert.assertFalse(entries.contains("key2"));
-        Assert.assertEquals("2", entries.get("key1"));
-        Assert.assertEquals("3", entries.get("key3"));
-        Assert.assertEquals("true", entries.get("key4"));
-        Assert.assertEquals("a", entries.get("key5"));
-        Assert.assertEquals(Arrays.asList("a", "b", "c"), entries.getAll("key5"));
-        Assert.assertEquals(Arrays.asList("x", "y", "z"), entries.getAll("key6"));
+        Assertions.assertFalse(entries.contains("key2"));
+        Assertions.assertEquals("2", entries.get("key1"));
+        Assertions.assertEquals("3", entries.get("key3"));
+        Assertions.assertEquals("true", entries.get("key4"));
+        Assertions.assertEquals("a", entries.get("key5"));
+        Assertions.assertEquals(Arrays.asList("a", "b", "c"), entries.getAll("key5"));
+        Assertions.assertEquals(Arrays.asList("x", "y", "z"), entries.getAll("key6"));
     }
 
     @Test
@@ -46,10 +46,10 @@ public class HttpUtilsTest {
         QueryStringDecoder decoder = new QueryStringDecoder(
             "http://localhost?_q=node==abc,(node2=in=(123,456) and node3!=zzz) and " +
             "node4=gt=10&_page=1&_per_page=20&_audit&_pretty");
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "_q=node==abc,(node2=in=(123,456) and node3!=zzz) and node4=gt=10&_page=1&_per_page=20&_audit&_pretty",
             decoder.rawQuery());
-        Assert.assertEquals("[node==abc,(node2=in=(123,456) and node3!=zzz) and node4=gt=10]",
+        Assertions.assertEquals("[node==abc,(node2=in=(123,456) and node3!=zzz) and node4=gt=10]",
                             decoder.parameters().get("_q").toString());
         System.out.println(decoder.parameters());
     }

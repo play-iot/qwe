@@ -2,7 +2,7 @@ package io.github.zero88.msa.bp.micro.type;
 
 import io.github.zero88.msa.bp.component.SharedDataDelegate;
 import io.github.zero88.msa.bp.dto.JsonData;
-import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.JsonObject;

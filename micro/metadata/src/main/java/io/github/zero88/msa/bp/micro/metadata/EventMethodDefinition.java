@@ -1,4 +1,4 @@
-package io.github.zero88.msa.bp.http.event;
+package io.github.zero88.msa.bp.micro.metadata;
 
 import java.util.Optional;
 import java.util.Set;
@@ -8,7 +8,6 @@ import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.dto.msg.RequestData;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventListener;
-import io.github.zero88.msa.bp.exceptions.ServiceNotFoundException;
 import io.github.zero88.msa.bp.utils.Networks;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
@@ -138,8 +137,9 @@ public final class EventMethodDefinition implements JsonData {
      * <p>
      * It is appropriate to handle {@code singleton resource} with no key or {@code action job}, e.g: {@code translate}
      *
-     * @param servicePath Origin service path that represents for manipulating {@code resource} or {@code action job}
-     * @param mapping     Mapping between {@code EventAction} and {@code HTTPMethod}
+     * @param servicePath    Origin service path that represents for manipulating {@code resource} or {@code action
+     *                       job}
+     * @param mapping        Mapping between {@code EventAction} and {@code HTTPMethod}
      * @param useRequestData Use RequestData {@code RequestData}
      * @return new instance
      * @see ActionMethodMapping
@@ -175,9 +175,9 @@ public final class EventMethodDefinition implements JsonData {
      * <p>
      * It is appropriate to handle {@code resource} with common {@code CRUD} operations
      *
-     * @param servicePath Origin service path that represents for manipulating {@code resource}
-     * @param paramPath   Parameter path for manipulating {@code resource}
-     * @param mapping     Mapping between {@code EventAction} and {@code HTTPMethod}
+     * @param servicePath    Origin service path that represents for manipulating {@code resource}
+     * @param paramPath      Parameter path for manipulating {@code resource}
+     * @param mapping        Mapping between {@code EventAction} and {@code HTTPMethod}
      * @param useRequestData Use request data {@code RequestData}
      * @return new instance
      * @implNote {@code paramPath} will be append after {@code servicePath}. For example:

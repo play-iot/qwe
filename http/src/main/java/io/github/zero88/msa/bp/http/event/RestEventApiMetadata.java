@@ -1,6 +1,7 @@
 package io.github.zero88.msa.bp.http.event;
 
 import io.github.zero88.msa.bp.event.EventPattern;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

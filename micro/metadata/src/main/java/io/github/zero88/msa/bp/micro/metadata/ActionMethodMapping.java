@@ -1,4 +1,4 @@
-package io.github.zero88.msa.bp.http.event;
+package io.github.zero88.msa.bp.micro.metadata;
 
 import java.util.Collection;
 import java.util.Collections;

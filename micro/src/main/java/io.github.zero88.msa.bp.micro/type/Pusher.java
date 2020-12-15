@@ -7,7 +7,7 @@ import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.event.ReplyEventHandler;
-import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;

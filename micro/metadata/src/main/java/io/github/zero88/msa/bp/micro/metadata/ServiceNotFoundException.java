@@ -1,4 +1,7 @@
-package io.github.zero88.msa.bp.exceptions;
+package io.github.zero88.msa.bp.micro.metadata;
+
+import io.github.zero88.msa.bp.exceptions.ErrorCode;
+import io.github.zero88.msa.bp.exceptions.ServiceException;
 
 public final class ServiceNotFoundException extends ServiceException {
 
