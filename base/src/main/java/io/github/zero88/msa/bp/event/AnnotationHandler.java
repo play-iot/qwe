@@ -95,7 +95,7 @@ final class AnnotationHandler<T extends EventListener> {
                 EventContractor contractor = method.getAnnotation(EventContractor.class);
                 return !ReflectionClass.assertDataType(method.getReturnType(), Void.class) &&
                        ReflectionClass.assertDataType(method.getReturnType(), contractor.returnType()) &&
-                       Stream.of(contractor.action()).anyMatch(eventType -> action == EventAction.parse(eventType));
+                       Stream.of(contractor.action()).anyMatch(eventType -> EventAction.parse(eventType).equals(action));
             });
     }
 
