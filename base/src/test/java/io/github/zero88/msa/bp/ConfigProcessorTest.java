@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -22,9 +22,10 @@ import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.utils.OSHelper;
 import io.github.zero88.utils.SystemHelper;
 import io.vertx.core.Vertx;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
 public class ConfigProcessorTest {
 
     private ConfigProcessor processor;
@@ -36,8 +37,7 @@ public class ConfigProcessorTest {
     }
 
     @BeforeEach
-    public void before() {
-        Vertx vertx = Vertx.vertx();
+    public void before(Vertx vertx, VertxTestContext testContext) {
         processor = new ConfigProcessor(vertx);
 
         String jsonInput = "{\"__system__\":{\"__eventBus__\":{\"clientAuth\":\"REQUIRED\",\"ssl\":true," +
@@ -49,6 +49,7 @@ public class ConfigProcessorTest {
                            "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_2\", \"HTTP_1_1\" ]},\"api" +
                            ".name\":\"edge-connector\"}}";
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
+        testContext.completeNow();
     }
 
     @Test

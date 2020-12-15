@@ -50,7 +50,7 @@ public interface TestHelper {
     static void setup() {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
         ((Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.INFO);
-        ((Logger) LoggerFactory.getLogger("io.zero88")).setLevel(Level.DEBUG);
+        ((Logger) LoggerFactory.getLogger("io.github.zero88")).setLevel(Level.DEBUG);
     }
 
     static void testComplete(io.vertx.reactivex.ext.unit.Async async) {
