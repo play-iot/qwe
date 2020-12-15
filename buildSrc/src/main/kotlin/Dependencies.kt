@@ -30,7 +30,7 @@ object JacksonLibs {
 
     object Version {
 
-        const val jackson = "2.9.8"
+        const val jackson = "2.12.0"
     }
 
     const val core = "com.fasterxml.jackson.core:jackson-core:${Version.jackson}"
@@ -52,6 +52,7 @@ object TestLibs {
     const val junit = "junit:junit:${Version.junit}"
     const val junit5Api = "org.junit.jupiter:junit-jupiter-api:${Version.junit5}"
     const val junit5Engine = "org.junit.jupiter:junit-jupiter-engine:${Version.junit5}"
+    const val junit5Vintage = "org.junit.vintage:junit-vintage-engine:${Version.junit5}"
     const val jsonAssert = "org.skyscreamer:jsonassert:${Version.jsonAssert}"
 }
 
@@ -118,7 +119,7 @@ object DatabaseLibs {
 object ZeroLibs {
     object Version {
 
-        const val utils = "1.0.0"
+        const val utils = "1.0.1"
         const val jpaExt = "0.9.0"
     }
 
