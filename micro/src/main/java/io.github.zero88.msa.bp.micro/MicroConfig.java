@@ -51,8 +51,8 @@ public final class MicroConfig implements IConfig {
 
         public static final String NAME = "__serviceDiscovery__";
 
-        public static final String NUBE_ANNOUNCE_ADDRESS = "nubeio.service.discovery.announce";
-        public static final String NUBE_USAGE_ADDRESS = "nubeio.service.discovery.usage";
+        public static final String SERVICE_DISCOVERY_ANNOUNCE_ADDRESS = "zbp.service.discovery.announce";
+        public static final String SERVICE_DISCOVERY_USAGE_ADDRESS = "zbp.service.discovery.usage";
 
         private boolean enabled;
         private BackendConfig backendConfig;
@@ -75,21 +75,23 @@ public final class MicroConfig implements IConfig {
         boolean isLocal() { return false; }
 
         @JsonIgnore
-        String getNubeAnnounceAddress() { return NUBE_ANNOUNCE_ADDRESS; }
+        String getServiceDiscoveryAnnounceAddress() { return SERVICE_DISCOVERY_ANNOUNCE_ADDRESS; }
 
         @JsonIgnore
-        String getNubeUsageAddress() { return NUBE_USAGE_ADDRESS; }
+        String getServiceDiscoveryUsageAddress() { return SERVICE_DISCOVERY_USAGE_ADDRESS; }
 
         private void reload() {
             reloadProperty();
             String announceAddress = this.getAnnounceAddress();
             String usageAddress = this.getUsageAddress();
             this.setAnnounceAddress(Strings.isBlank(announceAddress) || DEFAULT_ANNOUNCE_ADDRESS.equals(announceAddress)
-                                    ? getNubeAnnounceAddress()
+                                    ? getServiceDiscoveryAnnounceAddress()
                                     : announceAddress);
             this.setUsageAddress(Strings.isBlank(usageAddress)
                                  ? null
-                                 : DEFAULT_USAGE_ADDRESS.equals(usageAddress) ? getNubeUsageAddress() : usageAddress);
+                                 : DEFAULT_USAGE_ADDRESS.equals(usageAddress)
+                                   ? getServiceDiscoveryUsageAddress()
+                                   : usageAddress);
             this.setAutoRegistrationOfImporters(!isLocal()).setBackendConfiguration(backendConfig.toConfiguration());
         }
 
@@ -109,8 +111,8 @@ public final class MicroConfig implements IConfig {
 
         public static final String NAME = "__localServiceDiscovery__";
 
-        public static final String NUBE_ANNOUNCE_LOCAL_ADDRESS = "nubeio.service.local.discovery.announce";
-        public static final String DEFAULT_USAGE_LOCAL_ADDRESS = "nubeio.service.local.discovery.usage";
+        public static final String SERVICE_DISCOVERY_ANNOUNCE_LOCAL_ADDRESS = "zbp.service.local.discovery.announce";
+        public static final String SERVICE_DISCOVERY_USAGE_LOCAL_ADDRESS = "zbp.service.local.discovery.usage";
 
         LocalServiceDiscoveryConfig() { super(false, new BackendConfig(true)); }
 
@@ -121,10 +123,10 @@ public final class MicroConfig implements IConfig {
         boolean isLocal() { return true; }
 
         @JsonIgnore
-        String getNubeAnnounceAddress() { return NUBE_ANNOUNCE_LOCAL_ADDRESS; }
+        String getServiceDiscoveryAnnounceAddress() { return SERVICE_DISCOVERY_ANNOUNCE_LOCAL_ADDRESS; }
 
         @JsonIgnore
-        String getNubeUsageAddress() { return DEFAULT_USAGE_LOCAL_ADDRESS; }
+        String getServiceDiscoveryUsageAddress() { return SERVICE_DISCOVERY_USAGE_LOCAL_ADDRESS; }
 
     }
 
@@ -166,10 +168,10 @@ public final class MicroConfig implements IConfig {
     public static class CircuitBreakerConfig implements IConfig {
 
         public static final String NAME = "__circuitBreaker__";
-        public static final String DEFAULT_NOTIFICATION_ADDRESS = "nubeio.circuit.breaker";
+        public static final String DEFAULT_NOTIFICATION_ADDRESS = "zbp.circuit.breaker";
 
         @JsonProperty(value = "name")
-        private String circuitName = "nubeio-circuit-breaker";
+        private String circuitName = "zbp-circuit-breaker";
         private boolean enabled = false;
         private CircuitBreakerOptions options = new CircuitBreakerOptions().setNotificationAddress(
             DEFAULT_NOTIFICATION_ADDRESS);
@@ -189,7 +191,7 @@ public final class MicroConfig implements IConfig {
         static final String NAME = "__gateway__";
 
         private boolean enabled = false;
-        private String indexAddress = "nubeio.service.gateway.index";
+        private String indexAddress = "zbp.service.gateway.index";
         private String clusterAnnounceMonitorClass = ServiceGatewayAnnounceMonitor.class.getName();
         private String clusterUsageMonitorClass = ServiceGatewayUsageMonitor.class.getName();
         private String localAnnounceMonitorClass = ServiceGatewayAnnounceMonitor.class.getName();

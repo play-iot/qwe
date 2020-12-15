@@ -2,12 +2,8 @@
   "__app__": {
     "__micro__": {
       "__gateway__": {
-        "enabled": false,
-        "indexAddress": "zbp.service.gateway.index",
-        "clusterAnnounceMonitorClass": "io.github.zero88.msa.bp.micro.monitor.ServiceGatewayAnnounceMonitor",
-        "clusterUsageMonitorClass": "io.github.zero88.msa.bp.micro.monitor.ServiceGatewayUsageMonitor",
-        "localAnnounceMonitorClass": "io.github.zero88.msa.bp.micro.monitor.ServiceGatewayAnnounceMonitor",
-        "localUsageMonitorClass": "io.github.zero88.msa.bp.micro.monitor.ServiceGatewayUsageMonitor"
+        "enabled": true,
+        "indexAddress": "mock.gateway.index"
       },
       "__serviceDiscovery__": {
         "announceAddress": "zbp.service.discovery.announce",
@@ -16,7 +12,7 @@
           "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
         },
         "usageAddress": "zbp.service.discovery.usage",
-        "enabled": true
+        "enabled": false
       },
       "__localServiceDiscovery__": {
         "announceAddress": "zbp.service.local.discovery.announce",
@@ -25,10 +21,10 @@
           "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
         },
         "usageAddress": "zbp.service.local.discovery.usage",
-        "enabled": false
+        "enabled": true
       },
       "__circuitBreaker__": {
-        "enabled": false,
+        "enabled": true,
         "options": {
           "timeout": 10000,
           "maxFailures": 5,

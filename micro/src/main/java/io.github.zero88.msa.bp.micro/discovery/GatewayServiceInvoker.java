@@ -98,7 +98,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
                                                                          .put(Params.SCOPE, scope())
                                                                          .put(Params.KIND, kind())
                                                                          .put(Params.VIEW, RecordView.TECHNICAL)
-                                                                         .put(Params.ACTION, action))
+                                                                         .put(Params.ACTION, action.action()))
                                                  .build();
         final Single<EventMessage> invoker = invoke(gatewayAddress(), EventAction.GET_ONE, searchReq);
         return invoker.flatMap(out -> out.isError()
