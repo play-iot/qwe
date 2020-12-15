@@ -35,7 +35,7 @@ import io.github.zero88.msa.bp.http.server.handler.NotFoundContextHandler;
 import io.github.zero88.msa.bp.http.server.handler.RestEventResponseHandler;
 import io.github.zero88.msa.bp.http.server.handler.UploadFileHandler;
 import io.github.zero88.msa.bp.http.server.handler.UploadListener;
-import io.github.zero88.msa.bp.http.server.handler.WebsocketBridgeEventHandler;
+import io.github.zero88.msa.bp.http.server.handler.WebSocketBridgeEventHandler;
 import io.github.zero88.msa.bp.http.server.rest.RestApisBuilder;
 import io.github.zero88.msa.bp.http.server.rest.RestEventApi;
 import io.github.zero88.msa.bp.http.server.rest.RestEventApisBuilder;
@@ -257,7 +257,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
         logger.info("Init Websocket router...");
         return new WebSocketEventBuilder(vertx, router, getSharedKey()).rootWs(websocketCfg.getRootWs())
                                                                        .register(httpRouter.getWebSocketEvents())
-                                                                       .handler(WebsocketBridgeEventHandler.class)
+                                                                       .handler(WebSocketBridgeEventHandler.class)
                                                                        .options(websocketCfg)
                                                                        .build();
     }

@@ -1,13 +1,12 @@
 package io.github.zero88.msa.bp.micro;
 
-import io.github.zero88.utils.Strings;
-import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.EventBus;
-
 import io.github.zero88.msa.bp.micro.MicroConfig.ServiceDiscoveryConfig;
 import io.github.zero88.msa.bp.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.github.zero88.msa.bp.micro.monitor.ServiceGatewayUsageMonitor;
 import io.github.zero88.msa.bp.utils.Networks;
+import io.github.zero88.utils.Strings;
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 
 import lombok.NonNull;
 

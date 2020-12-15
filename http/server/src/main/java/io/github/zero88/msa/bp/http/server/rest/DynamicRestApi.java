@@ -5,13 +5,12 @@ import java.util.Set;
 
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
+import io.github.zero88.msa.bp.http.HttpUtils;
+import io.github.zero88.msa.bp.micro.type.EventMessageService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
-
-import io.github.zero88.msa.bp.http.HttpUtils;
-import io.github.zero88.msa.bp.micro.type.EventMessageService;
 
 import lombok.NonNull;
 

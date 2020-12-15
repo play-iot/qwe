@@ -29,13 +29,13 @@ import lombok.NonNull;
  * Websocket event bus handler
  */
 //TODO handle auth with socket header
-public class WebsocketBridgeEventHandler implements Handler<BridgeEvent> {
+public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebsocketBridgeEventHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketBridgeEventHandler.class);
     private final Map<String, WebSocketServerEventMetadata> metadataByListener = new HashMap<>();
     private final WebSocketEventExecutor executor;
 
-    public WebsocketBridgeEventHandler(@NonNull EventbusClient eventbusClient,
+    public WebSocketBridgeEventHandler(@NonNull EventbusClient eventbusClient,
                                        @NonNull List<WebSocketServerEventMetadata> addressMap) {
         this.executor = new WebSocketEventExecutor(eventbusClient);
         addressMap.forEach(this::initMetadata);

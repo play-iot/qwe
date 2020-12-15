@@ -1,12 +1,11 @@
 package io.github.zero88.msa.bp.micro.monitor;
 
+import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
+import io.github.zero88.msa.bp.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-
-import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
-import io.github.zero88.msa.bp.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 
 import lombok.Getter;
 

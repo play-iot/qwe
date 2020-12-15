@@ -1,12 +1,12 @@
 package io.github.zero88.msa.bp.micro.transfomer;
 
+import io.github.zero88.msa.bp.dto.JsonData;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Status;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import io.github.zero88.msa.bp.dto.JsonData;
 
 import lombok.Builder;
 import lombok.Getter;

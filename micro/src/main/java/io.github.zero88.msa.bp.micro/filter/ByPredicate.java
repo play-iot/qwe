@@ -4,9 +4,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import io.vertx.servicediscovery.Record;
-
 import io.github.zero88.msa.bp.event.EventAction;
+import io.vertx.servicediscovery.Record;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

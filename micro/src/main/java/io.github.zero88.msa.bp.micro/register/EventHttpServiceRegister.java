@@ -7,18 +7,17 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import io.github.zero88.msa.bp.component.SharedDataDelegate;
+import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.http.EventHttpService;
+import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
+import io.github.zero88.msa.bp.utils.ExecutorHelpers;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.servicediscovery.Record;
-
-import io.github.zero88.msa.bp.component.SharedDataDelegate;
-import io.github.zero88.msa.bp.event.EventbusClient;
-import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
-import io.github.zero88.msa.bp.utils.ExecutorHelpers;
 
 import lombok.Builder;
 import lombok.NonNull;

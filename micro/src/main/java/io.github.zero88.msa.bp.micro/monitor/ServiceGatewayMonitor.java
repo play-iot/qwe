@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
@@ -11,8 +12,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-
-import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
 
 import lombok.AccessLevel;
 import lombok.Getter;

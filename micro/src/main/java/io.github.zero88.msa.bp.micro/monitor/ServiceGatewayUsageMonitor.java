@@ -1,10 +1,9 @@
 package io.github.zero88.msa.bp.micro.monitor;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.Message;
-
 import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
 import io.github.zero88.msa.bp.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.Message;
 
 import lombok.Getter;
 

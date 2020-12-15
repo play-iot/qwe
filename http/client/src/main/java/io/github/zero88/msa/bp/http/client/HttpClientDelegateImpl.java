@@ -7,10 +7,10 @@ import io.github.zero88.msa.bp.dto.msg.ResponseData;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.HttpUtils.HttpRequests;
-import io.github.zero88.msa.bp.http.client.ClientDelegate;
-import io.github.zero88.msa.bp.http.client.HttpClientConfig;
 import io.github.zero88.msa.bp.http.client.HttpClientConfig.HandlerConfig;
-import io.github.zero88.msa.bp.http.client.HttpClientDelegate;
+import io.github.zero88.msa.bp.http.client.handler.HttpClientWriter;
+import io.github.zero88.msa.bp.http.client.handler.HttpErrorHandler;
+import io.github.zero88.msa.bp.http.client.handler.HttpLightResponseHandler;
 import io.github.zero88.utils.Urls;
 import io.reactivex.Single;
 import io.vertx.core.Handler;
@@ -26,9 +26,6 @@ import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
 import io.vertx.reactivex.RxHelper;
 
-import io.github.zero88.msa.bp.http.client.handler.HttpClientWriter;
-import io.github.zero88.msa.bp.http.client.handler.HttpErrorHandler;
-import io.github.zero88.msa.bp.http.client.handler.HttpLightResponseHandler;
 import lombok.NonNull;
 
 final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientDelegate {

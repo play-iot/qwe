@@ -1,8 +1,7 @@
 package io.github.zero88.msa.bp.micro;
 
-import io.vertx.core.Future;
-
 import io.github.zero88.msa.bp.component.UnitVerticle;
+import io.vertx.core.Future;
 
 public final class Microservice extends UnitVerticle<MicroConfig, MicroContext> {
 

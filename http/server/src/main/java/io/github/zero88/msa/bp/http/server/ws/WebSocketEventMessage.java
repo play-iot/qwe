@@ -3,6 +3,9 @@ package io.github.zero88.msa.bp.http.server.ws;
 import java.io.Serializable;
 import java.util.Objects;
 
+import io.github.zero88.msa.bp.dto.JsonData;
+import io.github.zero88.msa.bp.event.EventMessage;
+import io.github.zero88.msa.bp.exceptions.InitializerError;
 import io.github.zero88.utils.Strings;
 import io.vertx.ext.bridge.BridgeEventType;
 
@@ -11,9 +14,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.github.zero88.msa.bp.dto.JsonData;
-import io.github.zero88.msa.bp.event.EventMessage;
-import io.github.zero88.msa.bp.exceptions.InitializerError;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

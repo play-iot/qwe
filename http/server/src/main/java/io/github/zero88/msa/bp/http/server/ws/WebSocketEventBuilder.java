@@ -17,7 +17,7 @@ import io.github.zero88.msa.bp.exceptions.InitializerError;
 import io.github.zero88.msa.bp.http.event.WebSocketServerEventMetadata;
 import io.github.zero88.msa.bp.http.server.ApiConstants;
 import io.github.zero88.msa.bp.http.server.HttpConfig.WebSocketConfig;
-import io.github.zero88.msa.bp.http.server.handler.WebsocketBridgeEventHandler;
+import io.github.zero88.msa.bp.http.server.handler.WebSocketBridgeEventHandler;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
@@ -43,7 +43,7 @@ public final class WebSocketEventBuilder {
     private final String sharedKey;
     private final Map<String, List<WebSocketServerEventMetadata>> socketsByPath = new HashMap<>();
     private WebSocketConfig webSocketConfig;
-    private Class<? extends WebsocketBridgeEventHandler> bridgeHandlerClass = WebsocketBridgeEventHandler.class;
+    private Class<? extends WebSocketBridgeEventHandler> bridgeHandlerClass = WebSocketBridgeEventHandler.class;
     @Getter(AccessLevel.PACKAGE)
     private String rootWs = ApiConstants.ROOT_WS_PATH;
 
@@ -79,7 +79,7 @@ public final class WebSocketEventBuilder {
         return this;
     }
 
-    public WebSocketEventBuilder handler(@NonNull Class<? extends WebsocketBridgeEventHandler> handler) {
+    public WebSocketEventBuilder handler(@NonNull Class<? extends WebSocketBridgeEventHandler> handler) {
         this.bridgeHandlerClass = handler;
         return this;
     }
@@ -127,13 +127,13 @@ public final class WebSocketEventBuilder {
         return opts;
     }
 
-    private WebsocketBridgeEventHandler createHandler(EventbusClient controller,
+    private WebSocketBridgeEventHandler createHandler(EventbusClient controller,
                                                       List<WebSocketServerEventMetadata> socketMapping) {
         Map<Class, Object> map = new LinkedHashMap<>();
         map.put(EventbusClient.class, controller);
         map.put(List.class, socketMapping);
-        WebsocketBridgeEventHandler handler = ReflectionClass.createObject(bridgeHandlerClass, map);
-        return Objects.isNull(handler) ? new WebsocketBridgeEventHandler(controller, socketMapping) : handler;
+        WebSocketBridgeEventHandler handler = ReflectionClass.createObject(bridgeHandlerClass, map);
+        return Objects.isNull(handler) ? new WebSocketBridgeEventHandler(controller, socketMapping) : handler;
     }
 
     private WebSocketConfig config() {

@@ -11,7 +11,6 @@ import io.github.zero88.msa.bp.event.EventModel;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.json.JsonObject;
 
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

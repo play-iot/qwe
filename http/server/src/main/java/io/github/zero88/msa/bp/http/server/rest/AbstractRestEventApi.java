@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import io.vertx.core.http.HttpMethod;
-
 import io.github.zero88.msa.bp.component.SharedDataDelegate.AbstractSharedDataDelegate;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventModel;
@@ -16,6 +14,7 @@ import io.github.zero88.msa.bp.event.EventPattern;
 import io.github.zero88.msa.bp.http.event.ActionMethodMapping;
 import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
 import io.github.zero88.msa.bp.http.event.RestEventApiMetadata;
+import io.vertx.core.http.HttpMethod;
 
 import lombok.NonNull;
 

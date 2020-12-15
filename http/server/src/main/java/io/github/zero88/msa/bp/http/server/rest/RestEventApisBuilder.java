@@ -7,6 +7,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
+import io.github.zero88.msa.bp.component.SharedDataDelegate;
+import io.github.zero88.msa.bp.event.EventbusClient;
+import io.github.zero88.msa.bp.exceptions.InitializerError;
+import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
+import io.github.zero88.msa.bp.http.event.EventMethodMapping;
+import io.github.zero88.msa.bp.http.event.RestEventApiMetadata;
 import io.github.zero88.msa.bp.http.server.HttpServer;
 import io.github.zero88.msa.bp.http.server.handler.RestEventApiDispatcher;
 import io.github.zero88.utils.Reflections.ReflectionClass;
@@ -15,13 +21,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
-
-import io.github.zero88.msa.bp.component.SharedDataDelegate;
-import io.github.zero88.msa.bp.event.EventbusClient;
-import io.github.zero88.msa.bp.exceptions.InitializerError;
-import io.github.zero88.msa.bp.http.event.EventMethodDefinition;
-import io.github.zero88.msa.bp.http.event.EventMethodMapping;
-import io.github.zero88.msa.bp.http.event.RestEventApiMetadata;
 
 import lombok.NonNull;
 

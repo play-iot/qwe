@@ -1,11 +1,10 @@
 package io.github.zero88.msa.bp.micro.filter;
 
+import io.github.zero88.msa.bp.micro.type.EventMessageService;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.spi.ServiceType;
 import io.vertx.servicediscovery.types.HttpEndpoint;
-
-import io.github.zero88.msa.bp.micro.type.EventMessageService;
 
 import lombok.NonNull;
 
