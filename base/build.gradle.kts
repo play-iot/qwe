@@ -1,3 +1,7 @@
+plugins {
+    `java-test-fixtures`
+}
+
 dependencies {
     api(VertxLibs.core)
     api(JacksonLibs.core)
@@ -9,7 +13,6 @@ dependencies {
     api(ZeroLibs.jpaExt)
     api(VertxLibs.rx2)
 
-    implementation(LogLibs.logback)
     implementation(VertxLibs.config)
 
     compileOnly(VertxLibs.codegen)
@@ -18,4 +21,11 @@ dependencies {
     testImplementation(TestLibs.jsonAssert)
     testImplementation(TestLibs.junit)
     testImplementation(VertxLibs.junit)
+
+    testFixturesApi(TestLibs.jsonAssert)
+    testFixturesApi(TestLibs.junit)
+    testFixturesApi(VertxLibs.junit)
+    testFixturesApi(LogLibs.logback)
+    testFixturesCompileOnly(UtilLibs.lombok)
+    testFixturesAnnotationProcessor(UtilLibs.lombok)
 }

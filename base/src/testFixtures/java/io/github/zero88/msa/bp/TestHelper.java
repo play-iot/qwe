@@ -18,9 +18,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 import org.slf4j.LoggerFactory;
 
+import io.github.zero88.msa.bp.component.UnitVerticle;
 import io.github.zero88.msa.bp.component.UnitVerticleTestHelper;
 import io.github.zero88.msa.bp.dto.JsonData;
-import io.github.zero88.msa.bp.component.UnitVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Handler;

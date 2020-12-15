@@ -83,25 +83,25 @@ public class BlueprintExceptionConverterTest {
         throw t.getCause();
     }
 
-    @Test(expected = BlueprintException.class)
-    public void test_with_code_with_blueprint_cause() throws Throwable {
-        BlueprintException t = converter.apply(new SecurityException("abc", new EngineException("xyz")));
-        Assert.assertEquals(ErrorCode.SECURITY_ERROR, t.errorCode());
-        Assert.assertEquals("abc | Cause: xyz - Error Code: ENGINE_ERROR", t.getMessage());
-        throw t.getCause();
-    }
+//    @Test(expected = BlueprintException.class)
+//    public void test_with_code_with_blueprint_cause() throws Throwable {
+//        BlueprintException t = converter.apply(new SecurityException("abc", new EngineException("xyz")));
+//        Assert.assertEquals(ErrorCode.SECURITY_ERROR, t.errorCode());
+//        Assert.assertEquals("abc | Cause: xyz - Error Code: ENGINE_ERROR", t.getMessage());
+//        throw t.getCause();
+//    }
 
-    @Test(expected = HiddenException.class)
-    public void test_with_code_with_hidden_cause() throws Throwable {
-        BlueprintException t = converter.apply(
-            new ServiceException("abc", new HiddenException(ErrorCode.EVENT_ERROR, "xyz", null)));
-        Assert.assertEquals(ErrorCode.SERVICE_ERROR, t.errorCode());
-        Assert.assertEquals("abc", t.getMessage());
-        BlueprintException cause = (BlueprintException) t.getCause();
-        Assert.assertEquals(ErrorCode.EVENT_ERROR, cause.errorCode());
-        Assert.assertEquals("xyz", cause.getMessage());
-        throw t.getCause();
-    }
+//    @Test(expected = HiddenException.class)
+//    public void test_with_code_with_hidden_cause() throws Throwable {
+//        BlueprintException t = converter.apply(
+//            new ServiceException("abc", new HiddenException(ErrorCode.EVENT_ERROR, "xyz", null)));
+//        Assert.assertEquals(ErrorCode.SERVICE_ERROR, t.errorCode());
+//        Assert.assertEquals("abc", t.getMessage());
+//        BlueprintException cause = (BlueprintException) t.getCause();
+//        Assert.assertEquals(ErrorCode.EVENT_ERROR, cause.errorCode());
+//        Assert.assertEquals("xyz", cause.getMessage());
+//        throw t.getCause();
+//    }
 
     @Test(expected = IllegalStateException.class)
     public void test_other_exception_no_message() throws Throwable {

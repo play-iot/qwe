@@ -1,7 +1,7 @@
 package io.github.zero88.msa.bp.cluster;
 
-import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.EngineException;
+import io.github.zero88.msa.bp.exceptions.ErrorCode;
 
 public final class ClusterException extends EngineException {
 

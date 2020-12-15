@@ -15,7 +15,6 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.NonNull;

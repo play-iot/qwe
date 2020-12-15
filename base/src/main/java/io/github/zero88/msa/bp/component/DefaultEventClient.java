@@ -2,12 +2,12 @@ package io.github.zero88.msa.bp.component;
 
 import java.util.Objects;
 
-import io.github.zero88.msa.bp.utils.ExecutorHelpers;
 import io.github.zero88.msa.bp.event.EventListener;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventPattern;
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.event.ReplyEventHandler;
+import io.github.zero88.msa.bp.utils.ExecutorHelpers;
 import io.github.zero88.utils.Strings;
 import io.reactivex.Single;
 import io.vertx.core.AsyncResult;

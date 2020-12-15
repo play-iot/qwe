@@ -1,7 +1,7 @@
 package io.github.zero88.msa.bp.component;
 
-import io.github.zero88.msa.bp.transport.ProxyService;
 import io.github.zero88.msa.bp.event.EventbusClient;
+import io.github.zero88.msa.bp.transport.ProxyService;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 

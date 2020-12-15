@@ -2,9 +2,9 @@ package io.github.zero88.msa.bp.dto;
 
 import java.io.Serializable;
 
-import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
+import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 
