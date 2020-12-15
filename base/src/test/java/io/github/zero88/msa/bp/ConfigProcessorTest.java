@@ -6,12 +6,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.json.JSONException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -29,12 +30,12 @@ public class ConfigProcessorTest {
     private ConfigProcessor processor;
     private BlueprintConfig blueprintConfig;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() {
         TestHelper.setup();
     }
 
-    @Before
+    @BeforeEach
     public void before() {
         Vertx vertx = Vertx.vertx();
         processor = new ConfigProcessor(vertx);
@@ -56,13 +57,13 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.app.http.host", "1.1.1.1");
 
         String value = processor.mergeEnvVarAndSystemVar().get("zbp.app.http.host").toString();
-        Assert.assertEquals("2.2.2.2", value);
+        Assertions.assertEquals("2.2.2.2", value);
     }
 
     @Test
     public void test_not_have_default_and_provide_config() {
         Optional<BlueprintConfig> bpCfgOpt = this.processor.override(null, null, true, true);
-        Assert.assertFalse(bpCfgOpt.isPresent());
+        Assertions.assertFalse(bpCfgOpt.isPresent());
     }
 
     @Test
@@ -71,8 +72,8 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.app.http1.abc.def", "123");
 
         overrideConfigThenAssert(finalResult -> {
-            Assert.assertEquals("thanh", finalResult.getAppConfig().get("name"));
-            Assert.assertEquals("{abc={def=123.0}}", finalResult.getAppConfig().get("http1").toString());
+            Assertions.assertEquals("thanh", finalResult.getAppConfig().get("name"));
+            Assertions.assertEquals("{abc={def=123.0}}", finalResult.getAppConfig().get("http1").toString());
         }, true, true);
     }
 
@@ -80,7 +81,7 @@ public class ConfigProcessorTest {
     public void test_invalid_type() {
         System.setProperty("zbp.app.http", "123");
 
-        overrideConfigThenAssert(finalResult -> Assert.assertEquals(
+        overrideConfigThenAssert(finalResult -> Assertions.assertEquals(
             "{host=0.0.0.0, port=8086, enabled=true, rootApi=/api, alpnVersions=[HTTP_2, HTTP_1_1]}",
             finalResult.getAppConfig().get("__http__").toString()), true, true);
     }
@@ -94,7 +95,7 @@ public class ConfigProcessorTest {
 
         overrideConfigThenAssert(finalResult -> {
             String httpConfig = finalResult.getAppConfig().get("__http__").toString();
-            Assert.assertEquals(
+            Assertions.assertEquals(
                 "{host=2.2.2.2, port=8088, enabled=false, rootApi=/test, alpnVersions=[" + "HTTP_2, HTTP_1_1]}",
                 httpConfig);
         }, true, true);
@@ -110,7 +111,7 @@ public class ConfigProcessorTest {
 
         overrideConfigThenAssert(finalResult -> {
             String httpConfig = finalResult.getAppConfig().get("__http__").toString();
-            Assert.assertEquals(
+            Assertions.assertEquals(
                 "{host=2.2.2.2, port=8088, enabled=false, rootApi=/test, alpnVersions=[HTTP_2, HTTP_1_2]}", httpConfig);
         }, true, true);
     }
@@ -123,10 +124,10 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.system.eventBus.clustered", "true");
 
         overrideConfigThenAssert(finalResult -> {
-            Assert.assertEquals(6000, finalResult.getSystemConfig().getEventBusConfig().getOptions().getPort());
-            Assert.assertTrue(finalResult.getSystemConfig().getEventBusConfig().getOptions().isClustered());
-            Assert.assertEquals(ClusterType.ZOOKEEPER, finalResult.getSystemConfig().getClusterConfig().getType());
-            Assert.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
+            Assertions.assertEquals(6000, finalResult.getSystemConfig().getEventBusConfig().getOptions().getPort());
+            Assertions.assertTrue(finalResult.getSystemConfig().getEventBusConfig().getOptions().isClustered());
+            Assertions.assertEquals(ClusterType.ZOOKEEPER, finalResult.getSystemConfig().getClusterConfig().getType());
+            Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
         }, true, true);
     }
 
@@ -153,7 +154,7 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.system.cluster.active", "invalid_type");
 
         overrideConfigThenAssert(
-            finalResult -> Assert.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive()), true, true);
+            finalResult -> Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive()), true, true);
     }
 
     @Test
@@ -163,10 +164,10 @@ public class ConfigProcessorTest {
 
         blueprintConfig = IConfig.from(jsonInput1, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(blueprintConfig.toJson(), null, true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object testConfig = finalResult.get().getAppConfig().get("test");
-        Assert.assertNotNull(testConfig);
-        Assert.assertEquals("anyvalue", testConfig.toString());
+        Assertions.assertNotNull(testConfig);
+        Assertions.assertEquals("anyvalue", testConfig.toString());
     }
 
     @Test
@@ -182,10 +183,10 @@ public class ConfigProcessorTest {
         BlueprintConfig bpConfig2 = IConfig.from(jsonInput2, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(blueprintConfig.toJson(), bpConfig2.toJson(),
                                                                         true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
-        Assert.assertNotNull(httpConfig);
-        Assert.assertEquals(
+        Assertions.assertNotNull(httpConfig);
+        Assertions.assertEquals(
             "{host=1.1.1.1, port=8087, enabled=false, rootApi=/api, alpnVersions=[" + "HTTP_3, HTTP_1_1]}",
             httpConfig.toString());
     }
@@ -194,7 +195,7 @@ public class ConfigProcessorTest {
     public void test_data_dir() {
         System.setProperty("zbp.dataDir", OSHelper.getAbsolutePathByOs("test").toString());
         overrideConfigThenAssert(
-            finalResult -> Assert.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getDataDir()), true,
+            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getDataDir()), true,
             true);
     }
 
@@ -204,10 +205,10 @@ public class ConfigProcessorTest {
         String jsonInput = "{\"__app__\":{\"__http__\":{\"port\":8086.0}}}";
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
-        Assert.assertNotNull(httpConfig);
-        Assert.assertEquals("{port=8087.0}", httpConfig.toString());
+        Assertions.assertNotNull(httpConfig);
+        Assertions.assertEquals("{port=8087.0}", httpConfig.toString());
     }
 
     @Test
@@ -217,10 +218,10 @@ public class ConfigProcessorTest {
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         ((Map<String, Object>) blueprintConfig.getAppConfig().get("__http__")).put("port", (float) 3.4e+028);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
-        Assert.assertNotNull(httpConfig);
-        Assert.assertEquals("{port=3.4E38}", httpConfig.toString());
+        Assertions.assertNotNull(httpConfig);
+        Assertions.assertEquals("{port=3.4E38}", httpConfig.toString());
     }
 
     @Test
@@ -232,10 +233,10 @@ public class ConfigProcessorTest {
             "\"rootApi\": \"/test1\"}]}}";
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpsConfig = finalResult.get().getAppConfig().get("__https__");
-        Assert.assertNotNull(httpsConfig);
-        Assert.assertEquals("[{host=2.2.2.2, port=8088, enabled=false, rootApi=/test}, {host=2.2.2.3, port=8089, " +
+        Assertions.assertNotNull(httpsConfig);
+        Assertions.assertEquals("[{host=2.2.2.2, port=8088, enabled=false, rootApi=/test}, {host=2.2.2.3, port=8089, " +
                             "enabled=true, rootApi=/test1}]", httpsConfig.toString());
     }
 
@@ -245,10 +246,10 @@ public class ConfigProcessorTest {
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpsConfig = finalResult.get().getAppConfig().get("__https__").toString();
-        Assert.assertNotNull(httpsConfig);
-        Assert.assertEquals("[abc1, def1]", httpsConfig.toString());
+        Assertions.assertNotNull(httpsConfig);
+        Assertions.assertEquals("[abc1, def1]", httpsConfig.toString());
     }
 
     @Test
@@ -257,10 +258,10 @@ public class ConfigProcessorTest {
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpsConfig = finalResult.get().getAppConfig().get("__https__");
-        Assert.assertNotNull(httpsConfig);
-        Assert.assertEquals("[abc, def]", httpsConfig.toString());
+        Assertions.assertNotNull(httpsConfig);
+        Assertions.assertEquals("[abc, def]", httpsConfig.toString());
     }
 
     @Test
@@ -270,10 +271,10 @@ public class ConfigProcessorTest {
 
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
-        Assert.assertNotNull(httpConfig);
-        Assert.assertEquals("{host=[{name=abc.com}, {name=def.com}]}", httpConfig.toString());
+        Assertions.assertNotNull(httpConfig);
+        Assertions.assertEquals("{host=[{name=abc.com}, {name=def.com}]}", httpConfig.toString());
     }
 
     @Test
@@ -282,10 +283,10 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.app.http.host.name", "[abc.net,def.net]");
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
-        Assert.assertTrue(finalResult.isPresent());
+        Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
-        Assert.assertNotNull(httpConfig);
-        Assert.assertEquals("{host=[abc.com, def.com]}", httpConfig.toString());
+        Assertions.assertNotNull(httpConfig);
+        Assertions.assertEquals("{host=[abc.com, def.com]}", httpConfig.toString());
     }
 
     @Test
@@ -302,10 +303,10 @@ public class ConfigProcessorTest {
             } catch (JSONException e) {
                 throw new BlueprintException(e);
             }
-            Assert.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive());
+            Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive());
             Object httpConfig = finalResult.getAppConfig().get("__http__");
-            Assert.assertNotNull(httpConfig);
-            Assert.assertEquals(
+            Assertions.assertNotNull(httpConfig);
+            Assertions.assertEquals(
                 "{host=0.0.0.0, port=8088, enabled=true, rootApi=/api, alpnVersions=[" + "HTTP_2, HTTP_1_1]}",
                 httpConfig.toString());
         }, true, false);
@@ -325,10 +326,10 @@ public class ConfigProcessorTest {
             } catch (JSONException e) {
                 throw new BlueprintException(e);
             }
-            Assert.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
+            Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
             Object httpConfig = finalResult.getAppConfig().get("__http__");
-            Assert.assertNotNull(httpConfig);
-            Assert.assertEquals(
+            Assertions.assertNotNull(httpConfig);
+            Assertions.assertEquals(
                 "{host=0.0.0.0, port=8086, enabled=true, rootApi=/api, alpnVersions=[" + "HTTP_2, HTTP_1_1]}",
                 httpConfig.toString());
         }, false, true);
@@ -349,7 +350,7 @@ public class ConfigProcessorTest {
                            ".name\":\"edge-connector\"}}";
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), false, false);
-        Assert.assertFalse(finalResult.isPresent());
+        Assertions.assertFalse(finalResult.isPresent());
     }
 
     @Test
@@ -386,8 +387,8 @@ public class ConfigProcessorTest {
                            "\"version\":\"1.0.0-SNAPSHOT\",\"service_name\":\"edge-gateway\"}}]}}}";
         blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
         Optional<BlueprintConfig> finalResult = this.processor.override(blueprintConfig.toJson(), null, true, true);
-        Assert.assertTrue(finalResult.isPresent());
-        Assert.assertThat(finalResult.get().getDataDir().toString(), CoreMatchers.containsString("data"));
+        Assertions.assertTrue(finalResult.isPresent());
+        MatcherAssert.assertThat(finalResult.get().getDataDir().toString(), CoreMatchers.containsString("data"));
     }
 
     private void overrideConfigThenAssert(Consumer<BlueprintConfig> configConsumer, boolean overrideAppConfig,
@@ -397,7 +398,7 @@ public class ConfigProcessorTest {
         configConsumer.accept(result.orElse(new BlueprintConfig()));
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         SystemHelper.cleanEnvironments();
         System.clearProperty("zbp.app.http.host");

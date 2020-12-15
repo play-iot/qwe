@@ -1,20 +1,17 @@
 package io.github.zero88.msa.bp.utils;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import io.reactivex.Single;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.junit5.VertxExtension;
+import io.vertx.junit5.VertxTestContext;
 
-@RunWith(VertxUnitRunner.class)
+@ExtendWith(VertxExtension.class)
 public class ExecutorHelpersTest {
-
-    private Vertx vertx;
 
     public static String block() {
         try {
@@ -25,36 +22,29 @@ public class ExecutorHelpersTest {
         return Thread.currentThread().getName();
     }
 
-    @Before
-    public void setup() {
-        vertx = Vertx.vertx();
-    }
-
     @Test
-    public void test_workerThread(final TestContext testContext) {
-        Async async = testContext.async();
+    public void test_workerThread(Vertx vertx, VertxTestContext testContext) {
         vertx.deployVerticle(new AbstractVerticle() {
             @Override
             public void start() {
                 ExecutorHelpers.blocking(vertx, ExecutorHelpersTest::block).subscribe(thread -> {
                     System.out.println("Thread: " + thread);
-                    testContext.assertEquals("vert.x-worker-thread-0", thread);
-                    async.complete();
+                    Assertions.assertEquals("vert.x-worker-thread-0", thread);
+                    testContext.completeNow();
                 });
             }
         });
     }
 
     @Test
-    public void test_eventLoopThread(final TestContext testContext) {
-        Async async = testContext.async();
+    public void test_eventLoopThread(Vertx vertx, VertxTestContext testContext) {
         vertx.deployVerticle(new AbstractVerticle() {
             @Override
             public void start() {
                 Single.fromCallable(ExecutorHelpersTest::block).subscribe(thread -> {
                     System.out.println("Thread: " + thread);
-                    testContext.assertEquals("vert.x-eventloop-thread-0", thread);
-                    async.complete();
+                    Assertions.assertEquals("vert.x-eventloop-thread-0", thread);
+                    testContext.completeNow();
                 });
             }
         });

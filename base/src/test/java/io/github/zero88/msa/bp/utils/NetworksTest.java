@@ -2,13 +2,13 @@ package io.github.zero88.msa.bp.utils;
 
 import java.net.InetSocketAddress;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class NetworksTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
         Networks.cleanup();
         System.setProperty(Networks.CLUSTER_PUBLIC_PROP, String.valueOf(true));
@@ -20,17 +20,17 @@ public class NetworksTest {
     @Test
     public void test_computeAddress_notEnabled() {
         System.setProperty(Networks.CLUSTER_PUBLIC_PROP, String.valueOf(false));
-        Assert.assertNull(Networks.computeClusterPublicUrl("127.0.0.1:9090"));
+        Assertions.assertNull(Networks.computeClusterPublicUrl("127.0.0.1:9090"));
     }
 
     @Test
     public void test_computeAddress_noEnv() {
         final InetSocketAddress address = Networks.computeClusterPublicUrl("127.0.0.1:9090");
-        Assert.assertNotNull(address);
-        Assert.assertEquals("127.0.0.1", address.getHostName());
-        Assert.assertEquals("127.0.0.1", address.getHostString());
-        Assert.assertEquals("127.0.0.1:9090", address.toString());
-        Assert.assertEquals(9090, address.getPort());
+        Assertions.assertNotNull(address);
+        Assertions.assertEquals("127.0.0.1", address.getHostName());
+        Assertions.assertEquals("127.0.0.1", address.getHostString());
+        Assertions.assertEquals("127.0.0.1:9090", address.toString());
+        Assertions.assertEquals(9090, address.getPort());
     }
 
     @Test
@@ -38,11 +38,11 @@ public class NetworksTest {
         System.setProperty(Networks.CLUSTER_PUBLIC_HOST_PROP, "10.10.10.10");
         System.setProperty(Networks.CLUSTER_PUBLIC_PORT_PROP, "1234");
         final InetSocketAddress address = Networks.computeClusterPublicUrl("127.0.0.1:9090");
-        Assert.assertNotNull(address);
-        Assert.assertEquals("10.10.10.10", address.getHostName());
-        Assert.assertEquals("10.10.10.10", address.getHostString());
-        Assert.assertEquals("10.10.10.10:1234", address.toString());
-        Assert.assertEquals(1234, address.getPort());
+        Assertions.assertNotNull(address);
+        Assertions.assertEquals("10.10.10.10", address.getHostName());
+        Assertions.assertEquals("10.10.10.10", address.getHostString());
+        Assertions.assertEquals("10.10.10.10:1234", address.toString());
+        Assertions.assertEquals(1234, address.getPort());
     }
 
 }

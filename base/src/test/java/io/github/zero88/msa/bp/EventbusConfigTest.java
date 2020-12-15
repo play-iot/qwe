@@ -1,8 +1,8 @@
 package io.github.zero88.msa.bp;
 
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -48,9 +48,9 @@ public class EventbusConfigTest {
         JsonObject from = new JsonObject("{\"acceptBacklog\":-1,\"clientAuth\":\"NONE\"}");
         JsonObject to = new JsonObject("{\"acceptBacklog\":-1,\"clientAuth\":\"REQUIRED\"}");
         EventBusConfig merge = IConfig.merge(from, to, EventBusConfig.class);
-        Assert.assertEquals(-1, merge.getOptions().getClusterPublicPort());
-        Assert.assertEquals(-1, merge.getOptions().getAcceptBacklog());
-        Assert.assertEquals(ClientAuth.REQUIRED, merge.getOptions().getClientAuth());
+        Assertions.assertEquals(-1, merge.getOptions().getClusterPublicPort());
+        Assertions.assertEquals(-1, merge.getOptions().getAcceptBacklog());
+        Assertions.assertEquals(ClientAuth.REQUIRED, merge.getOptions().getClientAuth());
     }
 
     @Test
@@ -58,9 +58,9 @@ public class EventbusConfigTest {
         EventBusConfig from = IConfig.from("{\"acceptBacklog\":-1,\"clientAuth\":\"NONE\"}", EventBusConfig.class);
         EventBusConfig to = IConfig.from("{\"acceptBacklog\":-1,\"clientAuth\":\"REQUIRED\"}", EventBusConfig.class);
         EventBusConfig merge = IConfig.merge(from, to, EventBusConfig.class);
-        Assert.assertEquals(-1, merge.getOptions().getClusterPublicPort());
-        Assert.assertEquals(-1, merge.getOptions().getAcceptBacklog());
-        Assert.assertEquals(ClientAuth.REQUIRED, merge.getOptions().getClientAuth());
+        Assertions.assertEquals(-1, merge.getOptions().getClusterPublicPort());
+        Assertions.assertEquals(-1, merge.getOptions().getAcceptBacklog());
+        Assertions.assertEquals(ClientAuth.REQUIRED, merge.getOptions().getClientAuth());
     }
 
     @Test
@@ -72,13 +72,13 @@ public class EventbusConfigTest {
             "\"timeout\": 300000, \"headers\":{\"Content-type\":\"application/json\", \"Method\":\"GET\"}}}",
             EventBusConfig.class);
         DeliveryOptions deliveryOptions = eventBusConfig.getDeliveryOptions();
-        Assert.assertNotNull(deliveryOptions);
-        Assert.assertEquals("abc", deliveryOptions.getCodecName());
-        Assert.assertEquals(300000, deliveryOptions.getSendTimeout());
-        Assert.assertNotNull(deliveryOptions.getHeaders());
-        Assert.assertEquals(2, deliveryOptions.getHeaders().size());
-        Assert.assertEquals("application/json", deliveryOptions.getHeaders().get("Content-type"));
-        Assert.assertEquals("GET", deliveryOptions.getHeaders().get("Method"));
+        Assertions.assertNotNull(deliveryOptions);
+        Assertions.assertEquals("abc", deliveryOptions.getCodecName());
+        Assertions.assertEquals(300000, deliveryOptions.getSendTimeout());
+        Assertions.assertNotNull(deliveryOptions.getHeaders());
+        Assertions.assertEquals(2, deliveryOptions.getHeaders().size());
+        Assertions.assertEquals("application/json", deliveryOptions.getHeaders().get("Content-type"));
+        Assertions.assertEquals("GET", deliveryOptions.getHeaders().get("Method"));
     }
 
 }

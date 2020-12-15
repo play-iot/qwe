@@ -21,7 +21,9 @@ dependencies {
     testImplementation(TestLibs.jsonAssert)
     testImplementation(TestLibs.junit)
     testImplementation(VertxLibs.junit)
+    testImplementation(VertxLibs.junit5)
 
+    testFixturesApi(TestLibs.junit5Api)
     testFixturesApi(TestLibs.jsonAssert)
     testFixturesApi(TestLibs.junit)
     testFixturesApi(VertxLibs.junit)

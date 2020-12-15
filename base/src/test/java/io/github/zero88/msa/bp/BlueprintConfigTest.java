@@ -1,8 +1,8 @@
 package io.github.zero88.msa.bp;
 
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -22,8 +22,8 @@ public class BlueprintConfigTest {
     public void test_default() throws JSONException {
         BlueprintConfig from = IConfig.fromClasspath("system.json", BlueprintConfig.class);
 
-        Assert.assertEquals(BlueprintConfig.DEFAULT_DATADIR, from.getDataDir());
-        Assert.assertNotNull(from.getSystemConfig());
+        Assertions.assertEquals(BlueprintConfig.DEFAULT_DATADIR, from.getDataDir());
+        Assertions.assertNotNull(from.getSystemConfig());
 
         final ClusterConfig clusterConfig = from.getSystemConfig().getClusterConfig();
         System.out.println(clusterConfig.toJson().encode());
@@ -32,7 +32,7 @@ public class BlueprintConfigTest {
                                 clusterConfig.toJson().encode(), JSONCompareMode.STRICT);
 
         final EventBusConfig eventBusConfig = from.getSystemConfig().getEventBusConfig();
-        Assert.assertNotNull(eventBusConfig);
+        Assertions.assertNotNull(eventBusConfig);
         System.out.println(eventBusConfig.toJson().encode());
         JSONAssert.assertEquals("{\"acceptBacklog\":-1,\"clientAuth\":\"NONE\",\"clusterPingInterval\":20000," +
                                 "\"clusterPingReplyInterval\":20000,\"clusterPublicPort\":-1,\"clustered\":true," +
@@ -48,42 +48,46 @@ public class BlueprintConfigTest {
                                 "\"usePooledBuffers\":false,\"__delivery__\":{\"timeout\":30000,\"localOnly\":false}}",
                                 eventBusConfig.toJson().encode(), JSONCompareMode.STRICT);
         final DeployConfig deployConfig = from.getDeployConfig();
-        Assert.assertNotNull(deployConfig);
+        Assertions.assertNotNull(deployConfig);
         JSONAssert.assertEquals("{\"ha\":false,\"instances\":1,\"maxWorkerExecuteTime\":60000000000," +
                                 "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\",\"multiThreaded\":false," +
                                 "\"worker\":false,\"workerPoolSize\":20}", deployConfig.toJson().encode(),
                                 JSONCompareMode.STRICT);
 
-        Assert.assertNotNull(from.getAppConfig());
-        Assert.assertTrue(from.getAppConfig().isEmpty());
+        Assertions.assertNotNull(from.getAppConfig());
+        Assertions.assertTrue(from.getAppConfig().isEmpty());
     }
 
     @Test
     public void test_init() {
         BlueprintConfig from = new BlueprintConfig();
         System.out.println(from.toJson().encodePrettily());
-        Assert.assertNotNull(from.getDataDir());
-        Assert.assertNull(from.getSystemConfig());
-        Assert.assertNotNull(from.getAppConfig());
-        Assert.assertNotNull(from.getDeployConfig());
+        Assertions.assertNotNull(from.getDataDir());
+        Assertions.assertNull(from.getSystemConfig());
+        Assertions.assertNotNull(from.getAppConfig());
+        Assertions.assertNotNull(from.getDeployConfig());
     }
 
     @Test
     public void test_deserialize_simple_root() {
         JsonObject jsonObject = new JsonObject();
         BlueprintConfig from = IConfig.from(jsonObject, BlueprintConfig.class);
-        Assert.assertNotNull(from.getDataDir());
+        Assertions.assertNotNull(from.getDataDir());
     }
 
-    @Test(expected = BlueprintException.class)
-    public void test_deserialize_error_decode() { IConfig.from("hello", BlueprintConfig.class); }
+    @Test
+    public void test_deserialize_error_decode() {
+        Assertions.assertThrows(BlueprintException.class, () -> IConfig.from("hello", BlueprintConfig.class));
+    }
 
-    @Test(expected = BlueprintException.class)
+    @Test
     public void test_deserialize_root_having_redundant_properties() {
-        String jsonStr = "{\"__redundant__\":{},\"__system__\":{\"__cluster__\":{\"active\":true,\"ha\":false," +
-                         "\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
-                         "\"file\":\"\",\"options\":{}}}}";
-        IConfig.from(jsonStr, BlueprintConfig.class);
+        Assertions.assertThrows(BlueprintException.class, () -> {
+            String jsonStr = "{\"__redundant__\":{},\"__system__\":{\"__cluster__\":{\"active\":true,\"ha\":false," +
+                             "\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
+                             "\"file\":\"\",\"options\":{}}}}";
+            IConfig.from(jsonStr, BlueprintConfig.class);
+        });
     }
 
     @Test
@@ -92,7 +96,7 @@ public class BlueprintConfigTest {
                          "\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
                          "\"file\":\"\",\"options\":{}}}}";
         SystemConfig cfg = IConfig.from(jsonStr, SystemConfig.class);
-        Assert.assertNotNull(cfg);
+        Assertions.assertNotNull(cfg);
     }
 
     @Test
@@ -100,8 +104,8 @@ public class BlueprintConfigTest {
         String jsonStr = "{\"active\":false,\"ha\":false,\"name\":\"\"," +
                          "\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}";
         SystemConfig.ClusterConfig cfg = IConfig.from(jsonStr, SystemConfig.ClusterConfig.class);
-        Assert.assertNotNull(cfg);
-        Assert.assertEquals(ClusterType.HAZELCAST, cfg.getType());
+        Assertions.assertNotNull(cfg);
+        Assertions.assertEquals(ClusterType.HAZELCAST, cfg.getType());
     }
 
     @Test
@@ -109,8 +113,8 @@ public class BlueprintConfigTest {
         String jsonStr = "{\"__cluster__\":{\"active\":false,\"ha\":false,\"name\":\"\"," +
                          "\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}}";
         SystemConfig.ClusterConfig cfg = IConfig.from(jsonStr, SystemConfig.ClusterConfig.class);
-        Assert.assertNotNull(cfg);
-        Assert.assertEquals(ClusterType.HAZELCAST, cfg.getType());
+        Assertions.assertNotNull(cfg);
+        Assertions.assertEquals(ClusterType.HAZELCAST, cfg.getType());
     }
 
     @Test
@@ -128,9 +132,9 @@ public class BlueprintConfigTest {
                          "\"clientAuth\":\"NONE\",\"reconnectAttempts\":0,\"reconnectInterval\":1000," +
                          "\"connectTimeout\":60000,\"trustAll\":true}}";
         SystemConfig cfg = IConfig.from(jsonStr, SystemConfig.class);
-        Assert.assertNotNull(cfg);
-        Assert.assertNotNull(cfg.getClusterConfig());
-        Assert.assertNotNull(cfg.getEventBusConfig());
+        Assertions.assertNotNull(cfg);
+        Assertions.assertNotNull(cfg.getClusterConfig());
+        Assertions.assertNotNull(cfg.getEventBusConfig());
     }
 
     @Test
@@ -139,44 +143,45 @@ public class BlueprintConfigTest {
             "{\"dataDir\": \"\", \"__system__\":{\"__cluster__\":{\"active\":false,\"ha\":false,\"name\":\"\"," +
             "\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}}}";
         SystemConfig.ClusterConfig cfg = IConfig.from(jsonStr, SystemConfig.ClusterConfig.class);
-        Assert.assertNotNull(cfg);
-        Assert.assertEquals(ClusterType.HAZELCAST, cfg.getType());
+        Assertions.assertNotNull(cfg);
+        Assertions.assertEquals(ClusterType.HAZELCAST, cfg.getType());
     }
 
     @Test
     public void test_deserialize_appCfg_from_root() throws JSONException {
         String jsonStr = "{\"__system__\":{},\"__app__\":{\"http.port\":8085}}";
         BlueprintConfig cfg = IConfig.from(jsonStr, BlueprintConfig.class);
-        Assert.assertNotNull(cfg);
-        Assert.assertNotNull(cfg.getAppConfig());
-        Assert.assertEquals(8085, cfg.getAppConfig().get("http.port"));
+        Assertions.assertNotNull(cfg);
+        Assertions.assertNotNull(cfg.getAppConfig());
+        Assertions.assertEquals(8085, cfg.getAppConfig().get("http.port"));
         JSONAssert.assertEquals("{\"http.port\":8085}", cfg.getAppConfig().toJson().encode(), JSONCompareMode.STRICT);
-        Assert.assertNotNull(cfg.getSystemConfig());
-        Assert.assertNotNull(cfg.getSystemConfig().getClusterConfig());
-        Assert.assertNotNull(cfg.getSystemConfig().getEventBusConfig());
-        Assert.assertNotNull(cfg.getDeployConfig());
-        Assert.assertNotNull(cfg.getDataDir());
+        Assertions.assertNotNull(cfg.getSystemConfig());
+        Assertions.assertNotNull(cfg.getSystemConfig().getClusterConfig());
+        Assertions.assertNotNull(cfg.getSystemConfig().getEventBusConfig());
+        Assertions.assertNotNull(cfg.getDeployConfig());
+        Assertions.assertNotNull(cfg.getDataDir());
     }
 
     @Test
     public void test_deserialize_appCfg_directly() {
         String jsonStr = "{\"__system__\":{},\"__app__\":{\"http.port\":8085}}";
         AppConfig cfg = IConfig.from(jsonStr, AppConfig.class);
-        Assert.assertNotNull(cfg);
-        Assert.assertEquals(1, cfg.size());
-        Assert.assertEquals(8085, cfg.get("http.port"));
+        Assertions.assertNotNull(cfg);
+        Assertions.assertEquals(1, cfg.size());
+        Assertions.assertEquals(8085, cfg.get("http.port"));
     }
 
-    @Test(expected = BlueprintException.class)
+    @Test
     public void test_deserialize_appCfg_invalid_json() {
-        IConfig.from("{\"__system__\":{},\"__app__\":8085}}", AppConfig.class);
+        Assertions.assertThrows(BlueprintException.class,
+                                () -> IConfig.from("{\"__system__\":{},\"__app__\":8085}}", AppConfig.class));
     }
 
     @Test
     public void test_deserialize_appCfg_limitation() {
         AppConfig from = IConfig.from("{\"__system__\":{\"__cluster__\":{},\"__eventbus__\":{},\"__micro__\":{}}}",
                                       AppConfig.class);
-        Assert.assertNotNull(from);
+        Assertions.assertNotNull(from);
     }
 
     @Test
@@ -220,32 +225,32 @@ public class BlueprintConfigTest {
     @Test
     public void test_blank() throws JSONException {
         BlueprintConfig blank = BlueprintConfig.blank();
-        Assert.assertNotNull(blank);
-        Assert.assertNotNull(blank.getDataDir());
-        Assert.assertNotNull(blank.getAppConfig());
-        Assert.assertTrue(blank.getAppConfig().isEmpty());
-        Assert.assertNotNull(blank.getDeployConfig());
+        Assertions.assertNotNull(blank);
+        Assertions.assertNotNull(blank.getDataDir());
+        Assertions.assertNotNull(blank.getAppConfig());
+        Assertions.assertTrue(blank.getAppConfig().isEmpty());
+        Assertions.assertNotNull(blank.getDeployConfig());
         JSONAssert.assertEquals("{\"worker\":false,\"multiThreaded\":false,\"workerPoolSize\":20," +
                                 "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
                                 "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}",
                                 blank.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
-        Assert.assertNull(blank.getSystemConfig());
+        Assertions.assertNull(blank.getSystemConfig());
     }
 
     @Test
     public void test_blank_with_app_cfg() throws JSONException {
         BlueprintConfig blank = BlueprintConfig.blank(new JsonObject().put("hello", 1));
-        Assert.assertNotNull(blank);
-        Assert.assertNotNull(blank.getDataDir());
-        Assert.assertNotNull(blank.getAppConfig());
-        Assert.assertEquals(1, blank.getAppConfig().size());
-        Assert.assertEquals(1, blank.getAppConfig().get("hello"));
-        Assert.assertNotNull(blank.getDeployConfig());
+        Assertions.assertNotNull(blank);
+        Assertions.assertNotNull(blank.getDataDir());
+        Assertions.assertNotNull(blank.getAppConfig());
+        Assertions.assertEquals(1, blank.getAppConfig().size());
+        Assertions.assertEquals(1, blank.getAppConfig().get("hello"));
+        Assertions.assertNotNull(blank.getDeployConfig());
         JSONAssert.assertEquals("{\"worker\":false,\"multiThreaded\":false,\"workerPoolSize\":20," +
                                 "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
                                 "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}",
                                 blank.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
-        Assert.assertNull(blank.getSystemConfig());
+        Assertions.assertNull(blank.getSystemConfig());
     }
 
     @Test
@@ -259,8 +264,8 @@ public class BlueprintConfigTest {
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\"},\"api.name\":\"edge-connector\"}}";
         BlueprintConfig input = IConfig.from(jsonInput, BlueprintConfig.class);
-        Assert.assertEquals("0.0.0.0", input.getSystemConfig().getEventBusConfig().getOptions().getHost());
-        Assert.assertEquals(5000, input.getSystemConfig().getEventBusConfig().getOptions().getPort());
+        Assertions.assertEquals("0.0.0.0", input.getSystemConfig().getEventBusConfig().getOptions().getHost());
+        Assertions.assertEquals(5000, input.getSystemConfig().getEventBusConfig().getOptions().getPort());
         JsonObject mergeJson = BlueprintConfig.toJson().mergeIn(input.toJson(), true);
         JsonObject mergeToJson = BlueprintConfig.mergeToJson(input);
 

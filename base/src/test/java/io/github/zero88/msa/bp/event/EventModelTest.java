@@ -1,27 +1,24 @@
 package io.github.zero88.msa.bp.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class EventModelTest {
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void test_no_address() {
-        EventModel.builder().build();
+        Assertions.assertThrows(NullPointerException.class, () -> EventModel.builder().build());
     }
 
     @Test
     public void test_only_address() {
         EventModel model = EventModel.builder().address("1").build();
-        assertEquals("1", model.getAddress());
-        assertEquals(EventPattern.REQUEST_RESPONSE, model.getPattern());
-        assertFalse(model.isLocal());
-        assertEquals(0, model.getEvents().size());
+        Assertions.assertEquals("1", model.getAddress());
+        Assertions.assertEquals(EventPattern.REQUEST_RESPONSE, model.getPattern());
+        Assertions.assertFalse(model.isLocal());
+        Assertions.assertEquals(0, model.getEvents().size());
     }
 
     @Test
@@ -29,18 +26,18 @@ public class EventModelTest {
         EventModel model = EventModel.builder().address("1").build();
         EventModel clone1 = EventModel.clone(model, "2");
         EventModel clone2 = EventModel.clone(model, "3", EventPattern.PUBLISH_SUBSCRIBE);
-        assertEquals("1", model.getAddress());
-        assertEquals("2", clone1.getAddress());
-        assertEquals("3", clone2.getAddress());
-        assertEquals(EventPattern.REQUEST_RESPONSE, model.getPattern());
-        assertEquals(EventPattern.REQUEST_RESPONSE, clone1.getPattern());
-        assertEquals(EventPattern.PUBLISH_SUBSCRIBE, clone2.getPattern());
-        assertFalse(model.isLocal());
-        assertFalse(clone1.isLocal());
-        assertFalse(clone2.isLocal());
-        assertEquals(0, model.getEvents().size());
-        assertEquals(0, clone1.getEvents().size());
-        assertEquals(0, clone2.getEvents().size());
+        Assertions.assertEquals("1", model.getAddress());
+        Assertions.assertEquals("2", clone1.getAddress());
+        Assertions.assertEquals("3", clone2.getAddress());
+        Assertions.assertEquals(EventPattern.REQUEST_RESPONSE, model.getPattern());
+        Assertions.assertEquals(EventPattern.REQUEST_RESPONSE, clone1.getPattern());
+        Assertions.assertEquals(EventPattern.PUBLISH_SUBSCRIBE, clone2.getPattern());
+        Assertions.assertFalse(model.isLocal());
+        Assertions.assertFalse(clone1.isLocal());
+        Assertions.assertFalse(clone2.isLocal());
+        Assertions.assertEquals(0, model.getEvents().size());
+        Assertions.assertEquals(0, clone1.getEvents().size());
+        Assertions.assertEquals(0, clone2.getEvents().size());
     }
 
     @Test
@@ -55,10 +52,10 @@ public class EventModelTest {
                                      .events(Arrays.asList(EventAction.GET_ONE, EventAction.UPDATE, EventAction.CREATE,
                                                            null))
                                      .build();
-        assertEquals("1", model.getAddress());
-        assertEquals(EventPattern.PUBLISH_SUBSCRIBE, model.getPattern());
-        assertTrue(model.isLocal());
-        assertEquals(4, model.getEvents().size());
+        Assertions.assertEquals("1", model.getAddress());
+        Assertions.assertEquals(EventPattern.PUBLISH_SUBSCRIBE, model.getPattern());
+        Assertions.assertTrue(model.isLocal());
+        Assertions.assertEquals(4, model.getEvents().size());
     }
 
 }

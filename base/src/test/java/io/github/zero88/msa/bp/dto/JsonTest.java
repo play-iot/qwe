@@ -3,8 +3,8 @@ package io.github.zero88.msa.bp.dto;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.sameInstance;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,8 +23,8 @@ public class JsonTest {
         ContextObject ctx = new ContextObject();
         mapper.setInjectableValues(new InjectableValues.Std().addValue(ContextObject.class, ctx));
         DataNeedingContext data = mapper.readValue("{\"prop\":\"foo\"}", DataNeedingContext.class);
-        Assert.assertThat(data.ctx, sameInstance(ctx));
-        Assert.assertThat(data.prop, equalTo("foo"));
+        MatcherAssert.assertThat(data.ctx, sameInstance(ctx));
+        MatcherAssert.assertThat(data.prop, equalTo("foo"));
     }
 
     @Test
@@ -33,8 +33,8 @@ public class JsonTest {
         DataNeedingContext data = mapper.readerFor(DataNeedingContext.class)
                                         .with(new InjectableValues.Std().addValue(ContextObject.class, ctx))
                                         .readValue("{\"prop\":\"foo\"}");
-        Assert.assertThat(data.ctx, sameInstance(ctx));
-        Assert.assertThat(data.prop, equalTo("foo"));
+        MatcherAssert.assertThat(data.ctx, sameInstance(ctx));
+        MatcherAssert.assertThat(data.prop, equalTo("foo"));
     }
 
     public static class ContextObject {}

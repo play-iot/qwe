@@ -1,8 +1,8 @@
 package io.github.zero88.msa.bp.component;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.utils.mock.MockConfig;
@@ -14,20 +14,21 @@ public class HasConfigTest {
 
     private MockHasConfig hasConfig;
 
-    @Before
-    public void SetUp() {
+    @BeforeEach
+    public void setUp() {
         hasConfig = new MockHasConfig();
     }
 
     @Test
     public void test_not_found_config_file_should_get_default_value() {
         final MockConfig config = hasConfig.computeConfig(new JsonObject());
-        Assert.assertNotNull(config);
+        Assertions.assertNotNull(config);
     }
 
-    @Test(expected = BlueprintException.class)
+    @Test
     public void test_invalid_config_should_throw_exception() {
-        hasConfig.computeConfig(new JsonObject().put("aaa", "yyy"));
+        Assertions.assertThrows(BlueprintException.class,
+                                () -> hasConfig.computeConfig(new JsonObject().put("aaa", "yyy")));
     }
 
     static class MockHasConfig implements HasConfig<MockConfig> {

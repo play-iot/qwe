@@ -37,7 +37,6 @@ subprojects {
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
         withJavadocJar()
         withSourcesJar()
     }
@@ -46,6 +45,8 @@ subprojects {
         compileOnly(UtilLibs.lombok)
         annotationProcessor(UtilLibs.lombok)
 
+        testImplementation(TestLibs.junit5Api)
+        testImplementation(TestLibs.junit5Engine)
         testCompileOnly(UtilLibs.lombok)
         testAnnotationProcessor(UtilLibs.lombok)
     }
@@ -71,9 +72,9 @@ subprojects {
                                      "implNote:a:Implementation Note:")
             }
         }
-//        test {
-//            useJUnitPlatform()
-//        }
+        test {
+            useJUnitPlatform()
+        }
     }
 
     publishing {
@@ -168,6 +169,10 @@ sonarqube {
     }
 }
 
+tasks.withType<Sign>().configureEach {
+    onlyIf { project.hasProperty("release") }
+}
+
 task<Sign>("sign") {
     dependsOn(subprojects.map { it.tasks.withType<Sign>() })
 }
@@ -178,7 +183,7 @@ nexusStaging {
     password = project.property("nexus.password") as String?
 }
 
-//tasks.test {
-//    // Use junit platform for unit tests.
-//    useJUnitPlatform()
-//}
+tasks.test {
+    // Use junit platform for unit tests.
+    useJUnitPlatform()
+}

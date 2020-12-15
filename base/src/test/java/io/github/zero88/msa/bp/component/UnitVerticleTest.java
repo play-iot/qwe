@@ -30,7 +30,7 @@ public class UnitVerticleTest {
     @BeforeClass
     public static void beforeSuite() {
         TestHelper.setup();
-        ((Logger) LoggerFactory.getLogger("io.zero88")).setLevel(Level.TRACE);
+        ((Logger) LoggerFactory.getLogger("io.github.zero88")).setLevel(Level.TRACE);
     }
 
     @Before

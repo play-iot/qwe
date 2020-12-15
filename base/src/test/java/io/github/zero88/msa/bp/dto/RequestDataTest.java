@@ -1,8 +1,8 @@
 package io.github.zero88.msa.bp.dto;
 
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.github.zero88.jpa.Sortable.Order;
 import io.github.zero88.msa.bp.TestHelper.JsonHelper;
@@ -20,12 +20,12 @@ public class RequestDataTest {
                                              .body(new JsonObject().put("name", "hello"))
                                              .filter(new JsonObject().put("x", "test"))
                                              .build();
-        Assert.assertEquals("hello", requestData.body().getString("name"));
-        Assert.assertEquals("test", requestData.filter().getString("x"));
-        Assert.assertEquals(1, requestData.pagination().getPage());
-        Assert.assertEquals(20, requestData.pagination().getPerPage());
-        Assert.assertEquals("{\"headers\":{},\"body\":{\"name\":\"hello\"},\"filter\":{\"x\":\"test\"}," +
-                            "\"pagination\":{\"_page\":1,\"_per_page\":20}}", requestData.toJson().encode());
+        Assertions.assertEquals("hello", requestData.body().getString("name"));
+        Assertions.assertEquals("test", requestData.filter().getString("x"));
+        Assertions.assertEquals(1, requestData.pagination().getPage());
+        Assertions.assertEquals(20, requestData.pagination().getPerPage());
+        Assertions.assertEquals("{\"headers\":{},\"body\":{\"name\":\"hello\"},\"filter\":{\"x\":\"test\"}," +
+                                "\"pagination\":{\"_page\":1,\"_per_page\":20}}", requestData.toJson().encode());
     }
 
     @Test
@@ -34,11 +34,11 @@ public class RequestDataTest {
                                              .body(new JsonObject().put("name", "hello"))
                                              .filter(new JsonObject().put("x", "test"))
                                              .build();
-        Assert.assertEquals("hello", requestData.body().getString("name"));
-        Assert.assertEquals("test", requestData.filter().getString("x"));
-        Assert.assertNull(requestData.pagination());
-        Assert.assertEquals("{\"headers\":{},\"body\":{\"name\":\"hello\"},\"filter\":{\"x\":\"test\"}}",
-                            requestData.toJson().encode());
+        Assertions.assertEquals("hello", requestData.body().getString("name"));
+        Assertions.assertEquals("test", requestData.filter().getString("x"));
+        Assertions.assertNull(requestData.pagination());
+        Assertions.assertEquals("{\"headers\":{},\"body\":{\"name\":\"hello\"},\"filter\":{\"x\":\"test\"}}",
+                                requestData.toJson().encode());
     }
 
     @Test
@@ -48,11 +48,11 @@ public class RequestDataTest {
                                                 .put("body", new JsonObject())
                                                 .put("filter", new JsonObject());
         final RequestData requestData = data.mapTo(RequestData.class);
-        Assert.assertTrue(requestData.body().isEmpty());
-        Assert.assertTrue(requestData.filter().isEmpty());
-        Assert.assertNotNull(requestData.pagination());
-        Assert.assertEquals(5, requestData.pagination().getPage());
-        Assert.assertEquals(10, requestData.pagination().getPerPage());
+        Assertions.assertTrue(requestData.body().isEmpty());
+        Assertions.assertTrue(requestData.filter().isEmpty());
+        Assertions.assertNotNull(requestData.pagination());
+        Assertions.assertEquals(5, requestData.pagination().getPage());
+        Assertions.assertEquals(10, requestData.pagination().getPerPage());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class RequestDataTest {
                                                 .put("body", new JsonObject().put("name", "xyz"))
                                                 .put("filter", new JsonObject().put("key", "1"));
         RequestData requestData = JsonData.from(data, RequestData.class);
-        Assert.assertEquals("xyz", requestData.body().getString("name"));
+        Assertions.assertEquals("xyz", requestData.body().getString("name"));
     }
 
     @Test
