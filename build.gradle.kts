@@ -195,7 +195,7 @@ task<Sign>("sign") {
 }
 
 nexusStaging {
-    packageGroup = project.group as String?
+    packageGroup = "io.github.zero88"
     username = project.property("nexus.username") as String?
     password = project.property("nexus.password") as String?
 }

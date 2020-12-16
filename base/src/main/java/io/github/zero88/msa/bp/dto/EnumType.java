@@ -1,5 +1,6 @@
 package io.github.zero88.msa.bp.dto;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-public interface EnumType extends JsonData {
+public interface EnumType extends JsonData, Serializable {
 
     static <E extends EnumType> E factory(String type, @NonNull Class<E> clazz) {
         return factory(type, clazz, null);
