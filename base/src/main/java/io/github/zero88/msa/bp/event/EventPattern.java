@@ -8,5 +8,4 @@ import java.io.Serializable;
 public enum EventPattern implements Serializable {
 
     PUBLISH_SUBSCRIBE, POINT_2_POINT, REQUEST_RESPONSE
-
 }

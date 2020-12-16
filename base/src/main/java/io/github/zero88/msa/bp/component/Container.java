@@ -9,7 +9,6 @@ import io.github.zero88.msa.bp.event.EventbusClient;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
-
 /**
  * Represents a container consists a list of {@code Verticle unit} to startup application
  *

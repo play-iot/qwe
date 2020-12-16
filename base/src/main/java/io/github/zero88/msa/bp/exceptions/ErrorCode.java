@@ -49,4 +49,5 @@ public final class ErrorCode extends AbstractEnumType implements io.github.zero8
         }
         return Objects.equals(this.code(), ((io.github.zero88.exceptions.ErrorCode) o).code());
     }
+
 }

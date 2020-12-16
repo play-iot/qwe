@@ -10,7 +10,6 @@ import io.github.zero88.msa.bp.TestHelper;
 import io.github.zero88.msa.bp.TestHelper.JsonHelper;
 import io.github.zero88.msa.bp.component.ContainerVerticle;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
-import io.github.zero88.msa.bp.exceptions.NotFoundException;
 import io.github.zero88.msa.bp.http.server.dynamic.mock.MockHttpServiceServer;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpMethod;

@@ -13,5 +13,4 @@ A Vertx framework for microservice
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=zero88_msa-blueprint&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=zero88_msa-blueprint)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=zero88_msa-blueprint&metric=coverage)](https://sonarcloud.io/dashboard?id=zero88_msa-blueprint)
 
-
 ## Overview

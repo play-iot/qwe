@@ -23,7 +23,8 @@ public final class FailureContextHandler implements Handler<RoutingContext> {
         if (Objects.nonNull(throwable)) {
             logger.error("API exception", throwable);
             ErrorMessage errorMessage = ErrorMessage.parse(throwable);
-            failureContext.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpUtils.JSON_UTF8_CONTENT_TYPE)
+            failureContext.response()
+                          .putHeader(HttpHeaders.CONTENT_TYPE, HttpUtils.JSON_UTF8_CONTENT_TYPE)
                           .setStatusCode(HttpStatusMapping.error(method, errorMessage.getThrowable()).code())
                           .end(HttpUtils.prettify(errorMessage, failureContext.request()));
         }

@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.vertx.reactivex.core.eventbus.EventBus;
-
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventListener;
 import io.github.zero88.msa.bp.event.EventModel;
+import io.vertx.reactivex.core.eventbus.EventBus;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

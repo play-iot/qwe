@@ -32,7 +32,9 @@ class Pusher implements EventMessagePusher {
     public void execute(String path, HttpMethod httpMethod, JsonObject requestData, Consumer<ResponseData> dataConsumer,
                         Consumer<Throwable> errorConsumer) {
         EventAction action = definition.search(path, httpMethod);
-        ReplyEventHandler handler = ReplyEventHandler.builder().system("SERVICE_DISCOVERY").address(address)
+        ReplyEventHandler handler = ReplyEventHandler.builder()
+                                                     .system("SERVICE_DISCOVERY")
+                                                     .address(address)
                                                      .action(EventAction.RETURN)
                                                      .success(msg -> dataConsumer.accept(ResponseData.from(msg)))
                                                      .exception(errorConsumer)

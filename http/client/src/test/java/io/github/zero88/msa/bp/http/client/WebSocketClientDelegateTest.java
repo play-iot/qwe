@@ -21,7 +21,6 @@ import io.github.zero88.msa.bp.event.EventPattern;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.HttpException;
-import io.github.zero88.msa.bp.exceptions.NotFoundException;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.event.WebSocketClientEventMetadata;
 import io.netty.handler.codec.http.HttpResponseStatus;

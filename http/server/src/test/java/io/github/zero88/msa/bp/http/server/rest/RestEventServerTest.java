@@ -19,8 +19,6 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
-import io.github.zero88.msa.bp.TestHelper;
-
 @RunWith(VertxUnitRunner.class)
 public class RestEventServerTest extends HttpServerTestBase {
 

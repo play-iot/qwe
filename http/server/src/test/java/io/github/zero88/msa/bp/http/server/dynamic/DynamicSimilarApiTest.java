@@ -8,7 +8,6 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 
-
 public class DynamicSimilarApiTest extends DynamicServiceTestBase {
 
     @Override

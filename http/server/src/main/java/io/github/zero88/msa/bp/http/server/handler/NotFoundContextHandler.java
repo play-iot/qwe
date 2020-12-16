@@ -8,7 +8,6 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-
 public final class NotFoundContextHandler implements Handler<RoutingContext> {
 
     @Override

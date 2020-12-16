@@ -16,7 +16,6 @@ import io.github.zero88.msa.bp.TestHelper;
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
-import io.github.zero88.msa.bp.exceptions.NotFoundException;
 import io.github.zero88.msa.bp.exceptions.TimeoutException;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.vertx.core.Vertx;
@@ -24,7 +23,6 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
 
 @RunWith(VertxUnitRunner.class)
 public class HttpClientDelegateTest {

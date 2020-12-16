@@ -45,7 +45,7 @@ public final class HttpClientRegistry {
     }
 
     public HttpClientDelegate getHttpClient(@NonNull HostInfo hostInfo,
-                                                                         @NonNull Supplier<HttpClientDelegate> fallback) {
+                                            @NonNull Supplier<HttpClientDelegate> fallback) {
         return httpRegistries.computeIfAbsent(hostInfo, hf -> new ClientStorage<>(hf, fallback.get())).tickAndGet();
     }
 

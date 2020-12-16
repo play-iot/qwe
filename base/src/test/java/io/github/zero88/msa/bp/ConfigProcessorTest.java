@@ -155,7 +155,8 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.system.cluster.active", "invalid_type");
 
         overrideConfigThenAssert(
-            finalResult -> Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive()), true, true);
+            finalResult -> Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive()), true,
+            true);
     }
 
     @Test
@@ -196,8 +197,8 @@ public class ConfigProcessorTest {
     public void test_data_dir() {
         System.setProperty("zbp.dataDir", OSHelper.getAbsolutePathByOs("test").toString());
         overrideConfigThenAssert(
-            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getDataDir()), true,
-            true);
+            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getDataDir()),
+            true, true);
     }
 
     @Test
@@ -238,7 +239,7 @@ public class ConfigProcessorTest {
         Object httpsConfig = finalResult.get().getAppConfig().get("__https__");
         Assertions.assertNotNull(httpsConfig);
         Assertions.assertEquals("[{host=2.2.2.2, port=8088, enabled=false, rootApi=/test}, {host=2.2.2.3, port=8089, " +
-                            "enabled=true, rootApi=/test1}]", httpsConfig.toString());
+                                "enabled=true, rootApi=/test1}]", httpsConfig.toString());
     }
 
     @Test

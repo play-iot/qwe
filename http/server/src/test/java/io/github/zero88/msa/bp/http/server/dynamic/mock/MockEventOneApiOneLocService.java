@@ -1,13 +1,12 @@
 package io.github.zero88.msa.bp.http.server.dynamic.mock;
 
-import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
-import io.reactivex.Single;
-
 import io.github.zero88.msa.bp.component.ContainerVerticle;
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.micro.MicroContext;
 import io.github.zero88.msa.bp.micro.MicroserviceProvider;
 import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
+import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
+import io.reactivex.Single;
 
 public class MockEventOneApiOneLocService extends ContainerVerticle {
 

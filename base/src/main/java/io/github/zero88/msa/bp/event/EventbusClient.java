@@ -71,8 +71,8 @@ public interface EventbusClient extends Shareable, Transporter {
     /**
      * Send message with delivery options then return single response message
      *
-     * @param address Address
-     * @param message Event message
+     * @param address         Address
+     * @param message         Event message
      * @param deliveryOptions delivery options
      * @return response message
      * @see EventMessage

@@ -29,7 +29,8 @@ public interface DynamicRestApi {
         if (EventMessageService.TYPE.equals(record.getType())) {
             return (T) DynamicEventRestApi.create(record);
         }
-        throw new BlueprintException(ErrorCode.INVALID_ARGUMENT, "Dynamic Rest API unsupported type " + record.getType());
+        throw new BlueprintException(ErrorCode.INVALID_ARGUMENT,
+                                     "Dynamic Rest API unsupported type " + record.getType());
     }
 
     /**

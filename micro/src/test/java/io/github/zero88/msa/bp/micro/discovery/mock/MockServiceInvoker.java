@@ -1,6 +1,5 @@
 package io.github.zero88.msa.bp.micro.discovery.mock;
 
-
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.micro.discovery.GatewayServiceInvoker;
 

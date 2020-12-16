@@ -18,7 +18,6 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.servicediscovery.Record;
 
-
 public final class DynamicEventApiDispatcher<T extends DynamicEventRestApi>
     extends AbstractDynamicContextDispatcher<T> {
 

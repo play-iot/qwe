@@ -22,7 +22,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpLocation;
 
-
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseMicroServiceTest {
 

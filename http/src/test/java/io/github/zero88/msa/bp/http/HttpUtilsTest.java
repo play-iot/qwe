@@ -50,7 +50,7 @@ public class HttpUtilsTest {
             "_q=node==abc,(node2=in=(123,456) and node3!=zzz) and node4=gt=10&_page=1&_per_page=20&_audit&_pretty",
             decoder.rawQuery());
         Assertions.assertEquals("[node==abc,(node2=in=(123,456) and node3!=zzz) and node4=gt=10]",
-                            decoder.parameters().get("_q").toString());
+                                decoder.parameters().get("_q").toString());
         System.out.println(decoder.parameters());
     }
 

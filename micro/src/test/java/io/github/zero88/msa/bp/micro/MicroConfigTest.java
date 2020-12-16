@@ -20,16 +20,17 @@ public class MicroConfigTest {
         MicroConfig def = new MicroConfig();
         Assertions.assertTrue(def.getDiscoveryConfig().isEnabled());
         Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_ANNOUNCE_ADDRESS,
-                            def.getDiscoveryConfig().getAnnounceAddress());
-        Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_ADDRESS, def.getDiscoveryConfig().getUsageAddress());
+                                def.getDiscoveryConfig().getAnnounceAddress());
+        Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_ADDRESS,
+                                def.getDiscoveryConfig().getUsageAddress());
         Assertions.assertFalse(def.getDiscoveryConfig().isLocal());
         Assertions.assertTrue(def.getDiscoveryConfig().isAutoRegistrationOfImporters());
 
         Assertions.assertFalse(def.getLocalDiscoveryConfig().isEnabled());
         Assertions.assertEquals(LocalServiceDiscoveryConfig.SERVICE_DISCOVERY_ANNOUNCE_LOCAL_ADDRESS,
-                            def.getLocalDiscoveryConfig().getAnnounceAddress());
+                                def.getLocalDiscoveryConfig().getAnnounceAddress());
         Assertions.assertEquals(LocalServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_LOCAL_ADDRESS,
-                            def.getLocalDiscoveryConfig().getUsageAddress());
+                                def.getLocalDiscoveryConfig().getUsageAddress());
         Assertions.assertTrue(def.getLocalDiscoveryConfig().isLocal());
         Assertions.assertFalse(def.getLocalDiscoveryConfig().isAutoRegistrationOfImporters());
 
@@ -67,11 +68,13 @@ public class MicroConfigTest {
         MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
         Assertions.assertFalse(fromMicro.getDiscoveryConfig().isLocal());
         fromMicro.getDiscoveryConfig().reloadProperty();
-        Assertions.assertFalse(Boolean.parseBoolean(System.getProperty(BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND)));
+        Assertions.assertFalse(
+            Boolean.parseBoolean(System.getProperty(BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND)));
 
         Assertions.assertTrue(fromMicro.getLocalDiscoveryConfig().isLocal());
         fromMicro.getLocalDiscoveryConfig().reloadProperty();
-        Assertions.assertTrue(Boolean.parseBoolean(System.getProperty(BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND)));
+        Assertions.assertTrue(
+            Boolean.parseBoolean(System.getProperty(BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND)));
     }
 
     @Test

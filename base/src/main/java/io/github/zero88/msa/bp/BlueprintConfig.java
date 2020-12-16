@@ -41,7 +41,8 @@ public final class BlueprintConfig implements IConfig {
     private AppConfig appConfig = new AppConfig();
 
     /**
-     * Create {@link BlueprintConfig} with {@link AppConfig}, default {@link DeployConfig} and without {@link SystemConfig}
+     * Create {@link BlueprintConfig} with {@link AppConfig}, default {@link DeployConfig} and without {@link
+     * SystemConfig}
      *
      * @param appConfig Given app config
      * @return BlueprintConfig instance

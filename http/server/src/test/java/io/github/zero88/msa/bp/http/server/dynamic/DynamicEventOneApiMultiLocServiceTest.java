@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import io.github.zero88.msa.bp.component.ContainerVerticle;
 import io.github.zero88.msa.bp.http.server.dynamic.mock.MockEventOneApiMultiLocService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
-import io.github.zero88.msa.bp.component.ContainerVerticle;
 
 @RunWith(VertxUnitRunner.class)
 public class DynamicEventOneApiMultiLocServiceTest extends DynamicServiceTestBase {
