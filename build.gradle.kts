@@ -13,9 +13,10 @@ plugins {
 }
 val jacocoHtml: String? by project
 val semanticVersion: String by project
+val buildHash: String by project
 
 allprojects {
-    group = "io.github.zero88"
+    group = "io.github.zero88.msa.bp"
 
     repositories {
         mavenLocal()
@@ -34,6 +35,10 @@ subprojects {
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
     project.version = "$version$semanticVersion"
+    project.group = ProjectUtils.computeGroup(project)
+    project.ext.set("title", findProperty("title") ?: project.name)
+    project.ext.set("baseName", ProjectUtils.computeBaseName(project))
+    project.ext.set("description", findProperty("description") ?: "A Vertx framework for microservice: ${project.name}")
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -54,9 +59,19 @@ subprojects {
 
     tasks {
         jar {
+            doFirst {
+                println("- Project Name:     ${project.ext.get("baseName")}")
+                println("- Project Title:    ${project.ext.get("title")}")
+                println("- Project Group:    ${project.group}")
+                println("- Project Artifact: ${project.name}")
+                println("- Project Version:  ${project.version}")
+            }
+
+            archiveBaseName.set(project.ext.get("baseName") as String)
             manifest {
                 attributes(
-                    mapOf(Name.IMPLEMENTATION_TITLE.toString() to project.name,
+                    mapOf(Name.MANIFEST_VERSION.toString() to "1.0",
+                          Name.IMPLEMENTATION_TITLE.toString() to archiveBaseName,
                           Name.IMPLEMENTATION_VERSION.toString() to project.version,
                           "Created-By" to GradleVersion.current(),
                           "Build-Jdk" to Jvm.current(),
@@ -67,6 +82,7 @@ subprojects {
             }
         }
         javadoc {
+            title = "${project.ext.get("title")} ${project.version} API"
             options {
                 this as StandardJavadocDocletOptions
                 tags = mutableListOf("apiNote:a:API Note:", "implSpec:a:Implementation Requirements:",
@@ -75,6 +91,10 @@ subprojects {
         }
         test {
             useJUnitPlatform()
+        }
+
+        withType<Sign>().configureEach {
+            onlyIf { project.hasProperty("release") }
         }
     }
 
@@ -96,12 +116,12 @@ subprojects {
                 }
                 pom {
                     name.set(project.name)
-                    description.set("A Vertx framework for microservice")
-                    url.set("https://github.com/zero88/blueprint")
+                    description.set(project.ext.get("description") as String)
+                    url.set("https://github.com/zero88/msa-blueprint")
                     licenses {
                         license {
                             name.set("The Apache License, Version 2.0")
-                            url.set("https://github.com/zero88/blueprint/blob/master/LICENSE")
+                            url.set("https://github.com/zero88/msa-blueprint/blob/master/LICENSE")
                         }
                     }
                     developers {
@@ -111,9 +131,9 @@ subprojects {
                         }
                     }
                     scm {
-                        connection.set("scm:git:git://git@github.com:zero88/blueprint.git")
-                        developerConnection.set("scm:git:ssh://git@github.com:zero88/blueprint.git")
-                        url.set("https://github.com/zero88/blueprint")
+                        connection.set("scm:git:git://git@github.com:zero88/msa-blueprint.git")
+                        developerConnection.set("scm:git:ssh://git@github.com:zero88/msa-blueprint.git")
+                        url.set("https://github.com/zero88/msa-blueprint")
                     }
                 }
             }
@@ -168,10 +188,6 @@ sonarqube {
         property("sonar.sourceEncoding", "UTF-8")
         property("sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/coverage.xml")
     }
-}
-
-tasks.withType<Sign>().configureEach {
-    onlyIf { project.hasProperty("release") }
 }
 
 task<Sign>("sign") {
