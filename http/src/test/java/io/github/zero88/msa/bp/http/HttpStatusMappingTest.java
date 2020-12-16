@@ -12,7 +12,6 @@ import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.msa.bp.cluster.ClusterException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.HttpException;
-import io.github.zero88.msa.bp.exceptions.NotFoundException;
 import io.github.zero88.msa.bp.exceptions.ServiceException;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;

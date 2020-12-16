@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import io.github.zero88.exceptions.HiddenException;
+import io.github.zero88.msa.bp.cluster.ClusterException;
 import io.github.zero88.msa.bp.exceptions.BeingUsedException;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.exceptions.ConflictException;
@@ -64,6 +65,7 @@ public final class HttpStatusMapping {
         map.put(InsufficientPermissionError.CODE.code(), HttpResponseStatus.FORBIDDEN);
 
         map.put(ErrorCode.EVENT_ERROR.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
+        map.put(ClusterException.CODE.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
 
         map.put(TimeoutException.CODE.code(), HttpResponseStatus.REQUEST_TIMEOUT);
         return Collections.unmodifiableMap(map);
