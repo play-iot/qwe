@@ -1,6 +1,12 @@
 # Changelog
 
-## [v0.5.2](https://github.com/zero88/blueprint/tree/release/0.5.1) (2020-12-16)
+## [v0.5.3](https://github.com/zero88/blueprint/tree/release/0.5.3) (2020-12-16)
+
+### Changes
+
+- Refactor ErrorCode and Exception
+
+## [v0.5.2](https://github.com/zero88/blueprint/tree/release/0.5.2) (2020-12-16)
 
 ### Changes
 
