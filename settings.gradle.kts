@@ -7,7 +7,7 @@
  * in the user manual at https://docs.gradle.org/6.7/userguide/multi_project_builds.html
  */
 
-rootProject.name = "blueprint"
+rootProject.name = "msa-blueprint"
 include("base")
 include("cache")
 include("http")

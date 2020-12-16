@@ -35,13 +35,13 @@ jobs:
         shell: bash
         run: |
           commitMsg="${{ github.event.head_commit.message }}"
-          isOnMaster=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          isOnMaster=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           isReleaseCommit=$(echo $commitMsg | grep -P -q '^Merge pull request #\d+ from .+/release/.+$' && echo 1 || echo 0)
           isSkipPublish=$(echo $commitMsg | grep -P -q '^<skip_publish>.+$' && echo true || echo false)
           [[ $isOnMaster == true && $isReleaseCommit == 1 ]] && isAfterReleaseMerged=true || isAfterReleaseMerged=false
           isPR=${{ github.event_name == 'pull_request' }}
           isReleasePR=${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/') }}
-          [[ $isOnMaster == true ]] && branch="master" || branch="${{ github.head_ref }}"
+          [[ $isOnMaster == true ]] && branch="main" || branch="${{ github.head_ref }}"
 
           echo "Information:"
           echo "- Is on master? $isOnMaster"

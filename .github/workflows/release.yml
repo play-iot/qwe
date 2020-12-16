@@ -119,7 +119,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: master
+          ref: main
           token: ${{ secrets.OSS_GITHUB_TOKEN }}
 
       - name: Import GPG key
