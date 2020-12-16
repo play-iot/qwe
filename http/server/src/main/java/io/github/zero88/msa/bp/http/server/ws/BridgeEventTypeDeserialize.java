@@ -18,7 +18,7 @@ public final class BridgeEventTypeDeserialize extends StdDeserializer<BridgeEven
 
     @Override
     public BridgeEventType deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+        throws IOException, JsonProcessingException {
         final String jsonValue = p.getText();
         if ("rec".equalsIgnoreCase(jsonValue)) {
             return BridgeEventType.RECEIVE;

@@ -36,7 +36,7 @@ public final class BlueprintLauncher extends Launcher {
 
     private BlueprintConfig config;
     private VertxOptions options;
-//    private IClusterDelegate clusterDelegate;
+    //    private IClusterDelegate clusterDelegate;
 
     public static void main(String[] args) {
         new BlueprintLauncher().dispatch(args);
@@ -48,7 +48,8 @@ public final class BlueprintLauncher extends Launcher {
         if (logger.isDebugEnabled()) {
             logger.debug("CONFIG::INPUT: {}", config.encode());
         }
-        BlueprintConfig fileConfig = IConfig.merge(Configs.loadJsonConfig("system.json"), config, BlueprintConfig.class);
+        BlueprintConfig fileConfig = IConfig.merge(Configs.loadJsonConfig("system.json"), config,
+                                                   BlueprintConfig.class);
         Vertx dummy = Vertx.vertx();
         this.config = new ConfigProcessor(dummy).override(fileConfig.toJson(), false, true).orElse(fileConfig);
         dummy.close();
@@ -72,11 +73,12 @@ public final class BlueprintLauncher extends Launcher {
             String addr = config.getSystemConfig().getClusterConfig().getListenerAddress();
             ClusterManager clusterManager = this.options.getClusterManager();
             if (Strings.isNotBlank(addr)) {
-//                clusterManager.nodeListener(new ClusterNodeListener(clusterDelegate,
-//                                                                    SharedDataDelegate.getEventController(vertx,
-//                                                                                                          this.getClass()
-//                                                                                                              .getName()),
-//                                                                    addr));
+                //                clusterManager.nodeListener(new ClusterNodeListener(clusterDelegate,
+                //                                                                    SharedDataDelegate
+                //                                                                    .getEventController(vertx,
+                //                                                                                                          this.getClass()
+                //                                                                                                              .getName()),
+                //                                                                    addr));
             }
         }
         super.afterStartingVertx(vertx);
@@ -125,7 +127,7 @@ public final class BlueprintLauncher extends Launcher {
 
     private VertxOptions reloadVertxOptions(VertxOptions vertxOptions) {
         configEventBus(vertxOptions);
-//        configCluster(vertxOptions);
+        //        configCluster(vertxOptions);
         final Entry<Long, TimeUnit> e1 = getSystemProp("vertx.blockedThreadCheckInterval",
                                                        VertxOptions.DEFAULT_BLOCKED_THREAD_CHECK_INTERVAL,
                                                        "vertx.blockedThreadCheckIntervalUnit",
@@ -175,22 +177,21 @@ public final class BlueprintLauncher extends Launcher {
         options.setEventBusOptions(option);
     }
 
-//    private void configCluster(VertxOptions options) {
-//        logger.info("Setup Cluster...");
-//        ClusterConfig clusterCfg = config.getSystemConfig().getClusterConfig();
-//        if (Objects.isNull(clusterCfg) || !clusterCfg.isActive()) {
-//            logger.info("Cluster is not activated");
-//            return;
-//        }
-//        logger.info("Configure Cluster with options: {}", clusterCfg.toJson());
-//        logger.info("Cluster type: {}", clusterCfg.getType());
-//        options.setClustered(true);
-//        options.setHAEnabled(clusterCfg.isHa());
-//        this.clusterDelegate = ClusterRegistry.instance().getClusterDelegate(clusterCfg.getType());
-//        if (Objects.isNull(this.clusterDelegate)) {
-//            throw new EngineException("Cannot load cluster type: " + clusterCfg.getType());
-//        }
-//        options.setClusterManager(this.clusterDelegate.initClusterManager(clusterCfg));
-//    }
-
+    //    private void configCluster(VertxOptions options) {
+    //        logger.info("Setup Cluster...");
+    //        ClusterConfig clusterCfg = config.getSystemConfig().getClusterConfig();
+    //        if (Objects.isNull(clusterCfg) || !clusterCfg.isActive()) {
+    //            logger.info("Cluster is not activated");
+    //            return;
+    //        }
+    //        logger.info("Configure Cluster with options: {}", clusterCfg.toJson());
+    //        logger.info("Cluster type: {}", clusterCfg.getType());
+    //        options.setClustered(true);
+    //        options.setHAEnabled(clusterCfg.isHa());
+    //        this.clusterDelegate = ClusterRegistry.instance().getClusterDelegate(clusterCfg.getType());
+    //        if (Objects.isNull(this.clusterDelegate)) {
+    //            throw new EngineException("Cannot load cluster type: " + clusterCfg.getType());
+    //        }
+    //        options.setClusterManager(this.clusterDelegate.initClusterManager(clusterCfg));
+    //    }
 }

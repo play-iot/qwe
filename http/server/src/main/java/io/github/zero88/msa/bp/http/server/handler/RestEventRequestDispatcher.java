@@ -15,7 +15,8 @@ public interface RestEventRequestDispatcher extends Handler<RoutingContext> {
     default void dispatch(RoutingContext context, String system, String address, EventPattern pattern,
                           EventMessage message) {
         ReplyEventHandler handler = ReplyEventHandler.builder()
-                                                     .system(system).address(address)
+                                                     .system(system)
+                                                     .address(address)
                                                      .action(message.getAction())
                                                      .success(respMsg -> {
                                                          context.put(EventAction.RETURN.type(), respMsg);

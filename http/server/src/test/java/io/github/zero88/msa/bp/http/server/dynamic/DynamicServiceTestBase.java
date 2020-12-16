@@ -8,15 +8,14 @@ import java.util.function.Supplier;
 import org.junit.Before;
 import org.skyscreamer.jsonassert.Customization;
 
+import io.github.zero88.msa.bp.TestHelper;
+import io.github.zero88.msa.bp.TestHelper.VertxHelper;
+import io.github.zero88.msa.bp.component.ContainerVerticle;
 import io.github.zero88.msa.bp.http.server.HttpServerTestBase;
 import io.github.zero88.msa.bp.http.server.dynamic.mock.MockGatewayServer;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
-
-import io.github.zero88.msa.bp.TestHelper;
-import io.github.zero88.msa.bp.TestHelper.VertxHelper;
-import io.github.zero88.msa.bp.component.ContainerVerticle;
 
 public abstract class DynamicServiceTestBase extends HttpServerTestBase {
 

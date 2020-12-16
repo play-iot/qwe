@@ -2,7 +2,7 @@
 
 ## Internal cache
 
-For caching local in `RAM` 
+For caching local in `RAM`
 
 ## External case
 

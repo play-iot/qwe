@@ -14,7 +14,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
-
 @RunWith(VertxUnitRunner.class)
 public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase {
 

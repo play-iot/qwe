@@ -13,6 +13,7 @@ import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.micro.BaseMicroServiceTest;
 import io.github.zero88.msa.bp.micro.discovery.mock.MockServiceInvoker;
 import io.github.zero88.msa.bp.micro.discovery.mock.MockServiceListener;
+import io.github.zero88.msa.bp.micro.metadata.ServiceNotFoundException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -35,7 +36,7 @@ public class GatewayServiceInvokerTest extends BaseMicroServiceTest {
                    context.assertTrue(t instanceof BlueprintException);
                    assert t instanceof BlueprintException;
                    BlueprintException e = (BlueprintException) t;
-                   context.assertEquals(ErrorCode.SERVICE_NOT_FOUND, e.errorCode());
+                   context.assertEquals(ServiceNotFoundException.CODE, e.errorCode());
                    context.assertEquals(invoker.serviceLabel() +
                                         " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
                                         e.getMessage());
@@ -53,7 +54,7 @@ public class GatewayServiceInvokerTest extends BaseMicroServiceTest {
                    context.assertTrue(t instanceof BlueprintException);
                    assert t instanceof BlueprintException;
                    BlueprintException e = (BlueprintException) t;
-                   context.assertEquals(ErrorCode.SERVICE_NOT_FOUND, e.errorCode());
+                   context.assertEquals(ServiceNotFoundException.CODE, e.errorCode());
                    context.assertEquals(invoker.serviceLabel() +
                                         " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
                                         e.getMessage());

@@ -5,14 +5,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import io.github.zero88.msa.bp.TestHelper;
 import io.github.zero88.msa.bp.http.server.HttpServerRouter;
 import io.github.zero88.msa.bp.http.server.HttpServerTestBase;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
-import io.github.zero88.msa.bp.TestHelper;
 
 @RunWith(VertxUnitRunner.class)
 public class UploadDownloadServerTest extends HttpServerTestBase {

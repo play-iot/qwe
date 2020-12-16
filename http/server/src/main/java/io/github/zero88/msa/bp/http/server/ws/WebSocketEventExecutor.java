@@ -32,7 +32,8 @@ public class WebSocketEventExecutor {
         EventModel processor = metadata.getProcessor();
         if (processor.getPattern() == EventPattern.REQUEST_RESPONSE) {
             ReplyEventHandler handler = ReplyEventHandler.builder()
-                                                         .system(WEBSOCKET_SERVER).address(processor.getAddress())
+                                                         .system(WEBSOCKET_SERVER)
+                                                         .address(processor.getAddress())
                                                          .action(msg.getAction())
                                                          .success(callback(metadata.getPublisher(), callback))
                                                          .build();

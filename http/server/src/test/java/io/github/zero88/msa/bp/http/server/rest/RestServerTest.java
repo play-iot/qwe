@@ -5,7 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.github.zero88.exceptions.ErrorCode;
+import io.github.zero88.msa.bp.TestHelper;
 import io.github.zero88.msa.bp.dto.ErrorMessage;
+import io.github.zero88.msa.bp.exceptions.InitializerError;
 import io.github.zero88.msa.bp.http.server.HttpServerRouter;
 import io.github.zero88.msa.bp.http.server.HttpServerTestBase;
 import io.github.zero88.msa.bp.http.server.mock.MockApiDefinition;
@@ -14,9 +16,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
-import io.github.zero88.msa.bp.TestHelper;
-import io.github.zero88.msa.bp.exceptions.InitializerError;
 
 @RunWith(VertxUnitRunner.class)
 public class RestServerTest extends HttpServerTestBase {

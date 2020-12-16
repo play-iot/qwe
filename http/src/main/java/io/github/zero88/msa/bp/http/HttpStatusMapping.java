@@ -9,8 +9,17 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import io.github.zero88.exceptions.HiddenException;
+import io.github.zero88.msa.bp.cluster.ClusterException;
+import io.github.zero88.msa.bp.exceptions.BeingUsedException;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.ConflictException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
+import io.github.zero88.msa.bp.exceptions.HttpException;
+import io.github.zero88.msa.bp.exceptions.SecurityException;
+import io.github.zero88.msa.bp.exceptions.SecurityException.AuthenticationException;
+import io.github.zero88.msa.bp.exceptions.SecurityException.InsufficientPermissionError;
+import io.github.zero88.msa.bp.exceptions.TimeoutException;
+import io.github.zero88.msa.bp.micro.metadata.ServiceNotFoundException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 
@@ -42,23 +51,23 @@ public final class HttpStatusMapping {
     private static Map<String, HttpResponseStatus> init() {
         Map<String, HttpResponseStatus> map = new HashMap<>();
         map.put(ErrorCode.INVALID_ARGUMENT.code(), HttpResponseStatus.BAD_REQUEST);
-        map.put(ErrorCode.HTTP_ERROR.code(), HttpResponseStatus.BAD_REQUEST);
+        map.put(HttpException.HTTP_ERROR.code(), HttpResponseStatus.BAD_REQUEST);
 
-        map.put(ErrorCode.SERVICE_NOT_FOUND.code(), HttpResponseStatus.NOT_FOUND);
+        map.put(ServiceNotFoundException.CODE.code(), HttpResponseStatus.NOT_FOUND);
         map.put(ErrorCode.ALREADY_EXIST.code(), HttpResponseStatus.UNPROCESSABLE_ENTITY);
-        map.put(ErrorCode.BEING_USED.code(), HttpResponseStatus.UNPROCESSABLE_ENTITY);
+        map.put(BeingUsedException.CODE.code(), HttpResponseStatus.UNPROCESSABLE_ENTITY);
 
-        map.put(ErrorCode.CONFLICT_ERROR.code(), HttpResponseStatus.CONFLICT);
+        map.put(ConflictException.CODE.code(), HttpResponseStatus.CONFLICT);
         map.put(ErrorCode.UNSUPPORTED.code(), HttpResponseStatus.CONFLICT);
 
-        map.put(ErrorCode.AUTHENTICATION_ERROR.code(), HttpResponseStatus.UNAUTHORIZED);
-        map.put(ErrorCode.SECURITY_ERROR.code(), HttpResponseStatus.FORBIDDEN);
-        map.put(ErrorCode.INSUFFICIENT_PERMISSION_ERROR.code(), HttpResponseStatus.FORBIDDEN);
+        map.put(AuthenticationException.CODE.code(), HttpResponseStatus.UNAUTHORIZED);
+        map.put(SecurityException.CODE.code(), HttpResponseStatus.FORBIDDEN);
+        map.put(InsufficientPermissionError.CODE.code(), HttpResponseStatus.FORBIDDEN);
 
         map.put(ErrorCode.EVENT_ERROR.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
-        map.put(ErrorCode.CLUSTER_ERROR.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
+        map.put(ClusterException.CODE.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
 
-        map.put(ErrorCode.TIMEOUT_ERROR.code(), HttpResponseStatus.REQUEST_TIMEOUT);
+        map.put(TimeoutException.CODE.code(), HttpResponseStatus.REQUEST_TIMEOUT);
         return Collections.unmodifiableMap(map);
     }
 

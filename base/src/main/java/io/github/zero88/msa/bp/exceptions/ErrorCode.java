@@ -1,5 +1,7 @@
 package io.github.zero88.msa.bp.exceptions;
 
+import java.util.Objects;
+
 import io.github.zero88.msa.bp.dto.EnumType;
 import io.github.zero88.msa.bp.dto.EnumType.AbstractEnumType;
 
@@ -11,27 +13,13 @@ import lombok.NonNull;
 @Getter
 public final class ErrorCode extends AbstractEnumType implements io.github.zero88.exceptions.ErrorCode, EnumType {
 
-    public static final ErrorCode CONFLICT_ERROR = new ErrorCode("CONFLICT_ERROR");
     public static final ErrorCode DESIRED_ERROR = new ErrorCode("DESIRED_ERROR");
     public static final ErrorCode ALREADY_EXIST = new ErrorCode("ALREADY_EXIST");
     public static final ErrorCode NOT_FOUND = new ErrorCode("NOT_FOUND");
-    public static final ErrorCode SECURITY_ERROR = new ErrorCode("SECURITY_ERROR");
-    public static final ErrorCode AUTHENTICATION_ERROR = new ErrorCode("AUTHENTICATION_ERROR");
-    public static final ErrorCode INSUFFICIENT_PERMISSION_ERROR = new ErrorCode("INSUFFICIENT_PERMISSION_ERROR");
-    public static final ErrorCode HTTP_ERROR = new ErrorCode("HTTP_ERROR");
     public static final ErrorCode SERVICE_ERROR = new ErrorCode("SERVICE_ERROR");
-    public static final ErrorCode INITIALIZER_ERROR = new ErrorCode("INITIALIZER_ERROR");
-    public static final ErrorCode ENGINE_ERROR = new ErrorCode("ENGINE_ERROR");
-    public static final ErrorCode CLUSTER_ERROR = new ErrorCode("CLUSTER_ERROR");
     public static final ErrorCode EVENT_ERROR = new ErrorCode("EVENT_ERROR");
-    public static final ErrorCode DATABASE_ERROR = new ErrorCode("DATABASE_ERROR");
-    public static final ErrorCode TIMEOUT_ERROR = new ErrorCode("TIMEOUT_ERROR");
-    public static final ErrorCode NETWORK_ERROR = new ErrorCode("NETWORK_ERROR");
-    public static final ErrorCode COMMUNICATION_PROTOCOL_ERROR = new ErrorCode("COMMUNICATION_PROTOCOL_ERROR");
-    public static final ErrorCode BEING_USED = new ErrorCode("BEING_USED");
-    public static final ErrorCode SERVICE_NOT_FOUND = new ErrorCode("SERVICE_NOT_FOUND");
 
-    public ErrorCode(String code) {
+    private ErrorCode(String code) {
         super(code);
     }
 
@@ -43,6 +31,23 @@ public final class ErrorCode extends AbstractEnumType implements io.github.zero8
 
     public static ErrorCode parse(String code) {
         return EnumType.factory(code, ErrorCode.class);
+    }
+
+    public int hashCode() {
+        return this.code().hashCode();
+    }
+
+    public boolean equals(final Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o instanceof String) {
+            return Objects.equals(this.code(), o);
+        }
+        if (!(o instanceof io.github.zero88.exceptions.ErrorCode)) {
+            return false;
+        }
+        return Objects.equals(this.code(), ((io.github.zero88.exceptions.ErrorCode) o).code());
     }
 
 }

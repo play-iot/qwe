@@ -2,7 +2,9 @@ package io.github.zero88.msa.bp.exceptions;
 
 public final class TimeoutException extends BlueprintException {
 
-    public TimeoutException(String message, Throwable e) { super(ErrorCode.TIMEOUT_ERROR, message, e); }
+    public static final ErrorCode CODE = ErrorCode.parse("TIMEOUT_ERROR");
+
+    public TimeoutException(String message, Throwable e) { super(CODE, message, e); }
 
     public TimeoutException(String message)              { this(message, null); }
 

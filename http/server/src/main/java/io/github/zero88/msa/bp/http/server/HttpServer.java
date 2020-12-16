@@ -87,7 +87,8 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
     public void start(Future<Void> future) {
         logger.info("Starting HTTP Server...");
         super.start();
-        this.dataDir = this.getSharedData(SharedDataDelegate.SHARED_DATADIR, BlueprintConfig.DEFAULT_DATADIR.toString());
+        this.dataDir = this.getSharedData(SharedDataDelegate.SHARED_DATADIR,
+                                          BlueprintConfig.DEFAULT_DATADIR.toString());
         HttpServerOptions options = new HttpServerOptions(config.getOptions()).setHost(config.getHost())
                                                                               .setPort(config.getPort());
         final Router handler = initRouter();
@@ -209,7 +210,8 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
         if (!storageCfg.isEnabled()) {
             return router;
         }
-        Path storageDir = Paths.get(FileUtils.createFolder(BlueprintConfig.DEFAULT_DATADIR, dataDir, storageCfg.getDir()));
+        Path storageDir = Paths.get(
+            FileUtils.createFolder(BlueprintConfig.DEFAULT_DATADIR, dataDir, storageCfg.getDir()));
         initUploadRouter(router, storageDir, storageCfg.getUploadConfig(), publicUrl);
         initDownloadRouter(router, storageDir, storageCfg.getDownloadConfig());
         return router;

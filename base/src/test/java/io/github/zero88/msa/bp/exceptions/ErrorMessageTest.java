@@ -37,7 +37,7 @@ public class ErrorMessageTest {
     public void test_composite_exception_include_blueprint_exception_at_last() {
         final ErrorMessage message = ErrorMessage.parse(
             new CompositeException(new RuntimeException("1"), new NotFoundException("xxx")));
-        Assertions.assertEquals(ErrorCode.NOT_FOUND, message.getCode());
+        Assertions.assertEquals(NotFoundException.CODE, message.getCode());
         Assertions.assertEquals("xxx", message.getMessage());
     }
 

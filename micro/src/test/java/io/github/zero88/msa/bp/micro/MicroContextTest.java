@@ -89,7 +89,8 @@ public class MicroContextTest {
         final MicroConfig config = IConfig.fromClasspath("local.json", MicroConfig.class);
         micro = new MicroContext().setup(vertx, IConfig.fromClasspath("local.json", MicroConfig.class));
         JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"address1\"},\"metadata\":{\"service" +
-                                             ".interface\":\"io.github.zero88.msa.bp.micro.mock.MockEventbusService\"}," +
+                                             ".interface\":\"io.github.zero88.msa.bp.micro.mock" +
+                                             ".MockEventbusService\"}," +
                                              "\"name\":\"test\",\"status\":\"UP\"," +
                                              "\"type\":\"eventbus-service-proxy\"}");
         EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),

@@ -1,5 +1,3 @@
-
-
 class Strings {
 
     static boolean isBlank(String text) {

@@ -11,7 +11,6 @@ import lombok.NonNull;
 
 /**
  * Marks class method to handle event type.
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

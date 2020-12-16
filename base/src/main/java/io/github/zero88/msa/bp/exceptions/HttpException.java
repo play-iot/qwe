@@ -7,11 +7,13 @@ import lombok.NonNull;
 
 public final class HttpException extends BlueprintException {
 
+    public static final ErrorCode HTTP_ERROR = ErrorCode.parse("HTTP_ERROR");
+
     @Getter
     private HttpResponseStatus statusCode = null;
 
     public HttpException(String message, Throwable e) {
-        super(ErrorCode.HTTP_ERROR, message, e);
+        super(HTTP_ERROR, message, e);
     }
 
     public HttpException(int statusCode, String message) {
@@ -19,7 +21,7 @@ public final class HttpException extends BlueprintException {
     }
 
     public HttpException(@NonNull HttpResponseStatus statusCode, String message) {
-        super(ErrorCode.HTTP_ERROR, message);
+        super(HTTP_ERROR, message);
         this.statusCode = statusCode;
     }
 
@@ -28,7 +30,7 @@ public final class HttpException extends BlueprintException {
     public HttpException(Throwable e)    { this(null, e); }
 
     public HttpException(int statusCode, String message, Throwable e) {
-        super(ErrorCode.HTTP_ERROR, message, e);
+        super(HTTP_ERROR, message, e);
         this.statusCode = HttpResponseStatus.valueOf(statusCode);
     }
 

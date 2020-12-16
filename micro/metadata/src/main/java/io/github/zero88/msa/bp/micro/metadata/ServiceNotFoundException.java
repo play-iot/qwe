@@ -5,8 +5,10 @@ import io.github.zero88.msa.bp.exceptions.ServiceException;
 
 public final class ServiceNotFoundException extends ServiceException {
 
+    public static final ErrorCode CODE = ErrorCode.parse("SERVICE_NOT_FOUND");
+
     public ServiceNotFoundException(String message, Throwable e) {
-        super(ErrorCode.SERVICE_NOT_FOUND, message, e);
+        super(CODE, message, e);
     }
 
     public ServiceNotFoundException(String message) {

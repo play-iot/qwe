@@ -2,7 +2,9 @@ package io.github.zero88.msa.bp.exceptions;
 
 public final class NetworkException extends BlueprintException {
 
-    public NetworkException(String message, Throwable e) { super(ErrorCode.NETWORK_ERROR, message, e); }
+    public static final ErrorCode CODE = ErrorCode.parse("NETWORK_ERROR");
+
+    public NetworkException(String message, Throwable e) { super(CODE, message, e); }
 
     public NetworkException(String message)              { this(message, null); }
 

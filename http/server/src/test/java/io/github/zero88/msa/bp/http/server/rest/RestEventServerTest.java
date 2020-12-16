@@ -6,6 +6,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import io.github.zero88.msa.bp.exceptions.EngineException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.http.server.HttpServerRouter;
 import io.github.zero88.msa.bp.http.server.HttpServerTestBase;
@@ -17,8 +18,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-
-import io.github.zero88.msa.bp.TestHelper;
 
 @RunWith(VertxUnitRunner.class)
 public class RestEventServerTest extends HttpServerTestBase {
@@ -49,7 +48,7 @@ public class RestEventServerTest extends HttpServerTestBase {
     public void test_api_eventbus_error_from_server(TestContext context) {
         MockEventBusErrorListener.create(this.vertx.eventBus()).start();
         String path = "/api/test/events";
-        JsonObject expected = new JsonObject().put("code", ErrorCode.ENGINE_ERROR.code()).put("message", "Engine error");
+        JsonObject expected = new JsonObject().put("code", EngineException.CODE.code()).put("message", "Engine error");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockApiDefinition.MockRestEventApi.class));
         assertRestByClient(context, HttpMethod.POST, path, 500, expected);
     }

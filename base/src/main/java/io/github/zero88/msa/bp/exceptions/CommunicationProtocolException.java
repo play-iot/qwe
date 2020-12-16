@@ -2,8 +2,10 @@ package io.github.zero88.msa.bp.exceptions;
 
 public final class CommunicationProtocolException extends BlueprintException {
 
+    public static final ErrorCode CODE = ErrorCode.parse("COMMUNICATION_PROTOCOL_ERROR");
+
     public CommunicationProtocolException(String message, Throwable e) {
-        super(ErrorCode.COMMUNICATION_PROTOCOL_ERROR, message, e);
+        super(CommunicationProtocolException.CODE, message, e);
     }
 
     public CommunicationProtocolException(String message) { this(message, null); }
