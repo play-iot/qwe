@@ -2,8 +2,10 @@ package io.github.zero88.msa.bp.exceptions;
 
 public final class ConflictException extends BlueprintException {
 
+    public static final ErrorCode CODE = ErrorCode.parse("CONFLICT_ERROR");
+
     public ConflictException(String message, Throwable e) {
-        super(ErrorCode.CONFLICT_ERROR, message, e);
+        super(CODE, message, e);
     }
 
     public ConflictException(String message) {

@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 import io.github.zero88.msa.bp.component.SharedDataDelegate;
 import io.github.zero88.msa.bp.event.EventbusClient;
-import io.github.zero88.msa.bp.http.EventHttpService;
+import io.github.zero88.msa.bp.micro.metadata.EventHttpService;
 import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
 import io.github.zero88.msa.bp.utils.ExecutorHelpers;
 import io.reactivex.Observable;

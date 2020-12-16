@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.github.zero88.exceptions.HiddenException;
+import io.github.zero88.msa.bp.cluster.ClusterException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
+import io.github.zero88.msa.bp.exceptions.HttpException;
+import io.github.zero88.msa.bp.exceptions.NotFoundException;
 import io.github.zero88.msa.bp.exceptions.ServiceException;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -39,7 +42,7 @@ public class HttpStatusMappingTest {
     @Test
     public void test_error_bad_request() {
         Assertions.assertEquals(HttpResponseStatus.BAD_REQUEST,
-                                HttpStatusMapping.error(HttpMethod.DELETE, ErrorCode.HTTP_ERROR));
+                                HttpStatusMapping.error(HttpMethod.DELETE, HttpException.HTTP_ERROR));
         Assertions.assertEquals(HttpResponseStatus.BAD_REQUEST,
                                 HttpStatusMapping.error(HttpMethod.POST, ErrorCode.INVALID_ARGUMENT));
     }
@@ -72,7 +75,7 @@ public class HttpStatusMappingTest {
     public void test_error_service_unavailable() {
         Map<ErrorCode, List<HttpMethod>> test = new HashMap<>();
         test.put(ErrorCode.EVENT_ERROR, Arrays.asList(HttpMethod.values()));
-        test.put(ErrorCode.CLUSTER_ERROR, Arrays.asList(HttpMethod.values()));
+        test.put(ClusterException.CODE, Arrays.asList(HttpMethod.values()));
         test.entrySet()
             .stream()
             .parallel()
@@ -92,7 +95,7 @@ public class HttpStatusMappingTest {
 
     @Test
     public void test_error_by_exception_with_hidden() {
-        ServiceException t = new ServiceException("Hey", new HiddenException(ErrorCode.CLUSTER_ERROR, "xx", null));
+        ServiceException t = new ServiceException("Hey", new HiddenException(ClusterException.CODE, "xx", null));
         Assertions.assertEquals(HttpResponseStatus.SERVICE_UNAVAILABLE, HttpStatusMapping.error(HttpMethod.GET, t));
     }
 

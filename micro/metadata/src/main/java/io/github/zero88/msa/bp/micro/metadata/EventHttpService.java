@@ -1,9 +1,8 @@
-package io.github.zero88.msa.bp.http;
+package io.github.zero88.msa.bp.micro.metadata;
 
 import java.util.Set;
 
 import io.github.zero88.msa.bp.event.EventListener;
-import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 
 /**
  * Represents Event HTTP service.

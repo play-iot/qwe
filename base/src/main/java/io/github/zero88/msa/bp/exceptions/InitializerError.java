@@ -2,8 +2,10 @@ package io.github.zero88.msa.bp.exceptions;
 
 public class InitializerError extends BlueprintException {
 
+    public static final ErrorCode CODE = ErrorCode.parse("INITIALIZER_ERROR");
+
     public InitializerError(String message, Throwable e) {
-        super(ErrorCode.INITIALIZER_ERROR, message, e);
+        super(CODE, message, e);
     }
 
     public InitializerError(String message) { this(message, null);}

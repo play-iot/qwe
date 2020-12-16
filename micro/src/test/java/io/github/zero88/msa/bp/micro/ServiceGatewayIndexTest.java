@@ -9,8 +9,8 @@ import io.github.zero88.msa.bp.dto.msg.RequestData;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.Status;
-import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.micro.ServiceGatewayIndex.Params;
+import io.github.zero88.msa.bp.micro.metadata.ServiceNotFoundException;
 import io.github.zero88.msa.bp.micro.transfomer.RecordTransformer.RecordView;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -20,7 +20,7 @@ public class ServiceGatewayIndexTest extends BaseMicroServiceTest {
 
     @Test
     public void test_not_found(TestContext context) {
-        final JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_NOT_FOUND.code())
+        final JsonObject expected = new JsonObject().put("code", ServiceNotFoundException.CODE.code())
                                                     .put("message", "Not found service by given parameters: " +
                                                                     "{\"_by\":\"name\",\"identifier\":\"event.not" +
                                                                     ".found\"}");

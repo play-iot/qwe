@@ -84,8 +84,8 @@ public class BlueprintExceptionConverterTest {
     public void test_with_code_with_other_cause_has_message() {
         Assertions.assertThrows(RuntimeException.class, () -> {
             BlueprintException t = converter.apply(
-                new BlueprintException(ErrorCode.HTTP_ERROR, "abc", new RuntimeException("xyz")));
-            Assertions.assertEquals(ErrorCode.HTTP_ERROR, t.errorCode());
+                new BlueprintException(ErrorCode.NOT_FOUND, "abc", new RuntimeException("xyz")));
+            Assertions.assertEquals(ErrorCode.NOT_FOUND, t.errorCode());
             Assertions.assertEquals("abc | Cause: xyz", t.getMessage());
             throw t.getCause();
         });
@@ -95,7 +95,7 @@ public class BlueprintExceptionConverterTest {
     public void test_with_code_with_blueprint_cause() {
         Assertions.assertThrows(BlueprintException.class, () -> {
             BlueprintException t = converter.apply(new SecurityException("abc", new EngineException("xyz")));
-            Assertions.assertEquals(ErrorCode.SECURITY_ERROR, t.errorCode());
+            Assertions.assertEquals(SecurityException.CODE, t.errorCode());
             Assertions.assertEquals("abc | Cause: xyz - Error Code: ENGINE_ERROR", t.getMessage());
             throw t.getCause();
         });
