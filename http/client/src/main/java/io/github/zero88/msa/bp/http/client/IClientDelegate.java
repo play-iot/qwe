@@ -29,4 +29,5 @@ interface IClientDelegate extends Transporter, Supplier<HttpClient> {
      */
     void close();
 
+    io.vertx.reactivex.core.http.HttpClient getRx();
 }

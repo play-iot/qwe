@@ -39,7 +39,7 @@ public final class CircuitBreakerController implements Supplier<CircuitBreaker> 
         if (Objects.isNull(circuitBreaker)) {
             return command;
         }
-        return getRx().rxExecuteCommand(event -> command.subscribe(event::complete, event::fail));
+        return getRx().rxExecute(event -> command.subscribe(event::complete, event::fail));
     }
 
     private io.vertx.reactivex.circuitbreaker.CircuitBreaker getRx() {

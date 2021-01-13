@@ -86,6 +86,11 @@ abstract class ClientDelegate implements IClientDelegate {
         }
     }
 
+    @Override
+    public io.vertx.reactivex.core.http.HttpClient getRx() {
+        return io.vertx.reactivex.core.http.HttpClient.newInstance(get());
+    }
+
     void silentClose() {
         try {
             get().close();

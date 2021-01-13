@@ -6,8 +6,8 @@ import io.github.zero88.msa.bp.BlueprintConfig;
 import io.github.zero88.msa.bp.event.EventListener;
 import io.github.zero88.msa.bp.event.EventModel;
 import io.github.zero88.msa.bp.event.EventbusClient;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 
 /**
  * Represents a container consists a list of {@code Verticle unit} to startup application
@@ -53,7 +53,7 @@ public interface Container extends HasConfig<BlueprintConfig> {
 
     /**
      * Handle event after start all registered {@code Unit} successfully. It will called by {@link
-     * #installUnits(Future)} automatically
+     * #installUnits(Promise)} automatically
      *
      * @param successHandler Success handler after system start component successfully
      */
@@ -87,13 +87,13 @@ public interface Container extends HasConfig<BlueprintConfig> {
      *
      * @param future a future which should be called when all unit verticle start-up is complete.
      */
-    void installUnits(Future<Void> future);
+    void installUnits(Promise<Void> future);
 
     /**
      * Stop a list of register units
      *
      * @param future a future which should be called when all unit verticle clean-up is complete.
      */
-    void stopUnits(Future<Void> future);
+    void stopUnits(Promise<Void> future);
 
 }

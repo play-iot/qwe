@@ -19,8 +19,8 @@ import io.github.zero88.msa.bp.utils.ExecutorHelpers;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -56,14 +56,14 @@ public abstract class ContainerVerticle extends AbstractVerticle implements Cont
     }
 
     @Override
-    public void start(Future<Void> future) {
+    public void start(Promise<Void> promise) {
         this.start();
-        this.installUnits(future);
+        this.installUnits(promise);
     }
 
     @Override
-    public void stop(Future<Void> future) {
-        this.stopUnits(future);
+    public void stop(Promise<Void> promise) {
+        this.stopUnits(promise);
     }
 
     @Override
@@ -95,7 +95,7 @@ public abstract class ContainerVerticle extends AbstractVerticle implements Cont
 
     @Override
     @SuppressWarnings("unchecked")
-    public final void installUnits(Future<Void> future) {
+    public final void installUnits(Promise<Void> promise) {
         ExecutorHelpers.blocking(getVertx(), components::entrySet).flattenAsObservable(s -> s).flatMapSingle(entry -> {
             Unit unit = entry.getValue().get().registerSharedKey(getSharedKey());
             JsonObject deployConfig = IConfig.from(this.config, unit.configClass()).toJson();
@@ -107,11 +107,11 @@ public abstract class ContainerVerticle extends AbstractVerticle implements Cont
             logger.info("Deployed {} unit verticle(s)...", count);
             Optional.ofNullable(successHandler).ifPresent(handler -> handler.handle(null));
             return count;
-        }).subscribe(count -> future.complete(), throwable -> fail(future, throwable));
+        }).subscribe(count -> promise.complete(), throwable -> fail(promise, throwable));
     }
 
     @Override
-    public final void stopUnits(Future<Void> future) {
+    public final void stopUnits(Promise<Void> future) {
         Flowable.fromIterable(this.deployments)
                 .parallel()
                 .map(vertx::rxUndeploy)
@@ -123,10 +123,10 @@ public abstract class ContainerVerticle extends AbstractVerticle implements Cont
                 }, future::fail);
     }
 
-    private void fail(Future<Void> future, Throwable throwable) {
+    private void fail(Promise<Void> promise, Throwable throwable) {
         BlueprintException t = BlueprintExceptionConverter.from(throwable);
         logger.error("Cannot start container verticle {}", t, this.getClass().getName());
-        future.fail(t);
+        promise.fail(t);
     }
 
     @SuppressWarnings("unchecked")

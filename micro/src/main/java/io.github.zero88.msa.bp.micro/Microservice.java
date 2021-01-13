@@ -1,7 +1,7 @@
 package io.github.zero88.msa.bp.micro;
 
 import io.github.zero88.msa.bp.component.UnitVerticle;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 
 public final class Microservice extends UnitVerticle<MicroConfig, MicroContext> {
 
@@ -17,7 +17,7 @@ public final class Microservice extends UnitVerticle<MicroConfig, MicroContext> 
     }
 
     @Override
-    public void stop(Future<Void> future) { getContext().unregister(future); }
+    public void stop(Promise<Void> promise) { getContext().unregister(promise); }
 
     @Override
     public Class<MicroConfig> configClass() { return MicroConfig.class; }

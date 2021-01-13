@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
  * @see WebSocketServerEventMetadata
  */
 @RequiredArgsConstructor
-public abstract class WsLightResponseDispatcher implements Handler<Buffer> {
+public abstract class WebSocketResponseDispatcher implements Handler<Buffer> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -34,11 +34,11 @@ public abstract class WsLightResponseDispatcher implements Handler<Buffer> {
     private final EventModel listener;
 
     @SuppressWarnings("unchecked")
-    public static <T extends WsLightResponseDispatcher> T create(@NonNull EventbusClient controller,
-                                                                 @NonNull EventModel listener,
-                                                                 @NonNull Class<T> bodyHandlerClass) {
-        if (Objects.isNull(bodyHandlerClass) || WsLightResponseDispatcher.class.equals(bodyHandlerClass)) {
-            return (T) new WsLightResponseDispatcher(controller, listener) {};
+    public static <T extends WebSocketResponseDispatcher> T create(@NonNull EventbusClient controller,
+                                                                   @NonNull EventModel listener,
+                                                                   @NonNull Class<T> bodyHandlerClass) {
+        if (Objects.isNull(bodyHandlerClass) || WebSocketResponseDispatcher.class.equals(bodyHandlerClass)) {
+            return (T) new WebSocketResponseDispatcher(controller, listener) {};
         }
         Map<Class, Object> params = new LinkedHashMap<>();
         params.put(EventbusClient.class, controller);

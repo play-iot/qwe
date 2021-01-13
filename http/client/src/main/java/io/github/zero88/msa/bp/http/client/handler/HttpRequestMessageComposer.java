@@ -13,18 +13,22 @@ import io.vertx.core.http.HttpHeaders;
 import lombok.NonNull;
 
 /**
- * Represents for {@code HTTP client} write data (header/body/cookie) into request before actual sending to specific
- * server.
- * <b>Notice:</b> Never close {@code HTTPClientRequest} in this function
+ * Represents for a composer that prepare and compose {@code HTTP Request Message} to send it to any host
+ * <p>
+ * {@code HTTP Request Message} includes {@code HTTP Request Header}, {@code HTTP Request payload}
+ *
+ * @apiNote Never close {@code HTTPClientRequest} in this function
+ * @see <a href="https://tools.ietf.org/html/rfc7231#section-5">HTTP Request header</a>
+ * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.3">HTTP Request payload</a>
  */
 //TODO Optimize header
-public interface HttpClientWriter extends BiFunction<HttpClientRequest, RequestData, HttpClientRequest> {
+public interface HttpRequestMessageComposer extends BiFunction<HttpClientRequest, RequestData, HttpClientRequest> {
 
-    HttpClientWriter DEFAULT = new HttpClientWriter() {};
+    HttpRequestMessageComposer DEFAULT = new HttpRequestMessageComposer() {};
 
     @SuppressWarnings("unchecked")
-    static <T extends HttpClientWriter> T create(Class<T> writerClass) {
-        return Objects.isNull(writerClass) || HttpClientWriter.class.equals(writerClass)
+    static <T extends HttpRequestMessageComposer> T create(Class<T> writerClass) {
+        return Objects.isNull(writerClass) || HttpRequestMessageComposer.class.equals(writerClass)
                ? (T) DEFAULT
                : ReflectionClass.createObject(writerClass);
     }

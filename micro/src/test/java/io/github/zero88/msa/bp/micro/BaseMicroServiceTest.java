@@ -14,6 +14,7 @@ import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 import io.reactivex.Single;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -64,7 +65,7 @@ public abstract class BaseMicroServiceTest {
     @After
     public void tearDown() {
         if (Objects.nonNull(micro)) {
-            micro.unregister(Future.future());
+            micro.unregister(Promise.promise());
         }
         vertx.close();
     }

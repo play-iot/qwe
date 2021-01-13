@@ -21,6 +21,7 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.jackson.DatabindCodec;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -43,10 +44,11 @@ import lombok.NonNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface JsonData {
 
-    ObjectMapper MAPPER = Json.mapper.copy()
-                                     .registerModule(new JavaTimeModule())
-                                     .registerModule(JsonModule.BASIC)
-                                     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    ObjectMapper MAPPER = DatabindCodec.mapper()
+                                       .copy()
+                                       .registerModule(new JavaTimeModule())
+                                       .registerModule(JsonModule.BASIC)
+                                       .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     ObjectMapper LENIENT_MAPPER = MAPPER.copy().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     String SUCCESS_KEY = "data";
     String ERROR_KEY = "error";

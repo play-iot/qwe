@@ -1,6 +1,5 @@
 package io.github.zero88.msa.bp.http;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,12 +47,12 @@ public class HttpStatusMappingTest {
 
     @Test
     public void test_error_gone() {
-        Arrays.stream(HttpMethod.values())
-              .parallel()
-              .filter(method -> HttpMethod.GET != method)
-              .forEach(method -> Assertions.assertEquals(HttpResponseStatus.GONE,
-                                                         HttpStatusMapping.error(method, ErrorCode.NOT_FOUND),
-                                                         "HTTP Method: " + method));
+        HttpMethod.values()
+                  .parallelStream()
+                  .filter(method -> HttpMethod.GET != method)
+                  .forEach(method -> Assertions.assertEquals(HttpResponseStatus.GONE,
+                                                             HttpStatusMapping.error(method, ErrorCode.NOT_FOUND),
+                                                             "HTTP Method: " + method));
     }
 
     @Test
@@ -73,8 +72,8 @@ public class HttpStatusMappingTest {
     @Test
     public void test_error_service_unavailable() {
         Map<ErrorCode, List<HttpMethod>> test = new HashMap<>();
-        test.put(ErrorCode.EVENT_ERROR, Arrays.asList(HttpMethod.values()));
-        test.put(ClusterException.CODE, Arrays.asList(HttpMethod.values()));
+        test.put(ErrorCode.EVENT_ERROR, HttpMethod.values());
+        test.put(ClusterException.CODE, HttpMethod.values());
         test.entrySet()
             .stream()
             .parallel()

@@ -23,14 +23,18 @@ import io.github.zero88.msa.bp.http.server.HttpServerTestBase;
 import io.github.zero88.msa.bp.http.server.mock.MockWebSocketEvent;
 import io.github.zero88.msa.bp.http.server.mock.MockWebSocketEvent.MockWebSocketEventServerListener;
 import io.github.zero88.utils.Urls;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.UpgradeRejectedException;
 import io.vertx.core.http.WebSocket;
+import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.reactivex.core.http.HttpClientRequest;
+import io.vertx.reactivex.core.http.HttpClientResponse;
 
 @Ignore
 @RunWith(VertxUnitRunner.class)
@@ -153,21 +157,39 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
     }
 
     private void assertGreeting(TestContext context, Async async, String uri) {
-        client.getNow(requestOptions.setURI(uri), resp -> {
-            context.assertEquals(200, resp.statusCode());
-            context.assertEquals("text/plain; charset=UTF-8", resp.getHeader("content-type"));
-            resp.bodyHandler(buff -> {
-                context.assertEquals("Welcome to SockJS!\n", buff.toString());
-                testComplete(async);
+        client.request(requestOptions.setURI(uri).setMethod(HttpMethod.GET), ar -> {
+            if (!ar.succeeded()) {
+                context.fail(ar.cause());
+                return;
+            }
+            final HttpClientRequest request = ar.result();
+            request.send(ar2 -> {
+                if (!ar2.succeeded()) {
+                    context.fail(ar2.cause());
+                    return;
+                }
+                final HttpClientResponse resp = ar2.result();
+                context.assertEquals(200, resp.statusCode());
+                context.assertEquals("text/plain; charset=UTF-8", resp.getHeader("content-type"));
+                resp.bodyHandler(buff -> {
+                    context.assertEquals("Welcome to SockJS!\n", buff.toString());
+                    testComplete(async);
+                });
             });
         });
     }
 
     private void assertNotFound(TestContext context, Async async, String uri) {
-        client.websocket(requestOptions.setURI(uri), websocket -> testComplete(async), t -> {
+        WebSocketConnectOptions opt = new WebSocketConnectOptions(requestOptions.setURI(uri).toJson());
+        client.webSocket(opt, ar -> {
+            if (ar.succeeded()) {
+                testComplete(async);
+                return;
+            }
+            final Throwable cause = ar.cause();
             try {
-                if (t instanceof UpgradeRejectedException) {
-                    context.assertEquals(404, ((UpgradeRejectedException) t).getStatus());
+                if (cause instanceof UpgradeRejectedException) {
+                    context.assertEquals(404, ((UpgradeRejectedException) cause).getStatus());
                 }
             } finally {
                 testComplete(async);

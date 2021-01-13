@@ -12,7 +12,6 @@ import io.github.zero88.msa.bp.BlueprintConfig.DeployConfig;
 import io.github.zero88.msa.bp.utils.Configs;
 import io.github.zero88.msa.bp.utils.Networks;
 import io.github.zero88.utils.Functions;
-import io.github.zero88.utils.Strings;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;
@@ -21,7 +20,6 @@ import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.spi.cluster.ClusterManager;
 
 import lombok.NonNull;
 
@@ -48,11 +46,11 @@ public final class BlueprintLauncher extends Launcher {
         if (logger.isDebugEnabled()) {
             logger.debug("CONFIG::INPUT: {}", config.encode());
         }
-        BlueprintConfig fileConfig = IConfig.merge(Configs.loadJsonConfig("system.json"), config,
-                                                   BlueprintConfig.class);
-        Vertx dummy = Vertx.vertx();
-        this.config = new ConfigProcessor(dummy).override(fileConfig.toJson(), false, true).orElse(fileConfig);
-        dummy.close();
+        this.config = IConfig.merge(Configs.loadJsonConfig("system.json"), config, BlueprintConfig.class);
+        //        Vertx dummy = Vertx.vertx();
+        //        this.config = new ConfigProcessor(dummy).override(fileConfig.toJson(), false, true).orElse
+        //        (fileConfig);
+        //        dummy.close();
         JsonObject cfg = this.config.toJson();
         if (logger.isDebugEnabled()) {
             logger.debug("CONFIG::FINAL: {}", cfg.encode());
@@ -70,16 +68,16 @@ public final class BlueprintLauncher extends Launcher {
     @Override
     public void afterStartingVertx(Vertx vertx) {
         if (vertx.isClustered()) {
-            String addr = config.getSystemConfig().getClusterConfig().getListenerAddress();
-            ClusterManager clusterManager = this.options.getClusterManager();
-            if (Strings.isNotBlank(addr)) {
-                //                clusterManager.nodeListener(new ClusterNodeListener(clusterDelegate,
-                //                                                                    SharedDataDelegate
-                //                                                                    .getEventController(vertx,
-                //                                                                                                          this.getClass()
-                //                                                                                                              .getName()),
-                //                                                                    addr));
-            }
+            //            String addr = config.getSystemConfig().getClusterConfig().getListenerAddress();
+            //            ClusterManager clusterManager = this.options.getClusterManager();
+            //            if (Strings.isNotBlank(addr)) {
+            //                clusterManager.nodeListener(new ClusterNodeListener(clusterDelegate,
+            //                                                                    SharedDataDelegate
+            //                                                                    .getEventController(vertx,
+            //                                                                                                          this.getClass()
+            //                                                                                                              .getName()),
+            //                                                                    addr));
+            //            }
         }
         super.afterStartingVertx(vertx);
     }
@@ -95,14 +93,14 @@ public final class BlueprintLauncher extends Launcher {
 
     @Override
     public void afterStoppingVertx() {
-        ClusterManager clusterManager = this.options.getClusterManager();
-        if (Objects.nonNull(clusterManager)) {
-            clusterManager.leave(event -> {
-                if (event.failed()) {
-                    logger.error("Failed to leave cluster", event.cause());
-                }
-            });
-        }
+        //        ClusterManager clusterManager = this.options.getClusterManager();
+        //        if (Objects.nonNull(clusterManager)) {
+        //            clusterManager.leave(promise -> {
+        //                if (promise.failed()) {
+        //                    logger.error("Failed to leave cluster", promise.cause());
+        //                }
+        //            });
+        //        }
         super.afterStoppingVertx();
     }
 

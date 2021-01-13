@@ -8,17 +8,16 @@ import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.HttpUtils.HttpRequests;
 import io.github.zero88.msa.bp.http.client.HttpClientConfig.HandlerConfig;
-import io.github.zero88.msa.bp.http.client.handler.HttpClientWriter;
 import io.github.zero88.msa.bp.http.client.handler.HttpErrorHandler;
-import io.github.zero88.msa.bp.http.client.handler.HttpLightResponseHandler;
+import io.github.zero88.msa.bp.http.client.handler.HttpRequestMessageComposer;
+import io.github.zero88.msa.bp.http.client.handler.HttpResponseTextHandler;
 import io.github.zero88.utils.Urls;
 import io.reactivex.Single;
-import io.vertx.core.Handler;
+import io.reactivex.SingleEmitter;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -39,23 +38,15 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
     }
 
     @Override
-    public Single<ResponseData> execute(String path, HttpMethod method, RequestData requestData, boolean swallowError) {
+    public Single<ResponseData> request(String path, HttpMethod method, RequestData requestData, boolean swallowError) {
         final RequestData reqData = decorator(requestData);
         final HostInfo hostInfo = getHostInfo();
         final HandlerConfig cfg = getHandlerConfig();
         return Single.<ResponseData>create(emitter -> {
-            Handler<HttpClientResponse> respHandler = HttpLightResponseHandler.create(emitter, swallowError,
-                                                                                      cfg.getHttpLightBodyHandlerClass());
-            HttpErrorHandler errHandler = HttpErrorHandler.create(emitter, hostInfo, cfg.getHttpErrorHandlerClass());
-            String query = HttpRequests.serializeQuery(reqData.filter());
-            HttpClientRequest req = get().request(method, Urls.buildURL(path, query), respHandler)
-                                         .exceptionHandler(errHandler);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Send HTTP request {}::{} | <{}>", req.method(), req.absoluteURI(), reqData.toJson());
-            } else {
-                logger.info("Send HTTP request {}::{}", req.method(), req.absoluteURI());
-            }
-            HttpClientWriter.create(cfg.getHttpClientWriterClass()).apply(req, reqData).end();
+            HttpErrorHandler errHandler = HttpErrorHandler.create(emitter, hostInfo, cfg.getHttpErrorHandlerCls());
+            get().request(method, Urls.buildURL(path, HttpRequests.serializeQuery(reqData.filter())))
+                 .onSuccess(req -> onConnectionSuccess(req, reqData, cfg, emitter, swallowError, errHandler))
+                 .onFailure(errHandler);
         }).doOnSuccess(res -> HttpClientRegistry.getInstance().remove(hostInfo, false))
           .doOnError(err -> HttpClientRegistry.getInstance().remove(hostInfo, false))
           .subscribeOn(RxHelper.blockingScheduler(getVertx()));
@@ -93,6 +84,21 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
             headers.put(HttpHeaders.USER_AGENT.toString(), this.getUserAgent());
         }
         return reqData;
+    }
+
+    private void onConnectionSuccess(HttpClientRequest req, RequestData reqData, HandlerConfig cfg,
+                                     SingleEmitter<ResponseData> emitter, boolean swallowError,
+                                     HttpErrorHandler errHandler) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Send HTTP request {}::{} | <{}>", req.getMethod(), req.absoluteURI(), reqData.toJson());
+        } else {
+            logger.info("Send HTTP request {}::{}", req.getMethod(), req.absoluteURI());
+        }
+        HttpRequestMessageComposer.create(cfg.getRequestComposerCls())
+                                  .apply(req, reqData)
+                                  .exceptionHandler(errHandler)
+                                  .send(HttpResponseTextHandler.create(emitter, swallowError,
+                                                                       cfg.getResponseTextHandlerCls()));
     }
 
 }

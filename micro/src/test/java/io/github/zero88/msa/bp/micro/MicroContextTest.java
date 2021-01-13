@@ -22,7 +22,7 @@ import io.github.zero88.msa.bp.micro.ServiceGatewayIndex.Params;
 import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 import io.github.zero88.msa.bp.micro.mock.MockEventbusService;
 import io.github.zero88.msa.bp.micro.type.EventMessageService;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -50,7 +50,7 @@ public class MicroContextTest {
     @After
     public void tearDown() {
         if (Objects.nonNull(micro)) {
-            micro.unregister(Future.future());
+            micro.unregister(Promise.promise());
         }
         vertx.close();
     }
@@ -90,8 +90,7 @@ public class MicroContextTest {
         micro = new MicroContext().setup(vertx, IConfig.fromClasspath("local.json", MicroConfig.class));
         JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"address1\"},\"metadata\":{\"service" +
                                              ".interface\":\"io.github.zero88.msa.bp.micro.mock" +
-                                             ".MockEventbusService\"}," +
-                                             "\"name\":\"test\",\"status\":\"UP\"," +
+                                             ".MockEventbusService\"}," + "\"name\":\"test\",\"status\":\"UP\"," +
                                              "\"type\":\"eventbus-service-proxy\"}");
         EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected));

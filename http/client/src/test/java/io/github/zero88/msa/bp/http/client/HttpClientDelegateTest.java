@@ -53,7 +53,7 @@ public class HttpClientDelegateTest {
     public void test_get_success(TestContext context) {
         Async async = context.async();
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
-        client.execute("/get?foo1=bar1&foo2=bar2", HttpMethod.GET, null)
+        client.request("/get?foo1=bar1&foo2=bar2", HttpMethod.GET, null)
               .doFinally(() -> TestHelper.testComplete(async))
               .subscribe(resp -> {
                   System.out.println(resp.body());
@@ -68,7 +68,7 @@ public class HttpClientDelegateTest {
         Async async = context.async();
         config.getOptions().setConnectTimeout(2000).setIdleTimeout(1);
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
-        client.execute("/delay/5", HttpMethod.GET, null)
+        client.request("/delay/5", HttpMethod.GET, null)
               .doFinally(() -> TestHelper.testComplete(async))
               .subscribe((responseData, throwable) -> context.assertTrue(throwable instanceof TimeoutException));
     }
@@ -78,7 +78,7 @@ public class HttpClientDelegateTest {
         Async async = context.async();
         config.getOptions().setConnectTimeout(2000).setIdleTimeout(1);
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
-        client.execute("/xxx", HttpMethod.GET, null)
+        client.request("/xxx", HttpMethod.GET, null)
               .doFinally(() -> TestHelper.testComplete(async))
               .subscribe((responseData, throwable) -> {
                   context.assertEquals(404, responseData.getStatus().code());
@@ -91,7 +91,7 @@ public class HttpClientDelegateTest {
         Async async = context.async();
         config.getOptions().setConnectTimeout(2000).setIdleTimeout(1);
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
-        client.execute("/xxx", HttpMethod.GET, null, false)
+        client.request("/xxx", HttpMethod.GET, null, false)
               .doFinally(() -> TestHelper.testComplete(async))
               .subscribe((responseData, throwable) -> {
                   context.assertNull(responseData);
@@ -121,13 +121,13 @@ public class HttpClientDelegateTest {
         context.assertEquals(2, HttpClientRegistry.getInstance().getHttpRegistries().size());
         context.assertEquals(1, HttpClientRegistry.getInstance().getHttpRegistries().get(host2).current());
 
-        client1.execute("/xxx", HttpMethod.GET, null)
+        client1.request("/xxx", HttpMethod.GET, null)
                .subscribe((r, t) -> countDown(async, latch, client1, r, t, "/xxx", false));
 
-        client2.execute("/yyy", HttpMethod.GET, null)
+        client2.request("/yyy", HttpMethod.GET, null)
                .subscribe((r, t) -> countDown(async, latch, client2, r, t, "/yyy", false));
 
-        client3.execute("/echo", HttpMethod.GET, null)
+        client3.request("/echo", HttpMethod.GET, null)
                .subscribe((r, t) -> countDown(async, latch, client3, r, t, "/echo", true));
         final boolean await = latch.await(TestHelper.TEST_TIMEOUT_SEC * 2, TimeUnit.SECONDS);
         if (await) {

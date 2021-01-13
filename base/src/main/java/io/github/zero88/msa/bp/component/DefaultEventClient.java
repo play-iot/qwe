@@ -72,7 +72,7 @@ final class DefaultEventClient implements EventbusClient {
         }
         if (pattern == EventPattern.REQUEST_RESPONSE) {
             Objects.requireNonNull(replyHandler, "Must provide message reply handler");
-            vertx.eventBus().send(address, data, options, replyHandler);
+            vertx.eventBus().request(address, data, options, replyHandler);
         }
     }
 

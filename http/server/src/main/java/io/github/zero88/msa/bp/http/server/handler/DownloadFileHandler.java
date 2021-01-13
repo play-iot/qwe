@@ -9,6 +9,8 @@ import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.RoutingContext;
 
 import lombok.Getter;
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class DownloadFileHandler implements Handler<RoutingContext> {
 
+    private final Logger logger = LoggerFactory.getLogger(DownloadFileHandler.class);
     private final String downloadPath;
     private final Path downloadDir;
 
@@ -48,8 +51,11 @@ public abstract class DownloadFileHandler implements Handler<RoutingContext> {
             context.response()
                    .setChunked(true)
                    .setStatusCode(HttpResponseStatus.OK.code())
-                   .sendFile(filePath.toString())
-                   .end();
+                   .sendFile(filePath.toString(), ar -> {
+                       if (!ar.succeeded()) {
+                           logger.warn("Something wrong when sending file", ar.cause());
+                       }
+                   });
         } else {
             throw new NotFoundException("Not found");
         }

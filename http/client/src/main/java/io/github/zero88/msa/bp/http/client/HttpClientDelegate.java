@@ -86,11 +86,11 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @param method      Http Method
      * @param requestData Request data
      * @return single response data. Must be subscribe before using
-     * @apiNote It is equivalent to call {@link #execute(String, HttpMethod, RequestData, boolean)} with {@code
+     * @apiNote It is equivalent to call {@link #request(String, HttpMethod, RequestData, boolean)} with {@code
      *     swallowError} is {@code true}
      */
-    default Single<ResponseData> execute(String path, HttpMethod method, RequestData requestData) {
-        return this.execute(path, method, requestData, true);
+    default Single<ResponseData> request(String path, HttpMethod method, RequestData requestData) {
+        return this.request(path, method, requestData, true);
     }
 
     /**
@@ -103,7 +103,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      *                     HTTP Response status code >= 400}
      * @return single response data. Must be subscribe before using
      */
-    Single<ResponseData> execute(String path, HttpMethod method, RequestData requestData, boolean swallowError);
+    Single<ResponseData> request(String path, HttpMethod method, RequestData requestData, boolean swallowError);
 
     /**
      * Upload file in {@code POST} method

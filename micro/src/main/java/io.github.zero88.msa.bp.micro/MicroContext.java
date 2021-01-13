@@ -5,7 +5,7 @@ import java.util.Objects;
 import io.github.zero88.msa.bp.component.SharedDataDelegate;
 import io.github.zero88.msa.bp.component.UnitContext;
 import io.github.zero88.msa.bp.micro.MicroConfig.GatewayConfig;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
@@ -56,9 +56,9 @@ public final class MicroContext extends UnitContext {
                           .register(config.getIndexAddress(), new ServiceGatewayIndex(this));
     }
 
-    void unregister(Future future) {
-        this.clusterController.unregister(future);
-        this.localController.unregister(future);
+    void unregister(Promise<Void> promise) {
+        this.clusterController.unregister(promise);
+        this.localController.unregister(promise);
     }
 
     public void rescanService(EventBus eventBus) {

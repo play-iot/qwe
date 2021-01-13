@@ -1,8 +1,6 @@
 package io.github.zero88.msa.bp.http;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,8 +38,8 @@ public final class HttpStatusMapping {
     private static Map<String, Map<HttpMethod, HttpResponseStatus>> initMethod() {
         Map<String, Map<HttpMethod, HttpResponseStatus>> map = new HashMap<>();
 
-        Map<HttpMethod, HttpResponseStatus> notFound = new EnumMap<>(HttpMethod.class);
-        Arrays.stream(HttpMethod.values()).forEach(method -> notFound.put(method, HttpResponseStatus.GONE));
+        Map<HttpMethod, HttpResponseStatus> notFound = new HashMap<>();
+        HttpMethod.values().forEach(method -> notFound.put(method, HttpResponseStatus.GONE));
         notFound.put(HttpMethod.GET, HttpResponseStatus.NOT_FOUND);
         map.put(ErrorCode.NOT_FOUND.code(), notFound);
 

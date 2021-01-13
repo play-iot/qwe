@@ -43,7 +43,7 @@ import io.github.zero88.msa.bp.http.server.ws.WebSocketEventBuilder;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
@@ -84,7 +84,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
     }
 
     @Override
-    public void start(Future<Void> future) {
+    public void start(Promise<Void> promise) {
         logger.info("Starting HTTP Server...");
         super.start();
         this.dataDir = this.getSharedData(SharedDataDelegate.SHARED_DATADIR,
@@ -97,10 +97,10 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
                 int port = event.result().actualPort();
                 logger.info("Web Server started at {}", port);
                 this.getContext().setup(addSharedData(SERVER_INFO_DATA_KEY, createServerInfo(handler, port)));
-                future.complete();
+                promise.complete();
                 return;
             }
-            future.fail(BlueprintExceptionConverter.from(event.cause()));
+            promise.fail(BlueprintExceptionConverter.from(event.cause()));
         });
     }
 

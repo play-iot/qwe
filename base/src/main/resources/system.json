@@ -57,7 +57,6 @@
     "instances": 1,
     "maxWorkerExecuteTime": 60000000000,
     "maxWorkerExecuteTimeUnit": "NANOSECONDS",
-    "multiThreaded": false,
     "worker": false,
     "workerPoolSize": 20
   },

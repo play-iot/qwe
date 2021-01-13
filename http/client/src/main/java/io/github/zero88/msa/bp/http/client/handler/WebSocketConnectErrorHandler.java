@@ -23,17 +23,17 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class WsConnectErrorHandler implements Handler<Throwable> {
+public abstract class WebSocketConnectErrorHandler implements Handler<Throwable> {
 
     private final HostInfo hostInfo;
     private final EventbusClient controller;
 
     @SuppressWarnings("unchecked")
-    public static <T extends WsConnectErrorHandler> T create(@NonNull HostInfo hostInfo,
-                                                             @NonNull EventbusClient controller,
-                                                             @NonNull Class<T> connErrorHandlerClass) {
-        if (Objects.isNull(connErrorHandlerClass) || WsConnectErrorHandler.class.equals(connErrorHandlerClass)) {
-            return (T) new WsConnectErrorHandler(hostInfo, controller) {};
+    public static <T extends WebSocketConnectErrorHandler> T create(@NonNull HostInfo hostInfo,
+                                                                    @NonNull EventbusClient controller,
+                                                                    @NonNull Class<T> connErrorHandlerClass) {
+        if (Objects.isNull(connErrorHandlerClass) || WebSocketConnectErrorHandler.class.equals(connErrorHandlerClass)) {
+            return (T) new WebSocketConnectErrorHandler(hostInfo, controller) {};
         }
         Map<Class, Object> params = new LinkedHashMap<>();
         params.put(HostInfo.class, hostInfo);

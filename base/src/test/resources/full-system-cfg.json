@@ -50,7 +50,6 @@
   },
   "__deploy__": {
     "worker": false,
-    "multiThreaded": false,
     "workerPoolSize": 20,
     "maxWorkerExecuteTime": 60000000000,
     "ha": false,

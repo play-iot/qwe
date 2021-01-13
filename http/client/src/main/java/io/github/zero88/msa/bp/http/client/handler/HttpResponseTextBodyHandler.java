@@ -27,10 +27,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Represents for handler {@code HTTP Response}
+ * Represents for {@code HTTP Response Body} handler
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3">HTTP Response Body</a>
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages#body_2">HTTP Response body</a>
  */
 @RequiredArgsConstructor
-public abstract class HttpLightResponseBodyHandler implements Handler<Buffer> {
+public abstract class HttpResponseTextBodyHandler implements Handler<Buffer> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @NonNull
@@ -40,11 +43,11 @@ public abstract class HttpLightResponseBodyHandler implements Handler<Buffer> {
     private final boolean swallowError;
 
     @SuppressWarnings("unchecked")
-    public static <T extends HttpLightResponseBodyHandler> T create(HttpClientResponse response,
-                                                                    SingleEmitter<ResponseData> emitter,
-                                                                    boolean swallowError, Class<T> bodyHandlerClass) {
-        if (Objects.isNull(bodyHandlerClass) || HttpLightResponseBodyHandler.class.equals(bodyHandlerClass)) {
-            return (T) new HttpLightResponseBodyHandler(response, emitter, swallowError) {};
+    public static <T extends HttpResponseTextBodyHandler> T create(HttpClientResponse response,
+                                                                   SingleEmitter<ResponseData> emitter,
+                                                                   boolean swallowError, Class<T> bodyHandlerClass) {
+        if (Objects.isNull(bodyHandlerClass) || HttpResponseTextBodyHandler.class.equals(bodyHandlerClass)) {
+            return (T) new HttpResponseTextBodyHandler(response, emitter, swallowError) {};
         }
         Map<Class, Object> params = new LinkedHashMap<>();
         params.put(HttpClientResponse.class, response);
@@ -57,7 +60,7 @@ public abstract class HttpLightResponseBodyHandler implements Handler<Buffer> {
     public void handle(Buffer buffer) {
         final JsonObject body = tryParse(buffer);
         if (!swallowError && response.statusCode() >= 400) {
-            ErrorCode code = HttpStatusMapping.error(response.request().method(), response.statusCode());
+            ErrorCode code = HttpStatusMapping.error(response.request().getMethod(), response.statusCode());
             emitter.onError(new BlueprintException(code, body.encode()));
             return;
         }
@@ -72,7 +75,7 @@ public abstract class HttpLightResponseBodyHandler implements Handler<Buffer> {
 
     protected JsonObject tryParse(Buffer buffer) {
         String contentType = response.getHeader(HttpHeaders.CONTENT_TYPE);
-        final HttpMethod method = response.request().method();
+        final HttpMethod method = response.request().getMethod();
         final String uri = response.request().absoluteURI();
         final boolean isError = response.statusCode() >= 400;
         if (Strings.isNotBlank(contentType) && contentType.contains("json")) {

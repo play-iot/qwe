@@ -33,6 +33,7 @@ import io.vertx.core.logging.LoggerFactory;
 
 import lombok.NonNull;
 
+@Deprecated
 public final class ConfigProcessor {
 
     private static final int DOMAIN_CFG_INDEX = 2;

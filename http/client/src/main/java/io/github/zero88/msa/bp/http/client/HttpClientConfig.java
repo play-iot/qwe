@@ -7,13 +7,13 @@ import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.http.HostInfo;
-import io.github.zero88.msa.bp.http.client.handler.HttpClientWriter;
 import io.github.zero88.msa.bp.http.client.handler.HttpErrorHandler;
-import io.github.zero88.msa.bp.http.client.handler.HttpHeavyResponseHandler;
-import io.github.zero88.msa.bp.http.client.handler.HttpLightResponseBodyHandler;
-import io.github.zero88.msa.bp.http.client.handler.WsConnectErrorHandler;
-import io.github.zero88.msa.bp.http.client.handler.WsLightResponseDispatcher;
-import io.github.zero88.msa.bp.http.client.handler.WsResponseErrorHandler;
+import io.github.zero88.msa.bp.http.client.handler.HttpRequestMessageComposer;
+import io.github.zero88.msa.bp.http.client.handler.HttpResponseBinaryHandler;
+import io.github.zero88.msa.bp.http.client.handler.HttpResponseTextBodyHandler;
+import io.github.zero88.msa.bp.http.client.handler.WebSocketConnectErrorHandler;
+import io.github.zero88.msa.bp.http.client.handler.WebSocketResponseDispatcher;
+import io.github.zero88.msa.bp.http.client.handler.WebSocketResponseErrorHandler;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpClientOptions;
@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -104,45 +105,46 @@ public final class HttpClientConfig implements IConfig {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class HandlerConfig {
 
-        private Class<? extends HttpClientWriter> httpClientWriterClass = HttpClientWriter.class;
-        private Class<? extends HttpLightResponseBodyHandler> httpLightBodyHandlerClass
-            = HttpLightResponseBodyHandler.class;
-        private Class<? extends HttpHeavyResponseHandler> httpHeavyBodyHandlerClass = HttpHeavyResponseHandler.class;
-        private Class<? extends HttpErrorHandler> httpErrorHandlerClass = HttpErrorHandler.class;
-        private Class<? extends WsConnectErrorHandler> wsConnectErrorHandlerClass = WsConnectErrorHandler.class;
-        private Class<? extends WsResponseErrorHandler> wsErrorHandlerClass = WsResponseErrorHandler.class;
-        private Class<? extends WsLightResponseDispatcher> wsLightResponseHandlerClass
-            = WsLightResponseDispatcher.class;
+        private Class<? extends HttpRequestMessageComposer> requestComposerCls = HttpRequestMessageComposer.class;
+        private Class<? extends HttpResponseTextBodyHandler> responseTextHandlerCls = HttpResponseTextBodyHandler.class;
+        private Class<? extends HttpResponseBinaryHandler> responseBinaryHandlerCls = HttpResponseBinaryHandler.class;
+        private Class<? extends HttpErrorHandler> httpErrorHandlerCls = HttpErrorHandler.class;
+        private Class<? extends WebSocketConnectErrorHandler> webSocketConnectErrorHandlerCls
+            = WebSocketConnectErrorHandler.class;
+        private Class<? extends WebSocketResponseErrorHandler> webSocketErrorHandlerCls
+            = WebSocketResponseErrorHandler.class;
+        private Class<? extends WebSocketResponseDispatcher> webSocketResponseDispatcherCls
+            = WebSocketResponseDispatcher.class;
 
         @JsonCreator
-        HandlerConfig(@JsonProperty("httpClientWriterClass") String httpClientWriterClass,
-                      @JsonProperty("httpLightBodyHandlerClass") String httpLightBodyHandlerClass,
-                      @JsonProperty("httpHeavyBodyHandlerClass") String httpHeavyBodyHandlerClass,
-                      @JsonProperty("httpErrorHandlerClass") String httpErrorHandlerClass,
-                      @JsonProperty("wsConnectErrorHandlerClass") String wsConnectErrorHandlerClass,
-                      @JsonProperty("wsErrorHandlerClass") String wsErrorHandlerClass,
-                      @JsonProperty("wsLightResponseHandlerClass") String wsLightResponseHandlerClass) {
-            this.httpClientWriterClass = Strings.isBlank(httpClientWriterClass)
-                                         ? HttpClientWriter.class
-                                         : ReflectionClass.findClass(httpClientWriterClass);
-            this.httpLightBodyHandlerClass = Strings.isBlank(httpLightBodyHandlerClass)
-                                             ? HttpLightResponseBodyHandler.class
-                                             : ReflectionClass.findClass(httpLightBodyHandlerClass);
-            this.httpHeavyBodyHandlerClass = Strings.isBlank(httpHeavyBodyHandlerClass)
-                                             ? HttpHeavyResponseHandler.class
-                                             : ReflectionClass.findClass(httpHeavyBodyHandlerClass);
-            this.httpErrorHandlerClass = Strings.isBlank(httpErrorHandlerClass)
-                                         ? HttpErrorHandler.class
-                                         : ReflectionClass.findClass(httpErrorHandlerClass);
-            this.wsConnectErrorHandlerClass = Strings.isBlank(wsConnectErrorHandlerClass)
-                                              ? WsConnectErrorHandler.class
-                                              : ReflectionClass.findClass(wsConnectErrorHandlerClass);
-            this.wsErrorHandlerClass = Strings.isBlank(wsErrorHandlerClass)
-                                       ? WsResponseErrorHandler.class
-                                       : ReflectionClass.findClass(wsErrorHandlerClass);
-            this.wsLightResponseHandlerClass = Strings.isBlank(wsLightResponseHandlerClass)
-                                               ? WsLightResponseDispatcher.class
-                                               : ReflectionClass.findClass(wsLightResponseHandlerClass);
+        HandlerConfig(@JsonProperty("requestComposerCls") String requestComposerCls,
+                      @JsonProperty("responseTextHandlerCls") String responseTextHandlerCls,
+                      @JsonProperty("responseBinaryHandlerCls") String responseBinaryHandlerCls,
+                      @JsonProperty("httpErrorHandlerCls") String httpErrorHandlerCls,
+                      @JsonProperty("webSocketConnectErrorHandlerCls") String webSocketConnectErrorHandlerCls,
+                      @JsonProperty("webSocketErrorHandlerCls") String webSocketErrorHandlerCls,
+                      @JsonProperty("webSocketResponseDispatcherCls") String webSocketResponseDispatcherCls) {
+            this.requestComposerCls = Strings.isBlank(requestComposerCls)
+                                      ? HttpRequestMessageComposer.class
+                                      : ReflectionClass.findClass(requestComposerCls);
+            this.responseTextHandlerCls = Strings.isBlank(responseTextHandlerCls)
+                                          ? HttpResponseTextBodyHandler.class
+                                          : ReflectionClass.findClass(responseTextHandlerCls);
+            this.responseBinaryHandlerCls = Strings.isBlank(responseBinaryHandlerCls)
+                                            ? HttpResponseBinaryHandler.class
+                                            : ReflectionClass.findClass(responseBinaryHandlerCls);
+            this.httpErrorHandlerCls = Strings.isBlank(httpErrorHandlerCls)
+                                       ? HttpErrorHandler.class
+                                       : ReflectionClass.findClass(httpErrorHandlerCls);
+            this.webSocketConnectErrorHandlerCls = Strings.isBlank(webSocketConnectErrorHandlerCls)
+                                                   ? WebSocketConnectErrorHandler.class
+                                                   : ReflectionClass.findClass(webSocketConnectErrorHandlerCls);
+            this.webSocketErrorHandlerCls = Strings.isBlank(webSocketErrorHandlerCls)
+                                            ? WebSocketResponseErrorHandler.class
+                                            : ReflectionClass.findClass(webSocketErrorHandlerCls);
+            this.webSocketResponseDispatcherCls = Strings.isBlank(webSocketResponseDispatcherCls)
+                                                  ? WebSocketResponseDispatcher.class
+                                                  : ReflectionClass.findClass(webSocketResponseDispatcherCls);
         }
 
     }

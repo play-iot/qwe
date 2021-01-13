@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class WsResponseErrorHandler implements Handler<Throwable> {
+public abstract class WebSocketResponseErrorHandler implements Handler<Throwable> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -27,11 +27,11 @@ public abstract class WsResponseErrorHandler implements Handler<Throwable> {
     private final EventModel listener;
 
     @SuppressWarnings("unchecked")
-    public static <T extends WsResponseErrorHandler> T create(@NonNull EventbusClient controller,
-                                                              @NonNull EventModel listener,
-                                                              @NonNull Class<T> errorHandlerClass) {
-        if (Objects.isNull(errorHandlerClass) || WsResponseErrorHandler.class.equals(errorHandlerClass)) {
-            return (T) new IgnoreWsResponseError(controller, listener) {};
+    public static <T extends WebSocketResponseErrorHandler> T create(@NonNull EventbusClient controller,
+                                                                     @NonNull EventModel listener,
+                                                                     @NonNull Class<T> errorHandlerClass) {
+        if (Objects.isNull(errorHandlerClass) || WebSocketResponseErrorHandler.class.equals(errorHandlerClass)) {
+            return (T) new IgnoreWebSocketResponseError(controller, listener) {};
         }
         Map<Class, Object> params = new LinkedHashMap<>();
         params.put(EventbusClient.class, controller);
@@ -39,9 +39,9 @@ public abstract class WsResponseErrorHandler implements Handler<Throwable> {
         return ReflectionClass.createObject(errorHandlerClass, params);
     }
 
-    public static class IgnoreWsResponseError extends WsResponseErrorHandler {
+    public static class IgnoreWebSocketResponseError extends WebSocketResponseErrorHandler {
 
-        IgnoreWsResponseError(@NonNull EventbusClient controller, @NonNull EventModel listener) {
+        IgnoreWebSocketResponseError(@NonNull EventbusClient controller, @NonNull EventModel listener) {
             super(controller, listener);
         }
 

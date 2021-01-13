@@ -9,6 +9,7 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpMethod;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
@@ -29,6 +30,7 @@ import lombok.NonNull;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = EventMethodMapping.Builder.class)
+// FIXME Why dont include capturePath and regexPath in equals
 public final class EventMethodMapping implements JsonData {
 
     @Include
@@ -43,6 +45,10 @@ public final class EventMethodMapping implements JsonData {
      */
     private final String regexPath;
 
+    @JsonProperty("method")
+    public String method() {
+        return this.getMethod().name();
+    }
 
     @JsonPOJOBuilder(withPrefix = "")
     static class Builder {

@@ -26,7 +26,7 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -99,15 +99,15 @@ public abstract class ServiceDiscoveryController implements Supplier<ServiceDisc
         return Objects.requireNonNull(serviceDiscovery, kind() + " Service Discovery is not enabled");
     }
 
-    void unregister(Future future) {
+    void unregister(Promise<Void> promise) {
         if (Objects.nonNull(serviceDiscovery)) {
             io.vertx.reactivex.servicediscovery.ServiceDiscovery serviceDiscovery = getRx();
             serviceDiscovery.rxGetRecords(r -> registrationMap.containsKey(r.getRegistration()), true)
                             .flattenAsObservable(rs -> rs)
                             .flatMapCompletable(r -> serviceDiscovery.rxUnpublish(r.getRegistration()))
-                            .subscribe(future::complete, err -> {
+                            .subscribe(promise::complete, err -> {
                                 logger.warn("Cannot un-published record", err);
-                                future.complete();
+                                promise.complete();
                             });
         }
     }
@@ -143,7 +143,7 @@ public abstract class ServiceDiscoveryController implements Supplier<ServiceDisc
                                                                                      ? null
                                                                                      : options.toJson());
             HttpClientDelegate delegate = HttpClientDelegate.create(reference.getAs(HttpClient.class));
-            return circuitController.wrap(delegate.execute(path, method, requestData, false))
+            return circuitController.wrap(delegate.request(path, method, requestData, false))
                                     .doFinally(reference::release);
         }).doOnError(t -> logger.error("Failed when redirect to {}::{}", t, method, path));
     }

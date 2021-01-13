@@ -35,7 +35,7 @@ public class BlueprintConfigTest {
         Assertions.assertNotNull(eventBusConfig);
         System.out.println(eventBusConfig.toJson().encode());
         JSONAssert.assertEquals("{\"acceptBacklog\":-1,\"clientAuth\":\"NONE\",\"clusterPingInterval\":20000," +
-                                "\"clusterPingReplyInterval\":20000,\"clusterPublicPort\":-1,\"clustered\":true," +
+                                "\"clusterPingReplyInterval\":20000,\"clusterPublicPort\":-1," +
                                 "\"connectTimeout\":60000,\"crlPaths\":[],\"crlValues\":[]," +
                                 "\"enabledCipherSuites\":[],\"enabledSecureTransportProtocols\":[\"TLSv1\"," +
                                 "\"TLSv1.1\",\"TLSv1.2\"],\"host\":\"0.0.0.0\",\"idleTimeout\":0," +
@@ -45,12 +45,12 @@ public class BlueprintConfigTest {
                                 "\"ssl\":false,\"sslHandshakeTimeout\":10,\"sslHandshakeTimeoutUnit\":\"SECONDS\"," +
                                 "\"tcpCork\":false,\"tcpFastOpen\":false,\"tcpKeepAlive\":false,\"tcpNoDelay\":true," +
                                 "\"tcpQuickAck\":false,\"trafficClass\":-1,\"trustAll\":true,\"useAlpn\":false," +
-                                "\"usePooledBuffers\":false,\"__delivery__\":{\"timeout\":30000,\"localOnly\":false}}",
+                                "\"__delivery__\":{\"timeout\":30000,\"localOnly\":false}}",
                                 eventBusConfig.toJson().encode(), JSONCompareMode.STRICT);
         final DeployConfig deployConfig = from.getDeployConfig();
         Assertions.assertNotNull(deployConfig);
         JSONAssert.assertEquals("{\"ha\":false,\"instances\":1,\"maxWorkerExecuteTime\":60000000000," +
-                                "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\",\"multiThreaded\":false," +
+                                "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"," +
                                 "\"worker\":false,\"workerPoolSize\":20}", deployConfig.toJson().encode(),
                                 JSONCompareMode.STRICT);
 
@@ -230,7 +230,7 @@ public class BlueprintConfigTest {
         Assertions.assertNotNull(blank.getAppConfig());
         Assertions.assertTrue(blank.getAppConfig().isEmpty());
         Assertions.assertNotNull(blank.getDeployConfig());
-        JSONAssert.assertEquals("{\"worker\":false,\"multiThreaded\":false,\"workerPoolSize\":20," +
+        JSONAssert.assertEquals("{\"worker\":false,\"workerPoolSize\":20," +
                                 "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
                                 "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}",
                                 blank.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
@@ -246,7 +246,7 @@ public class BlueprintConfigTest {
         Assertions.assertEquals(1, blank.getAppConfig().size());
         Assertions.assertEquals(1, blank.getAppConfig().get("hello"));
         Assertions.assertNotNull(blank.getDeployConfig());
-        JSONAssert.assertEquals("{\"worker\":false,\"multiThreaded\":false,\"workerPoolSize\":20," +
+        JSONAssert.assertEquals("{\"worker\":false,\"workerPoolSize\":20," +
                                 "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
                                 "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}",
                                 blank.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);

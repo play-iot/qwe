@@ -33,6 +33,7 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
+import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.http.WebSocketFrame;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.BridgeEventType;
@@ -117,7 +118,7 @@ public abstract class HttpServerTestBase {
                                       ExpectedResponse expected) {
         Async async = context.async(expected.hasAfter() ? 2 : 1);
         HttpClientDelegate.create(vertx.getDelegate(), HostInfo.from(requestOptions))
-                          .execute(path, method, requestData)
+                          .request(path, method, requestData)
                           .doFinally(() -> TestHelper.testComplete(async))
                           .subscribe(resp -> expected._assert(context, async, resp), context::fail);
     }
@@ -126,7 +127,7 @@ public abstract class HttpServerTestBase {
                                                RequestData requestData) {
         Async async = context.async();
         return HttpClientDelegate.create(vertx.getDelegate(), HostInfo.from(requestOptions))
-                                 .execute(path, method, requestData)
+                                 .request(path, method, requestData)
                                  .doFinally(() -> TestHelper.testComplete(async));
     }
 
@@ -171,15 +172,21 @@ public abstract class HttpServerTestBase {
         throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<WebSocket> wsReference = new AtomicReference<>();
-        client.websocket(requestOptions.setURI(Urls.combinePath(path, "websocket")), ws -> {
-            if (Objects.nonNull(writerBeforeHandler)) {
-                writerBeforeHandler.accept(ws.getDelegate());
-            }
-            wsReference.set(ws.getDelegate());
-            latch.countDown();
-            ws.endHandler(v -> testComplete(async, "CLIENT END"));
-            ws.exceptionHandler(error::accept);
-        }, error::accept);
+        client.webSocket(
+            new WebSocketConnectOptions(requestOptions.setURI(Urls.combinePath(path, "websocket")).toJson()), ar -> {
+                if (ar.succeeded()) {
+                    final io.vertx.reactivex.core.http.WebSocket ws = ar.result();
+                    if (Objects.nonNull(writerBeforeHandler)) {
+                        writerBeforeHandler.accept(ws.getDelegate());
+                    }
+                    wsReference.set(ws.getDelegate());
+                    latch.countDown();
+                    ws.endHandler(v -> testComplete(async, "CLIENT END"));
+                    ws.exceptionHandler(error::accept);
+                } else {
+                    error.accept(ar.cause());
+                }
+            });
         context.assertTrue(latch.await(TestHelper.TEST_TIMEOUT_SEC, TimeUnit.SECONDS), "Timeout");
         return wsReference.get();
     }

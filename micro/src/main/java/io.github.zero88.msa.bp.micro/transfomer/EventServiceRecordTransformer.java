@@ -29,7 +29,7 @@ class EventServiceRecordTransformer implements RecordTransformer {
     }
 
     protected JsonObject serializeEventMethod(@NonNull EventMethodMapping map) {
-        return new JsonObject().put("method", map.getMethod()).put("path", map.getCapturePath());
+        return new JsonObject().put("method", map.method()).put("path", map.getCapturePath());
     }
 
 }
