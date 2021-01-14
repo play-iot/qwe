@@ -1,10 +1,8 @@
 package io.github.zero88.msa.bp.http.client.handler;
 
 import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
 import io.github.zero88.msa.bp.exceptions.TimeoutException;
@@ -14,50 +12,38 @@ import io.github.zero88.msa.bp.http.client.HttpClientRegistry;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.netty.resolver.dns.DnsNameResolverException;
 import io.netty.resolver.dns.DnsNameResolverTimeoutException;
-import io.reactivex.SingleEmitter;
-import io.vertx.core.Handler;
+import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import io.vertx.core.VertxException;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public abstract class HttpErrorHandler implements Handler<Throwable>, Supplier<SingleEmitter<ResponseData>> {
+public abstract class HttpErrorHandler implements Function<Throwable, Single<ResponseData>> {
 
-    @NonNull
-    private final SingleEmitter<ResponseData> emitter;
     @NonNull
     private final HostInfo hostInfo;
 
     @SuppressWarnings("unchecked")
-    public static <T extends HttpErrorHandler> T create(SingleEmitter<ResponseData> emitter, @NonNull HostInfo hostInfo,
-                                                        Class<T> endHandlerClass) {
+    public static <T extends HttpErrorHandler> T create(@NonNull HostInfo hostInfo, Class<T> endHandlerClass) {
         if (Objects.isNull(endHandlerClass) || HttpErrorHandler.class.equals(endHandlerClass)) {
-            return (T) new HttpErrorHandler(emitter, hostInfo) {};
+            return (T) new HttpErrorHandler(hostInfo) {};
         }
-        Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(SingleEmitter.class, emitter);
-        inputs.put(HostInfo.class, hostInfo);
-        return (T) ReflectionClass.createObject(endHandlerClass, inputs).get();
+        return ReflectionClass.createObject(endHandlerClass, Collections.singletonMap(HostInfo.class, hostInfo));
     }
 
     @Override
-    public void handle(Throwable error) {
+    public Single<ResponseData> apply(Throwable error) throws Exception {
         if (error instanceof VertxException && error.getMessage().equals("Connection was closed") ||
             error instanceof DnsNameResolverTimeoutException) {
-            emitter.onError(new TimeoutException("Request timeout", error));
             HttpClientRegistry.getInstance().remove(hostInfo, false);
-            return;
+            return Single.error(new TimeoutException("Request timeout", error));
         }
         if (error instanceof UnknownHostException || error instanceof DnsNameResolverException) {
             HttpClientRegistry.getInstance().remove(hostInfo, false);
         }
-        emitter.onError(BlueprintExceptionConverter.friendly(error));
-    }
-
-    @Override
-    public SingleEmitter<ResponseData> get() {
-        return emitter;
+        return Single.error(BlueprintExceptionConverter.friendly(error));
     }
 
 }

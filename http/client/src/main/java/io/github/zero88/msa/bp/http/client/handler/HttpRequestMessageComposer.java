@@ -6,9 +6,10 @@ import java.util.function.BiFunction;
 import io.github.zero88.msa.bp.dto.msg.RequestData;
 import io.github.zero88.msa.bp.http.HttpUtils.HttpHeaderUtils;
 import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.reactivex.core.MultiMap;
+import io.vertx.reactivex.core.buffer.Buffer;
+import io.vertx.reactivex.core.http.HttpClientRequest;
 
 import lombok.NonNull;
 
@@ -40,14 +41,14 @@ public interface HttpRequestMessageComposer extends BiFunction<HttpClientRequest
         }
         if (!reqData.headers().isEmpty()) {
             request.headers()
-                   .setAll(HttpHeaderUtils.deserializeHeaders(reqData.headers()))
+                   .setAll(MultiMap.newInstance(HttpHeaderUtils.deserializeHeaders(reqData.headers())))
                    .remove(HttpHeaders.ACCEPT_ENCODING)
                    .remove(HttpHeaders.CONTENT_LENGTH);
         }
         if (Objects.nonNull(reqData.body()) && !reqData.body().isEmpty()) {
-            final Buffer buffer = reqData.body().toBuffer();
+            final io.vertx.core.buffer.Buffer buffer = reqData.body().toBuffer();
             request.putHeader(HttpHeaders.CONTENT_LENGTH, Integer.toString(buffer.length()));
-            request.write(buffer);
+            request.write(Buffer.newInstance(buffer));
         }
         return request;
     }

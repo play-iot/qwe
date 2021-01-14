@@ -60,6 +60,8 @@ public class HttpClientDelegateTest {
                   System.out.println(resp.headers());
                   JSONAssert.assertEquals("{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}",
                                           resp.body().getJsonObject("args").encode(), JSONCompareMode.STRICT);
+                  //FIXME Cache?
+//                  context.assertNotNull(HttpClientRegistry.getInstance().getHttpRegistries().get(hostInfo));
               });
     }
 

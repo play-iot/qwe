@@ -10,7 +10,7 @@ import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.client.handler.HttpErrorHandler;
 import io.github.zero88.msa.bp.http.client.handler.HttpRequestMessageComposer;
 import io.github.zero88.msa.bp.http.client.handler.HttpResponseBinaryHandler;
-import io.github.zero88.msa.bp.http.client.handler.HttpResponseTextBodyHandler;
+import io.github.zero88.msa.bp.http.client.handler.HttpResponseTextHandler;
 import io.github.zero88.msa.bp.http.client.handler.WebSocketConnectErrorHandler;
 import io.github.zero88.msa.bp.http.client.handler.WebSocketResponseDispatcher;
 import io.github.zero88.msa.bp.http.client.handler.WebSocketResponseErrorHandler;
@@ -27,7 +27,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.FieldNameConstants;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -105,9 +104,9 @@ public final class HttpClientConfig implements IConfig {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class HandlerConfig {
 
-        private Class<? extends HttpRequestMessageComposer> requestComposerCls = HttpRequestMessageComposer.class;
-        private Class<? extends HttpResponseTextBodyHandler> responseTextHandlerCls = HttpResponseTextBodyHandler.class;
-        private Class<? extends HttpResponseBinaryHandler> responseBinaryHandlerCls = HttpResponseBinaryHandler.class;
+        private Class<? extends HttpRequestMessageComposer> reqComposerCls = HttpRequestMessageComposer.class;
+        private Class<? extends HttpResponseTextHandler> respTextHandlerCls = HttpResponseTextHandler.class;
+        private Class<? extends HttpResponseBinaryHandler> respBinaryHandlerCls = HttpResponseBinaryHandler.class;
         private Class<? extends HttpErrorHandler> httpErrorHandlerCls = HttpErrorHandler.class;
         private Class<? extends WebSocketConnectErrorHandler> webSocketConnectErrorHandlerCls
             = WebSocketConnectErrorHandler.class;
@@ -117,22 +116,22 @@ public final class HttpClientConfig implements IConfig {
             = WebSocketResponseDispatcher.class;
 
         @JsonCreator
-        HandlerConfig(@JsonProperty("requestComposerCls") String requestComposerCls,
-                      @JsonProperty("responseTextHandlerCls") String responseTextHandlerCls,
-                      @JsonProperty("responseBinaryHandlerCls") String responseBinaryHandlerCls,
+        HandlerConfig(@JsonProperty("reqComposerCls") String reqComposerCls,
+                      @JsonProperty("respTextHandlerCls") String respTextHandlerCls,
+                      @JsonProperty("respBinaryHandlerCls") String respBinaryHandlerCls,
                       @JsonProperty("httpErrorHandlerCls") String httpErrorHandlerCls,
                       @JsonProperty("webSocketConnectErrorHandlerCls") String webSocketConnectErrorHandlerCls,
                       @JsonProperty("webSocketErrorHandlerCls") String webSocketErrorHandlerCls,
                       @JsonProperty("webSocketResponseDispatcherCls") String webSocketResponseDispatcherCls) {
-            this.requestComposerCls = Strings.isBlank(requestComposerCls)
-                                      ? HttpRequestMessageComposer.class
-                                      : ReflectionClass.findClass(requestComposerCls);
-            this.responseTextHandlerCls = Strings.isBlank(responseTextHandlerCls)
-                                          ? HttpResponseTextBodyHandler.class
-                                          : ReflectionClass.findClass(responseTextHandlerCls);
-            this.responseBinaryHandlerCls = Strings.isBlank(responseBinaryHandlerCls)
-                                            ? HttpResponseBinaryHandler.class
-                                            : ReflectionClass.findClass(responseBinaryHandlerCls);
+            this.reqComposerCls = Strings.isBlank(reqComposerCls)
+                                  ? HttpRequestMessageComposer.class
+                                  : ReflectionClass.findClass(reqComposerCls);
+            this.respTextHandlerCls = Strings.isBlank(respTextHandlerCls)
+                                      ? HttpResponseTextHandler.class
+                                      : ReflectionClass.findClass(respTextHandlerCls);
+            this.respBinaryHandlerCls = Strings.isBlank(respBinaryHandlerCls)
+                                        ? HttpResponseBinaryHandler.class
+                                        : ReflectionClass.findClass(respBinaryHandlerCls);
             this.httpErrorHandlerCls = Strings.isBlank(httpErrorHandlerCls)
                                        ? HttpErrorHandler.class
                                        : ReflectionClass.findClass(httpErrorHandlerCls);

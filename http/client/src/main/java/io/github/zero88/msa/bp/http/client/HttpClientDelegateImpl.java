@@ -13,17 +13,15 @@ import io.github.zero88.msa.bp.http.client.handler.HttpRequestMessageComposer;
 import io.github.zero88.msa.bp.http.client.handler.HttpResponseTextHandler;
 import io.github.zero88.utils.Urls;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
-import io.vertx.reactivex.RxHelper;
+import io.vertx.reactivex.core.http.HttpClientRequest;
 
 import lombok.NonNull;
 
@@ -42,14 +40,12 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
         final RequestData reqData = decorator(requestData);
         final HostInfo hostInfo = getHostInfo();
         final HandlerConfig cfg = getHandlerConfig();
-        return Single.<ResponseData>create(emitter -> {
-            HttpErrorHandler errHandler = HttpErrorHandler.create(emitter, hostInfo, cfg.getHttpErrorHandlerCls());
-            get().request(method, Urls.buildURL(path, HttpRequests.serializeQuery(reqData.filter())))
-                 .onSuccess(req -> onConnectionSuccess(req, reqData, cfg, emitter, swallowError, errHandler))
-                 .onFailure(errHandler);
-        }).doOnSuccess(res -> HttpClientRegistry.getInstance().remove(hostInfo, false))
-          .doOnError(err -> HttpClientRegistry.getInstance().remove(hostInfo, false))
-          .subscribeOn(RxHelper.blockingScheduler(getVertx()));
+        return getRx().rxRequest(method, Urls.buildURL(path, HttpRequests.serializeQuery(reqData.filter())))
+                      .flatMap(req -> onConnectionSuccess(req, reqData, cfg, swallowError))
+                      .onErrorResumeNext(HttpErrorHandler.create(hostInfo, cfg.getHttpErrorHandlerCls()))
+                      //FIXME Cache?
+                      .doOnSuccess(res -> HttpClientRegistry.getInstance().remove(hostInfo, false))
+                      .doOnError(err -> HttpClientRegistry.getInstance().remove(hostInfo, false));
     }
 
     @Override
@@ -86,19 +82,18 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
         return reqData;
     }
 
-    private void onConnectionSuccess(HttpClientRequest req, RequestData reqData, HandlerConfig cfg,
-                                     SingleEmitter<ResponseData> emitter, boolean swallowError,
-                                     HttpErrorHandler errHandler) {
+    private Single<ResponseData> onConnectionSuccess(HttpClientRequest req, RequestData reqData,
+                                                     HandlerConfig handlerConfig, boolean swallowError) {
         if (logger.isDebugEnabled()) {
             logger.debug("Send HTTP request {}::{} | <{}>", req.getMethod(), req.absoluteURI(), reqData.toJson());
         } else {
             logger.info("Send HTTP request {}::{}", req.getMethod(), req.absoluteURI());
         }
-        HttpRequestMessageComposer.create(cfg.getRequestComposerCls())
-                                  .apply(req, reqData)
-                                  .exceptionHandler(errHandler)
-                                  .send(HttpResponseTextHandler.create(emitter, swallowError,
-                                                                       cfg.getResponseTextHandlerCls()));
+        return HttpRequestMessageComposer.create(handlerConfig.getReqComposerCls())
+                                         .apply(req, reqData)
+                                         .rxSend()
+                                         .flatMap(HttpResponseTextHandler.create(swallowError,
+                                                                                 handlerConfig.getRespTextHandlerCls()));
     }
 
 }
