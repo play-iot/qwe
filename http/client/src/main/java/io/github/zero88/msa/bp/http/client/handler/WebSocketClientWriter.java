@@ -8,6 +8,7 @@ import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventContractor;
 import io.github.zero88.msa.bp.event.EventListener;
 import io.github.zero88.msa.bp.event.EventModel;
+import io.reactivex.Single;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.json.JsonObject;
 
@@ -25,10 +26,12 @@ public final class WebSocketClientWriter implements EventListener {
         return Collections.unmodifiableList(new ArrayList<>(publisher.getEvents()));
     }
 
-    @EventContractor(action = "SEND", returnType = boolean.class)
-    public boolean send(JsonObject data) {
-        webSocket.writeTextMessage(data.encode());
-        return true;
+    @EventContractor(action = "SEND", returnType = Single.class)
+    public Single<Boolean> send(JsonObject data) {
+        return io.vertx.reactivex.core.http.WebSocket.newInstance(webSocket)
+                                                     .rxWriteTextMessage(data.encode())
+                                                     .andThen(Single.just(true))
+                                                     .onErrorReturn(err -> false);
     }
 
 }

@@ -45,8 +45,7 @@ public class HttpClientDelegateTest {
 
     @After
     public void teardown(TestContext context) {
-        HttpClientRegistry.getInstance().clear();
-        vertx.close(context.asyncAssertSuccess());
+        vertx.close(HttpClientRegistry.getInstance().clear());
     }
 
     @Test
@@ -61,7 +60,8 @@ public class HttpClientDelegateTest {
                   JSONAssert.assertEquals("{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}",
                                           resp.body().getJsonObject("args").encode(), JSONCompareMode.STRICT);
                   //FIXME Cache?
-//                  context.assertNotNull(HttpClientRegistry.getInstance().getHttpRegistries().get(hostInfo));
+                  //                  context.assertNotNull(HttpClientRegistry.getInstance().getHttpRegistries().get
+                  //                  (hostInfo));
               });
     }
 
@@ -98,7 +98,7 @@ public class HttpClientDelegateTest {
               .subscribe((responseData, throwable) -> {
                   context.assertNull(responseData);
                   context.assertNotNull(throwable);
-                  context.assertTrue(throwable instanceof BlueprintException);
+                  assert throwable instanceof BlueprintException;
                   context.assertEquals(ErrorCode.NOT_FOUND, ((BlueprintException) throwable).errorCode());
               });
     }
@@ -144,17 +144,18 @@ public class HttpClientDelegateTest {
 
     private void countDown(Async async, CountDownLatch latch, HttpClientDelegate client, ResponseData r, Throwable t,
                            String path, boolean isErr) {
-        try {
-            if (isErr || Objects.nonNull(t)) {
-                System.out.println("RESPONSE ERROR " + path + ":" + t);
-            } else {
-                System.out.println("RESPONSE " + path + ":" + r.toJson());
-            }
-            client.close();
-        } finally {
+        if (isErr || Objects.nonNull(t)) {
+            System.out.println("RESPONSE ERROR " + path + ":" + t);
+        } else {
+            System.out.println("RESPONSE " + path + ":" + r.toJson());
+        }
+        client.close().subscribe(() -> {
             latch.countDown();
             TestHelper.testComplete(async);
-        }
+        }, err -> {
+            latch.countDown();
+            TestHelper.testComplete(async);
+        });
     }
 
 }

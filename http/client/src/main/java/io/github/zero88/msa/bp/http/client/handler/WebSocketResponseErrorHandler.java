@@ -22,7 +22,7 @@ public abstract class WebSocketResponseErrorHandler implements Handler<Throwable
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @NonNull
-    private final EventbusClient controller;
+    private final EventbusClient eventbus;
     @NonNull
     private final EventModel listener;
 

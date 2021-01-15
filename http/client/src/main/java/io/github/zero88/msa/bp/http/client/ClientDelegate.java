@@ -6,6 +6,7 @@ import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.client.HttpClientConfig.HandlerConfig;
+import io.reactivex.Completable;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
@@ -78,27 +79,13 @@ abstract class ClientDelegate implements IClientDelegate {
     }
 
     @Override
-    public void close() {
-        try {
-            get().close();
-        } catch (IllegalStateException e) {
-            logger.warn(e.getMessage());
-        }
+    public Completable close() {
+        return getRx().rxClose();
     }
 
     @Override
     public io.vertx.reactivex.core.http.HttpClient getRx() {
         return io.vertx.reactivex.core.http.HttpClient.newInstance(get());
-    }
-
-    void silentClose() {
-        try {
-            get().close();
-        } catch (IllegalStateException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage());
-            }
-        }
     }
 
 }

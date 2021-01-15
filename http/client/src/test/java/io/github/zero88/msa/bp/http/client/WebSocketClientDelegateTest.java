@@ -18,12 +18,9 @@ import io.github.zero88.msa.bp.event.EventListener;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventModel;
 import io.github.zero88.msa.bp.event.EventPattern;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
-import io.github.zero88.msa.bp.exceptions.ErrorCode;
-import io.github.zero88.msa.bp.exceptions.HttpException;
+import io.github.zero88.msa.bp.event.Status;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.event.WebSocketClientEventMetadata;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -65,44 +62,64 @@ public class WebSocketClientDelegateTest {
 
     @After
     public void teardown(TestContext context) {
-        HttpClientRegistry.getInstance().clear();
-        vertx.close(context.asyncAssertSuccess());
-    }
-
-    @Test(expected = HttpException.class)
-    public void test_connect_failed_due_unknown_dns() {
-        config.getOptions().setConnectTimeout(6 * 1000);
-        HostInfo opt = HostInfo.builder().host("echo.websocket.test").port(443).ssl(true).build();
-        WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, opt);
-        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS), null);
+        vertx.close(HttpClientRegistry.getInstance().clear());
     }
 
     @Test
-    public void test_connect_and_send(TestContext context) throws InterruptedException {
+    public void test_not_found(TestContext context) {
         Async async = context.async();
         WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, hostInfo);
-        client.getEventClient()
-              .register(LISTENER, new EventAsserter(LISTENER, context, async, new JsonObject().put("k", 1)));
-        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS), null);
-        Thread.sleep(1000);
-        client.getEventClient()
-              .publish(PUBLISHER_ADDRESS, EventMessage.initial(EventAction.SEND, new JsonObject().put("k", 1)));
-    }
-
-    @Test(expected = HttpException.class)
-    public void test_not_found(TestContext context) {
-        WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, hostInfo);
-        try {
-            client.open(WebSocketClientEventMetadata.create("/xxx", LISTENER, PUBLISHER_ADDRESS), null);
-        } catch (HttpException ex) {
-            context.assertEquals(HttpResponseStatus.NOT_FOUND, ex.getStatusCode());
-            context.assertEquals(ErrorCode.NOT_FOUND, ((BlueprintException) ex.getCause()).errorCode());
-            throw ex;
-        }
+        client.open(WebSocketClientEventMetadata.create("/xxx", LISTENER, PUBLISHER_ADDRESS))
+              .doFinally(() -> TestHelper.testComplete(async))
+              .subscribe(msg -> {
+                  String error
+                      = "WebSocket connection attempt returned HTTP status code 404 | Cause:  - Error Code: NOT_FOUND";
+                  JsonHelper.assertJson(new JsonObject().put("status", Status.FAILED)
+                                                        .put("action", "OPEN")
+                                                        .put("error", new JsonObject().put("code", "HTTP_ERROR")
+                                                                                      .put("message", error)),
+                                        msg.toJson());
+              });
     }
 
     @Test
-    public void test_cache(TestContext context) throws InterruptedException {
+    public void test_connect_failed_due_unknown_dns(TestContext context) {
+        Async async = context.async();
+        HostInfo opt = HostInfo.builder().host("echo.websocket.test").port(443).ssl(true).build();
+        WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, opt);
+        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS))
+              .doFinally(() -> TestHelper.testComplete(async))
+              .subscribe(msg -> {
+                  String error =
+                      "Failed when open WebSocket connection | Cause: failed to resolve 'echo.websocket.test'. " +
+                      "Exceeded max queries per resolve 4 ";
+                  JsonHelper.assertJson(new JsonObject().put("status", Status.FAILED)
+                                                        .put("action", "OPEN")
+                                                        .put("error", new JsonObject().put("code", "HTTP_ERROR")
+                                                                                      .put("message", error)),
+                                        msg.toJson());
+              });
+    }
+
+    @Test
+    public void test_connect_and_send(TestContext context) {
+        Async async = context.async(2);
+        WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, hostInfo);
+        client.getEventbus()
+              .register(LISTENER, new EventAsserter(LISTENER, context, async, new JsonObject().put("k", 1)));
+        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS))
+              .doFinally(() -> TestHelper.testComplete(async))
+              .subscribe(msg -> {
+                  System.out.println(msg.toJson());
+                  client.getEventbus()
+                        .publish(PUBLISHER_ADDRESS,
+                                 EventMessage.initial(EventAction.SEND, new JsonObject().put("k", 1)));
+              });
+    }
+
+    @Test
+    public void test_cache(TestContext context) {
+        Async async = context.async(3);
         context.assertTrue(HttpClientRegistry.getInstance().getWsRegistries().isEmpty());
 
         final WebSocketClientDelegate client1 = WebSocketClientDelegate.create(vertx, config, hostInfo);
@@ -118,18 +135,26 @@ public class WebSocketClientDelegateTest {
         context.assertEquals(2, HttpClientRegistry.getInstance().getWsRegistries().size());
         context.assertEquals(1, HttpClientRegistry.getInstance().getWsRegistries().get(host2).current());
 
-        client1.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS), null);
-        client2.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS), null);
-        try {
-            client3.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS), null);
-        } catch (HttpException e) {
-            context.assertEquals(1, HttpClientRegistry.getInstance().getWsRegistries().size());
-        }
-        client1.close();
-        client2.close();
-
-        Thread.sleep(1000);
-        context.assertTrue(HttpClientRegistry.getInstance().getWsRegistries().isEmpty());
+        final WebSocketClientEventMetadata metadata = WebSocketClientEventMetadata.create("/echo", LISTENER,
+                                                                                          PUBLISHER_ADDRESS);
+        client1.open(metadata)
+               .doOnSuccess(msg -> {
+                   System.out.println(msg.toJson());
+                   TestHelper.testComplete(async);
+               })
+               .flatMap(msg -> client2.open(metadata))
+               .doOnSuccess(msg -> {
+                   System.out.println(msg.toJson());
+                   TestHelper.testComplete(async);
+               })
+               .flatMap(msg -> client3.open(metadata))
+               .doFinally(() -> TestHelper.testComplete(async))
+               .map(msg -> client1.close())
+               .mergeWith(r -> client2.close())
+               .subscribe(a -> {
+                   System.out.println(HttpClientRegistry.getInstance().getWsRegistries().size());
+                   context.assertTrue(HttpClientRegistry.getInstance().getWsRegistries().isEmpty());
+               }, System.out::println);
     }
 
     @RequiredArgsConstructor

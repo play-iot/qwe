@@ -29,7 +29,7 @@ public abstract class WebSocketResponseDispatcher implements Handler<Buffer> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @NonNull
-    private final EventbusClient controller;
+    private final EventbusClient eventbus;
     @NonNull
     private final EventModel listener;
 
@@ -49,8 +49,8 @@ public abstract class WebSocketResponseDispatcher implements Handler<Buffer> {
     @Override
     public void handle(Buffer data) {
         logger.info("Websocket Client received message then dispatch data to '{}'", listener.getAddress());
-        controller.fire(listener.getAddress(), listener.getPattern(),
-                        EventMessage.tryParse(JsonData.tryParse(data), true));
+        eventbus.fire(listener.getAddress(), listener.getPattern(),
+                      EventMessage.tryParse(JsonData.tryParse(data), true));
     }
 
 }

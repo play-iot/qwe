@@ -5,9 +5,12 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.zero88.msa.bp.http.HostInfo;
+import io.reactivex.Observable;
+import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -16,7 +19,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpClientRegistry {
 
@@ -39,7 +44,7 @@ public final class HttpClientRegistry {
         }
     }
 
-    public WebSocketClientDelegate getWebsocket(@NonNull HostInfo hostInfo,
+    public WebSocketClientDelegate getWebSocket(@NonNull HostInfo hostInfo,
                                                 @NonNull Supplier<WebSocketClientDelegate> fallback) {
         return wsRegistries.computeIfAbsent(hostInfo, hf -> new ClientStorage<>(hf, fallback.get())).tickAndGet();
     }
@@ -55,23 +60,35 @@ public final class HttpClientRegistry {
             return;
         }
         if (storage.shouldClose()) {
-            ((ClientDelegate) storage.get()).silentClose();
-            if (isWebsocket) {
-                wsRegistries.remove(hostInfo);
-            } else {
-                httpRegistries.remove(hostInfo);
-            }
+            storage.get().close().subscribe(() -> {
+                if (isWebsocket) {
+                    wsRegistries.remove(hostInfo);
+                } else {
+                    httpRegistries.remove(hostInfo);
+                }
+            });
         }
     }
 
     /**
      * Must be call before closing {@code Vertx}
+     *
+     * @return promise
      */
-    public void clear() {
-        Stream.concat(httpRegistries.values().stream(), wsRegistries.values().stream())
-              .parallel()
-              .map(ClientStorage::get)
-              .forEach(IClientDelegate::close);
+    public Promise<Void> clear() {
+        Promise<Void> promise = Promise.promise();
+        Observable.fromIterable(Stream.concat(httpRegistries.values().stream(), wsRegistries.values().stream())
+                                      .collect(Collectors.toList()))
+                  .map(ClientStorage::get)
+                  .map(IClientDelegate::close)
+                  .count()
+                  .doOnSuccess(c -> log.debug("Closed {} HTTP client(s)", c))
+                  .ignoreElement()
+                  .subscribe(promise::complete, err -> {
+                      log.debug("Something error when closing http client", err);
+                      promise.complete();
+                  });
+        return promise;
     }
 
     @RequiredArgsConstructor

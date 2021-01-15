@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.client.HttpClientConfig.HandlerConfig;
 import io.github.zero88.msa.bp.transport.Transporter;
+import io.reactivex.Completable;
 import io.vertx.core.http.HttpClient;
 
 interface IClientDelegate extends Transporter, Supplier<HttpClient> {
@@ -26,8 +27,11 @@ interface IClientDelegate extends Transporter, Supplier<HttpClient> {
 
     /**
      * Close client
+     *
+     * @return completable
      */
-    void close();
+    Completable close();
 
     io.vertx.reactivex.core.http.HttpClient getRx();
+
 }

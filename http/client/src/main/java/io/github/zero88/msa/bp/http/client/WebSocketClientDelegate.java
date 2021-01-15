@@ -1,8 +1,10 @@
 package io.github.zero88.msa.bp.http.client;
 
+import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.event.WebSocketClientEventMetadata;
+import io.reactivex.Single;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 
@@ -63,25 +65,28 @@ public interface WebSocketClientDelegate extends IClientDelegate {
                                           int idleTimeout) {
         HttpClientConfig cfg = ClientDelegate.cloneConfig(config, hostInfo, idleTimeout);
         return HttpClientRegistry.getInstance()
-                                 .getWebsocket(cfg.getHostInfo(), () -> new WebSocketClientDelegateImpl(vertx, cfg));
+                                 .getWebSocket(cfg.getHostInfo(), () -> new WebSocketClientDelegateImpl(vertx, cfg));
     }
 
     /**
      * Blocking open websocket connection
      *
      * @param metadata Websocket metadata for {@code listener} and {@code publisher}
-     * @param headers  Websocket headers
+     * @return eventMessage for websocket status
      */
-    void open(@NonNull WebSocketClientEventMetadata metadata, MultiMap headers);
+    default Single<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata) {
+        return open(metadata, null);
+    };
 
     /**
-     * Async open websocket connection
+     * Blocking open websocket connection
      *
      * @param metadata Websocket metadata for {@code listener} and {@code publisher}
      * @param headers  Websocket headers
+     * @return eventMessage for websocket status
      */
-    void asyncOpen(WebSocketClientEventMetadata metadata, MultiMap headers);
+    Single<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata, MultiMap headers);
 
-    EventbusClient getEventClient();
+    EventbusClient getEventbus();
 
 }
