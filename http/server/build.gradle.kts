@@ -5,7 +5,7 @@ dependencies {
     api("com.zandero:rest.vertx:0.9.1") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation("org.jboss.resteasy:resteasy-jaxrs:3.6.2.Final")
+    api("javax.ws.rs:javax.ws.rs-api:2.1.1")
     compileOnly(project(":micro"))
     compileOnly(VertxLibs.serviceDiscovery)
 
