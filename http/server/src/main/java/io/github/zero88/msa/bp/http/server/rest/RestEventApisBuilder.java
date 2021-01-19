@@ -7,6 +7,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.component.SharedDataDelegate;
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.exceptions.InitializerError;
@@ -18,8 +21,6 @@ import io.github.zero88.msa.bp.micro.metadata.EventMethodMapping;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 
 import lombok.NonNull;

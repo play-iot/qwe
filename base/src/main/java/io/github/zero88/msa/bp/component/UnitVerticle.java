@@ -3,12 +3,13 @@ package io.github.zero88.msa.bp.component;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.BlueprintConfig;
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.Getter;

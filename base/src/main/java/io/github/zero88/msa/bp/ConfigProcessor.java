@@ -16,6 +16,9 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
 import io.github.zero88.msa.bp.BlueprintConfig.DeployConfig;
 import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig;
@@ -28,8 +31,6 @@ import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import lombok.NonNull;
 

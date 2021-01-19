@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventModel;
@@ -17,8 +20,6 @@ import io.github.zero88.msa.bp.http.server.ws.WebSocketEventMessage;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import io.vertx.ext.web.handler.sockjs.SockJSSocket;

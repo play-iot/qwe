@@ -2,6 +2,9 @@ package io.github.zero88.msa.bp.http.client;
 
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.http.HostInfo;
@@ -12,8 +15,6 @@ import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.impl.HttpClientImpl;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import lombok.Getter;
 import lombok.NonNull;

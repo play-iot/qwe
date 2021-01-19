@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+
 import io.github.zero88.msa.bp.component.SharedDataDelegate;
 import io.github.zero88.msa.bp.exceptions.BlueprintException;
 import io.github.zero88.msa.bp.http.server.HttpServer;
@@ -13,7 +15,6 @@ import io.github.zero88.msa.bp.http.server.handler.DynamicContextDispatcher;
 import io.github.zero88.msa.bp.http.server.rest.DynamicRestApi;
 import io.github.zero88.msa.bp.micro.monitor.ServiceGatewayMonitor;
 import io.github.zero88.utils.Urls;
-import io.vertx.core.logging.Logger;
 import io.vertx.ext.web.Router;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;

@@ -13,7 +13,6 @@ import io.github.zero88.msa.bp.component.SharedDataDelegate;
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.msa.bp.micro.metadata.EventMethodDefinition;
 import io.reactivex.Single;
-import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;

@@ -1,9 +1,10 @@
 package io.github.zero88.msa.bp.http.server.gateway;
 
+import org.slf4j.Logger;
+
 import io.github.zero88.msa.bp.micro.ServiceDiscoveryController;
 import io.github.zero88.msa.bp.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
 

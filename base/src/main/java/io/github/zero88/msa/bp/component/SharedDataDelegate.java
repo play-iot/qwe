@@ -5,11 +5,12 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.event.EventbusClient;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

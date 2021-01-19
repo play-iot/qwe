@@ -3,6 +3,9 @@ package io.github.zero88.msa.bp.event;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.msa.bp.dto.ErrorMessage;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
@@ -12,8 +15,6 @@ import io.reactivex.Single;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import lombok.Builder;
 import lombok.Builder.Default;

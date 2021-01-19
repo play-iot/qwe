@@ -3,6 +3,9 @@ package io.github.zero88.msa.bp.http.client.handler;
 import java.util.Collections;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
@@ -17,8 +20,6 @@ import io.reactivex.functions.Function;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.reactivex.core.buffer.Buffer;
 import io.vertx.reactivex.core.http.HttpClientResponse;
 

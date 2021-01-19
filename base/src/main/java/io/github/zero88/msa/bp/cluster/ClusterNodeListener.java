@@ -1,10 +1,11 @@
 package io.github.zero88.msa.bp.cluster;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventbusClient;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.spi.cluster.NodeListener;
 
 import lombok.RequiredArgsConstructor;

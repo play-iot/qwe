@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.exceptions.InvalidUrlException;
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
 import io.github.zero88.msa.bp.exceptions.InitializerError;
@@ -21,8 +24,6 @@ import io.github.zero88.utils.Reflections;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 
 import com.zandero.rest.RestBuilder;

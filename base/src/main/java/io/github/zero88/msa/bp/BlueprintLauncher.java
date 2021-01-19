@@ -7,6 +7,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
 import io.github.zero88.msa.bp.BlueprintConfig.DeployConfig;
 import io.github.zero88.msa.bp.utils.Configs;
@@ -18,8 +21,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import lombok.NonNull;
 

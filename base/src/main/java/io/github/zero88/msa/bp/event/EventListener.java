@@ -3,11 +3,12 @@ package io.github.zero88.msa.bp.event;
 import java.util.Collection;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.reactivex.Single;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
