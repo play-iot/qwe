@@ -1,11 +1,11 @@
-name: build
+name: build-release
 
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
     paths-ignore:
       - '.github/ISSUE_TEMPLATE/**'
-      - 'CHANGELOG.md'
       - 'README.md'
       - 'LICENSE'
   pull_request:
@@ -16,119 +16,61 @@ jobs:
   context:
     runs-on: ubuntu-latest
     outputs:
-      branch: ${{ steps.check.outputs.branch }}
-      version: ${{ steps.checkVersion.outputs.version }}
-      semanticVersion: ${{ steps.checkVersion.outputs.semanticVersion }}
+      branch: ${{ steps.context.outputs.branch }}
+      version: ${{ steps.context.outputs.version }}
+      semanticVersion: ${{ steps.conclusion.outputs.semanticVersion }}
       shouldBuild: ${{ steps.conclusion.outputs.shouldBuild }}
       shouldAnalysis: ${{ steps.conclusion.outputs.shouldAnalysis }}
       shouldPublish: ${{ steps.conclusion.outputs.shouldPublish }}
-      shouldTag: ${{ steps.conclusion.outputs.shouldTag }}
+      isRelease: ${{ steps.context.outputs.isTag }}
 
     steps:
-      - name: debug
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
-      - name: Check
-        id: check
-        shell: bash
-        run: |
-          commitMsg="${{ github.event.head_commit.message }}"
-          isOnMaster=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          isReleaseCommit=$(echo $commitMsg | grep -P -q '^Merge pull request #\d+ from .+/release/.+$' && echo 1 || echo 0)
-          isSkipPublish=$(echo $commitMsg | grep -P -q '^<skip_publish>.+$' && echo true || echo false)
-          [[ $isOnMaster == true && $isReleaseCommit == 1 ]] && isAfterReleaseMerged=true || isAfterReleaseMerged=false
-          isPR=${{ github.event_name == 'pull_request' }}
-          isReleasePR=${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/') }}
-          [[ $isOnMaster == true ]] && branch="main" || branch="${{ github.head_ref }}"
-
-          echo "Information:"
-          echo "- Is on master? $isOnMaster"
-          echo "- Is skip publish? $isSkipPublish"
-          echo "- Is after release merged? $isAfterReleaseMerged"
-          echo "- Is PR? $isPR"
-          echo "- Is Release PR? $isReleasePR"
-          echo "- Branch? $branch"
-
-          echo ::set-output name=branch::$branch
-          echo ::set-output name=isOnMaster::$isOnMaster
-          echo ::set-output name=isSkipPublish::$isSkipPublish
-          echo ::set-output name=isPR::$isPR
-          echo ::set-output name=isReleasePR::$isReleasePR
-          echo ::set-output name=isAfterReleaseMerged::$isAfterReleaseMerged
-
       - uses: actions/checkout@v2
-        if: steps.check.outputs.isReleasePR == 'false'
-
-      - uses: actions/checkout@v2
-        if: steps.check.outputs.isReleasePR == 'true'
         with:
-          ref: ${{ github.head_ref }}
           token: ${{ secrets.OSS_GITHUB_TOKEN }}
 
-      - name: Correct version if any
-        id: checkVersion
-        shell: bash
-        run: |
-          cfgVer=$(grep version gradle.properties | cut -d'=' -f2)
-          cfgSemantic=$(grep semanticVersion gradle.properties | cut -d'=' -f2)
-          version=$(${{ steps.check.outputs.isReleasePR }} == true && echo $(echo "${{ github.head_ref }}" | sed -e"s#release/##") || echo $cfgVer)
-          semanticVersion=$(${{ steps.check.outputs.isReleasePR }} == true && echo "" || echo $cfgSemantic)
-          [[ "$cfgVer$cfgSemantic" == "$version$semanticVersion" ]] && same=true || same=false
-
-          echo "Verify:"
-          echo "- Is correct version? $same"
-          [[ $same == false && ${{ steps.check.outputs.isReleasePR }} == false ]] && { echo "Version is changed without release branch"; exit 1; }
-
-          echo "Correct version..."
-          sed -i -e "s/version=.*/version=$version/g" gradle.properties
-          sed -i -e "s/semanticVersion=.*/semanticVersion=$semanticVersion/g" gradle.properties
-
-          echo ::set-output name=version::$version
-          echo ::set-output name=semanticVersion::$semanticVersion
-          echo ::set-output name=isSameVersion::$same
-
       - name: Import GPG key
-        id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v2
-        if: ${{ steps.checkVersion.outputs.isSameVersion == 'false' }}
         with:
           git_user_signingkey: true
           git_commit_gpgsign: true
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.CI_GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.CI_GPG_PASSPHARSE }}
+          git-tag-gpgsign: true
+          git-push-gpgsign: true
+          gpg-private-key: ${{ secrets.CI_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.CI_GPG_PASSPHARSE }}
 
-      - name: GIT commit and push
-        if: ${{ steps.checkVersion.outputs.isSameVersion == 'false' }}
-        run: |
-          git commit -S -am "<ci-auto-commit> Correct version"
-          git show --shortstat --show-signature
-          git push
+      - name: Project context
+        id: context
+        uses: zero88/gh-project-context@v1.0.0-rc2
+        with:
+          dry: false
 
       - name: Conclusion
         id: conclusion
         shell: bash
         run: |
-          shouldBuild=${{ steps.checkVersion.outputs.isSameVersion == 'true' && steps.check.outputs.isAfterReleaseMerged == 'false' && (steps.check.outputs.isPR != 'true' || github.event.action != 'closed') }}
-          shouldTag=${{ steps.check.outputs.isReleasePR == 'true' && github.event.action == 'closed' && github.event.pull_request.merged }}
-          [[ $shouldBuild == true && "${{ needs.context.outputs.isSkipPublish }}" != 'true' ]] && shouldAnalysis=true || shouldAnalysis=false
-          [[ $shouldAnalysis == true && "${{ needs.context.outputs.isOnMaster }}" == 'true' ]] && shouldPublish=true || shouldPublish=false
+          shouldBuild=${{ steps.context.outputs.ci_isPushed != 'true' && steps.context.outputs.isClosed != 'true' }}
+          isSkipPublish=$(echo "${{ steps.context.outputs.commitMsg }}" | grep -P -q '^<skip_publish>.+$' && echo true || echo false)
+          [[ $shouldBuild == true && $isSkipPublish != 'true' ]] && shouldAnalysis=true || shouldAnalysis=false
+          onTagOrMaster=${{ steps.context.outputs.onDefaultBranch == 'true' || steps.context.outputs.isTag == 'true' }}
+          [[ "$shouldAnalysis" == 'true' && "$onTagOrMaster" == 'true' ]] && shouldPublish=true || shouldPublish=false
+
+          version="${{ steps.context.outputs.version }}"
+          version=$([[ -z "$version" ]] && echo "${{ steps.context.outputs.branch }}" || echo "$version")
+          semantic=$(grep semanticVersion gradle.properties | cut -d'=' -f2)
 
           echo "Conclusion:"
-          echo "- Branch? ${{ steps.check.outputs.branch }}"
-          echo "- Version? ${{ steps.checkVersion.outputs.version }}"
-          echo "- Semantic version? ${{ steps.checkVersion.outputs.semanticVersion }}"
+          echo "- Branch? ${{ steps.context.outputs.branch }}"
+          echo "- Version? $version"
+          echo "- Semantic version? $semantic"
           echo "- Should build? $shouldBuild"
           echo "- Should analysis? $shouldAnalysis"
           echo "- Should publish? $shouldPublish"
-          echo "- Should tag? $shouldTag"
 
           echo ::set-output name=shouldBuild::$shouldBuild
           echo ::set-output name=shouldAnalysis::$shouldAnalysis
           echo ::set-output name=shouldPublish::$shouldPublish
-          echo ::set-output name=shouldTag::$shouldTag
+          echo ::set-output name=semanticVersion::$semantic
 
   build:
     runs-on: ubuntu-latest
@@ -162,21 +104,25 @@ jobs:
       - name: Publish GitHub Package
         if: needs.context.outputs.shouldPublish == 'true'
         run: |
-          ./gradlew publish -Psigning.gnupg.homeDir=/home/runner/.gnupg \
-                            -Psigning.gnupg.keyName=${{ steps.import_gpg.outputs.keyid }} \
-                            -Psigning.gnupg.passphrase=${{ secrets.CI_GPG_PASSPHARSE }} \
-                            -Pgithub \
-                            -Pnexus.username=${{ github.repository_owner }} \
-                            -Pnexus.password=${{ secrets.OSS_GITHUB_TOKEN }}
+          args=( -Psigning.gnupg.homeDir=/home/runner/.gnupg \
+                 -Psigning.gnupg.keyName=${{ steps.import_gpg.outputs.keyid }} \
+                 -Psigning.gnupg.passphrase=${{ secrets.CI_GPG_PASSPHARSE }} \
+                 -Pnexus.username=${{ github.repository_owner }} \
+                 -Pnexus.password=${{ secrets.OSS_GITHUB_TOKEN }} )
+          args+=( -Pgithub )
+          [[ "${{ needs.context.outputs.isRelease }}" == 'true' ]] && args+=( -Prelease )
+          ./gradlew publish "${args[@]}"
 
       - name: Publish Sonatype OSSRH
         if: needs.context.outputs.shouldPublish == 'true'
         run: |
-          ./gradlew publish -Psigning.gnupg.homeDir=/home/runner/.gnupg \
-                            -Psigning.gnupg.keyName=${{ steps.import_gpg.outputs.keyid }} \
-                            -Psigning.gnupg.passphrase=${{ secrets.CI_GPG_PASSPHARSE }} \
-                            -Pnexus.username=${{ secrets.OSS_SONATYPE_USER }} \
-                            -Pnexus.password=${{ secrets.OSS_SONATYPE_PASSWORD }}
+          args=( -Psigning.gnupg.homeDir=/home/runner/.gnupg \
+                           -Psigning.gnupg.keyName=${{ steps.import_gpg.outputs.keyid }} \
+                           -Psigning.gnupg.passphrase=${{ secrets.CI_GPG_PASSPHARSE }} \
+                           -Pnexus.username=${{ github.repository_owner }} \
+                           -Pnexus.password=${{ secrets.OSS_GITHUB_TOKEN }} )
+          [[ "${{ needs.context.outputs.isRelease }}" == 'true' ]] && args+=( -Prelease )
+          ./gradlew publish "${args[@]}"
 
   analysis:
     runs-on: ubuntu-latest
@@ -214,29 +160,28 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-  tag:
+  release:
     runs-on: ubuntu-latest
-    needs: context
-    if: needs.context.outputs.shouldTag == 'true'
+    needs: [ build, context ]
+    if: needs.context.outputs.isRelease == 'true'
     steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.OSS_GITHUB_TOKEN }}
-
-      - name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v2
-        with:
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_tag_gpgsign: true
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.CI_GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.CI_GPG_PASSPHARSE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.context.outputs.branch }}
+          release_name: Release ${{ needs.context.outputs.branch }}
+          draft: false
+          prerelease: false
 
-      - name: GIT tag
-        run: |
-          version="v${{ needs.context.outputs.version }}${{ needs.context.outputs.semanticVersion }}"
-          git tag -s $version ${{ github.sha }} -m "Release $version"
-          git show --shortstat --show-signature $version
-          git push origin $version
+  promote:
+    name: Promote release Sonatype OSSRH
+    runs-on: ubuntu-latest
+    needs: [ build, context ]
+    if: needs.context.outputs.isRelease == 'true'
+    steps:
+      - run: |
+          ./gradlew closeAndReleaseRepository \
+                            -Pnexus.username=${{ secrets.OSS_SONATYPE_USER }} \
+                            -Pnexus.password=${{ secrets.OSS_SONATYPE_PASSWORD }} || echo 'Need to promote manually'
