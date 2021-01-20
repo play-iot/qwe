@@ -13,7 +13,7 @@ on:
     branches: [ main ]
 
 env:
-  DISABLE_TEST: true
+  ENABLE_TEST: false
 
 jobs:
   context:
@@ -163,7 +163,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-test
 
       - name: Test
-        if: ${{ env.DISABLE_TEST }} != 'true'
+        if: env.ENABLE_TEST == 'true'
         run: ./gradlew jacocoRootReport -PjacocoHtml=false
 
       - name: SonarQube
