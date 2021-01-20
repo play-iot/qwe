@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class UnsupportedException extends BlueprintException {
+public final class UnsupportedException extends CarlException {
 
     public UnsupportedException(String message, Throwable e) {
         super(ErrorCode.UNSUPPORTED, message, e);

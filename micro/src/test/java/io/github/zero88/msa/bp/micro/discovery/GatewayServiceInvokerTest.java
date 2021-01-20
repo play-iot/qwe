@@ -8,7 +8,7 @@ import io.github.zero88.msa.bp.TestHelper.JsonHelper;
 import io.github.zero88.msa.bp.dto.msg.DataTransferObject.Headers;
 import io.github.zero88.msa.bp.dto.msg.RequestData;
 import io.github.zero88.msa.bp.event.EventAction;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.micro.BaseMicroServiceTest;
 import io.github.zero88.msa.bp.micro.discovery.mock.MockServiceInvoker;
@@ -33,9 +33,9 @@ public class GatewayServiceInvokerTest extends BaseMicroServiceTest {
                                                             EVENT_RECORD_1 + "...");
         invoker.execute(EventAction.CREATE, RequestData.builder().build())
                .subscribe(d -> TestHelper.testComplete(async), t -> {
-                   context.assertTrue(t instanceof BlueprintException);
-                   assert t instanceof BlueprintException;
-                   BlueprintException e = (BlueprintException) t;
+                   context.assertTrue(t instanceof CarlException);
+                   assert t instanceof CarlException;
+                   CarlException e = (CarlException) t;
                    context.assertEquals(ServiceNotFoundException.CODE, e.errorCode());
                    context.assertEquals(invoker.serviceLabel() +
                                         " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
@@ -51,9 +51,9 @@ public class GatewayServiceInvokerTest extends BaseMicroServiceTest {
                                                             EVENT_RECORD_1);
         invoker.execute(EventAction.UNKNOWN, RequestData.builder().build())
                .subscribe(d -> TestHelper.testComplete(async), t -> {
-                   context.assertTrue(t instanceof BlueprintException);
-                   assert t instanceof BlueprintException;
-                   BlueprintException e = (BlueprintException) t;
+                   context.assertTrue(t instanceof CarlException);
+                   assert t instanceof CarlException;
+                   CarlException e = (CarlException) t;
                    context.assertEquals(ServiceNotFoundException.CODE, e.errorCode());
                    context.assertEquals(invoker.serviceLabel() +
                                         " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",

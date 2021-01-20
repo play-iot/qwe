@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.DeployConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.CarlConfig.AppConfig;
+import io.github.zero88.msa.bp.CarlConfig.DeployConfig;
+import io.github.zero88.msa.bp.CarlConfig.SystemConfig;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Strings;
 import io.vertx.config.ConfigRetriever;
@@ -80,8 +80,8 @@ public final class ConfigProcessor {
         return object instanceof JsonArray || object instanceof Collection;
     }
 
-    public Optional<BlueprintConfig> override(JsonObject fileConfig, boolean overrideAppConfig,
-                                              boolean overrideOtherConfigs) {
+    public Optional<CarlConfig> override(JsonObject fileConfig, boolean overrideAppConfig,
+                                         boolean overrideOtherConfigs) {
         logger.info("Starting to override config");
         if (Objects.isNull(fileConfig) || !overrideAppConfig && !overrideOtherConfigs) {
             return Optional.empty();
@@ -89,8 +89,8 @@ public final class ConfigProcessor {
         return overrideConfig(mergeEnvVarAndSystemVar(), fileConfig, overrideAppConfig, overrideOtherConfigs);
     }
 
-    Optional<BlueprintConfig> override(JsonObject defaultConfig, JsonObject provideConfig, boolean overrideAppConfig,
-                                       boolean overrideOtherConfigs) {
+    Optional<CarlConfig> override(JsonObject defaultConfig, JsonObject provideConfig, boolean overrideAppConfig,
+                                  boolean overrideOtherConfigs) {
         if ((Objects.isNull(provideConfig) && Objects.isNull(defaultConfig))) {
             return Optional.empty();
         }
@@ -137,14 +137,14 @@ public final class ConfigProcessor {
         }
         JsonObject input = defaultConfig.mergeIn(provideConfig, true);
         if (logger.isDebugEnabled()) {
-            logger.debug("Input BlueprintConfig: {}", input.encode());
+            logger.debug("Input CarlConfig: {}", input.encode());
         }
         return input;
     }
 
     private String toStandardKey(String key) {
-        if (key.equalsIgnoreCase(BlueprintConfig.DATA_DIR)) {
-            return BlueprintConfig.DATA_DIR;
+        if (key.equalsIgnoreCase(CarlConfig.DATA_DIR)) {
+            return CarlConfig.DATA_DIR;
         }
         if (key.startsWith("__") && key.endsWith("__")) {
             return key;
@@ -152,8 +152,8 @@ public final class ConfigProcessor {
         return "__" + key + "__";
     }
 
-    private Optional<BlueprintConfig> overrideConfig(Map<String, Object> envConfig, JsonObject fileConfig,
-                                                     boolean overrideAppConfig, boolean overrideSystemConfig) {
+    private Optional<CarlConfig> overrideConfig(Map<String, Object> envConfig, JsonObject fileConfig,
+                                                boolean overrideAppConfig, boolean overrideSystemConfig) {
         JsonObject bluePrintConfig = new JsonObject();
         JsonObject inputAppConfig = fileConfig.getJsonObject(AppConfig.NAME, new JsonObject());
         JsonObject inputSystemConfig = fileConfig.getJsonObject(SystemConfig.NAME, new JsonObject());
@@ -161,7 +161,7 @@ public final class ConfigProcessor {
         JsonObject destAppConfig = new JsonObject();
         JsonObject destSystemConfig = new JsonObject();
         JsonObject destDeployConfig = new JsonObject();
-        Object inputDataDir = fileConfig.getValue(BlueprintConfig.DATA_DIR);
+        Object inputDataDir = fileConfig.getValue(CarlConfig.DATA_DIR);
 
         for (Entry<String, Object> entry : envConfig.entrySet()) {
             String[] envKeyParts = entry.getKey().split("\\.");
@@ -170,10 +170,10 @@ public final class ConfigProcessor {
             }
             Object envValue = entry.getValue();
             String standardKey = toStandardKey(envKeyParts[1]);
-            if (standardKey.equals(BlueprintConfig.DATA_DIR) && overrideSystemConfig) {
+            if (standardKey.equals(CarlConfig.DATA_DIR) && overrideSystemConfig) {
                 try {
-                    bluePrintConfig.put(BlueprintConfig.DATA_DIR, FileUtils.toPath((String) envValue).toString());
-                } catch (BlueprintException ex) {
+                    bluePrintConfig.put(CarlConfig.DATA_DIR, FileUtils.toPath((String) envValue).toString());
+                } catch (CarlException ex) {
                     logger.warn("DataDir is not valid. ", ex);
                 }
             }
@@ -194,14 +194,14 @@ public final class ConfigProcessor {
         bluePrintConfig.put(DeployConfig.NAME,
                             new JsonObject(inputDeployConfig.toString()).mergeIn(destDeployConfig, true));
 
-        if (!bluePrintConfig.containsKey(BlueprintConfig.DATA_DIR)) {
-            bluePrintConfig.put(BlueprintConfig.DATA_DIR, inputDataDir);
+        if (!bluePrintConfig.containsKey(CarlConfig.DATA_DIR)) {
+            bluePrintConfig.put(CarlConfig.DATA_DIR, inputDataDir);
         }
         try {
             return Optional.of(
-                IConfig.MAPPER_IGNORE_UNKNOWN_PROPERTY.readValue(bluePrintConfig.encode(), BlueprintConfig.class));
+                IConfig.MAPPER_IGNORE_UNKNOWN_PROPERTY.readValue(bluePrintConfig.encode(), CarlConfig.class));
         } catch (IOException ex) {
-            throw new BlueprintException("Converting to object failed", ex);
+            throw new CarlException("Converting to object failed", ex);
         }
     }
 

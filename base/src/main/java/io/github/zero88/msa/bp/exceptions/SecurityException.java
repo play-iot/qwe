@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public class SecurityException extends BlueprintException {
+public class SecurityException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.parse("SECURITY_ERROR");
 

@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class CommunicationProtocolException extends BlueprintException {
+public final class CommunicationProtocolException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.parse("COMMUNICATION_PROTOCOL_ERROR");
 

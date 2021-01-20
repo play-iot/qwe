@@ -19,12 +19,12 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.msa.bp.dto.JsonData.SerializerFunction;
 import io.github.zero88.msa.bp.event.EventContractor.Param;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.DesiredException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.ImplementationError;
 import io.github.zero88.msa.bp.exceptions.UnsupportedException;
-import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
+import io.github.zero88.msa.bp.exceptions.converter.CarlExceptionConverter;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Reflections;
 import io.github.zero88.utils.Reflections.ReflectionClass;
@@ -137,7 +137,7 @@ final class AnnotationHandler<T extends EventListener> {
      * @param message Given {@link EventMessage}
      * @param params  Given inputClasses
      * @return data inputs
-     * @throws BlueprintException if message format is invalid
+     * @throws CarlException if message format is invalid
      */
     private Object[] parseMessage(EventMessage message, Map<String, Class<?>> params) {
         if (params.isEmpty()) {
@@ -174,8 +174,8 @@ final class AnnotationHandler<T extends EventListener> {
             }
             return mapper.convertValue(d, paramClass);
         } catch (ClassCastException | IllegalArgumentException e) {
-            throw new BlueprintException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
-                                         new HiddenException(e));
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
+                                    new HiddenException(e));
         }
     }
 
@@ -183,8 +183,8 @@ final class AnnotationHandler<T extends EventListener> {
         try {
             return mapper.convertValue(data.getMap(), paramClass);
         } catch (IllegalArgumentException e) {
-            throw new BlueprintException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
-                                         new HiddenException(e));
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
+                                    new HiddenException(e));
         }
     }
 
@@ -197,7 +197,7 @@ final class AnnotationHandler<T extends EventListener> {
             logger.warn("Failed when handle event {}", throwable, action);
         }
         final String overrideMsg = throwable instanceof ImplementationError ? "No reply from event " + action : "";
-        return EventMessage.error(action, BlueprintExceptionConverter.friendly(throwable, overrideMsg));
+        return EventMessage.error(action, CarlExceptionConverter.friendly(throwable, overrideMsg));
     }
 
 }

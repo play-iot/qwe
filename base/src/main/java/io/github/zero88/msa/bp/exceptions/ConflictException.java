@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class ConflictException extends BlueprintException {
+public final class ConflictException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.parse("CONFLICT_ERROR");
 

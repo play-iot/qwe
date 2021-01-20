@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 import io.github.zero88.msa.bp.component.SharedDataDelegate;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.http.server.HttpServer;
 import io.github.zero88.msa.bp.http.server.ServerInfo;
 import io.github.zero88.msa.bp.http.server.handler.DynamicContextDispatcher;
@@ -53,7 +53,7 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor {
                 });
             }
             return true;
-        } catch (BlueprintException e) {
+        } catch (CarlException e) {
             logger().warn("Cannot register Dynamic service", e);
             return false;
         }

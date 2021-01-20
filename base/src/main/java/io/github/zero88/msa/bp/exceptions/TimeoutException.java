@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class TimeoutException extends BlueprintException {
+public final class TimeoutException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.parse("TIMEOUT_ERROR");
 

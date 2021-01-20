@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.utils.mock;
 
-import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
+import io.github.zero88.msa.bp.CarlConfig.AppConfig;
 import io.github.zero88.msa.bp.IConfig;
 
 import lombok.Getter;

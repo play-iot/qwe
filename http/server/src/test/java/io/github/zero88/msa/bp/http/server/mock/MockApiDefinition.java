@@ -6,7 +6,7 @@ import javax.ws.rs.Produces;
 
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventModel;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.server.rest.AbstractRestEventApi;
 import io.github.zero88.msa.bp.http.server.rest.RestApi;
@@ -30,7 +30,7 @@ public class MockApiDefinition {
         @Path("/error")
         @Produces(HttpUtils.JSON_UTF8_CONTENT_TYPE)
         public JsonObject error() {
-            throw new BlueprintException("error");
+            throw new CarlException("error");
         }
 
     }

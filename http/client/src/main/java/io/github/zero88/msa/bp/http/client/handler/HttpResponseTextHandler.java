@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.HttpUtils.HttpHeaderUtils;
@@ -57,7 +57,7 @@ public abstract class HttpResponseTextHandler implements Function<HttpClientResp
             final int status = response.statusCode();
             if (!swallowError && status >= 400) {
                 ErrorCode code = HttpStatusMapping.error(response.request().getMethod(), status);
-                return Single.error(new BlueprintException(code, body.encode()));
+                return Single.error(new CarlException(code, body.encode()));
             }
             return Single.just(new ResponseData().setStatus(status).setHeaders(overrideHeader(response)).setBody(body));
         });

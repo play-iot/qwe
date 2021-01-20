@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class NetworkException extends BlueprintException {
+public final class NetworkException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.parse("NETWORK_ERROR");
 

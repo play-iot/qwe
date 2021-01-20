@@ -26,7 +26,7 @@ public class ErrorMessageTest {
     }
 
     @Test
-    public void test_composite_exception_include_blueprint_exception_not_last() {
+    public void test_composite_exception_include_carl_exception_not_last() {
         final ErrorMessage message = ErrorMessage.parse(
             new CompositeException(new NotFoundException("xxx"), new IllegalStateException("abc")));
         Assertions.assertEquals(io.github.zero88.exceptions.ErrorCode.UNKNOWN_ERROR, message.getCode());
@@ -34,7 +34,7 @@ public class ErrorMessageTest {
     }
 
     @Test
-    public void test_composite_exception_include_blueprint_exception_at_last() {
+    public void test_composite_exception_include_carl_exception_at_last() {
         final ErrorMessage message = ErrorMessage.parse(
             new CompositeException(new RuntimeException("1"), new NotFoundException("xxx")));
         Assertions.assertEquals(NotFoundException.CODE, message.getCode());
@@ -42,8 +42,8 @@ public class ErrorMessageTest {
     }
 
     @Test
-    public void test_blueprint_exception() {
-        final ErrorMessage message = ErrorMessage.parse(new BlueprintException(ErrorCode.INVALID_ARGUMENT, "invalid"));
+    public void test_carl_exception() {
+        final ErrorMessage message = ErrorMessage.parse(new CarlException(ErrorCode.INVALID_ARGUMENT, "invalid"));
         Assertions.assertEquals(ErrorCode.INVALID_ARGUMENT, message.getCode());
         Assertions.assertEquals("invalid", message.getMessage());
     }
@@ -64,7 +64,7 @@ public class ErrorMessageTest {
 
     @Test
     public void test_serialize_to_json() throws JSONException {
-        ErrorMessage msg = ErrorMessage.parse(new BlueprintException(ErrorCode.INVALID_ARGUMENT, "invalid"));
+        ErrorMessage msg = ErrorMessage.parse(new CarlException(ErrorCode.INVALID_ARGUMENT, "invalid"));
         Assertions.assertNotNull(msg.getThrowable());
         JsonObject jsonMsg = msg.toJson();
         JSONAssert.assertEquals("{\"code\":\"INVALID_ARGUMENT\",\"message\":\"invalid\"}", jsonMsg.encode(),

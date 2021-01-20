@@ -12,12 +12,12 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.msa.bp.BlueprintConfig;
+import io.github.zero88.msa.bp.CarlConfig;
 import io.github.zero88.msa.bp.ConfigProcessor;
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.msa.bp.event.EventbusClient;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
-import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
+import io.github.zero88.msa.bp.exceptions.CarlException;
+import io.github.zero88.msa.bp.exceptions.converter.CarlExceptionConverter;
 import io.github.zero88.msa.bp.utils.ExecutorHelpers;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -39,14 +39,14 @@ public abstract class ContainerVerticle extends AbstractVerticle implements Cont
     private final Map<Class<? extends Unit>, Consumer<? extends UnitContext>> afterSuccesses = new HashMap<>();
     private final Set<String> deployments = new HashSet<>();
     @Getter
-    protected BlueprintConfig config;
+    protected CarlConfig config;
     @Getter
     private EventbusClient eventbusClient;
     private Handler<Void> successHandler;
 
     @Override
     public void start() {
-        final BlueprintConfig fileConfig = computeConfig(config());
+        final CarlConfig fileConfig = computeConfig(config());
         this.config = new ConfigProcessor(vertx).override(fileConfig.toJson(), true, false).orElse(fileConfig);
         this.eventbusClient = new DefaultEventClient(this.vertx.getDelegate(), this.config.getSystemConfig()
                                                                                           .getEventBusConfig()
@@ -125,7 +125,7 @@ public abstract class ContainerVerticle extends AbstractVerticle implements Cont
     }
 
     private void fail(Promise<Void> promise, Throwable throwable) {
-        BlueprintException t = BlueprintExceptionConverter.from(throwable);
+        CarlException t = CarlExceptionConverter.from(throwable);
         logger.error("Cannot start container verticle {}", t, this.getClass().getName());
         promise.fail(t);
     }

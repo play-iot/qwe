@@ -3,7 +3,7 @@ package io.github.zero88.msa.bp.http.server.rest;
 import java.util.Optional;
 import java.util.Set;
 
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.micro.type.EventMessageService;
@@ -29,7 +29,7 @@ public interface DynamicRestApi {
         if (EventMessageService.TYPE.equals(record.getType())) {
             return (T) DynamicEventRestApi.create(record);
         }
-        throw new BlueprintException(ErrorCode.INVALID_ARGUMENT,
+        throw new CarlException(ErrorCode.INVALID_ARGUMENT,
                                      "Dynamic Rest API unsupported type " + record.getType());
     }
 

@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.msa.bp.dto.JsonData;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.utils.Configs;
 import io.github.zero88.utils.Functions.Silencer;
@@ -62,7 +62,7 @@ public interface IConfig extends JsonData, Shareable {
                 hidden.addSuppressed(Objects.nonNull(cause.getCause()) ? cause.getCause() : cause);
             }
             String msg = Strings.isNotBlank(errorMsg) ? errorMsg : "Invalid config format";
-            throw new BlueprintException(ErrorCode.INVALID_ARGUMENT, msg, hidden);
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, msg, hidden);
         }
     }
 
@@ -105,7 +105,7 @@ public interface IConfig extends JsonData, Shareable {
     static <C extends IConfig> C parseConfig(JsonObject config, Class<C> clazz, Supplier<C> fallback) {
         try {
             return IConfig.from(config, clazz);
-        } catch (BlueprintException ex) {
+        } catch (CarlException ex) {
             return fallback.get();
         }
     }

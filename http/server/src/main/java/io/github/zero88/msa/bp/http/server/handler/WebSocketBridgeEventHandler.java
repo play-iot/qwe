@@ -13,7 +13,7 @@ import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventModel;
 import io.github.zero88.msa.bp.event.EventbusClient;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.http.event.WebSocketServerEventMetadata;
 import io.github.zero88.msa.bp.http.server.ws.WebSocketEventExecutor;
 import io.github.zero88.msa.bp.http.server.ws.WebSocketEventMessage;
@@ -27,7 +27,7 @@ import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import lombok.NonNull;
 
 /**
- * Websocket event bus handler
+ * WebSocket event bus handler
  */
 //TODO handle auth with socket header
 public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
@@ -85,7 +85,7 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
         try {
             logger.info("WEBSOCKET::Redirect message from address: {}", address);
             executor.execute(WebSocketEventMessage.from(event.getRawMessage()), metadata, handleMessage(socket));
-        } catch (BlueprintException e) {
+        } catch (CarlException e) {
             handleMessage(socket).accept(EventMessage.error(EventAction.RETURN, e));
         }
     }

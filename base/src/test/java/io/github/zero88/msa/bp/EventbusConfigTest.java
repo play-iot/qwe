@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig.EventBusConfig;
+import io.github.zero88.msa.bp.CarlConfig.SystemConfig.EventBusConfig;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.http.ClientAuth;
 import io.vertx.core.json.JsonObject;

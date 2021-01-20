@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public class ServiceException extends BlueprintException {
+public class ServiceException extends CarlException {
 
     public ServiceException(String message, Throwable e) {
         this(ErrorCode.SERVICE_ERROR, message, e);

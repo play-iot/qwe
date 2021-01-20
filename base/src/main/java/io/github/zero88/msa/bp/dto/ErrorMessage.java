@@ -3,9 +3,9 @@ package io.github.zero88.msa.bp.dto;
 import java.io.Serializable;
 import java.util.function.Function;
 
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
-import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
+import io.github.zero88.msa.bp.exceptions.converter.CarlExceptionConverter;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 
@@ -28,11 +28,11 @@ import lombok.ToString;
 public final class ErrorMessage implements Serializable, JsonData {
 
     @JsonIgnore
-    private BlueprintException throwable;
+    private CarlException throwable;
     private io.github.zero88.exceptions.ErrorCode code;
     private String message;
 
-    private ErrorMessage(@NonNull BlueprintException throwable) {
+    private ErrorMessage(@NonNull CarlException throwable) {
         this.throwable = throwable;
         this.code = throwable.errorCode();
         this.message = throwable.getMessage();
@@ -49,10 +49,10 @@ public final class ErrorMessage implements Serializable, JsonData {
     }
 
     public static ErrorMessage parse(@NonNull Throwable throwable) {
-        return parse(throwable, BlueprintExceptionConverter::friendly);
+        return parse(throwable, CarlExceptionConverter::friendly);
     }
 
-    public static ErrorMessage parse(@NonNull Throwable throwable, @NonNull Function<Throwable, BlueprintException> c) {
+    public static ErrorMessage parse(@NonNull Throwable throwable, @NonNull Function<Throwable, CarlException> c) {
         return new ErrorMessage(c.apply(throwable));
     }
 

@@ -3,7 +3,7 @@ package io.github.zero88.msa.bp.http.server.mock;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.dto.msg.RequestData;
 import io.github.zero88.msa.bp.event.EventContractor;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.EngineException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.eventbus.EventBus;
@@ -34,7 +34,7 @@ public class MockEventBusErrorListener extends MockEventBusListener {
 
     @EventContractor(action = "UPDATE")
     public JsonObject update(RequestData data) {
-        throw new BlueprintException(ErrorCode.INVALID_ARGUMENT, "invalid");
+        throw new CarlException(ErrorCode.INVALID_ARGUMENT, "invalid");
     }
 
 }

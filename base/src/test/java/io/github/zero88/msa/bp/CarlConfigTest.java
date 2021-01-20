@@ -6,23 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.DeployConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig.ClusterConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.SystemConfig.EventBusConfig;
+import io.github.zero88.msa.bp.CarlConfig.AppConfig;
+import io.github.zero88.msa.bp.CarlConfig.DeployConfig;
+import io.github.zero88.msa.bp.CarlConfig.SystemConfig;
+import io.github.zero88.msa.bp.CarlConfig.SystemConfig.ClusterConfig;
+import io.github.zero88.msa.bp.CarlConfig.SystemConfig.EventBusConfig;
 import io.github.zero88.msa.bp.cluster.ClusterType;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.utils.Configs;
 import io.vertx.core.json.JsonObject;
 
-public class BlueprintConfigTest {
+public class CarlConfigTest {
 
     @Test
     public void test_default() throws JSONException {
-        BlueprintConfig from = IConfig.fromClasspath("system.json", BlueprintConfig.class);
+        CarlConfig from = IConfig.fromClasspath("system.json", CarlConfig.class);
 
-        Assertions.assertEquals(BlueprintConfig.DEFAULT_DATADIR, from.getDataDir());
+        Assertions.assertEquals(CarlConfig.DEFAULT_DATADIR, from.getDataDir());
         Assertions.assertNotNull(from.getSystemConfig());
 
         final ClusterConfig clusterConfig = from.getSystemConfig().getClusterConfig();
@@ -60,7 +60,7 @@ public class BlueprintConfigTest {
 
     @Test
     public void test_init() {
-        BlueprintConfig from = new BlueprintConfig();
+        CarlConfig from = new CarlConfig();
         System.out.println(from.toJson().encodePrettily());
         Assertions.assertNotNull(from.getDataDir());
         Assertions.assertNull(from.getSystemConfig());
@@ -71,22 +71,22 @@ public class BlueprintConfigTest {
     @Test
     public void test_deserialize_simple_root() {
         JsonObject jsonObject = new JsonObject();
-        BlueprintConfig from = IConfig.from(jsonObject, BlueprintConfig.class);
+        CarlConfig from = IConfig.from(jsonObject, CarlConfig.class);
         Assertions.assertNotNull(from.getDataDir());
     }
 
     @Test
     public void test_deserialize_error_decode() {
-        Assertions.assertThrows(BlueprintException.class, () -> IConfig.from("hello", BlueprintConfig.class));
+        Assertions.assertThrows(CarlException.class, () -> IConfig.from("hello", CarlConfig.class));
     }
 
     @Test
     public void test_deserialize_root_having_redundant_properties() {
-        Assertions.assertThrows(BlueprintException.class, () -> {
+        Assertions.assertThrows(CarlException.class, () -> {
             String jsonStr = "{\"__redundant__\":{},\"__system__\":{\"__cluster__\":{\"active\":true,\"ha\":false," +
                              "\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
                              "\"file\":\"\",\"options\":{}}}}";
-            IConfig.from(jsonStr, BlueprintConfig.class);
+            IConfig.from(jsonStr, CarlConfig.class);
         });
     }
 
@@ -150,7 +150,7 @@ public class BlueprintConfigTest {
     @Test
     public void test_deserialize_appCfg_from_root() throws JSONException {
         String jsonStr = "{\"__system__\":{},\"__app__\":{\"http.port\":8085}}";
-        BlueprintConfig cfg = IConfig.from(jsonStr, BlueprintConfig.class);
+        CarlConfig cfg = IConfig.from(jsonStr, CarlConfig.class);
         Assertions.assertNotNull(cfg);
         Assertions.assertNotNull(cfg.getAppConfig());
         Assertions.assertEquals(8085, cfg.getAppConfig().get("http.port"));
@@ -173,7 +173,7 @@ public class BlueprintConfigTest {
 
     @Test
     public void test_deserialize_appCfg_invalid_json() {
-        Assertions.assertThrows(BlueprintException.class,
+        Assertions.assertThrows(CarlException.class,
                                 () -> IConfig.from("{\"__system__\":{},\"__app__\":8085}}", AppConfig.class));
     }
 
@@ -224,7 +224,7 @@ public class BlueprintConfigTest {
 
     @Test
     public void test_blank() throws JSONException {
-        BlueprintConfig blank = BlueprintConfig.blank();
+        CarlConfig blank = CarlConfig.blank();
         Assertions.assertNotNull(blank);
         Assertions.assertNotNull(blank.getDataDir());
         Assertions.assertNotNull(blank.getAppConfig());
@@ -239,7 +239,7 @@ public class BlueprintConfigTest {
 
     @Test
     public void test_blank_with_app_cfg() throws JSONException {
-        BlueprintConfig blank = BlueprintConfig.blank(new JsonObject().put("hello", 1));
+        CarlConfig blank = CarlConfig.blank(new JsonObject().put("hello", 1));
         Assertions.assertNotNull(blank);
         Assertions.assertNotNull(blank.getDataDir());
         Assertions.assertNotNull(blank.getAppConfig());
@@ -255,7 +255,7 @@ public class BlueprintConfigTest {
 
     @Test
     public void test_merge_with_default() throws JSONException {
-        BlueprintConfig BlueprintConfig = IConfig.from(Configs.loadJsonConfig("system.json"), BlueprintConfig.class);
+        CarlConfig CarlConfig = IConfig.from(Configs.loadJsonConfig("system.json"), CarlConfig.class);
         String jsonInput = "{\"__system__\":{\"__eventBus__\":{\"clientAuth\":\"REQUIRED\",\"ssl\":true," +
                            "\"clustered\":true,\"keyStoreOptions\":{\"path\":\"eventBusKeystore.jks\"," +
                            "\"password\":\"zbpsparkEventBus\"},\"trustStoreOptions\":{\"path\":\"eventBusKeystore" +
@@ -263,16 +263,16 @@ public class BlueprintConfigTest {
                            "\"listenerAddress\":\"io.zero88.dashboard.connector.edge.cluster\"}}," +
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\"},\"api.name\":\"edge-connector\"}}";
-        BlueprintConfig input = IConfig.from(jsonInput, BlueprintConfig.class);
+        CarlConfig input = IConfig.from(jsonInput, CarlConfig.class);
         Assertions.assertEquals("0.0.0.0", input.getSystemConfig().getEventBusConfig().getOptions().getHost());
         Assertions.assertEquals(5000, input.getSystemConfig().getEventBusConfig().getOptions().getPort());
-        JsonObject mergeJson = BlueprintConfig.toJson().mergeIn(input.toJson(), true);
-        JsonObject mergeToJson = BlueprintConfig.mergeToJson(input);
+        JsonObject mergeJson = CarlConfig.toJson().mergeIn(input.toJson(), true);
+        JsonObject mergeToJson = CarlConfig.mergeToJson(input);
 
         JSONAssert.assertEquals(mergeJson.encode(), mergeToJson.encode(), JSONCompareMode.STRICT);
-        BlueprintConfig merge = IConfig.from(mergeToJson, BlueprintConfig.class);
+        CarlConfig merge = IConfig.from(mergeToJson, CarlConfig.class);
         JSONAssert.assertEquals(mergeJson.encode(), merge.toJson().encode(), JSONCompareMode.STRICT);
-        BlueprintConfig merge1 = BlueprintConfig.merge(input);
+        CarlConfig merge1 = CarlConfig.merge(input);
         System.out.println(mergeJson.encodePrettily());
         System.out.println("===========================================");
         System.out.println(merge1.toJson().encodePrettily());

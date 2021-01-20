@@ -19,7 +19,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.msa.bp.cluster.ClusterType;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.utils.OSHelper;
 import io.github.zero88.utils.SystemHelper;
 import io.vertx.core.Vertx;
@@ -31,7 +31,7 @@ import io.vertx.junit5.VertxTestContext;
 public class ConfigProcessorTest {
 
     private ConfigProcessor processor;
-    private BlueprintConfig blueprintConfig;
+    private CarlConfig carlConfig;
 
     @BeforeAll
     public static void beforeSuite() {
@@ -50,7 +50,7 @@ public class ConfigProcessorTest {
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_2\", \"HTTP_1_1\" ]},\"api" +
                            ".name\":\"edge-connector\"}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
         testContext.completeNow();
     }
 
@@ -65,7 +65,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_not_have_default_and_provide_config() {
-        Optional<BlueprintConfig> bpCfgOpt = this.processor.override(null, null, true, true);
+        Optional<CarlConfig> bpCfgOpt = this.processor.override(null, null, true, true);
         Assertions.assertFalse(bpCfgOpt.isPresent());
     }
 
@@ -148,7 +148,7 @@ public class ConfigProcessorTest {
                                         "\"worker\":true,\"workerPoolSize\":50}",
                                         finalResult.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
             } catch (JSONException e) {
-                throw new BlueprintException(e);
+                throw new CarlException(e);
             }
         }, true, true);
     }
@@ -167,8 +167,8 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.app.test.port", "8087");
         String jsonInput1 = "{\"__app__\":{\"test\":\"anyvalue\"}}";
 
-        blueprintConfig = IConfig.from(jsonInput1, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(blueprintConfig.toJson(), null, true, true);
+        carlConfig = IConfig.from(jsonInput1, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(carlConfig.toJson(), null, true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object testConfig = finalResult.get().getAppConfig().get("test");
         Assertions.assertNotNull(testConfig);
@@ -184,10 +184,10 @@ public class ConfigProcessorTest {
         String jsonInput2 = "{\"__app__\":{\"__http__\":{\"host\":\"1.1.1.1\",\"port\":8086," +
                             "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_3\", \"HTTP_1_1\" ]},\"api" +
                             ".name\":\"edge-connector\"}}";
-        blueprintConfig = IConfig.from(jsonInput1, BlueprintConfig.class);
-        BlueprintConfig bpConfig2 = IConfig.from(jsonInput2, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(blueprintConfig.toJson(), bpConfig2.toJson(),
-                                                                        true, true);
+        carlConfig = IConfig.from(jsonInput1, CarlConfig.class);
+        CarlConfig bpConfig2 = IConfig.from(jsonInput2, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(carlConfig.toJson(), bpConfig2.toJson(),
+                                                                   true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
         Assertions.assertNotNull(httpConfig);
@@ -208,8 +208,8 @@ public class ConfigProcessorTest {
     public void test_double() {
         System.setProperty("zbp.app.http.port", "8087.0");
         String jsonInput = "{\"__app__\":{\"__http__\":{\"port\":8086.0}}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
         Assertions.assertNotNull(httpConfig);
@@ -220,9 +220,9 @@ public class ConfigProcessorTest {
     public void test_float() {
         System.setProperty("zbp.app.http.port", String.valueOf(3.4e+038));
         String jsonInput = "{\"__app__\":{\"__http__\":{\"port\":8080}}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        ((Map<String, Object>) blueprintConfig.getAppConfig().get("__http__")).put("port", (float) 3.4e+028);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        ((Map<String, Object>) carlConfig.getAppConfig().get("__http__")).put("port", (float) 3.4e+028);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
         Assertions.assertNotNull(httpConfig);
@@ -236,8 +236,8 @@ public class ConfigProcessorTest {
             "{\"__app__\":{\"__https__\": [{\"host\": \"2.2.2.2\", \"port\": 8088, \"enabled\": false, " +
             "\"rootApi\": \"/test\"},{\"host\": \"2.2.2.3\", \"port\": 8089, \"enabled\": true, " +
             "\"rootApi\": \"/test1\"}]}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpsConfig = finalResult.get().getAppConfig().get("__https__");
         Assertions.assertNotNull(httpsConfig);
@@ -249,8 +249,8 @@ public class ConfigProcessorTest {
     public void test_json_array_of_primitive() {
         System.setProperty("zbp.app.https", "[abc1,def1]");
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpsConfig = finalResult.get().getAppConfig().get("__https__").toString();
         Assertions.assertNotNull(httpsConfig);
@@ -261,8 +261,8 @@ public class ConfigProcessorTest {
     public void test_json_array_of_primitive_not_update() {
         System.setProperty("zbp.app.https.name", "[abc1,def1]");
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpsConfig = finalResult.get().getAppConfig().get("__https__");
         Assertions.assertNotNull(httpsConfig);
@@ -274,8 +274,8 @@ public class ConfigProcessorTest {
         System.setProperty("zbp.app.http.host.name", "[abc.net,def.net]");
         String jsonInput = "{\"__app__\":{\"__http__\":{\"host\":[{\"name\":\"abc.com\"}, {\"name\":\"def.com\"}]}}}";
 
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
         Assertions.assertNotNull(httpConfig);
@@ -286,8 +286,8 @@ public class ConfigProcessorTest {
     public void test_json_array_of_primitive_1() {
         String jsonInput = "{\"__app__\":{\"__http__\":{\"host\":[\"abc.com\",\"def.com\"]}}}";
         System.setProperty("zbp.app.http.host.name", "[abc.net,def.net]");
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().get("__http__");
         Assertions.assertNotNull(httpConfig);
@@ -306,7 +306,7 @@ public class ConfigProcessorTest {
                                         "\"worker\":false,\"workerPoolSize\":20}",
                                         finalResult.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
             } catch (JSONException e) {
-                throw new BlueprintException(e);
+                throw new CarlException(e);
             }
             Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive());
             Object httpConfig = finalResult.getAppConfig().get("__http__");
@@ -329,7 +329,7 @@ public class ConfigProcessorTest {
                                         "\"workerPoolSize\":20}",
                                         finalResult.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
             } catch (JSONException e) {
-                throw new BlueprintException(e);
+                throw new CarlException(e);
             }
             Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
             Object httpConfig = finalResult.getAppConfig().get("__http__");
@@ -353,8 +353,8 @@ public class ConfigProcessorTest {
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_2\", \"HTTP_1_1\" ]},\"api" +
                            ".name\":\"edge-connector\"}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(null, blueprintConfig.toJson(), false, false);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), false, false);
         Assertions.assertFalse(finalResult.isPresent());
     }
 
@@ -390,17 +390,17 @@ public class ConfigProcessorTest {
                            "\"__hikari__\":{\"jdbcUrl\":\"jdbc:h2:file:/data/db/bios-installer\"}}}}," +
                            "{\"metadata\":{\"group_id\":\"io.zero88.edge.module\",\"artifact_id\":\"gateway\"," +
                            "\"version\":\"1.0.0-SNAPSHOT\",\"service_name\":\"edge-gateway\"}}]}}}";
-        blueprintConfig = IConfig.from(jsonInput, BlueprintConfig.class);
-        Optional<BlueprintConfig> finalResult = this.processor.override(blueprintConfig.toJson(), null, true, true);
+        carlConfig = IConfig.from(jsonInput, CarlConfig.class);
+        Optional<CarlConfig> finalResult = this.processor.override(carlConfig.toJson(), null, true, true);
         Assertions.assertTrue(finalResult.isPresent());
         MatcherAssert.assertThat(finalResult.get().getDataDir().toString(), CoreMatchers.containsString("data"));
     }
 
-    private void overrideConfigThenAssert(Consumer<BlueprintConfig> configConsumer, boolean overrideAppConfig,
+    private void overrideConfigThenAssert(Consumer<CarlConfig> configConsumer, boolean overrideAppConfig,
                                           boolean overrideOtherConfigs) {
-        Optional<BlueprintConfig> result = processor.override(blueprintConfig.toJson(), null, overrideAppConfig,
-                                                              overrideOtherConfigs);
-        configConsumer.accept(result.orElse(new BlueprintConfig()));
+        Optional<CarlConfig> result = processor.override(carlConfig.toJson(), null, overrideAppConfig,
+                                                         overrideOtherConfigs);
+        configConsumer.accept(result.orElse(new CarlConfig()));
     }
 
     @AfterEach

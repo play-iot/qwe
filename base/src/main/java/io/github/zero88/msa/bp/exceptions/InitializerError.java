@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public class InitializerError extends BlueprintException {
+public class InitializerError extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.parse("INITIALIZER_ERROR");
 

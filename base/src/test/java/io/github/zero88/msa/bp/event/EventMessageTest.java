@@ -7,7 +7,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.vertx.core.json.JsonObject;
 
 public class EventMessageTest {
@@ -41,7 +41,7 @@ public class EventMessageTest {
     @Test
     public void test_deserialize_missing_action() {
         final JsonObject json = new JsonObject("{\"data\":{\"groupId\":\"io.zbpspark\"}}");
-        Assertions.assertThrows(BlueprintException.class, () -> EventMessage.tryParse(json));
+        Assertions.assertThrows(CarlException.class, () -> EventMessage.tryParse(json));
     }
 
     @Test

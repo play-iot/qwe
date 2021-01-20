@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.github.zero88.msa.bp.BlueprintConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
+import io.github.zero88.msa.bp.CarlConfig;
+import io.github.zero88.msa.bp.CarlConfig.AppConfig;
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.msa.bp.micro.MicroConfig.BackendConfig;
 import io.github.zero88.msa.bp.micro.MicroConfig.LocalServiceDiscoveryConfig;
@@ -46,7 +46,7 @@ public class MicroConfigTest {
 
     @Test
     public void test_parse_from_root() throws JSONException {
-        MicroConfig fromRoot = IConfig.from(IConfig.fromClasspath("micro.json", BlueprintConfig.class),
+        MicroConfig fromRoot = IConfig.from(IConfig.fromClasspath("micro.json", CarlConfig.class),
                                             MicroConfig.class);
         MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
         System.out.println(fromRoot.toJson());

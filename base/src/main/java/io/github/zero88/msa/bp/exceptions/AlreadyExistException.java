@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class AlreadyExistException extends BlueprintException {
+public final class AlreadyExistException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.ALREADY_EXIST;
 

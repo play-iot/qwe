@@ -5,7 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import io.github.zero88.msa.bp.component.ContainerVerticle;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.server.HttpServerContext;
 import io.github.zero88.msa.bp.http.server.HttpServerProvider;
@@ -52,7 +52,7 @@ public class MockHttpServiceServer extends ContainerVerticle {
         @Path("/error")
         @Produces(HttpUtils.JSON_UTF8_CONTENT_TYPE)
         public JsonObject error() {
-            throw new BlueprintException("error");
+            throw new CarlException("error");
         }
 
     }

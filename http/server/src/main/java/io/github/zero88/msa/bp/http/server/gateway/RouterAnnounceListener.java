@@ -15,8 +15,8 @@ import lombok.NonNull;
  * <p>
  * To use it:
  * <ul>
- * <li>Add {@code nube-core-micro} in classpath</li>
- * <li>Modify {@code NubeConfig} in json file then override it in {@code Microservice} config. For example:
+ * <li>Add {@code carl-core-micro} in classpath</li>
+ * <li>Modify {@code CarlConfig} in json file then override it in {@code Microservice} config. For example:
  * <pre>
  * {
  *   "__app__": {

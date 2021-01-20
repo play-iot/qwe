@@ -9,7 +9,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.Status;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.InitializerError;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.BridgeEventType;
@@ -61,13 +61,13 @@ public class WebSocketEventMessageTest {
 
     @Test
     public void test_deserialize_socketMsg_missing_event_action() {
-        Assertions.assertThrows(BlueprintException.class, () -> WebSocketEventMessage.from(
+        Assertions.assertThrows(CarlException.class, () -> WebSocketEventMessage.from(
             "{\"address\":\"test\",\"type\":\"SEND\",\"body\":{\"data\":{\"hello\":\"world\"}}}"));
     }
 
     @Test
     public void test_deserialize_socketMsg_unknown_type() {
-        Assertions.assertThrows(BlueprintException.class,
+        Assertions.assertThrows(CarlException.class,
                                 () -> WebSocketEventMessage.from("{\"address\":\"test\",\"type\":\"xxx\"}"));
     }
 
@@ -96,7 +96,7 @@ public class WebSocketEventMessageTest {
 
     @Test
     public void test_deserialize_unknown_type() {
-        Assertions.assertThrows(BlueprintException.class, () -> WebSocketEventMessage.from(
+        Assertions.assertThrows(CarlException.class, () -> WebSocketEventMessage.from(
             "{\"address\":\"test\",\"type\":\"rec1\",\"body\":{" + "\"action\":\"CREATE\"}}"));
     }
 

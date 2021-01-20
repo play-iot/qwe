@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
 import io.github.zero88.msa.bp.exceptions.TimeoutException;
-import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
+import io.github.zero88.msa.bp.exceptions.converter.CarlExceptionConverter;
 import io.github.zero88.msa.bp.http.HostInfo;
 import io.github.zero88.msa.bp.http.client.HttpClientRegistry;
 import io.github.zero88.utils.Reflections.ReflectionClass;
@@ -43,7 +43,7 @@ public abstract class HttpErrorHandler implements Function<Throwable, Single<Res
         if (error instanceof UnknownHostException || error instanceof DnsNameResolverException) {
             HttpClientRegistry.getInstance().remove(hostInfo, false);
         }
-        return Single.error(BlueprintExceptionConverter.friendly(error));
+        return Single.error(CarlExceptionConverter.friendly(error));
     }
 
 }

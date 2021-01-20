@@ -2,7 +2,7 @@ package io.github.zero88.msa.bp.component;
 
 import java.util.function.Consumer;
 
-import io.github.zero88.msa.bp.BlueprintConfig;
+import io.github.zero88.msa.bp.CarlConfig;
 import io.github.zero88.msa.bp.event.EventListener;
 import io.github.zero88.msa.bp.event.EventModel;
 import io.github.zero88.msa.bp.event.EventbusClient;
@@ -16,11 +16,11 @@ import io.vertx.core.Promise;
  * @see HasConfig
  * @see ContainerVerticle
  */
-public interface Container extends HasConfig<BlueprintConfig> {
+public interface Container extends HasConfig<CarlConfig> {
 
     @Override
-    default Class<BlueprintConfig> configClass() {
-        return BlueprintConfig.class;
+    default Class<CarlConfig> configClass() {
+        return CarlConfig.class;
     }
 
     @Override

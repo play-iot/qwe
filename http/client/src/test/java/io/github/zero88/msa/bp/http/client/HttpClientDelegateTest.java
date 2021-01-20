@@ -14,7 +14,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.msa.bp.TestHelper;
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.TimeoutException;
 import io.github.zero88.msa.bp.http.HostInfo;
@@ -98,8 +98,8 @@ public class HttpClientDelegateTest {
               .subscribe((responseData, throwable) -> {
                   context.assertNull(responseData);
                   context.assertNotNull(throwable);
-                  assert throwable instanceof BlueprintException;
-                  context.assertEquals(ErrorCode.NOT_FOUND, ((BlueprintException) throwable).errorCode());
+                  assert throwable instanceof CarlException;
+                  context.assertEquals(ErrorCode.NOT_FOUND, ((CarlException) throwable).errorCode());
               });
     }
 

@@ -9,7 +9,7 @@ import io.github.zero88.msa.bp.dto.msg.RequestData;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventPattern;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.micro.ServiceGatewayIndex.Params;
 import io.github.zero88.msa.bp.micro.ServiceKind;
 import io.github.zero88.msa.bp.micro.ServiceScope;
@@ -162,7 +162,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      * @return converter function
      * @since 1.0.0
      */
-    default Function<ErrorMessage, BlueprintException> notFound() {
+    default Function<ErrorMessage, CarlException> notFound() {
         return msg -> ErrorMessageConverter.override(msg, ServiceNotFoundException.CODE,
                                                      RemoteServiceInvoker.notFoundMessage(serviceLabel()));
     }

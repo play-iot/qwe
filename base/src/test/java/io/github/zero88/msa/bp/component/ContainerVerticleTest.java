@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.zero88.msa.bp.TestHelper;
 import io.github.zero88.msa.bp.TestHelper.VertxHelper;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.utils.mock.MockConfig;
 import io.github.zero88.msa.bp.utils.mock.MockProvider;
 import io.vertx.core.DeploymentOptions;
@@ -80,14 +80,14 @@ public class ContainerVerticleTest {
     public void test_container_throw_exception_in_handler_cannot_start(TestContext context) {
         containerVerticle.setErrorInHandler(true);
         addDummyUnit();
-        assertDeployError(context, new BlueprintException("Error in success handler"));
+        assertDeployError(context, new CarlException("Error in success handler"));
     }
 
     @Test
     public void test_unit_throw_exception_cannot_start(TestContext context) {
         addDummyUnit();
         addMockUnitHavingException();
-        assertDeployError(context, new BlueprintException("UNKNOWN_ERROR | Cause: Error when starting Unit Verticle"));
+        assertDeployError(context, new CarlException("UNKNOWN_ERROR | Cause: Error when starting Unit Verticle"));
     }
 
     private void assertDeployError(TestContext context, Throwable error) {

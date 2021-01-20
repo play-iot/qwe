@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.msa.bp.dto.jackson.JsonModule;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.buffer.Buffer;
@@ -200,8 +200,8 @@ public interface JsonData {
             return mapper.convertValue(entries.getMap(), clazz);
         } catch (IllegalArgumentException | NullPointerException | DecodeException ex) {
             //            final Throwable cause = JacksonExceptionPrettier.getCause(ex);
-            //            throw BlueprintExceptionConverter.friendly(cause, errorMsg);
-            throw new BlueprintException(ErrorCode.INVALID_ARGUMENT, errorMsg, new HiddenException(ex));
+            //            throw CarlExceptionConverter.friendly(cause, errorMsg);
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, errorMsg, new HiddenException(ex));
         }
     }
 
@@ -268,7 +268,7 @@ public interface JsonData {
                     data.put(backupKey, buffer.toJsonArray());
                 } catch (DecodeException ex) {
                     if (isJson) {
-                        throw new BlueprintException(ErrorCode.INVALID_ARGUMENT,
+                        throw new CarlException(ErrorCode.INVALID_ARGUMENT,
                                                      "Cannot parse json data. Received data: " + buffer.toString(), ex);
                     }
                     logger.trace("Failed to parse json array. Use text", ex);

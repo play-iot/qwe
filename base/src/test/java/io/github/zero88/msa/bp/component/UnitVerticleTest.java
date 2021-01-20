@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.zero88.msa.bp.TestHelper;
 import io.github.zero88.msa.bp.TestHelper.VertxHelper;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -55,7 +55,7 @@ public class UnitVerticleTest {
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, unitVerticle, t -> {
             TestHelper.testComplete(async);
-            Assert.assertTrue(t instanceof BlueprintException);
+            Assert.assertTrue(t instanceof CarlException);
             Assert.assertEquals("Invalid config format", t.getMessage());
         });
     }

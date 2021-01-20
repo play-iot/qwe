@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class NotFoundException extends BlueprintException {
+public final class NotFoundException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.NOT_FOUND;
 

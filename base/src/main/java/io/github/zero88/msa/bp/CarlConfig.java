@@ -26,12 +26,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public final class BlueprintConfig implements IConfig {
+public final class CarlConfig implements IConfig {
 
     public static final String DATA_DIR = "dataDir";
     public static final Path DEFAULT_DATADIR = FileUtils.defaultDatadir(".zbp");
 
-    @JsonProperty(value = BlueprintConfig.DATA_DIR)
+    @JsonProperty(value = CarlConfig.DATA_DIR)
     private Path dataDir;
     @JsonProperty(value = SystemConfig.NAME)
     private SystemConfig systemConfig;
@@ -41,36 +41,36 @@ public final class BlueprintConfig implements IConfig {
     private AppConfig appConfig = new AppConfig();
 
     /**
-     * Create {@link BlueprintConfig} with {@link AppConfig}, default {@link DeployConfig} and without {@link
+     * Create {@link CarlConfig} with {@link AppConfig}, default {@link DeployConfig} and without {@link
      * SystemConfig}
      *
      * @param appConfig Given app config
-     * @return BlueprintConfig instance
+     * @return CarlConfig instance
      */
-    public static BlueprintConfig blank(@NonNull JsonObject appConfig) {
+    public static CarlConfig blank(@NonNull JsonObject appConfig) {
         return blank(DEFAULT_DATADIR, appConfig);
     }
 
-    public static BlueprintConfig blank(@NonNull Path dataDir, @NonNull JsonObject appConfig) {
-        return new BlueprintConfig(dataDir, null, new DeployConfig(), IConfig.from(appConfig, AppConfig.class));
+    public static CarlConfig blank(@NonNull Path dataDir, @NonNull JsonObject appConfig) {
+        return new CarlConfig(dataDir, null, new DeployConfig(), IConfig.from(appConfig, AppConfig.class));
     }
 
-    public static BlueprintConfig blank(@NonNull Path dataDir) {
-        return new BlueprintConfig(dataDir, null, new DeployConfig(), null);
+    public static CarlConfig blank(@NonNull Path dataDir) {
+        return new CarlConfig(dataDir, null, new DeployConfig(), null);
     }
 
     /**
-     * Create {@link BlueprintConfig} with default {@link DeployConfig} and without {@link SystemConfig}
+     * Create {@link CarlConfig} with default {@link DeployConfig} and without {@link SystemConfig}
      *
-     * @return BlueprintConfig instance
+     * @return CarlConfig instance
      */
-    public static BlueprintConfig blank() {
-        return BlueprintConfig.blank(new JsonObject());
+    public static CarlConfig blank() {
+        return CarlConfig.blank(new JsonObject());
     }
 
-    public static BlueprintConfig create(BlueprintConfig blueprintConfig, AppConfig appConfig) {
-        return IConfig.from(blueprintConfig.toJson().mergeIn(new JsonObject().put(AppConfig.NAME, appConfig.toJson())),
-                            BlueprintConfig.class);
+    public static CarlConfig create(CarlConfig carlConfig, AppConfig appConfig) {
+        return IConfig.from(carlConfig.toJson().mergeIn(new JsonObject().put(AppConfig.NAME, appConfig.toJson())),
+                            CarlConfig.class);
     }
 
     @Override
@@ -102,7 +102,7 @@ public final class BlueprintConfig implements IConfig {
         public String key() { return NAME; }
 
         @Override
-        public Class<? extends IConfig> parent() { return BlueprintConfig.class; }
+        public Class<? extends IConfig> parent() { return CarlConfig.class; }
 
         @Getter
         @NoArgsConstructor
@@ -204,7 +204,7 @@ public final class BlueprintConfig implements IConfig {
         public String key() { return NAME; }
 
         @Override
-        public Class<? extends IConfig> parent() { return BlueprintConfig.class; }
+        public Class<? extends IConfig> parent() { return CarlConfig.class; }
 
     }
 
@@ -217,7 +217,7 @@ public final class BlueprintConfig implements IConfig {
         public String key() { return NAME; }
 
         @Override
-        public Class<? extends IConfig> parent() { return BlueprintConfig.class; }
+        public Class<? extends IConfig> parent() { return CarlConfig.class; }
 
     }
 

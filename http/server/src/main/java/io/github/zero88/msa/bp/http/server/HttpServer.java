@@ -8,16 +8,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.github.zero88.msa.bp.BlueprintConfig;
+import io.github.zero88.msa.bp.CarlConfig;
 import io.github.zero88.msa.bp.component.SharedDataDelegate;
 import io.github.zero88.msa.bp.component.UnitVerticle;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventModel;
 import io.github.zero88.msa.bp.event.EventPattern;
 import io.github.zero88.msa.bp.event.EventbusClient;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.InitializerError;
-import io.github.zero88.msa.bp.exceptions.converter.BlueprintExceptionConverter;
+import io.github.zero88.msa.bp.exceptions.converter.CarlExceptionConverter;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.server.HttpConfig.ApiGatewayConfig;
 import io.github.zero88.msa.bp.http.server.HttpConfig.CorsOptions;
@@ -88,7 +88,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
         logger.info("Starting HTTP Server...");
         super.start();
         this.dataDir = this.getSharedData(SharedDataDelegate.SHARED_DATADIR,
-                                          BlueprintConfig.DEFAULT_DATADIR.toString());
+                                          CarlConfig.DEFAULT_DATADIR.toString());
         HttpServerOptions options = new HttpServerOptions(config.getOptions()).setHost(config.getHost())
                                                                               .setPort(config.getPort());
         final Router handler = initRouter();
@@ -100,7 +100,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
                 promise.complete();
                 return;
             }
-            promise.fail(BlueprintExceptionConverter.from(event.cause()));
+            promise.fail(CarlExceptionConverter.from(event.cause()));
         });
     }
 
@@ -168,7 +168,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
             initStaticWebRouter(mainRouter, config.getStaticWebConfig());
             mainRouter.route().last().handler(new NotFoundContextHandler());
             return mainRouter;
-        } catch (BlueprintException e) {
+        } catch (CarlException e) {
             throw new InitializerError("Error when initializing http server route", e);
         }
     }
@@ -181,7 +181,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
         if (webConfig.isInResource()) {
             staticHandler.setWebRoot(webConfig.getWebRoot());
         } else {
-            String webDir = FileUtils.createFolder(BlueprintConfig.DEFAULT_DATADIR, dataDir, webConfig.getWebRoot());
+            String webDir = FileUtils.createFolder(CarlConfig.DEFAULT_DATADIR, dataDir, webConfig.getWebRoot());
             logger.info("Static web dir {}", webDir);
             staticHandler.setEnableRangeSupport(true)
                          .setSendVaryHeader(true)
@@ -211,7 +211,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
             return router;
         }
         Path storageDir = Paths.get(
-            FileUtils.createFolder(BlueprintConfig.DEFAULT_DATADIR, dataDir, storageCfg.getDir()));
+            FileUtils.createFolder(CarlConfig.DEFAULT_DATADIR, dataDir, storageCfg.getDir()));
         initUploadRouter(router, storageDir, storageCfg.getUploadConfig(), publicUrl);
         initDownloadRouter(router, storageDir, storageCfg.getDownloadConfig());
         return router;

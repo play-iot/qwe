@@ -7,7 +7,7 @@ import java.util.Objects;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.dto.ErrorMessage;
 import io.github.zero88.msa.bp.dto.JsonData;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -150,7 +150,7 @@ public final class EventMessage implements Serializable, JsonData {
      *
      * @param object any non null object
      * @return event message instance
-     * @throws BlueprintException if wrong format
+     * @throws CarlException if wrong format
      */
     public static EventMessage tryParse(@NonNull Object object) {
         return tryParse(object, false);
@@ -167,7 +167,7 @@ public final class EventMessage implements Serializable, JsonData {
     public static EventMessage tryParse(@NonNull Object object, boolean lenient) {
         try {
             return JsonData.from(object, EventMessage.class, "Invalid event message format");
-        } catch (BlueprintException e) {
+        } catch (CarlException e) {
             if (lenient) {
                 return EventMessage.initial(EventAction.UNKNOWN, JsonData.tryParse(object));
             }

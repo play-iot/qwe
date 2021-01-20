@@ -1,7 +1,7 @@
 package io.github.zero88.msa.bp.http.server.converter;
 
 import io.github.zero88.msa.bp.dto.msg.ResponseData;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.HttpException;
 import io.github.zero88.msa.bp.http.HttpStatusMapping;
 import io.github.zero88.msa.bp.http.server.handler.ResponseDataWriter;
@@ -17,8 +17,8 @@ public class ResponseDataConverter {
             return ResponseDataWriter.serializeResponseData(
                 new JsonObject().put("error", httpException.getMessage()).encode())
                                      .setStatus(httpException.getStatusCode().code());
-        } else if (e instanceof BlueprintException) {
-            BlueprintException ex = (BlueprintException) e;
+        } else if (e instanceof CarlException) {
+            CarlException ex = (CarlException) e;
             HttpResponseStatus responseStatus = HttpStatusMapping.error(httpMethod, ex.errorCode());
             return ResponseDataWriter.serializeResponseData(new JsonObject().put("error", ex.getMessage()).encode())
                                      .setStatus(responseStatus.code());

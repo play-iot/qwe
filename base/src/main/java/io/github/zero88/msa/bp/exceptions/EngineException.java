@@ -3,7 +3,7 @@ package io.github.zero88.msa.bp.exceptions;
 /**
  * Wrap Vertx exceptions
  */
-public class EngineException extends BlueprintException {
+public class EngineException extends CarlException {
 
     public static final ErrorCode CODE = ErrorCode.parse("ENGINE_ERROR");
 

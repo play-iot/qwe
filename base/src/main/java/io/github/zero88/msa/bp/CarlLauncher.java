@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
-import io.github.zero88.msa.bp.BlueprintConfig.DeployConfig;
+import io.github.zero88.msa.bp.CarlConfig.AppConfig;
+import io.github.zero88.msa.bp.CarlConfig.DeployConfig;
 import io.github.zero88.msa.bp.utils.Configs;
 import io.github.zero88.msa.bp.utils.Networks;
 import io.github.zero88.utils.Functions;
@@ -24,21 +24,21 @@ import io.vertx.core.json.JsonObject;
 
 import lombok.NonNull;
 
-public final class BlueprintLauncher extends Launcher {
+public class CarlLauncher extends Launcher {
 
     private static final Logger logger;
 
     static {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
-        logger = LoggerFactory.getLogger(BlueprintLauncher.class);
+        logger = LoggerFactory.getLogger(CarlLauncher.class);
     }
 
-    private BlueprintConfig config;
+    private CarlConfig config;
     private VertxOptions options;
     //    private IClusterDelegate clusterDelegate;
 
     public static void main(String[] args) {
-        new BlueprintLauncher().dispatch(args);
+        new CarlLauncher().dispatch(args);
     }
 
     @Override
@@ -47,7 +47,7 @@ public final class BlueprintLauncher extends Launcher {
         if (logger.isDebugEnabled()) {
             logger.debug("CONFIG::INPUT: {}", config.encode());
         }
-        this.config = IConfig.merge(Configs.loadJsonConfig("system.json"), config, BlueprintConfig.class);
+        this.config = IConfig.merge(Configs.loadJsonConfig("system.json"), config, CarlConfig.class);
         //        Vertx dummy = Vertx.vertx();
         //        this.config = new ConfigProcessor(dummy).override(fileConfig.toJson(), false, true).orElse
         //        (fileConfig);
@@ -112,7 +112,7 @@ public final class BlueprintLauncher extends Launcher {
             logger.debug("CONFIG::INPUT DEPLOYMENT CFG: {}", input.encode());
             logger.debug("CONFIG::CURRENT DEPLOYMENT CFG: {}", config.getDeployConfig().toJson().encode());
         }
-        return IConfig.merge(config.getDeployConfig(), input, BlueprintConfig.DeployConfig.class);
+        return IConfig.merge(config.getDeployConfig(), input, CarlConfig.DeployConfig.class);
     }
 
     private AppConfig mergeAppConfig(DeploymentOptions deploymentOptions) {
@@ -121,7 +121,7 @@ public final class BlueprintLauncher extends Launcher {
             logger.debug("CONFIG::INPUT APP CFG: {}", input.encode());
             logger.debug("CONFIG::CURRENT APP CFG: {}", config.getAppConfig().toJson().encode());
         }
-        return IConfig.merge(config.getAppConfig(), input, BlueprintConfig.AppConfig.class);
+        return IConfig.merge(config.getAppConfig(), input, CarlConfig.AppConfig.class);
     }
 
     private VertxOptions reloadVertxOptions(VertxOptions vertxOptions) {

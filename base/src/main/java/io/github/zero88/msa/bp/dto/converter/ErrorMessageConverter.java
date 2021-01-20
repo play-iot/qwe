@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.dto.ErrorMessage;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.utils.Strings;
 
 import lombok.AccessLevel;
@@ -15,20 +15,20 @@ import lombok.NonNull;
 
 /**
  * @see ErrorMessage
- * @see BlueprintException
+ * @see CarlException
  */
 @SuppressWarnings("unchecked")
 @Builder(access = AccessLevel.PRIVATE)
-public final class ErrorMessageConverter<T extends BlueprintException> implements Function<ErrorMessage, T> {
+public final class ErrorMessageConverter<T extends CarlException> implements Function<ErrorMessage, T> {
 
     private final ErrorCode code;
     private final String overrideMsg;
 
-    public static BlueprintException from(@NonNull ErrorMessage error) {
+    public static CarlException from(@NonNull ErrorMessage error) {
         return ErrorMessageConverter.builder().build().apply(error);
     }
 
-    public static BlueprintException override(@NonNull ErrorMessage error, ErrorCode errorCode, String overrideMsg) {
+    public static CarlException override(@NonNull ErrorMessage error, ErrorCode errorCode, String overrideMsg) {
         return ErrorMessageConverter.builder().code(errorCode).overrideMsg(overrideMsg).build().apply(error);
     }
 
@@ -40,7 +40,7 @@ public final class ErrorMessageConverter<T extends BlueprintException> implement
         String msg = Strings.isBlank(overrideMsg)
                      ? error.getMessage()
                      : Strings.format("{0} | Error: {1}", overrideMsg, error.getCode());
-        return (T) new BlueprintException(Optional.ofNullable(code).orElse(error.getCode()), msg);
+        return (T) new CarlException(Optional.ofNullable(code).orElse(error.getCode()), msg);
     }
 
 }

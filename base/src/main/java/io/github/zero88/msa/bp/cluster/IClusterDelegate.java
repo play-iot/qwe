@@ -2,7 +2,7 @@ package io.github.zero88.msa.bp.cluster;
 
 import java.util.List;
 
-import io.github.zero88.msa.bp.BlueprintConfig;
+import io.github.zero88.msa.bp.CarlConfig;
 import io.github.zero88.msa.bp.exceptions.NotFoundException;
 import io.vertx.core.spi.cluster.ClusterManager;
 
@@ -12,7 +12,7 @@ public interface IClusterDelegate {
 
     @NonNull ClusterType getTypeName();
 
-    @NonNull ClusterManager initClusterManager(BlueprintConfig.SystemConfig.ClusterConfig clusterConfig);
+    @NonNull ClusterManager initClusterManager(CarlConfig.SystemConfig.ClusterConfig clusterConfig);
 
     /**
      * Find node in cluster.

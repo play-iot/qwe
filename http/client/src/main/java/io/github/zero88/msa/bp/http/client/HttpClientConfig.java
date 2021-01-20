@@ -3,7 +3,7 @@ package io.github.zero88.msa.bp.http.client;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import io.github.zero88.msa.bp.BlueprintConfig.AppConfig;
+import io.github.zero88.msa.bp.CarlConfig.AppConfig;
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.msa.bp.dto.JsonData;
 import io.github.zero88.msa.bp.http.HostInfo;

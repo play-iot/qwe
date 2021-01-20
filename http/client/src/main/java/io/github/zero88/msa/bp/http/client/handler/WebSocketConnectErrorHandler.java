@@ -7,7 +7,7 @@ import java.util.Objects;
 import io.github.zero88.msa.bp.event.EventAction;
 import io.github.zero88.msa.bp.event.EventMessage;
 import io.github.zero88.msa.bp.event.EventbusClient;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.HttpException;
 import io.github.zero88.msa.bp.exceptions.TimeoutException;
 import io.github.zero88.msa.bp.http.HostInfo;
@@ -56,7 +56,7 @@ public abstract class WebSocketConnectErrorHandler implements Function<Throwable
         if (error instanceof UpgradeRejectedException) {
             final int status = ((UpgradeRejectedException) error).getStatus();
             return new HttpException(status, error.getMessage(),
-                                     new BlueprintException(HttpStatusMapping.error(HttpMethod.GET, status), error));
+                                     new CarlException(HttpStatusMapping.error(HttpMethod.GET, status), error));
         }
         return new HttpException("Failed when open WebSocket connection", error);
     }

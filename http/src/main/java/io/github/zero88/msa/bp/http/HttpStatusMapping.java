@@ -9,7 +9,7 @@ import java.util.Objects;
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.msa.bp.cluster.ClusterException;
 import io.github.zero88.msa.bp.exceptions.BeingUsedException;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ConflictException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.HttpException;
@@ -79,7 +79,7 @@ public final class HttpStatusMapping {
         return HttpResponseStatus.OK;
     }
 
-    public static HttpResponseStatus error(HttpMethod method, BlueprintException exception) {
+    public static HttpResponseStatus error(HttpMethod method, CarlException exception) {
         final Throwable cause = exception.getCause();
         if (cause instanceof HiddenException) {
             return error(method, ((HiddenException) cause).errorCode());

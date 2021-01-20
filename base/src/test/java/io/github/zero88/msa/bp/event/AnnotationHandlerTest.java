@@ -18,7 +18,7 @@ import io.github.zero88.msa.bp.event.MockEventListener.MockChildEventListener;
 import io.github.zero88.msa.bp.event.MockEventListener.MockEventUnsupportedListener;
 import io.github.zero88.msa.bp.event.MockEventListener.MockEventWithDiffParam;
 import io.github.zero88.msa.bp.event.MockEventListener.MockParam;
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.msa.bp.exceptions.ImplementationError;
 import io.github.zero88.msa.bp.exceptions.UnsupportedException;
@@ -78,7 +78,7 @@ public class AnnotationHandlerTest {
 
     @Test
     public void test_data_is_null() {
-        Assertions.assertThrows(BlueprintException.class, () -> {
+        Assertions.assertThrows(CarlException.class, () -> {
             final EventMessage msg = MH.get()
                                        .execute(EventMessage.error(EventAction.GET_LIST, ErrorCode.EVENT_ERROR,
                                                                    "Invalid status"))
@@ -90,7 +90,7 @@ public class AnnotationHandlerTest {
 
     @Test
     public void test_invalid_status() {
-        Assertions.assertThrows(BlueprintException.class, () -> {
+        Assertions.assertThrows(CarlException.class, () -> {
             final EventMessage msg = MH.get()
                                        .execute(EventMessage.error(EventAction.GET_LIST, ErrorCode.EVENT_ERROR,
                                                                    "Invalid status"))

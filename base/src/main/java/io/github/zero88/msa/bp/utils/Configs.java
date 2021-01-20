@@ -10,7 +10,7 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.msa.bp.exceptions.BlueprintException;
+import io.github.zero88.msa.bp.exceptions.CarlException;
 import io.github.zero88.msa.bp.exceptions.ErrorCode;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Reflections;
@@ -34,7 +34,7 @@ public final class Configs {
         try (Scanner scanner = new Scanner(resourceAsStream).useDelimiter("\\A")) {
             return new JsonObject(scanner.next());
         } catch (DecodeException | NoSuchElementException e) {
-            throw new BlueprintException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
         }
     }
 

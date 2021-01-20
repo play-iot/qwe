@@ -3,7 +3,7 @@ package io.github.zero88.msa.bp.http.server;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.github.zero88.msa.bp.BlueprintConfig;
+import io.github.zero88.msa.bp.CarlConfig;
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.msa.bp.http.HttpUtils;
 import io.github.zero88.msa.bp.http.server.handler.DownloadFileHandler;
@@ -62,7 +62,7 @@ public final class HttpConfig implements IConfig {
     public String key() { return NAME; }
 
     @Override
-    public Class<? extends IConfig> parent() { return BlueprintConfig.AppConfig.class; }
+    public Class<? extends IConfig> parent() { return CarlConfig.AppConfig.class; }
 
     @JsonIgnore
     public String publicServerUrl() {

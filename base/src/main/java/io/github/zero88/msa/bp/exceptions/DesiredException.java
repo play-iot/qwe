@@ -1,6 +1,6 @@
 package io.github.zero88.msa.bp.exceptions;
 
-public final class DesiredException extends BlueprintException {
+public final class DesiredException extends CarlException {
 
     public DesiredException(String message, Throwable e) {
         super(ErrorCode.DESIRED_ERROR, message, e);

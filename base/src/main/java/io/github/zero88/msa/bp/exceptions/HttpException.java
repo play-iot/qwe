@@ -5,7 +5,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Getter;
 import lombok.NonNull;
 
-public final class HttpException extends BlueprintException {
+public final class HttpException extends CarlException {
 
     public static final ErrorCode HTTP_ERROR = ErrorCode.parse("HTTP_ERROR");
 

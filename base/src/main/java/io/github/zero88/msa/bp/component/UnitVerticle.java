@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.msa.bp.BlueprintConfig;
+import io.github.zero88.msa.bp.CarlConfig;
 import io.github.zero88.msa.bp.IConfig;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.AbstractVerticle;
@@ -36,7 +36,7 @@ public abstract class UnitVerticle<C extends IConfig, T extends UnitContext> ext
      */
     protected void injectTest(String sharedKey, Path testDir) {
         this.registerSharedKey(Strings.isBlank(sharedKey) ? toString() : sharedKey);
-        this.testDir = Objects.isNull(testDir) ? BlueprintConfig.DEFAULT_DATADIR : testDir;
+        this.testDir = Objects.isNull(testDir) ? CarlConfig.DEFAULT_DATADIR : testDir;
     }
 
     @Override
