@@ -6,8 +6,6 @@ import io.github.zero88.qwe.http.HttpUtils;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 
-import com.zandero.rest.writer.HttpResponseWriter;
-
 public class ApiJsonWriter<T> implements HttpResponseWriter<T> {
 
     @Override

@@ -9,8 +9,6 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 
-import com.zandero.rest.writer.HttpResponseWriter;
-
 // FIXME: We will find better way to handle the serialization of ResponseData
 @Deprecated
 public class ResponseDataWriter implements HttpResponseWriter<ResponseData> {

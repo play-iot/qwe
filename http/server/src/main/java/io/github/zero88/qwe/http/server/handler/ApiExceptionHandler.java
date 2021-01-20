@@ -6,9 +6,7 @@ import io.github.zero88.qwe.http.HttpUtils;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 
-import com.zandero.rest.exception.ExceptionHandler;
-
-public final class ApiExceptionHandler implements ExceptionHandler<Throwable> {
+public final class ApiExceptionHandler implements HttpResponseWriter<Throwable> {
 
     @Override
     public void write(Throwable result, HttpServerRequest request, HttpServerResponse response) {

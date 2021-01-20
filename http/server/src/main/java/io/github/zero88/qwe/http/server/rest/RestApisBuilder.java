@@ -11,13 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.InvalidUrlException;
-import io.github.zero88.qwe.dto.msg.ResponseData;
 import io.github.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.qwe.http.server.ApiConstants;
 import io.github.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;
 import io.github.zero88.qwe.http.server.HttpServer;
-import io.github.zero88.qwe.http.server.handler.ApiExceptionHandler;
-import io.github.zero88.qwe.http.server.handler.ResponseDataWriter;
 import io.github.zero88.qwe.http.server.handler.RestEventResponseHandler;
 import io.github.zero88.qwe.micro.MicroContext;
 import io.github.zero88.utils.Reflections;
@@ -25,9 +22,6 @@ import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
-
-import com.zandero.rest.RestBuilder;
-import com.zandero.rest.RestRouter;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -108,12 +102,8 @@ public final class RestApisBuilder {
         }
         Object[] classes = restApiClass.toArray(new Class[] {});
         logger.info("Registering sub router REST API...");
-        RestRouter.getExceptionHandlers().clear();
-        return new RestBuilder(vertx).errorHandler(ApiExceptionHandler.class)
-                                     //TODO remove com.zandero.rest
-                                     //                                     .writer(MediaType.APPLICATION_JSON_TYPE,
-                                     //                                     ApiJsonWriter.class)
-                                     .writer(ResponseData.class, ResponseDataWriter.class).register(classes).build();
+        //TODO register RestAPI
+        return null;
     }
 
     private Router initEventBusApiRouter() {
