@@ -22,7 +22,7 @@ TBD
 
 ## Dynamic REST API
 
-See [`Dynamic REST API` test](src/test/java/io.github.zero88.msa.bp/http/dynamic)
+See [`Dynamic REST API` test](src/test/java/io.github.zero88.qwe/http/dynamic)
 
 To implement `Dynamic REST API` function, it requires `gateway server` and `service supplier`. Currently,
 support `HTTP service supplier` and `Eventbus service supplier`
@@ -43,7 +43,7 @@ project `build.gradle` must declare dependency **`compile project(':core:micro')
   compile project(':core:micro')
   ```
 
-- See [sample implementation](src/test/java/io.github.zero88.msa.bp/http/dynamic/mock/GatewayServer.java)
+- See [sample implementation](src/test/java/io.github.zero88.qwe/http/dynamic/mock/GatewayServer.java)
 
 ### Dynamic HTTP REST
 
@@ -54,7 +54,7 @@ project `build.gradle` must declare dependency **`compile project(':core:micro')
   compile project(':core:micro')
   ```
 
-- See [sample implementation](src/test/java/io.github.zero88.msa.bp/http/dynamic/mock/HttpServiceServer.java)
+- See [sample implementation](src/test/java/io.github.zero88.qwe/http/dynamic/mock/HttpServiceServer.java)
 
 ### Dynamic Event Message REST
 
@@ -64,4 +64,4 @@ project `build.gradle` must declare dependency **`compile project(':core:micro')
   compile project(':core:micro')
   ```
 
-- See [sample implementation](src/test/java/io.github.zero88.msa.bp/http/dynamic/mock/EventMessageService.java)
+- See [sample implementation](src/test/java/io.github.zero88.qwe/http/dynamic/mock/EventMessageService.java)

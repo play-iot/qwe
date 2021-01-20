@@ -16,7 +16,7 @@ val semanticVersion: String by project
 val buildHash: String by project
 
 allprojects {
-    group = "io.github.zero88.msa.bp"
+    group = "io.github.zero88.qwe"
 
     repositories {
         mavenLocal()
@@ -117,11 +117,11 @@ subprojects {
                 pom {
                     name.set(project.name)
                     description.set(project.ext.get("description") as String)
-                    url.set("https://github.com/zero88/msa-blueprint")
+                    url.set("https://github.com/zero88/qwe")
                     licenses {
                         license {
                             name.set("The Apache License, Version 2.0")
-                            url.set("https://github.com/zero88/msa-blueprint/blob/master/LICENSE")
+                            url.set("https://github.com/zero88/qwe/blob/master/LICENSE")
                         }
                     }
                     developers {
@@ -131,9 +131,9 @@ subprojects {
                         }
                     }
                     scm {
-                        connection.set("scm:git:git://git@github.com:zero88/msa-blueprint.git")
-                        developerConnection.set("scm:git:ssh://git@github.com:zero88/msa-blueprint.git")
-                        url.set("https://github.com/zero88/msa-blueprint")
+                        connection.set("scm:git:git://git@github.com:zero88/qwe.git")
+                        developerConnection.set("scm:git:ssh://git@github.com:zero88/qwe.git")
+                        url.set("https://github.com/zero88/qwe")
                     }
                 }
             }

@@ -74,13 +74,13 @@
     "webSocketCompressionRequestServerNoContext": true
   },
   "handlerConfig": {
-    "httpErrorHandlerCls": "io.github.zero88.msa.bp.http.client.handler.HttpErrorHandler",
-    "reqComposerCls": "io.github.zero88.msa.bp.http.client.handler.HttpRequestMessageComposer",
-    "respTextHandlerCls": "io.github.zero88.msa.bp.http.client.handler.HttpResponseTextHandler",
-    "respBinaryHandlerCls": "io.github.zero88.msa.bp.http.client.handler.HttpResponseBinaryHandler",
-    "webSocketConnectErrorHandlerCls": "io.github.zero88.msa.bp.http.client.handler.WebSocketConnectErrorHandler",
-    "webSocketResponseDispatcherCls": "io.github.zero88.msa.bp.http.client.handler.WebSocketResponseDispatcher",
-    "webSocketErrorHandlerCls": "io.github.zero88.msa.bp.http.client.handler.WebSocketResponseErrorHandler"
+    "httpErrorHandlerCls": "io.github.zero88.qwe.http.client.handler.HttpErrorHandler",
+    "reqComposerCls": "io.github.zero88.qwe.http.client.handler.HttpRequestMessageComposer",
+    "respTextHandlerCls": "io.github.zero88.qwe.http.client.handler.HttpResponseTextHandler",
+    "respBinaryHandlerCls": "io.github.zero88.qwe.http.client.handler.HttpResponseBinaryHandler",
+    "webSocketConnectErrorHandlerCls": "io.github.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler",
+    "webSocketResponseDispatcherCls": "io.github.zero88.qwe.http.client.handler.WebSocketResponseDispatcher",
+    "webSocketErrorHandlerCls": "io.github.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler"
   },
   "userAgent": "zbp.httpclient"
 }

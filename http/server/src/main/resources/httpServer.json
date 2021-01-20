@@ -123,7 +123,7 @@
       "enabled": false,
       "path": "/u",
       "maxBodySizeMB": 10,
-      "handlerClass": "io.github.zero88.msa.bp.http.server.handler.UploadFileHandler"
+      "handlerClass": "io.github.zero88.qwe.http.server.handler.UploadFileHandler"
     },
     "__download__": {
       "enabled": false,
