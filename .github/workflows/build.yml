@@ -12,6 +12,9 @@ on:
     types: [ opened, synchronize, reopened, closed ]
     branches: [ main ]
 
+env:
+  DISABLE_TEST: true
+
 jobs:
   context:
     runs-on: ubuntu-latest
@@ -160,7 +163,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-test
 
       - name: Test
-        if: 'temporary' == 'true'
+        if: ${{ env.DISABLE_TEST }} != 'true'
         run: ./gradlew jacocoRootReport -PjacocoHtml=false
 
       - name: SonarQube
