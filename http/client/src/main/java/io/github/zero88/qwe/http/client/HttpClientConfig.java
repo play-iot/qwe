@@ -35,7 +35,7 @@ public final class HttpClientConfig implements IConfig {
     public static final int CONNECT_TIMEOUT_SECOND = 45;
     public static final int HTTP_IDLE_TIMEOUT_SECOND = 15;
     public static final int WS_IDLE_TIMEOUT_SECOND = 1200;
-    private String userAgent = "zbp.httpclient";
+    private String userAgent = "qwe.httpclient";
     private HostInfo hostInfo;
     private HttpClientOptions options;
     private HandlerConfig handlerConfig = new HandlerConfig();

@@ -3,7 +3,7 @@
     "__cluster__": {
       "active": false,
       "ha": false,
-      "name": "zbp-cluster",
+      "name": "qwe-cluster",
       "type": "HAZELCAST",
       "listenerAddress": "",
       "url": "",

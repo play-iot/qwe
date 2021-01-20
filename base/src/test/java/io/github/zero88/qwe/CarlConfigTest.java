@@ -27,7 +27,7 @@ public class CarlConfigTest {
 
         final ClusterConfig clusterConfig = from.getSystemConfig().getClusterConfig();
         System.out.println(clusterConfig.toJson().encode());
-        JSONAssert.assertEquals("{\"active\":false,\"ha\":false,\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\"," +
+        JSONAssert.assertEquals("{\"active\":false,\"ha\":false,\"name\":\"qwe-cluster\",\"type\":\"HAZELCAST\"," +
                                 "\"listenerAddress\":\"\",\"url\":\"\",\"file\":\"\",\"options\":{}}",
                                 clusterConfig.toJson().encode(), JSONCompareMode.STRICT);
 
@@ -84,7 +84,7 @@ public class CarlConfigTest {
     public void test_deserialize_root_having_redundant_properties() {
         Assertions.assertThrows(CarlException.class, () -> {
             String jsonStr = "{\"__redundant__\":{},\"__system__\":{\"__cluster__\":{\"active\":true,\"ha\":false," +
-                             "\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
+                             "\"name\":\"qwe-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
                              "\"file\":\"\",\"options\":{}}}}";
             IConfig.from(jsonStr, CarlConfig.class);
         });
@@ -93,7 +93,7 @@ public class CarlConfigTest {
     @Test
     public void test_deserialize_child_with_root_having_redundant_properties() {
         String jsonStr = "{\"__redundant__\":{},\"__system__\":{\"__cluster__\":{\"active\":true,\"ha\":false," +
-                         "\"name\":\"zbp-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
+                         "\"name\":\"qwe-cluster\",\"type\":\"HAZELCAST\",\"listenerAddress\":\"\",\"url\":\"\"," +
                          "\"file\":\"\",\"options\":{}}}}";
         SystemConfig cfg = IConfig.from(jsonStr, SystemConfig.class);
         Assertions.assertNotNull(cfg);
@@ -258,8 +258,8 @@ public class CarlConfigTest {
         CarlConfig CarlConfig = IConfig.from(Configs.loadJsonConfig("system.json"), CarlConfig.class);
         String jsonInput = "{\"__system__\":{\"__eventBus__\":{\"clientAuth\":\"REQUIRED\",\"ssl\":true," +
                            "\"clustered\":true,\"keyStoreOptions\":{\"path\":\"eventBusKeystore.jks\"," +
-                           "\"password\":\"zbpsparkEventBus\"},\"trustStoreOptions\":{\"path\":\"eventBusKeystore" +
-                           ".jks\",\"password\":\"zbpsparkEventBus\"}},\"__cluster__\":{\"active\":true,\"ha\":true," +
+                           "\"password\":\"qwesparkEventBus\"},\"trustStoreOptions\":{\"path\":\"eventBusKeystore" +
+                           ".jks\",\"password\":\"qwesparkEventBus\"}},\"__cluster__\":{\"active\":true,\"ha\":true," +
                            "\"listenerAddress\":\"io.zero88.dashboard.connector.edge.cluster\"}}," +
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\"},\"api.name\":\"edge-connector\"}}";

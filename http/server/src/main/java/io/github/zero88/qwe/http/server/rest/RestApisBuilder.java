@@ -110,6 +110,7 @@ public final class RestApisBuilder {
         logger.info("Registering sub router REST API...");
         RestRouter.getExceptionHandlers().clear();
         return new RestBuilder(vertx).errorHandler(ApiExceptionHandler.class)
+                                     //TODO remove com.zandero.rest
                                      //                                     .writer(MediaType.APPLICATION_JSON_TYPE,
                                      //                                     ApiJsonWriter.class)
                                      .writer(ResponseData.class, ResponseDataWriter.class).register(classes).build();
@@ -130,7 +131,7 @@ public final class RestApisBuilder {
         try {
             Class.forName(MicroContext.class.getName(), false, Reflections.contextClassLoader());
         } catch (ClassNotFoundException e) {
-            throw new InitializerError("To enabled dynamic route, you have to put on nube-core-micro.jar in classpath",
+            throw new InitializerError("To enabled dynamic route, you have to put on qwe-core-micro.jar in classpath",
                                        e);
         }
         String path = Urls.combinePath(dynamicRouteConfig.getPath(), ApiConstants.WILDCARDS_ANY_PATH);

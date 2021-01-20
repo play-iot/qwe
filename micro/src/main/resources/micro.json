@@ -3,28 +3,28 @@
     "__micro__": {
       "__gateway__": {
         "enabled": false,
-        "indexAddress": "zbp.service.gateway.index",
+        "indexAddress": "qwe.service.gateway.index",
         "clusterAnnounceMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
         "clusterUsageMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor",
         "localAnnounceMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
         "localUsageMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor"
       },
       "__serviceDiscovery__": {
-        "announceAddress": "zbp.service.discovery.announce",
+        "announceAddress": "qwe.service.discovery.announce",
         "autoRegistrationOfImporters": true,
         "backendConfig": {
           "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
         },
-        "usageAddress": "zbp.service.discovery.usage",
+        "usageAddress": "qwe.service.discovery.usage",
         "enabled": true
       },
       "__localServiceDiscovery__": {
-        "announceAddress": "zbp.service.local.discovery.announce",
+        "announceAddress": "qwe.service.local.discovery.announce",
         "autoRegistrationOfImporters": false,
         "backendConfig": {
           "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
         },
-        "usageAddress": "zbp.service.local.discovery.usage",
+        "usageAddress": "qwe.service.local.discovery.usage",
         "enabled": false
       },
       "__circuitBreaker__": {
@@ -34,14 +34,14 @@
           "maxFailures": 5,
           "fallbackOnFailure": false,
           "resetTimeout": 30000,
-          "notificationAddress": "zbp.circuit.breaker",
+          "notificationAddress": "qwe.circuit.breaker",
           "notificationPeriod": 2000,
           "maxRetries": 0,
           "metricsRollingWindow": 10000,
           "metricsRollingBuckets": 10,
           "failuresRollingWindow": 10000
         },
-        "name": "zbp-circuit-breaker"
+        "name": "qwe-circuit-breaker"
       }
     }
   }

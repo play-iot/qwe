@@ -32,10 +32,10 @@ public final class Networks {
     public static final Predicate<InterfaceAddress> IS_V4 = address -> IS_NAT_V4.test(address.getAddress());
     public static final int PRIORITY_FACTOR = 100;
 
-    static final String CLUSTER_PUBLIC_PROP = "zbp.cluster.public";
-    static final String CLUSTER_PUBLIC_HOST_PROP = "zbp.cluster.public.host";
-    static final String CLUSTER_PUBLIC_PORT_PROP = "zbp.cluster.public.port";
-    static final String CLUSTER_PUBLIC_EVENTBUS_PORT_PROP = "zbp.cluster.public.eventbus.port";
+    static final String CLUSTER_PUBLIC_PROP = "qwe.cluster.public";
+    static final String CLUSTER_PUBLIC_HOST_PROP = "qwe.cluster.public.host";
+    static final String CLUSTER_PUBLIC_PORT_PROP = "qwe.cluster.public.port";
+    static final String CLUSTER_PUBLIC_EVENTBUS_PORT_PROP = "qwe.cluster.public.eventbus.port";
     private static final Logger logger = LoggerFactory.getLogger(Networks.class);
     private static final List<String> BLACK_LIST_ADDRESS = Arrays.asList("0.0.0.0", "127.0.0.1", "localhost");
     private static final String GLOBAL_ADDRESS = "0.0.0.0";

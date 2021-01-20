@@ -51,8 +51,8 @@ public final class MicroConfig implements IConfig {
 
         public static final String NAME = "__serviceDiscovery__";
 
-        public static final String SERVICE_DISCOVERY_ANNOUNCE_ADDRESS = "zbp.service.discovery.announce";
-        public static final String SERVICE_DISCOVERY_USAGE_ADDRESS = "zbp.service.discovery.usage";
+        public static final String SERVICE_DISCOVERY_ANNOUNCE_ADDRESS = "qwe.service.discovery.announce";
+        public static final String SERVICE_DISCOVERY_USAGE_ADDRESS = "qwe.service.discovery.usage";
 
         private boolean enabled;
         private BackendConfig backendConfig;
@@ -111,8 +111,8 @@ public final class MicroConfig implements IConfig {
 
         public static final String NAME = "__localServiceDiscovery__";
 
-        public static final String SERVICE_DISCOVERY_ANNOUNCE_LOCAL_ADDRESS = "zbp.service.local.discovery.announce";
-        public static final String SERVICE_DISCOVERY_USAGE_LOCAL_ADDRESS = "zbp.service.local.discovery.usage";
+        public static final String SERVICE_DISCOVERY_ANNOUNCE_LOCAL_ADDRESS = "qwe.service.local.discovery.announce";
+        public static final String SERVICE_DISCOVERY_USAGE_LOCAL_ADDRESS = "qwe.service.local.discovery.usage";
 
         LocalServiceDiscoveryConfig() { super(false, new BackendConfig(true)); }
 
@@ -168,10 +168,10 @@ public final class MicroConfig implements IConfig {
     public static class CircuitBreakerConfig implements IConfig {
 
         public static final String NAME = "__circuitBreaker__";
-        public static final String DEFAULT_NOTIFICATION_ADDRESS = "zbp.circuit.breaker";
+        public static final String DEFAULT_NOTIFICATION_ADDRESS = "qwe.circuit.breaker";
 
         @JsonProperty(value = "name")
-        private String circuitName = "zbp-circuit-breaker";
+        private String circuitName = "qwe-circuit-breaker";
         private boolean enabled = false;
         private CircuitBreakerOptions options = new CircuitBreakerOptions().setNotificationAddress(
             DEFAULT_NOTIFICATION_ADDRESS);
@@ -191,7 +191,7 @@ public final class MicroConfig implements IConfig {
         static final String NAME = "__gateway__";
 
         private boolean enabled = false;
-        private String indexAddress = "zbp.service.gateway.index";
+        private String indexAddress = "qwe.service.gateway.index";
         private String clusterAnnounceMonitorClass = ServiceGatewayAnnounceMonitor.class.getName();
         private String clusterUsageMonitorClass = ServiceGatewayUsageMonitor.class.getName();
         private String localAnnounceMonitorClass = ServiceGatewayAnnounceMonitor.class.getName();

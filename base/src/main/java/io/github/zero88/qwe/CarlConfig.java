@@ -29,7 +29,7 @@ import lombok.Setter;
 public final class CarlConfig implements IConfig {
 
     public static final String DATA_DIR = "dataDir";
-    public static final Path DEFAULT_DATADIR = FileUtils.defaultDatadir(".zbp");
+    public static final Path DEFAULT_DATADIR = FileUtils.defaultDatadir(".qwe");
 
     @JsonProperty(value = CarlConfig.DATA_DIR)
     private Path dataDir;

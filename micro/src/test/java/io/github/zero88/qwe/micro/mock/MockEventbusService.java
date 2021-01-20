@@ -9,7 +9,7 @@ import io.vertx.core.json.JsonObject;
 @ProxyGen
 public interface MockEventbusService {
 
-    String SERVICE_ADDRESS = "zbp.micro.mock.MockEventbusService";
+    String SERVICE_ADDRESS = "qwe.micro.mock.MockEventbusService";
 
     String SERVICE_NAME = "mock-eventbus";
 

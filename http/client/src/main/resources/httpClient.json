@@ -82,5 +82,5 @@
     "webSocketResponseDispatcherCls": "io.github.zero88.qwe.http.client.handler.WebSocketResponseDispatcher",
     "webSocketErrorHandlerCls": "io.github.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler"
   },
-  "userAgent": "zbp.httpclient"
+  "userAgent": "qwe.httpclient"
 }

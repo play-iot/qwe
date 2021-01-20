@@ -3,7 +3,7 @@
     "__micro__": {
       "__gateway__": {
         "enabled": true,
-        "indexAddress": "test.zbp.service.gateway.index",
+        "indexAddress": "test.qwe.service.gateway.index",
         "localAnnounceMonitorClass": "io.github.zero88.qwe.http.server.gateway.RouterAnnounceListener"
       },
       "__serviceDiscovery__": {
@@ -26,7 +26,7 @@
       "__api_gateway__": {
         "enabled": true,
         "path": "/gw",
-        "address": "test.zbp.service.gateway.index"
+        "address": "test.qwe.service.gateway.index"
       }
     }
   }

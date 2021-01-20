@@ -57,9 +57,9 @@ public class ConfigProcessorTest {
     @Test
     public void test_environment_config_overridden_system_config() throws Exception {
         SystemHelper.setEnvironment(Collections.singletonMap("ZBP_APP_HTTP_HOST", "2.2.2.2"));
-        System.setProperty("zbp.app.http.host", "1.1.1.1");
+        System.setProperty("qwe.app.http.host", "1.1.1.1");
 
-        String value = processor.mergeEnvVarAndSystemVar().get("zbp.app.http.host").toString();
+        String value = processor.mergeEnvVarAndSystemVar().get("qwe.app.http.host").toString();
         Assertions.assertEquals("2.2.2.2", value);
     }
 
@@ -71,8 +71,8 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_properties_that_not_exist_in_appConfig_should_add() {
-        System.setProperty("zbp.app.name", "thanh");
-        System.setProperty("zbp.app.http1.abc.def", "123");
+        System.setProperty("qwe.app.name", "thanh");
+        System.setProperty("qwe.app.http1.abc.def", "123");
 
         overrideConfigThenAssert(finalResult -> {
             Assertions.assertEquals("thanh", finalResult.getAppConfig().get("name"));
@@ -82,7 +82,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_invalid_type() {
-        System.setProperty("zbp.app.http", "123");
+        System.setProperty("qwe.app.http", "123");
 
         overrideConfigThenAssert(finalResult -> Assertions.assertEquals(
             "{host=0.0.0.0, port=8086, enabled=true, rootApi=/api, alpnVersions=[HTTP_2, HTTP_1_1]}",
@@ -91,10 +91,10 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_override_app_config() {
-        System.setProperty("zbp.app.http.port", "8088");
-        System.setProperty("zbp.app.http.host", "2.2.2.2");
-        System.setProperty("zbp.app.http.enabled", "false");
-        System.setProperty("zbp.app.http.rootApi", "/test");
+        System.setProperty("qwe.app.http.port", "8088");
+        System.setProperty("qwe.app.http.host", "2.2.2.2");
+        System.setProperty("qwe.app.http.enabled", "false");
+        System.setProperty("qwe.app.http.rootApi", "/test");
 
         overrideConfigThenAssert(finalResult -> {
             String httpConfig = finalResult.getAppConfig().get("__http__").toString();
@@ -106,11 +106,11 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_override_app_config_with_array() {
-        System.setProperty("zbp.app.http.port", "8088");
-        System.setProperty("zbp.app.http.host", "2.2.2.2");
-        System.setProperty("zbp.app.http.enabled", "false");
-        System.setProperty("zbp.app.http.rootApi", "/test");
-        System.setProperty("zbp.app.http.alpnVersions", "[HTTP_2,HTTP_1_2]");
+        System.setProperty("qwe.app.http.port", "8088");
+        System.setProperty("qwe.app.http.host", "2.2.2.2");
+        System.setProperty("qwe.app.http.enabled", "false");
+        System.setProperty("qwe.app.http.rootApi", "/test");
+        System.setProperty("qwe.app.http.alpnVersions", "[HTTP_2,HTTP_1_2]");
 
         overrideConfigThenAssert(finalResult -> {
             String httpConfig = finalResult.getAppConfig().get("__http__").toString();
@@ -121,10 +121,10 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_override_system_config() {
-        System.setProperty("zbp.system.cluster.active", "false");
-        System.setProperty("zbp.system.cluster.type", "ZOOKEEPER");
-        System.setProperty("zbp.system.eventBus.port", "6000");
-        System.setProperty("zbp.system.eventBus.clustered", "true");
+        System.setProperty("qwe.system.cluster.active", "false");
+        System.setProperty("qwe.system.cluster.type", "ZOOKEEPER");
+        System.setProperty("qwe.system.eventBus.port", "6000");
+        System.setProperty("qwe.system.eventBus.clustered", "true");
 
         overrideConfigThenAssert(finalResult -> {
             Assertions.assertEquals(6000, finalResult.getSystemConfig().getEventBusConfig().getOptions().getPort());
@@ -137,9 +137,9 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_override_deploy_config() {
-        System.setProperty("zbp.deploy.workerPoolSize", "50");
-        System.setProperty("zbp.deploy.maxWorkerExecuteTime", "70000000000");
-        System.setProperty("zbp.deploy.worker", "true");
+        System.setProperty("qwe.deploy.workerPoolSize", "50");
+        System.setProperty("qwe.deploy.maxWorkerExecuteTime", "70000000000");
+        System.setProperty("qwe.deploy.worker", "true");
 
         overrideConfigThenAssert(finalResult -> {
             try {
@@ -155,7 +155,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_invalid_data_type_should_be_used_default_config() {
-        System.setProperty("zbp.system.cluster.active", "invalid_type");
+        System.setProperty("qwe.system.cluster.active", "invalid_type");
 
         overrideConfigThenAssert(
             finalResult -> Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive()), true,
@@ -164,7 +164,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_env_config_is_json_but_provide_config_is_primitive() {
-        System.setProperty("zbp.app.test.port", "8087");
+        System.setProperty("qwe.app.test.port", "8087");
         String jsonInput1 = "{\"__app__\":{\"test\":\"anyvalue\"}}";
 
         carlConfig = IConfig.from(jsonInput1, CarlConfig.class);
@@ -177,7 +177,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_default_config_and_override_config() {
-        System.setProperty("zbp.app.http.port", "8087");
+        System.setProperty("qwe.app.http.port", "8087");
         String jsonInput1 = "{\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":false," +
                             "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_2\", \"HTTP_1_1\" ]},\"api" +
                             ".name\":\"edge-connector\"}}";
@@ -198,7 +198,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_data_dir() {
-        System.setProperty("zbp.dataDir", OSHelper.getAbsolutePathByOs("test").toString());
+        System.setProperty("qwe.dataDir", OSHelper.getAbsolutePathByOs("test").toString());
         overrideConfigThenAssert(
             finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getDataDir()),
             true, true);
@@ -206,7 +206,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_double() {
-        System.setProperty("zbp.app.http.port", "8087.0");
+        System.setProperty("qwe.app.http.port", "8087.0");
         String jsonInput = "{\"__app__\":{\"__http__\":{\"port\":8086.0}}}";
         carlConfig = IConfig.from(jsonInput, CarlConfig.class);
         Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
@@ -218,7 +218,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_float() {
-        System.setProperty("zbp.app.http.port", String.valueOf(3.4e+038));
+        System.setProperty("qwe.app.http.port", String.valueOf(3.4e+038));
         String jsonInput = "{\"__app__\":{\"__http__\":{\"port\":8080}}}";
         carlConfig = IConfig.from(jsonInput, CarlConfig.class);
         ((Map<String, Object>) carlConfig.getAppConfig().get("__http__")).put("port", (float) 3.4e+028);
@@ -231,7 +231,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_json_array_of_json_object() {
-        System.setProperty("zbp.app.https.port", "8087");
+        System.setProperty("qwe.app.https.port", "8087");
         String jsonInput =
             "{\"__app__\":{\"__https__\": [{\"host\": \"2.2.2.2\", \"port\": 8088, \"enabled\": false, " +
             "\"rootApi\": \"/test\"},{\"host\": \"2.2.2.3\", \"port\": 8089, \"enabled\": true, " +
@@ -247,7 +247,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_json_array_of_primitive() {
-        System.setProperty("zbp.app.https", "[abc1,def1]");
+        System.setProperty("qwe.app.https", "[abc1,def1]");
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
         carlConfig = IConfig.from(jsonInput, CarlConfig.class);
         Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
@@ -259,7 +259,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_json_array_of_primitive_not_update() {
-        System.setProperty("zbp.app.https.name", "[abc1,def1]");
+        System.setProperty("qwe.app.https.name", "[abc1,def1]");
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
         carlConfig = IConfig.from(jsonInput, CarlConfig.class);
         Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
@@ -271,7 +271,7 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_json_array_of_json_object_1() {
-        System.setProperty("zbp.app.http.host.name", "[abc.net,def.net]");
+        System.setProperty("qwe.app.http.host.name", "[abc.net,def.net]");
         String jsonInput = "{\"__app__\":{\"__http__\":{\"host\":[{\"name\":\"abc.com\"}, {\"name\":\"def.com\"}]}}}";
 
         carlConfig = IConfig.from(jsonInput, CarlConfig.class);
@@ -285,7 +285,7 @@ public class ConfigProcessorTest {
     @Test
     public void test_json_array_of_primitive_1() {
         String jsonInput = "{\"__app__\":{\"__http__\":{\"host\":[\"abc.com\",\"def.com\"]}}}";
-        System.setProperty("zbp.app.http.host.name", "[abc.net,def.net]");
+        System.setProperty("qwe.app.http.host.name", "[abc.net,def.net]");
         carlConfig = IConfig.from(jsonInput, CarlConfig.class);
         Optional<CarlConfig> finalResult = this.processor.override(null, carlConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
@@ -296,9 +296,9 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_override_app_config_only() {
-        System.setProperty("zbp.app.http.port", "8088");
-        System.setProperty("zbp.system.cluster.active", "false");
-        System.setProperty("zbp.deploy.maxWorkerExecuteTime", "70000000000");
+        System.setProperty("qwe.app.http.port", "8088");
+        System.setProperty("qwe.system.cluster.active", "false");
+        System.setProperty("qwe.deploy.maxWorkerExecuteTime", "70000000000");
         overrideConfigThenAssert(finalResult -> {
             try {
                 JSONAssert.assertEquals("{\"ha\":false,\"instances\":1,\"maxWorkerExecuteTime\":60000000000," +
@@ -319,9 +319,9 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_override_other_configs_only() {
-        System.setProperty("zbp.app.http.port", "8088");
-        System.setProperty("zbp.system.cluster.active", "false");
-        System.setProperty("zbp.deploy.maxWorkerExecuteTime", "70000000000");
+        System.setProperty("qwe.app.http.port", "8088");
+        System.setProperty("qwe.system.cluster.active", "false");
+        System.setProperty("qwe.deploy.maxWorkerExecuteTime", "70000000000");
         overrideConfigThenAssert(finalResult -> {
             try {
                 JSONAssert.assertEquals("{\"ha\":false,\"instances\":1,\"maxWorkerExecuteTime\":70000000000," +
@@ -342,9 +342,9 @@ public class ConfigProcessorTest {
 
     @Test
     public void test_override_none() {
-        System.setProperty("zbp.app.http.port", "8088");
-        System.setProperty("zbp.system.cluster.active", "false");
-        System.setProperty("zbp.deploy.maxWorkerExecuteTime", "70000000000");
+        System.setProperty("qwe.app.http.port", "8088");
+        System.setProperty("qwe.system.cluster.active", "false");
+        System.setProperty("qwe.deploy.maxWorkerExecuteTime", "70000000000");
         String jsonInput = "{\"__system__\":{\"__eventBus__\":{\"clientAuth\":\"REQUIRED\",\"ssl\":true," +
                            "\"clustered\":true,\"keyStoreOptions\":{\"path\":\"eventBusKeystore.jks\"," +
                            "\"password\":\"abc123\"},\"trustStoreOptions\":{\"path\":\"eventBusKeystore" +
@@ -406,22 +406,22 @@ public class ConfigProcessorTest {
     @AfterEach
     public void after() throws Exception {
         SystemHelper.cleanEnvironments();
-        System.clearProperty("zbp.app.http.host");
-        System.clearProperty("zbp.app.http.host.name");
-        System.clearProperty("zbp.app.http.alpnVersions");
-        System.clearProperty("zbp.app.http.port");
-        System.clearProperty("zbp.app.https.port");
-        System.clearProperty("zbp.app.http.enabled");
-        System.clearProperty("zbp.app.http.rootApi");
-        System.clearProperty("zbp.app.https");
-        System.clearProperty("zbp.dataDir");
-        System.clearProperty("zbp.deploy.workerPoolSize");
-        System.clearProperty("zbp.deploy.worker");
-        System.clearProperty("zbp.deploy.maxWorkerExecuteTime");
-        System.clearProperty("zbp.system.cluster.active");
-        System.clearProperty("zbp.system.cluster.type");
-        System.clearProperty("zbp.system.eventBus.port");
-        System.clearProperty("zbp.system.eventBus.clustered");
+        System.clearProperty("qwe.app.http.host");
+        System.clearProperty("qwe.app.http.host.name");
+        System.clearProperty("qwe.app.http.alpnVersions");
+        System.clearProperty("qwe.app.http.port");
+        System.clearProperty("qwe.app.https.port");
+        System.clearProperty("qwe.app.http.enabled");
+        System.clearProperty("qwe.app.http.rootApi");
+        System.clearProperty("qwe.app.https");
+        System.clearProperty("qwe.dataDir");
+        System.clearProperty("qwe.deploy.workerPoolSize");
+        System.clearProperty("qwe.deploy.worker");
+        System.clearProperty("qwe.deploy.maxWorkerExecuteTime");
+        System.clearProperty("qwe.system.cluster.active");
+        System.clearProperty("qwe.system.cluster.type");
+        System.clearProperty("qwe.system.eventBus.port");
+        System.clearProperty("qwe.system.eventBus.clustered");
     }
 
 }

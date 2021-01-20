@@ -8,7 +8,7 @@ import io.vertx.core.http.HttpServerResponse;
 
 import com.zandero.rest.writer.HttpResponseWriter;
 
-public final class ApiJsonWriter<T> implements HttpResponseWriter<T> {
+public class ApiJsonWriter<T> implements HttpResponseWriter<T> {
 
     @Override
     public void write(T result, HttpServerRequest request, HttpServerResponse response) {

@@ -40,8 +40,8 @@ public final class ConfigProcessor {
     private static final int DOMAIN_CFG_INDEX = 2;
     private static final int CHILD_CFG_START_INDEX = 3;
     private static final Logger logger = LoggerFactory.getLogger(ConfigProcessor.class);
-    private static final String PREFIX_SYS = "ZBP.";
-    private static final String PREFIX_ENV = "ZBP_";
+    private static final String PREFIX_SYS = "QWE.";
+    private static final String PREFIX_ENV = "QWE_";
     private final Vertx vertx;
     private final LinkedHashMap<ConfigStoreOptions, Function<JsonObject, Map<String, Object>>> mappingOptions;
 
@@ -108,10 +108,10 @@ public final class ConfigProcessor {
 
     SortedMap<String, Object> mergeEnvVarAndSystemVar() {
         SortedMap<String, Object> result = new TreeMap<>();
-        mappingOptions.forEach((store, filterzbpVariables) -> {
+        mappingOptions.forEach((store, filterCarlVariables) -> {
             ConfigRetrieverOptions options = new ConfigRetrieverOptions().addStore(store);
             ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-            retriever.getConfig(json -> result.putAll(filterzbpVariables.apply(json.result())));
+            retriever.getConfig(json -> result.putAll(filterCarlVariables.apply(json.result())));
         });
         return result;
     }

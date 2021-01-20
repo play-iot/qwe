@@ -15,13 +15,13 @@ public class EventMessageTest {
     @Test
     public void test_EventMessage_Success() throws JSONException {
         EventMessage msg = EventMessage.success(EventAction.CREATE, new JsonObject(
-            "{\"groupId\":\"io.zbpspark\",\"version\":\"1.0-SNAPSHOT\"}"));
+            "{\"groupId\":\"io.qwespark\",\"version\":\"1.0-SNAPSHOT\"}"));
         Assertions.assertFalse(msg.isError());
         Assertions.assertTrue(msg.isSuccess());
         Assertions.assertEquals(EventAction.CREATE, msg.getAction());
         Assertions.assertNull(msg.getError());
         JSONAssert.assertEquals("{\"status\":\"SUCCESS\",\"action\":\"CREATE\",\"" +
-                                "data\":{\"groupId\":\"io.zbpspark\",\"version\":\"1.0-SNAPSHOT\"}}",
+                                "data\":{\"groupId\":\"io.qwespark\",\"version\":\"1.0-SNAPSHOT\"}}",
                                 msg.toJson().encode(), JSONCompareMode.STRICT);
     }
 
@@ -40,19 +40,19 @@ public class EventMessageTest {
 
     @Test
     public void test_deserialize_missing_action() {
-        final JsonObject json = new JsonObject("{\"data\":{\"groupId\":\"io.zbpspark\"}}");
+        final JsonObject json = new JsonObject("{\"data\":{\"groupId\":\"io.qwespark\"}}");
         Assertions.assertThrows(CarlException.class, () -> EventMessage.tryParse(json));
     }
 
     @Test
     public void test_deserialize_success() {
-        JsonObject jsonObject = new JsonObject("{\"action\":\"CREATE\",\"data\":{\"groupId\":\"io.zbpspark\"," +
-                                               "\"artifactId\":\"zbp-edge-ditto-driver\"}}");
+        JsonObject jsonObject = new JsonObject("{\"action\":\"CREATE\",\"data\":{\"groupId\":\"io.qwespark\"," +
+                                               "\"artifactId\":\"qwe-edge-ditto-driver\"}}");
         EventMessage message = EventMessage.tryParse(jsonObject.getMap());
         Assertions.assertFalse(message.isError());
         Assertions.assertFalse(message.isSuccess());
         Assertions.assertEquals(EventAction.CREATE, message.getAction());
-        Assertions.assertEquals("{\"groupId\":\"io.zbpspark\",\"artifactId\":\"zbp-edge-ditto-driver\"}",
+        Assertions.assertEquals("{\"groupId\":\"io.qwespark\",\"artifactId\":\"qwe-edge-ditto-driver\"}",
                                 message.getData().encode());
         Assertions.assertNull(message.getError());
     }
