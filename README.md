@@ -1,6 +1,6 @@
 # QWE
 
-It is [Carl](https://static.wikia.nocookie.net/dota2_gamepedia/images/e/eb/Vo_invoker_invo_spawn_01.mp3/revision/latest?cb=20201011165217): "Invoke my abilities when you need" 
+It is [Carl](https://static.wikia.nocookie.net/dota2_gamepedia/images/e/eb/Vo_invoker_invo_spawn_01.mp3/revision/latest): "Invoke my abilities when you need" 
 
 Microservice adapt for [IoT edge computing](https://iot-analytics.com/iot-edge-computing-what-it-is-and-how-it-is-becoming-more-intelligent/) based on [Vertx](https://vertx.io/)  
 
