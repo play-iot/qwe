@@ -146,7 +146,7 @@ public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext
             Router mainRouter = Router.router(vertx);
             CorsOptions corsOptions = config.getCorsOptions();
             CorsHandler corsHandler = CorsHandler.create(corsOptions.getAllowedOriginPattern())
-                                                 .allowedMethods(corsOptions.getAllowedMethods())
+                                                 .allowedMethods(corsOptions.allowedMethods())
                                                  .allowedHeaders(corsOptions.getAllowedHeaders())
                                                  .allowCredentials(corsOptions.isAllowCredentials())
                                                  .exposedHeaders(corsOptions.getExposedHeaders())

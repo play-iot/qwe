@@ -24,19 +24,22 @@
     "idleTimeoutUnit": "SECONDS",
     "soLinger": -1,
     "ssl": false,
+    "sslHandshakeTimeout": 10,
+    "sslHandshakeTimeoutUnit": "SECONDS",
     "tcpCork": false,
     "tcpFastOpen": false,
     "tcpKeepAlive": false,
     "tcpNoDelay": true,
     "tcpQuickAck": false,
     "useAlpn": false,
-    "usePooledBuffers": false,
     "acceptBacklog": -1,
     "clientAuth": "NONE",
-    "clientAuthRequired": false,
     "host": "0.0.0.0",
     "port": 80,
+    "proxyProtocolTimeout": 10,
+    "proxyProtocolTimeoutUnit": "SECONDS",
     "sni": false,
+    "useProxyProtocol": false,
     "acceptUnmaskedFrames": false,
     "alpnVersions": [
       "HTTP_2",
@@ -59,10 +62,14 @@
     "maxChunkSize": 8192,
     "maxHeaderSize": 8192,
     "maxInitialLineLength": 4096,
-    "maxWebsocketFrameSize": 65536,
-    "maxWebsocketMessageSize": 262144,
-    "websocketAllowServerNoContext": false,
-    "websocketPreferredClientNoContext": false
+    "maxWebSocketFrameSize": 65536,
+    "maxWebSocketMessageSize": 262144,
+    "perFrameWebSocketCompressionSupported": true,
+    "perMessageWebSocketCompressionSupported": true,
+    "tracingPolicy": "ALWAYS",
+    "webSocketAllowServerNoContext": false,
+    "webSocketCompressionLevel": 6,
+    "webSocketPreferredClientNoContext": false
   },
   "__rest__": {
     "enabled": true,
@@ -81,15 +88,15 @@
       "heartbeatInterval": 25000,
       "maxBytesStreaming": 131072,
       "libraryURL": "//cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js",
-      "disabledTransports": []
+      "disabledTransports": [],
+      "registerWriteHandler": false,
+      "localWriteHandler": true
     },
     "__bridge__": {
       "maxAddressLength": 200,
       "maxHandlersPerSocket": 1000,
       "pingTimeout": 10000,
-      "replyTimeout": 30000,
-      "inboundPermitteds": [],
-      "outboundPermitteds": []
+      "replyTimeout": 30000
     }
   },
   "__http2__": {
@@ -123,11 +130,13 @@
       "enabled": false,
       "path": "/u",
       "maxBodySizeMB": 10,
-      "handlerClass": "io.github.zero88.qwe.http.server.handler.UploadFileHandler"
+      "handlerClass": "io.github.zero88.qwe.http.server.handler.UploadFileHandler",
+      "listenerClass": "io.github.zero88.qwe.http.server.handler.UploadListener"
     },
     "__download__": {
       "enabled": false,
-      "path": "/f"
+      "path": "/f",
+      "handlerClass": "io.github.zero88.qwe.http.server.handler.DownloadFileHandler"
     }
   },
   "__static__": {

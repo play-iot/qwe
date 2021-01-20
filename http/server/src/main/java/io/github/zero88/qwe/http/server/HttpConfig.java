@@ -2,13 +2,14 @@ package io.github.zero88.qwe.http.server;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import io.github.zero88.qwe.CarlConfig.AppConfig;
 import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.http.HttpUtils;
 import io.github.zero88.qwe.http.server.handler.DownloadFileHandler;
 import io.github.zero88.qwe.http.server.handler.UploadFileHandler;
 import io.github.zero88.qwe.http.server.handler.UploadListener;
-import io.github.zero88.qwe.CarlConfig.AppConfig;
 import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpMethod;
@@ -198,7 +199,7 @@ public final class HttpConfig implements IConfig {
         public static final String NAME = "__cors__";
 
         private String allowedOriginPattern = "*";
-        private Set<HttpMethod> allowedMethods = HttpUtils.DEFAULT_CORS_HTTP_METHOD;
+        private Set<String> allowedMethods = defaultAllowMethods();
         private Set<String> allowedHeaders = new HashSet<>();
         private Set<String> exposedHeaders = new HashSet<>();
         private boolean allowCredentials = false;
@@ -209,6 +210,14 @@ public final class HttpConfig implements IConfig {
 
         @Override
         public Class<? extends IConfig> parent() { return HttpConfig.class; }
+
+        public Set<HttpMethod> allowedMethods() {
+            return this.allowedMethods.stream().map(HttpMethod::valueOf).collect(Collectors.toSet());
+        }
+
+        static Set<String> defaultAllowMethods() {
+            return HttpUtils.DEFAULT_CORS_HTTP_METHOD.stream().map(HttpMethod::name).collect(Collectors.toSet());
+        }
 
     }
 
