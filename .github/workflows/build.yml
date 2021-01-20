@@ -160,6 +160,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-test
 
       - name: Test
+        if: 'temporary' == 'true'
         run: ./gradlew jacocoRootReport -PjacocoHtml=false
 
       - name: SonarQube
