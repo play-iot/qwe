@@ -1,6 +1,9 @@
 package io.github.zero88.qwe.http.server.converter;
 
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.dto.msg.RequestData;
@@ -30,7 +33,13 @@ public final class RequestDataConverter {
     }
 
     public static JsonObject body(@NonNull RoutingContext context) {
-        final JsonObject params = JsonObject.mapFrom(context.pathParams());
+        //TODO re-check vertx-4 has path params `*`
+        final Map<String, String> obj = context.pathParams()
+                                               .entrySet()
+                                               .stream()
+                                               .filter(entry -> !entry.getKey().equals("*"))
+                                               .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        final JsonObject params = JsonObject.mapFrom(obj);
         final JsonObject body = Optional.ofNullable(context.getBody())
                                         .map(b -> JsonData.tryParse(b).toJson())
                                         .orElseGet(JsonObject::new);

@@ -43,8 +43,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.core.http.HttpClient;
 
-import com.zandero.rest.RestRouter;
-
 @RunWith(VertxUnitRunner.class)
 public abstract class HttpServerTestBase {
 
@@ -69,10 +67,10 @@ public abstract class HttpServerTestBase {
 
     @After
     public void after(TestContext context) {
-        RestRouter.getWriters().clear();
-        RestRouter.getReaders().clear();
-        RestRouter.getContextProviders().clear();
-        RestRouter.getExceptionHandlers().clear();
+        //        RestRouter.getWriters().clear();
+        //        RestRouter.getReaders().clear();
+        //        RestRouter.getContextProviders().clear();
+        //        RestRouter.getExceptionHandlers().clear();
         vertx.close(context.asyncAssertSuccess());
     }
 

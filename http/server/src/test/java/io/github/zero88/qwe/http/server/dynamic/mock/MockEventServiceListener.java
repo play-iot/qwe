@@ -72,7 +72,9 @@ class MockEventServiceListener {
         public List<String> list(RequestData data) { return Collections.singletonList(data.body().getString("cId")); }
 
         @EventContractor(action = "GET_ONE")
-        public JsonObject get(RequestData data) { return data.body(); }
+        public JsonObject get(RequestData data) {
+            return data.body();
+        }
 
     }
 

@@ -23,8 +23,8 @@ public interface DynamicEventRestApi extends DynamicRestApi {
             EventMethodDefinition.class);
         Set<String> paths = Collections.unmodifiableSet(definition.getMapping()
                                                                   .stream()
-                                                                  .filter(m -> Strings.isNotBlank(m.getCapturePath()))
                                                                   .map(EventMethodMapping::getCapturePath)
+                                                                  .filter(Strings::isNotBlank)
                                                                   .collect(Collectors.toSet()));
         return new DynamicEventRestApi() {
 
