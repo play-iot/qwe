@@ -1,21 +1,21 @@
 package io.github.zero88.qwe.utils.mock;
 
-import io.github.zero88.qwe.component.MockUnitVerticle;
-import io.github.zero88.qwe.component.UnitProvider;
+import io.github.zero88.qwe.component.MockComponent;
+import io.github.zero88.qwe.component.ComponentProvider;
 
 import lombok.Getter;
 import lombok.Setter;
 
-public class MockProvider implements UnitProvider<MockUnitVerticle> {
+public class MockProvider implements ComponentProvider<MockComponent> {
 
     @Getter
     @Setter
-    private MockUnitVerticle unitVerticle;
+    private MockComponent unitVerticle;
 
     @Override
-    public Class<MockUnitVerticle> unitClass() { return MockUnitVerticle.class; }
+    public Class<MockComponent> unitClass() { return MockComponent.class; }
 
     @Override
-    public MockUnitVerticle get() { return unitVerticle; }
+    public MockComponent get() { return unitVerticle; }
 
 }

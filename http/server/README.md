@@ -1,6 +1,6 @@
 # Core HTTP Server
 
-Provide `HTTP Server` unit for `REST API` server
+Provide `HTTP Server` component for `REST API` server
 
 To use it, must add in your `build.gradle`
 

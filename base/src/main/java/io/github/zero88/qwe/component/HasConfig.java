@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject;
 import lombok.NonNull;
 
 /**
- * Mark a component that having Config
+ * Mark a verticle has Config
  *
  * @param <C> type of {@code IConfig}
  * @see IConfig

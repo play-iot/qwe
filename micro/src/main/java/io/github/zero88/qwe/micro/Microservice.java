@@ -1,9 +1,9 @@
 package io.github.zero88.qwe.micro;
 
-import io.github.zero88.qwe.component.UnitVerticle;
+import io.github.zero88.qwe.component.ComponentVerticle;
 import io.vertx.core.Promise;
 
-public final class Microservice extends UnitVerticle<MicroConfig, MicroContext> {
+public final class Microservice extends ComponentVerticle<MicroConfig, MicroContext> {
 
     Microservice() {
         super(new MicroContext());

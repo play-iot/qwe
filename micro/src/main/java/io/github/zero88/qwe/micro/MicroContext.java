@@ -3,7 +3,7 @@ package io.github.zero88.qwe.micro;
 import java.util.Objects;
 
 import io.github.zero88.qwe.component.SharedDataDelegate;
-import io.github.zero88.qwe.component.UnitContext;
+import io.github.zero88.qwe.component.ComponentContext;
 import io.github.zero88.qwe.micro.MicroConfig.GatewayConfig;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public final class MicroContext extends UnitContext {
+public final class MicroContext extends ComponentContext {
 
     @Getter
     private CircuitBreakerController breakerController;

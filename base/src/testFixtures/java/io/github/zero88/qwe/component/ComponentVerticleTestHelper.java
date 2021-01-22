@@ -4,9 +4,9 @@ import java.nio.file.Path;
 
 import io.github.zero88.utils.Strings;
 
-public interface UnitVerticleTestHelper {
+public interface ComponentVerticleTestHelper {
 
-    static void injectTest(UnitVerticle verticle, String sharedKey, Path path) {
+    static void injectTest(ComponentVerticle verticle, String sharedKey, Path path) {
         verticle.injectTest(Strings.isBlank(verticle.getSharedKey()) ? sharedKey : verticle.getSharedKey(), path);
     }
 

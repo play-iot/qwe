@@ -9,8 +9,8 @@ import io.reactivex.Single;
 public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService {
 
     @Override
-    public void registerEventbus(EventbusClient controller) {
-        controller.register(MockEventServiceListener.TEST_EVENT_4, MockEventServiceListener.TEST_EVENT_LISTENER_4);
+    public void registerEventbus(EventbusClient eventbus) {
+        eventbus.register(MockEventServiceListener.TEST_EVENT_4, MockEventServiceListener.TEST_EVENT_LISTENER_4);
     }
 
     @Override

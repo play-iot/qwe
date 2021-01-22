@@ -23,7 +23,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 
 @RunWith(VertxUnitRunner.class)
-public class UnitVerticleTest {
+public class ComponentVerticleTest {
 
     private Vertx vertx;
 
@@ -40,7 +40,7 @@ public class UnitVerticleTest {
 
     @Test
     public void not_have_config_file_should_deploy_success(TestContext context) {
-        MockUnitVerticle unitVerticle = new MockUnitVerticle();
+        MockComponent unitVerticle = new MockComponent();
         Async async = context.async();
         VertxHelper.deploy(vertx, context, new DeploymentOptions(), unitVerticle, deployId -> {
             context.assertNotNull(deployId);
@@ -50,7 +50,7 @@ public class UnitVerticleTest {
 
     @Test
     public void invalid_config_should_deploy_failed(TestContext context) {
-        MockUnitVerticle unitVerticle = new MockUnitVerticle();
+        MockComponent unitVerticle = new MockComponent();
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, unitVerticle, t -> {
@@ -63,8 +63,8 @@ public class UnitVerticleTest {
     @Test
     @Ignore("Need the information from Zero")
     public void test_register_shared_data(TestContext context) {
-        MockUnitVerticle unitVerticle = new MockUnitVerticle();
-        final String key = MockUnitVerticle.class.getName();
+        MockComponent unitVerticle = new MockComponent();
+        final String key = MockComponent.class.getName();
         unitVerticle.registerSharedKey(key);
 
         Async async = context.async();
@@ -77,7 +77,7 @@ public class UnitVerticleTest {
 
     @Test
     public void throw_unexpected_error_cannot_start(TestContext context) {
-        MockUnitVerticle unitVerticle = new MockUnitVerticle(true);
+        MockComponent unitVerticle = new MockComponent(true);
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
         VertxHelper.deployFailed(vertx, context, options, unitVerticle, t -> {

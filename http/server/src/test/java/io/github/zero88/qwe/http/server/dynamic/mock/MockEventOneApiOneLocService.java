@@ -1,6 +1,6 @@
 package io.github.zero88.qwe.http.server.dynamic.mock;
 
-import io.github.zero88.qwe.component.ContainerVerticle;
+import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.MicroContext;
 import io.github.zero88.qwe.micro.MicroserviceProvider;
@@ -8,7 +8,7 @@ import io.github.zero88.qwe.micro.ServiceDiscoveryController;
 import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
 import io.reactivex.Single;
 
-public class MockEventOneApiOneLocService extends ContainerVerticle {
+public class MockEventOneApiOneLocService extends ApplicationVerticle {
 
     public String configFile() { return "eventService.json"; }
 
@@ -19,10 +19,10 @@ public class MockEventOneApiOneLocService extends ContainerVerticle {
     }
 
     @Override
-    public void registerEventbus(EventbusClient controller) {
-        controller.register(MockEventServiceListener.TEST_EVENT_1, MockEventServiceListener.TEST_EVENT_LISTENER_1);
-        controller.register(MockEventServiceListener.TEST_EVENT_2, MockEventServiceListener.TEST_EVENT_LISTENER_2);
-        controller.register(MockEventServiceListener.TEST_EVENT_3, MockEventServiceListener.TEST_EVENT_LISTENER_3);
+    public void registerEventbus(EventbusClient eventbus) {
+        eventbus.register(MockEventServiceListener.TEST_EVENT_1, MockEventServiceListener.TEST_EVENT_LISTENER_1);
+        eventbus.register(MockEventServiceListener.TEST_EVENT_2, MockEventServiceListener.TEST_EVENT_LISTENER_2);
+        eventbus.register(MockEventServiceListener.TEST_EVENT_3, MockEventServiceListener.TEST_EVENT_LISTENER_3);
     }
 
     protected void publishService(MicroContext microContext) {

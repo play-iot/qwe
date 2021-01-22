@@ -10,7 +10,7 @@ import org.skyscreamer.jsonassert.Customization;
 
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.TestHelper.VertxHelper;
-import io.github.zero88.qwe.component.ContainerVerticle;
+import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.http.server.HttpServerTestBase;
 import io.github.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 import io.vertx.core.DeploymentOptions;
@@ -27,7 +27,7 @@ public abstract class DynamicServiceTestBase extends HttpServerTestBase {
         startGatewayAndService(context, service(), getServiceOptions());
     }
 
-    protected void startGatewayAndService(TestContext context, ContainerVerticle service,
+    protected void startGatewayAndService(TestContext context, ApplicationVerticle service,
                                           DeploymentOptions serviceOptions) {
         CountDownLatch latch = new CountDownLatch(2);
         DeploymentOptions config = new DeploymentOptions().setConfig(deployConfig(httpConfig.getPort()));
@@ -56,7 +56,7 @@ public abstract class DynamicServiceTestBase extends HttpServerTestBase {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T extends ContainerVerticle> Supplier<T> gateway() {
+    protected <T extends ApplicationVerticle> Supplier<T> gateway() {
         return () -> (T) new MockGatewayServer();
     }
 
@@ -64,7 +64,7 @@ public abstract class DynamicServiceTestBase extends HttpServerTestBase {
         return new DeploymentOptions();
     }
 
-    protected abstract <T extends ContainerVerticle> T service();
+    protected abstract <T extends ApplicationVerticle> T service();
 
     protected int timeoutInSecond() {
         return TestHelper.TEST_TIMEOUT_SEC;

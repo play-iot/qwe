@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import io.github.zero88.qwe.CarlConfig;
 import io.github.zero88.qwe.component.SharedDataDelegate;
-import io.github.zero88.qwe.component.UnitVerticle;
+import io.github.zero88.qwe.component.ComponentVerticle;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
@@ -55,7 +55,7 @@ import io.vertx.ext.web.handler.StaticHandler;
 
 import lombok.NonNull;
 
-public final class HttpServer extends UnitVerticle<HttpConfig, HttpServerContext> {
+public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerContext> {
 
     public final static String SERVER_INFO_DATA_KEY = "SERVER_INFO";
     public final static String SERVER_GATEWAY_ADDRESS_DATA_KEY = "SERVER_GATEWAY_ADDRESS";

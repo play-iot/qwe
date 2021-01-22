@@ -4,7 +4,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import io.github.zero88.qwe.component.ContainerVerticle;
+import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.http.HttpUtils;
 import io.github.zero88.qwe.http.server.HttpServerContext;
@@ -17,7 +17,7 @@ import io.github.zero88.qwe.micro.MicroserviceProvider;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.types.HttpLocation;
 
-public class MockHttpServiceServer extends ContainerVerticle {
+public class MockHttpServiceServer extends ApplicationVerticle {
 
     private HttpServerContext httpContext;
     private MicroContext microContext;

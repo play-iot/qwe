@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.github.zero88.qwe.component.ContainerVerticle;
+import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.http.server.dynamic.mock.MockEventOneApiMultiLocService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -17,7 +17,7 @@ public class DynamicEventOneApiMultiLocServiceTest extends DynamicServiceTestBas
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T extends ContainerVerticle> T service() {
+    protected <T extends ApplicationVerticle> T service() {
         return (T) new MockEventOneApiMultiLocService();
     }
 

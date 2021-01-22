@@ -1,11 +1,11 @@
 package io.github.zero88.qwe.http.server;
 
-import io.github.zero88.qwe.component.UnitProvider;
+import io.github.zero88.qwe.component.ComponentProvider;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class HttpServerProvider implements UnitProvider<HttpServer> {
+public final class HttpServerProvider implements ComponentProvider<HttpServer> {
 
     private final HttpServerRouter httpRouter;
 

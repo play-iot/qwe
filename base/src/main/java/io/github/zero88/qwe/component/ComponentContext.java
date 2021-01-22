@@ -8,21 +8,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * Unit context after deployment
+ * Component context after deployment
  *
- * @see Unit
+ * @see Component
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UnitContext {
+public class ComponentContext {
 
-    public static final UnitContext VOID = new UnitContext();
+    public static final ComponentContext VOID = new ComponentContext();
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Getter
     private String deployId;
 
-    UnitContext registerDeployId(String deployId) {
+    ComponentContext registerDeployId(String deployId) {
         this.deployId = deployId;
         return this;
     }

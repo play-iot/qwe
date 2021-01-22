@@ -2,7 +2,7 @@ package io.github.zero88.qwe.component;
 
 import lombok.Setter;
 
-public final class MockContainerVerticle extends ContainerVerticle {
+public final class MockApplication extends ApplicationVerticle {
 
     @Setter
     private boolean error;

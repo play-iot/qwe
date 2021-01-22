@@ -6,7 +6,7 @@ package io.github.zero88.qwe.component;
 public interface ApplicationProbe {
 
     /**
-     * Check is able to serve requests.
+     * Check if application is able to serve requests.
      *
      * @return {@code true} if application is able to serve requests, otherwise is {@code false}
      */

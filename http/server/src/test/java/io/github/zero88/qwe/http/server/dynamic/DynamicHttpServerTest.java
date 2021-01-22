@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.TestHelper.JsonHelper;
-import io.github.zero88.qwe.component.ContainerVerticle;
+import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.http.server.dynamic.mock.MockHttpServiceServer;
 import io.vertx.core.DeploymentOptions;
@@ -28,7 +28,7 @@ public class DynamicHttpServerTest extends DynamicServiceTestBase {
     }
 
     @Override
-    protected <T extends ContainerVerticle> T service() {
+    protected <T extends ApplicationVerticle> T service() {
         return (T) new MockHttpServiceServer();
     }
 

@@ -26,21 +26,21 @@ import lombok.NonNull;
 import lombok.Setter;
 
 @RunWith(VertxUnitRunner.class)
-public class ContainerVerticleTest {
+public class ApplicationVerticleTest {
 
     private Vertx vertx;
-    private MockContainerVerticle containerVerticle;
+    private MockApplication application;
 
     @BeforeClass
     public static void beforeSuite() {
         TestHelper.setup();
-        ((Logger) LoggerFactory.getLogger("io.zero88")).setLevel(Level.TRACE);
+        ((Logger) LoggerFactory.getLogger("io.github.zero88")).setLevel(Level.TRACE);
     }
 
     @Before
     public void before() {
         vertx = Vertx.vertx();
-        containerVerticle = new MockContainerVerticle();
+        application = new MockApplication();
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ContainerVerticleTest {
         addDummyUnit();
 
         Async async = context.async();
-        VertxHelper.deploy(vertx.getDelegate(), context, new DeploymentOptions(), containerVerticle, deployId -> {
+        VertxHelper.deploy(vertx.getDelegate(), context, new DeploymentOptions(), application, deployId -> {
             context.assertNotNull(deployId);
             TestHelper.testComplete(async);
             Assert.assertEquals(2, vertx.deploymentIDs().size());
@@ -62,7 +62,7 @@ public class ContainerVerticleTest {
         addMockUnit();
 
         Async async = context.async();
-        VertxHelper.deploy(vertx.getDelegate(), context, new DeploymentOptions(), containerVerticle, deployId -> {
+        VertxHelper.deploy(vertx.getDelegate(), context, new DeploymentOptions(), application, deployId -> {
             context.assertNotNull(deployId);
             TestHelper.testComplete(async);
             Assert.assertEquals(3, vertx.deploymentIDs().size());
@@ -71,14 +71,14 @@ public class ContainerVerticleTest {
 
     @Test
     public void test_container_throw_exception_cannot_start(TestContext context) {
-        containerVerticle.setError(true);
+        application.setError(true);
         addDummyUnit();
         assertDeployError(context, new RuntimeException("Error when starting"));
     }
 
     @Test
     public void test_container_throw_exception_in_handler_cannot_start(TestContext context) {
-        containerVerticle.setErrorInHandler(true);
+        application.setErrorInHandler(true);
         addDummyUnit();
         assertDeployError(context, new CarlException("Error in success handler"));
     }
@@ -92,7 +92,7 @@ public class ContainerVerticleTest {
 
     private void assertDeployError(TestContext context, Throwable error) {
         Async async = context.async();
-        VertxHelper.deployFailed(vertx.getDelegate(), context, new DeploymentOptions(), containerVerticle, t -> {
+        VertxHelper.deployFailed(vertx.getDelegate(), context, new DeploymentOptions(), application, t -> {
             try {
                 Assert.assertTrue(error.getClass().isInstance(t));
                 Assert.assertEquals(error.getMessage(), t.getMessage());
@@ -113,14 +113,14 @@ public class ContainerVerticleTest {
 
     private void addMockUnit(boolean error) {
         MockProvider provider = new MockProvider();
-        provider.setUnitVerticle(new MockUnitVerticle(error));
-        containerVerticle.addProvider(provider);
+        provider.setUnitVerticle(new MockComponent(error));
+        application.addProvider(provider);
     }
 
     private void addDummyUnit() {
         DummyProvider provider = new DummyProvider();
-        provider.setUnitVerticle(new DummyUnitVerticle());
-        containerVerticle.addProvider(provider);
+        provider.setUnitVerticle(new DummyComponentVerticle());
+        application.addProvider(provider);
     }
 
     @After
@@ -128,14 +128,14 @@ public class ContainerVerticleTest {
         vertx.close();
     }
 
-    final class DummyUnitVerticle extends UnitVerticle<MockConfig, UnitContext> {
+    final class DummyComponentVerticle extends ComponentVerticle<MockConfig, ComponentContext> {
 
-        public DummyUnitVerticle() {
+        public DummyComponentVerticle() {
             this(false);
         }
 
-        public DummyUnitVerticle(boolean error) {
-            super(UnitContext.VOID);
+        public DummyComponentVerticle(boolean error) {
+            super(ComponentContext.VOID);
         }
 
         @Override
@@ -157,17 +157,17 @@ public class ContainerVerticleTest {
     }
 
 
-    final class DummyProvider implements UnitProvider<DummyUnitVerticle> {
+    final class DummyProvider implements ComponentProvider<DummyComponentVerticle> {
 
         @Getter
         @Setter
-        private DummyUnitVerticle unitVerticle;
+        private DummyComponentVerticle unitVerticle;
 
         @Override
-        public Class<DummyUnitVerticle> unitClass() { return DummyUnitVerticle.class; }
+        public Class<DummyComponentVerticle> unitClass() { return DummyComponentVerticle.class; }
 
         @Override
-        public DummyUnitVerticle get() { return unitVerticle; }
+        public DummyComponentVerticle get() { return unitVerticle; }
 
     }
 

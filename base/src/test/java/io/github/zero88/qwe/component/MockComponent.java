@@ -5,17 +5,17 @@ import io.github.zero88.qwe.utils.mock.MockConfig;
 import lombok.Getter;
 import lombok.NonNull;
 
-public final class MockUnitVerticle extends UnitVerticle<MockConfig, UnitContext> {
+public final class MockComponent extends ComponentVerticle<MockConfig, ComponentContext> {
 
     @Getter
     private final boolean error;
 
-    public MockUnitVerticle() {
+    public MockComponent() {
         this(false);
     }
 
-    public MockUnitVerticle(boolean error) {
-        super(UnitContext.VOID);
+    public MockComponent(boolean error) {
+        super(ComponentContext.VOID);
         this.error = error;
     }
 

@@ -7,32 +7,32 @@ import io.vertx.core.Verticle;
  * Represents small and independent component that integrate with verticle.
  *
  * @param <C> Type of Config
- * @param <T> Type of Unit Context
+ * @param <T> Type of Component Context
  * @see IConfig
- * @see UnitContext
+ * @see ComponentContext
  * @see HasConfig
- * @see UnitVerticle
+ * @see ComponentVerticle
  */
-public interface Unit<C extends IConfig, T extends UnitContext> extends HasConfig<C>, Verticle {
+public interface Component<C extends IConfig, T extends ComponentContext> extends HasConfig<C>, Verticle {
 
     /**
      * Unit context
      *
-     * @return UnitContext
+     * @return ComponentContext
      */
     T getContext();
 
     /**
-     * Register {@code Vertx} local shared data key between {@code Container} and {@code unit}
+     * Register {@code Vertx} local shared data key from {@code Application} to {@code Component}
      * <p>
      * This method will be called automatically by system before deploying verticle.
      *
      * @param sharedKey shared data key
-     * @param <U>       Type of Unit Verticle
+     * @param <U>       Type of Component Verticle
      * @return a reference to this, so the API can be used fluently
-     * @see Container
+     * @see Application
      */
-    <U extends Unit<C, T>> U registerSharedKey(String sharedKey);
+    <U extends Component<C, T>> U registerSharedKey(String sharedKey);
 
     /**
      * Retrieve {@code Vertx} shared data value by key data

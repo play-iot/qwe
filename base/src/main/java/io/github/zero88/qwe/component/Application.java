@@ -8,15 +8,16 @@ import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.Verticle;
 
 /**
- * Represents a container consists a list of {@code Verticle unit} to startup application
+ * Represents a container consists a list of {@code Verticle component} to startup application
  *
- * @see Unit
+ * @see Component
  * @see HasConfig
- * @see ContainerVerticle
+ * @see ApplicationVerticle
  */
-public interface Container extends HasConfig<CarlConfig> {
+public interface Application extends HasConfig<CarlConfig>, Verticle {
 
     @Override
     default Class<CarlConfig> configClass() {
@@ -49,51 +50,52 @@ public interface Container extends HasConfig<CarlConfig> {
      * @param data Data value
      * @return a reference to this, so the API can be used fluently
      */
-    Container addSharedData(String key, Object data);
+    Application addSharedData(String key, Object data);
 
     /**
      * Handle event after start all registered {@code Unit} successfully. It will called by {@link
-     * #installUnits(Promise)} automatically
+     * #installComponents(Promise)} automatically
      *
      * @param successHandler Success handler after system start component successfully
      */
     void registerSuccessHandler(Handler<Void> successHandler);
 
     /**
-     * Add unit provider to startup
+     * Add component provider to startup
      *
-     * @param <T>      Type of unit
+     * @param <T>      Type of component
      * @param provider Unit provider
      * @return a reference to this, so the API can be used fluently
      */
-    <T extends Unit> Container addProvider(UnitProvider<T> provider);
+    <T extends Component> Application addProvider(ComponentProvider<T> provider);
 
     /**
-     * Add unit provider to startup
+     * Add component provider to startup
      *
      * @param <T>            Type of {@code Unit}
-     * @param <C>            Type of {@code UnitContext}
+     * @param <C>            Type of {@code ComponentContext}
      * @param provider       {@code Unit} provider
      * @param successHandler Success handler after system start {@code Unit} successfully
      * @return a reference to this, so the API can be used fluently
      */
-    <C extends UnitContext, T extends Unit> Container addProvider(UnitProvider<T> provider, Consumer<C> successHandler);
+    <C extends ComponentContext, T extends Component> Application addProvider(ComponentProvider<T> provider,
+                                                                              Consumer<C> successHandler);
 
     /**
-     * Install a list of register unit verticle based on the order of given providers of {@link
-     * #addProvider(UnitProvider)} or {@link #addProvider(UnitProvider, Consumer)}
+     * Install a list of register component verticle based on the order of given providers of {@link
+     * #addProvider(ComponentProvider)} or {@link #addProvider(ComponentProvider, Consumer)}
      * <p>
-     * If any unit verticle starts failed, future will catch and report it to {@code Vertx}
+     * If any component verticle starts failed, future will catch and report it to {@code Vertx}
      *
-     * @param future a future which should be called when all unit verticle start-up is complete.
+     * @param future a future which should be called when all component verticle start-up is complete.
      */
-    void installUnits(Promise<Void> future);
+    void installComponents(Promise<Void> future);
 
     /**
-     * Stop a list of register units
+     * Uninstall a list of register components when application is stopped
      *
-     * @param future a future which should be called when all unit verticle clean-up is complete.
+     * @param future a future which should be called when all component verticle clean-up is complete.
      */
-    void stopUnits(Promise<Void> future);
+    void uninstallComponents(Promise<Void> future);
 
 }

@@ -29,8 +29,8 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
     static EventModel EVENT_2 = EventModel.clone(EVENT_1, "test.SimilarApiService.2");
 
     @Override
-    public void registerEventbus(EventbusClient controller) {
-        controller.register(EVENT_1, new MockSiteListener()).register(EVENT_2, new MockProductListener());
+    public void registerEventbus(EventbusClient eventbus) {
+        eventbus.register(EVENT_1, new MockSiteListener()).register(EVENT_2, new MockProductListener());
     }
 
     @Override
