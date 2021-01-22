@@ -6,7 +6,8 @@ on:
     tags: [ 'v*' ]
     paths-ignore:
       - '.github/ISSUE_TEMPLATE/**'
-      - 'README.md'
+      - '.github/*.yml'
+      - '*.md'
       - 'LICENSE'
   pull_request:
     types: [ opened, synchronize, reopened, closed ]
