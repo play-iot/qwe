@@ -17,7 +17,7 @@ import lombok.Getter;
 @Getter
 public class EventAction extends AbstractEnumType implements EnumType, Serializable {
 
-    public EventAction(String type) {
+    private EventAction(String type) {
         super(type);
     }
 

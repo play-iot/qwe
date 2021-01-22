@@ -20,12 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branch: ${{ steps.context.outputs.branch }}
-      version: ${{ steps.context.outputs.version }}
-      semanticVersion: ${{ steps.conclusion.outputs.semanticVersion }}
-      shouldBuild: ${{ steps.conclusion.outputs.shouldBuild }}
-      shouldAnalysis: ${{ steps.conclusion.outputs.shouldAnalysis }}
-      shouldPublish: ${{ steps.conclusion.outputs.shouldPublish }}
+      shouldBuild: ${{ steps.context.outputs.decision_build }}
+      shouldPublish: ${{ steps.context.outputs.decision_publish }}
       isRelease: ${{ steps.context.outputs.isTag }}
+      version: ${{ steps.context.outputs.version }}
+      semanticVersion: ${{ steps.semantic.outputs.semanticVersion }}
 
     steps:
       - uses: actions/checkout@v2
@@ -44,37 +43,15 @@ jobs:
 
       - name: Project context
         id: context
-        uses: zero88/gh-project-context@v1.0.0-rc2
+        uses: zero88/gh-project-context@v1.0.0
         with:
           dry: false
 
-      - name: Conclusion
-        id: conclusion
+      - name: Find semantic version
+        id: semantic
         shell: bash
         run: |
-          shouldBuild=${{ steps.context.outputs.ci_isPushed != 'true' && steps.context.outputs.isClosed != 'true' }}
-          isSkipPublish=$(echo "${{ steps.context.outputs.commitMsg }}" | grep -P -q '^<skip_publish>.+$' && echo true || echo false)
-          [[ $shouldBuild == true && $isSkipPublish != 'true' ]] && shouldAnalysis=true || shouldAnalysis=false
-          onTagOrMaster=${{ steps.context.outputs.onDefaultBranch == 'true' || steps.context.outputs.isTag == 'true' }}
-          [[ "$shouldAnalysis" == 'true' && "$onTagOrMaster" == 'true' ]] && shouldPublish=true || shouldPublish=false
-
-          version="${{ steps.context.outputs.version }}"
-          branch="${{ steps.context.outputs.branch }}"
-          version=$([[ -z "$version" ]] && echo "${branch//\//-}" || echo "$version")
-          semantic=$(grep semanticVersion gradle.properties | cut -d'=' -f2)
-
-          echo "Conclusion:"
-          echo "- Branch? $branch"
-          echo "- Version? $version"
-          echo "- Semantic version? $semantic"
-          echo "- Should build? $shouldBuild"
-          echo "- Should analysis? $shouldAnalysis"
-          echo "- Should publish? $shouldPublish"
-
-          echo ::set-output name=shouldBuild::$shouldBuild
-          echo ::set-output name=shouldAnalysis::$shouldAnalysis
-          echo ::set-output name=shouldPublish::$shouldPublish
-          echo ::set-output name=semanticVersion::$semantic
+          echo ::set-output name=semanticVersion::$(grep semanticVersion gradle.properties | cut -d'=' -f2)
 
   build:
     runs-on: ubuntu-latest
@@ -137,7 +114,7 @@ jobs:
   analysis:
     runs-on: ubuntu-latest
     needs: context
-    if: needs.context.outputs.shouldAnalysis == 'true'
+    if: needs.context.outputs.shouldBuild == 'true'
     steps:
       - uses: actions/checkout@v2
         with:
