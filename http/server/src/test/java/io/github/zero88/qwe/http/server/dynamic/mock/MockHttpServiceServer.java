@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import io.github.zero88.qwe.component.ApplicationVerticle;
+import io.github.zero88.qwe.component.ContextLookup;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.http.HttpUtils;
 import io.github.zero88.qwe.http.server.HttpServerContext;
@@ -19,25 +20,25 @@ import io.vertx.servicediscovery.types.HttpLocation;
 
 public class MockHttpServiceServer extends ApplicationVerticle {
 
-    private HttpServerContext httpContext;
-    private MicroContext microContext;
-
     @Override
     public void start() {
         super.start();
-        final HttpServerRouter httpRouter = new HttpServerRouter().registerApi(MockAPI.class);
-        this.addProvider(new HttpServerProvider(httpRouter), c -> this.httpContext = (HttpServerContext) c)
-            .addProvider(new MicroserviceProvider(), c -> this.microContext = (MicroContext) c);
-        this.registerSuccessHandler(event -> {
-            ServerInfo info = this.httpContext.getServerInfo();
-            microContext.getLocalController()
-                        .addHttpRecord("httpService", new HttpLocation(info.toJson()).setRoot(info.getApiPath()),
-                                       new JsonObject())
-                        .subscribe();
-        });
+        this.addProvider(new HttpServerProvider(new HttpServerRouter().registerApi(MockAPI.class)))
+            .addProvider(new MicroserviceProvider());
     }
 
     public String configFile() { return "httpService.json"; }
+
+    @Override
+    public void onInstallCompleted(ContextLookup lookup) {
+        final HttpServerContext httpContext = lookup.query(HttpServerContext.class);
+        final MicroContext microContext = lookup.query(MicroContext.class);
+        final ServerInfo info = httpContext.getServerInfo();
+        microContext.getLocalController()
+                    .addHttpRecord("httpService", new HttpLocation(info.toJson()).setRoot(info.getApiPath()),
+                                   new JsonObject())
+                    .subscribe();
+    }
 
     @Path("/test")
     public static class MockAPI implements RestApi {

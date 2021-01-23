@@ -1,6 +1,5 @@
 package io.github.zero88.qwe.http.client;
 
-import io.github.zero88.qwe.component.SharedDataDelegate;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;
@@ -23,7 +22,7 @@ final class WebSocketClientDelegateImpl extends ClientDelegate implements WebSoc
 
     WebSocketClientDelegateImpl(Vertx vertx, HttpClientConfig config) {
         super(vertx, config);
-        this.eventbus = SharedDataDelegate.getEventController(vertx, WebSocketClientDelegate.class.getName());
+        this.eventbus = EventbusClient.create(vertx);
     }
 
     @Override

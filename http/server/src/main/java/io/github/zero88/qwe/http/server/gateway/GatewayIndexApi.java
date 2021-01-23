@@ -10,7 +10,7 @@ public final class GatewayIndexApi extends AbstractRestEventApi {
 
     @Override
     public GatewayIndexApi initRouter() {
-        addRouter(getSharedDataValue(HttpServer.SERVER_GATEWAY_ADDRESS_DATA_KEY), EventPattern.REQUEST_RESPONSE,
+        addRouter(this.proxy.getData(HttpServer.SERVER_GATEWAY_ADDRESS_DATA_KEY), EventPattern.REQUEST_RESPONSE,
                   EventMethodDefinition.create("/index", "/:identifier", this));
         return this;
     }

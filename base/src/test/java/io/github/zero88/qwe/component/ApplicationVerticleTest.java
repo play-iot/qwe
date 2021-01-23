@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.TestHelper.VertxHelper;
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.utils.mock.MockConfig;
-import io.github.zero88.qwe.utils.mock.MockProvider;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -21,9 +19,6 @@ import io.vertx.reactivex.core.Vertx;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 
 @RunWith(VertxUnitRunner.class)
 public class ApplicationVerticleTest {
@@ -112,63 +107,17 @@ public class ApplicationVerticleTest {
     }
 
     private void addMockUnit(boolean error) {
-        MockProvider provider = new MockProvider();
-        provider.setUnitVerticle(new MockComponent(error));
+        MockProvider provider = new MockProvider(error);
         application.addProvider(provider);
     }
 
     private void addDummyUnit() {
-        DummyProvider provider = new DummyProvider();
-        provider.setUnitVerticle(new DummyComponentVerticle());
-        application.addProvider(provider);
+        application.addProvider(new DummyProvider());
     }
 
     @After
     public void after() {
         vertx.close();
-    }
-
-    final class DummyComponentVerticle extends ComponentVerticle<MockConfig, ComponentContext> {
-
-        public DummyComponentVerticle() {
-            this(false);
-        }
-
-        public DummyComponentVerticle(boolean error) {
-            super(ComponentContext.VOID);
-        }
-
-        @Override
-        public @NonNull Class<MockConfig> configClass() {
-            return MockConfig.class;
-        }
-
-        @Override
-        public @NonNull String configFile() {
-            return "config.json";
-        }
-
-        @Override
-        public void start() {
-            logger.info("Starting Fake Unit Verticle...");
-            super.start();
-        }
-
-    }
-
-
-    final class DummyProvider implements ComponentProvider<DummyComponentVerticle> {
-
-        @Getter
-        @Setter
-        private DummyComponentVerticle unitVerticle;
-
-        @Override
-        public Class<DummyComponentVerticle> unitClass() { return DummyComponentVerticle.class; }
-
-        @Override
-        public DummyComponentVerticle get() { return unitVerticle; }
-
     }
 
 }

@@ -1,14 +1,13 @@
 package io.github.zero88.qwe.component;
 
-import java.util.function.Consumer;
-
 import io.github.zero88.qwe.CarlConfig;
 import io.github.zero88.qwe.event.EventListener;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventbusClient;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
+
+import lombok.NonNull;
 
 /**
  * Represents a container consists a list of {@code Verticle component} to startup application
@@ -17,7 +16,7 @@ import io.vertx.core.Verticle;
  * @see HasConfig
  * @see ApplicationVerticle
  */
-public interface Application extends HasConfig<CarlConfig>, Verticle {
+public interface Application extends HasConfig<CarlConfig>, HasSharedKey, Verticle {
 
     @Override
     default Class<CarlConfig> configClass() {
@@ -49,16 +48,12 @@ public interface Application extends HasConfig<CarlConfig>, Verticle {
      * @param key  Data key
      * @param data Data value
      * @return a reference to this, so the API can be used fluently
+     * @deprecated Use {@link #sharedData()}
      */
+    @Deprecated
     Application addSharedData(String key, Object data);
 
-    /**
-     * Handle event after start all registered {@code Unit} successfully. It will called by {@link
-     * #installComponents(Promise)} automatically
-     *
-     * @param successHandler Success handler after system start component successfully
-     */
-    void registerSuccessHandler(Handler<Void> successHandler);
+    SharedDataLocalProxy sharedData();
 
     /**
      * Add component provider to startup
@@ -70,20 +65,8 @@ public interface Application extends HasConfig<CarlConfig>, Verticle {
     <T extends Component> Application addProvider(ComponentProvider<T> provider);
 
     /**
-     * Add component provider to startup
-     *
-     * @param <T>            Type of {@code Unit}
-     * @param <C>            Type of {@code ComponentContext}
-     * @param provider       {@code Unit} provider
-     * @param successHandler Success handler after system start {@code Unit} successfully
-     * @return a reference to this, so the API can be used fluently
-     */
-    <C extends ComponentContext, T extends Component> Application addProvider(ComponentProvider<T> provider,
-                                                                              Consumer<C> successHandler);
-
-    /**
      * Install a list of register component verticle based on the order of given providers of {@link
-     * #addProvider(ComponentProvider)} or {@link #addProvider(ComponentProvider, Consumer)}
+     * #addProvider(ComponentProvider)}
      * <p>
      * If any component verticle starts failed, future will catch and report it to {@code Vertx}
      *
@@ -97,5 +80,12 @@ public interface Application extends HasConfig<CarlConfig>, Verticle {
      * @param future a future which should be called when all component verticle clean-up is complete.
      */
     void uninstallComponents(Promise<Void> future);
+
+    /**
+     * Raise event after installed all component completely
+     *
+     * @param lookup Context lookup
+     */
+    void onInstallCompleted(@NonNull ContextLookup lookup);
 
 }

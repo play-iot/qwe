@@ -18,8 +18,6 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.qwe.component.ComponentVerticle;
-import io.github.zero88.qwe.component.ComponentVerticleTestHelper;
 import io.github.zero88.qwe.dto.JsonData;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
@@ -88,9 +86,6 @@ public interface TestHelper {
         static <T extends Verticle> T deploy(@NonNull Vertx vertx, @NonNull TestContext context,
                                              @NonNull DeploymentOptions options, @NonNull T verticle,
                                              @NonNull Handler<String> handlerSuccess) {
-            if (verticle instanceof ComponentVerticle) {
-                ComponentVerticleTestHelper.injectTest((ComponentVerticle) verticle, verticle.getClass().getName(), null);
-            }
             vertx.deployVerticle(verticle, options, context.asyncAssertSuccess(handlerSuccess));
             return verticle;
         }
@@ -108,9 +103,6 @@ public interface TestHelper {
         static <T extends Verticle> T deploy(@NonNull Vertx vertx, @NonNull TestContext context,
                                              @NonNull DeploymentOptions options, @NonNull T verticle, int timeout,
                                              @NonNull Handler<String> handlerSuccess) {
-            if (verticle instanceof ComponentVerticle) {
-                ComponentVerticleTestHelper.injectTest((ComponentVerticle) verticle, verticle.getClass().getName(), null);
-            }
             CountDownLatch latch = new CountDownLatch(1);
             vertx.deployVerticle(verticle, options, context.asyncAssertSuccess(id -> {
                 latch.countDown();
@@ -126,9 +118,6 @@ public interface TestHelper {
 
         static <T extends Verticle> void deployFailed(Vertx vertx, TestContext context, DeploymentOptions options,
                                                       T verticle, Handler<Throwable> errorHandler) {
-            if (verticle instanceof ComponentVerticle) {
-                ComponentVerticleTestHelper.injectTest((ComponentVerticle) verticle, verticle.getClass().getName(), null);
-            }
             vertx.deployVerticle(verticle, options, context.asyncAssertFailure(errorHandler));
         }
 

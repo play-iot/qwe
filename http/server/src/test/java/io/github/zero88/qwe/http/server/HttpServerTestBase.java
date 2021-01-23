@@ -18,6 +18,7 @@ import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.TestHelper.EventbusHelper;
 import io.github.zero88.qwe.TestHelper.VertxHelper;
+import io.github.zero88.qwe.component.TestComponentSharedDataProxy;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.dto.msg.ResponseData;
 import io.github.zero88.qwe.event.EventMessage;
@@ -67,10 +68,6 @@ public abstract class HttpServerTestBase {
 
     @After
     public void after(TestContext context) {
-        //        RestRouter.getWriters().clear();
-        //        RestRouter.getReaders().clear();
-        //        RestRouter.getContextProviders().clear();
-        //        RestRouter.getExceptionHandlers().clear();
         vertx.close(context.asyncAssertSuccess());
     }
 
@@ -130,13 +127,18 @@ public abstract class HttpServerTestBase {
     }
 
     protected HttpServer startServer(TestContext context, HttpServerRouter httpRouter) {
+        final HttpServerProvider provider = new HttpServerProvider(httpRouter);
         return VertxHelper.deploy(vertx.getDelegate(), context, new DeploymentOptions().setConfig(httpConfig.toJson()),
-                                  new HttpServer(httpRouter));
+                                  provider.provide(new TestComponentSharedDataProxy<>(vertx.getDelegate(),
+                                                                                      provider.componentClass())));
     }
 
     protected void startServer(TestContext context, HttpServerRouter httpRouter, Handler<Throwable> consumer) {
+        final HttpServerProvider provider = new HttpServerProvider(httpRouter);
         VertxHelper.deployFailed(vertx.getDelegate(), context, new DeploymentOptions().setConfig(httpConfig.toJson()),
-                                 new HttpServer(httpRouter), consumer);
+                                 provider.provide(new TestComponentSharedDataProxy<>(vertx.getDelegate(),
+                                                                                     provider.componentClass())),
+                                 consumer);
     }
 
     protected JsonObject notFoundResponse(int port, String path) {

@@ -8,9 +8,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.github.zero88.qwe.CarlConfig;
-import io.github.zero88.qwe.component.SharedDataDelegate;
+import io.github.zero88.qwe.IConfig;
+import io.github.zero88.qwe.component.Component;
 import io.github.zero88.qwe.component.ComponentVerticle;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
@@ -63,11 +64,10 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
     @NonNull
     private final HttpServerRouter httpRouter;
     private io.vertx.core.http.HttpServer httpServer;
-    private String dataDir;
 
-    HttpServer(HttpServerRouter httpRouter) {
-        super(new HttpServerContext());
-        this.httpRouter = httpRouter;
+    HttpServer(SharedDataLocalProxy sharedData, HttpServerRouter router) {
+        super(sharedData);
+        this.httpRouter = router;
     }
 
     /**
@@ -87,16 +87,14 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
     public void start(Promise<Void> promise) {
         logger.info("Starting HTTP Server...");
         super.start();
-        this.dataDir = this.getSharedData(SharedDataDelegate.SHARED_DATADIR,
-                                          CarlConfig.DEFAULT_DATADIR.toString());
-        HttpServerOptions options = new HttpServerOptions(config.getOptions()).setHost(config.getHost())
-                                                                              .setPort(config.getPort());
-        final Router handler = initRouter();
-        this.httpServer = vertx.createHttpServer(options).requestHandler(handler).listen(event -> {
+        final HttpServerOptions options = new HttpServerOptions(config.getOptions()).setHost(config.getHost())
+                                                                                    .setPort(config.getPort());
+        final Router router = initRouter();
+        this.httpServer = vertx.createHttpServer(options).requestHandler(router).listen(event -> {
             if (event.succeeded()) {
                 int port = event.result().actualPort();
                 logger.info("Web Server started at {}", port);
-                this.getContext().setup(addSharedData(SERVER_INFO_DATA_KEY, createServerInfo(handler, port)));
+                this.sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(router, port));
                 promise.complete();
                 return;
             }
@@ -109,6 +107,12 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         if (Objects.nonNull(this.httpServer)) {
             this.httpServer.close();
         }
+    }
+
+    @Override
+    public HttpServerContext onSuccess(@NonNull Class<Component<IConfig, HttpServerContext>> aClass, Path dataDir,
+                                       String sharedKey, String deployId) {
+        return new HttpServerContext(aClass, dataDir, sharedKey, deployId, sharedData().getData(SERVER_INFO_DATA_KEY));
     }
 
     private ServerInfo createServerInfo(Router handler, int port) {
@@ -181,7 +185,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         if (webConfig.isInResource()) {
             staticHandler.setWebRoot(webConfig.getWebRoot());
         } else {
-            String webDir = FileUtils.createFolder(CarlConfig.DEFAULT_DATADIR, dataDir, webConfig.getWebRoot());
+            String webDir = FileUtils.createFolder(getContext().dataDir(), webConfig.getWebRoot());
             logger.info("Static web dir {}", webDir);
             staticHandler.setEnableRangeSupport(true)
                          .setSendVaryHeader(true)
@@ -202,7 +206,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
                                                      .registerApi(httpRouter.getRestApiClasses())
                                                      .registerEventBusApi(httpRouter.getRestEventApiClasses())
                                                      .dynamicRouteConfig(restConfig.getDynamicConfig())
-                                                     .addSharedDataFunc(this::getSharedData)
+                                                     .addSharedDataProxy(this.sharedData())
                                                      .build();
     }
 
@@ -210,8 +214,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         if (!storageCfg.isEnabled()) {
             return router;
         }
-        Path storageDir = Paths.get(
-            FileUtils.createFolder(CarlConfig.DEFAULT_DATADIR, dataDir, storageCfg.getDir()));
+        final Path storageDir = Paths.get(FileUtils.createFolder(getContext().dataDir(), storageCfg.getDir()));
         initUploadRouter(router, storageDir, storageCfg.getUploadConfig(), publicUrl);
         initDownloadRouter(router, storageDir, storageCfg.getDownloadConfig());
         return router;
@@ -221,14 +224,15 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         if (!apiGatewayConfig.isEnabled()) {
             return;
         }
-        addSharedData(SERVER_GATEWAY_ADDRESS_DATA_KEY,
-                      Strings.requireNotBlank(apiGatewayConfig.getAddress(), "Gateway address cannot be blank"));
+        this.sharedData()
+            .addData(SERVER_GATEWAY_ADDRESS_DATA_KEY,
+                     Strings.requireNotBlank(apiGatewayConfig.getAddress(), "Gateway address cannot be blank"));
         final Set<Class<? extends RestEventApi>> gatewayApis = Stream.concat(httpRouter.getGatewayApiClasses().stream(),
                                                                              Stream.of(GatewayIndexApi.class))
                                                                      .collect(Collectors.toSet());
         logger.info("Registering sub routers in Gateway API: '{}'...", apiGatewayConfig.getPath());
         final Router gatewayRouter = new RestEventApisBuilder(vertx).register(gatewayApis)
-                                                                    .addSharedDataFunc(this::getSharedData)
+                                                                    .addSharedDataProxy(this.sharedData())
                                                                     .build();
         final String wildcardsPath = Urls.combinePath(apiGatewayConfig.getPath(), ApiConstants.WILDCARDS_ANY_PATH);
         mainRouter.mountSubRouter(apiGatewayConfig.getPath(), gatewayRouter);
@@ -257,11 +261,12 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
             return router;
         }
         logger.info("Init Websocket router...");
-        return new WebSocketEventBuilder(vertx, router, getSharedKey()).rootWs(websocketCfg.getRootWs())
-                                                                       .register(httpRouter.getWebSocketEvents())
-                                                                       .handler(WebSocketBridgeEventHandler.class)
-                                                                       .options(websocketCfg)
-                                                                       .build();
+        final String sharedKey = getContext().sharedKey();
+        return new WebSocketEventBuilder(vertx, router, sharedKey).rootWs(websocketCfg.getRootWs())
+                                                                  .register(httpRouter.getWebSocketEvents())
+                                                                  .handler(WebSocketBridgeEventHandler.class)
+                                                                  .options(websocketCfg)
+                                                                  .build();
     }
 
     private Router initHttp2Router(Router router) { return router; }
@@ -271,17 +276,18 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
             return router;
         }
         logger.info("Init Upload router: '{}'...", uploadCfg.getPath());
-        EventbusClient controller = SharedDataDelegate.getEventController(vertx, getSharedKey());
+        final String sharedKey = getContext().sharedKey();
+        EventbusClient controller = EventbusClient.create(vertx, sharedKey);
         EventModel listenerEvent = EventModel.builder()
                                              .address(Strings.fallback(uploadCfg.getListenerAddress(),
-                                                                       getSharedKey() + ".upload"))
+                                                                       sharedKey + ".upload"))
                                              .event(EventAction.CREATE)
                                              .pattern(EventPattern.REQUEST_RESPONSE)
                                              .local(true)
                                              .build();
         String handlerClass = uploadCfg.getHandlerClass();
         String listenerClass = uploadCfg.getListenerClass();
-        controller.register(listenerEvent, UploadListener.create(vertx, listenerClass, getSharedKey(),
+        controller.register(listenerEvent, UploadListener.create(vertx, listenerClass, sharedKey,
                                                                  new ArrayList<>(listenerEvent.getEvents())));
         router.post(uploadCfg.getPath())
               .handler(BodyHandler.create(storageDir.toString()).setBodyLimit(uploadCfg.getMaxBodySizeMB() * MB))

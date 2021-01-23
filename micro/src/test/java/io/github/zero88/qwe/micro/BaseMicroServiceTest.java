@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 
 import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.component.SharedDataDelegate;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
 import io.reactivex.Single;
@@ -46,7 +45,7 @@ public abstract class BaseMicroServiceTest {
         config = IConfig.fromClasspath("local.json", MicroConfig.class);
         vertx = Vertx.vertx();
         micro = new MicroContext().setup(vertx, config);
-        eventClient = SharedDataDelegate.getEventController(vertx, MicroContext.class.getName());
+        eventClient = EventbusClient.create(vertx, MicroContext.class.getName());
         final ServiceDiscoveryController discovery = micro.getLocalController();
         final Single<Record> record1 = discovery.addHttpRecord(HTTP_RECORD, new HttpLocation().setHost("123.456.0.1")
                                                                                               .setPort(1234)

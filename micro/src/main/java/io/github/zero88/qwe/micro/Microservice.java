@@ -1,19 +1,19 @@
 package io.github.zero88.qwe.micro;
 
+import java.nio.file.Path;
+
+import io.github.zero88.qwe.IConfig;
+import io.github.zero88.qwe.component.Component;
 import io.github.zero88.qwe.component.ComponentVerticle;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.vertx.core.Promise;
+
+import lombok.NonNull;
 
 public final class Microservice extends ComponentVerticle<MicroConfig, MicroContext> {
 
-    Microservice() {
-        super(new MicroContext());
-    }
-
-    @Override
-    public void start() {
-        super.start();
-        logger.info("Setup micro-service...");
-        getContext().setup(vertx, config, getSharedKey());
+    Microservice(SharedDataLocalProxy sharedData) {
+        super(sharedData);
     }
 
     @Override
@@ -24,5 +24,12 @@ public final class Microservice extends ComponentVerticle<MicroConfig, MicroCont
 
     @Override
     public String configFile() { return "micro.json"; }
+
+    @Override
+    public MicroContext onSuccess(@NonNull Class<Component<IConfig, MicroContext>> aClass, Path dataDir,
+                                  String sharedKey, String deployId) {
+        logger.info("Setup micro-service...");
+        return new MicroContext(aClass, dataDir, sharedKey, deployId).setup(vertx, config);
+    }
 
 }

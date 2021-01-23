@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.utils.mock.MockConfig;
 import io.vertx.core.json.JsonObject;
 
 import lombok.NonNull;

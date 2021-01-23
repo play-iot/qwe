@@ -10,7 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public interface RestEventRequestDispatcher extends Handler<RoutingContext> {
 
-    EventbusClient getController();
+    EventbusClient eventbus();
 
     default void dispatch(RoutingContext context, String system, String address, EventPattern pattern,
                           EventMessage message) {
@@ -24,7 +24,7 @@ public interface RestEventRequestDispatcher extends Handler<RoutingContext> {
                                                      })
                                                      .exception(context::fail)
                                                      .build();
-        getController().fire(address, pattern, message, handler);
+        eventbus().fire(address, pattern, message, handler);
     }
 
 }

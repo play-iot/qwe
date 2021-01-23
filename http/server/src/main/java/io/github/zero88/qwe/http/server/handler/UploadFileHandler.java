@@ -23,6 +23,7 @@ import io.vertx.ext.web.RoutingContext;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * Only override it if any performance issue
@@ -31,7 +32,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UploadFileHandler implements RestEventRequestDispatcher {
 
-    private final EventbusClient controller;
+    @NonNull
+    @Accessors(fluent = true)
+    private final EventbusClient eventbus;
     private final EventModel eventModel;
     private final Path uploadDir;
     private final String publicUrl;

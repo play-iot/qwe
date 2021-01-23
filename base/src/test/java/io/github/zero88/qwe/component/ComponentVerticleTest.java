@@ -40,7 +40,8 @@ public class ComponentVerticleTest {
 
     @Test
     public void not_have_config_file_should_deploy_success(TestContext context) {
-        MockComponent unitVerticle = new MockComponent();
+        MockProvider.MockComponent
+            unitVerticle = new MockProvider.MockComponent(new TestComponentSharedDataProxy<>(vertx, MockProvider.MockComponent.class));
         Async async = context.async();
         VertxHelper.deploy(vertx, context, new DeploymentOptions(), unitVerticle, deployId -> {
             context.assertNotNull(deployId);
@@ -50,7 +51,8 @@ public class ComponentVerticleTest {
 
     @Test
     public void invalid_config_should_deploy_failed(TestContext context) {
-        MockComponent unitVerticle = new MockComponent();
+        MockProvider.MockComponent
+            unitVerticle = new MockProvider.MockComponent(new TestComponentSharedDataProxy<>(vertx, MockProvider.MockComponent.class));
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, unitVerticle, t -> {
@@ -63,24 +65,24 @@ public class ComponentVerticleTest {
     @Test
     @Ignore("Need the information from Zero")
     public void test_register_shared_data(TestContext context) {
-        MockComponent unitVerticle = new MockComponent();
-        final String key = MockComponent.class.getName();
-        unitVerticle.registerSharedKey(key);
+        MockProvider.MockComponent component = new MockProvider.MockComponent(new TestComponentSharedDataProxy<>(vertx, MockProvider.MockComponent.class));
+        final String key = MockProvider.MockComponent.class.getName();
+        //        component.setup(key);
 
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
-        VertxHelper.deploy(vertx, context, options, unitVerticle, t -> {
-            unitVerticle.getSharedData(key);
+        VertxHelper.deploy(vertx, context, options, component, t -> {
             TestHelper.testComplete(async);
         });
     }
 
     @Test
     public void throw_unexpected_error_cannot_start(TestContext context) {
-        MockComponent unitVerticle = new MockComponent(true);
+        MockProvider.MockComponent component = new MockProvider.MockComponent(new TestComponentSharedDataProxy<>(vertx, MockProvider.MockComponent.class),
+                                                                              true);
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
-        VertxHelper.deployFailed(vertx, context, options, unitVerticle, t -> {
+        VertxHelper.deployFailed(vertx, context, options, component, t -> {
             TestHelper.testComplete(async);
             Assert.assertTrue(t instanceof RuntimeException);
             Assert.assertEquals(0, vertx.deploymentIDs().size());

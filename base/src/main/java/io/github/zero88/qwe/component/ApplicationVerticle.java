@@ -1,13 +1,8 @@
 package io.github.zero88.qwe.component;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,16 +11,17 @@ import io.github.zero88.qwe.CarlConfig;
 import io.github.zero88.qwe.ConfigProcessor;
 import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.event.EventbusClient;
+import io.github.zero88.qwe.event.EventbusDeliveryOption;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.converter.CarlExceptionConverter;
-import io.github.zero88.qwe.utils.ExecutorHelpers;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.shareddata.LocalMap;
 import io.vertx.reactivex.core.AbstractVerticle;
 
 import lombok.Getter;
@@ -34,28 +30,25 @@ import lombok.Getter;
  * @see Application
  */
 @SuppressWarnings("rawtypes")
-public abstract class ApplicationVerticle extends AbstractVerticle implements Application {
+public abstract class ApplicationVerticle extends AbstractVerticle implements Application, SharedDataLocalProxy {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final Map<Class<? extends Component>, ComponentProvider<? extends Component>> components = new LinkedHashMap<>();
-    private final Map<Class<? extends Component>, Consumer<? extends ComponentContext>> afterSuccesses = new HashMap<>();
-    private final Set<String> deployments = new HashSet<>();
+    private final Map<Class<? extends Component>, ComponentProvider<? extends Component>> providers = new HashMap<>();
+    private final ContextLookup contexts = new ContextLookupImpl();
     @Getter
     protected CarlConfig config;
     @Getter
-    private EventbusClient eventbusClient;
-    private Handler<Void> successHandler;
+    private EventbusClient eventbus;
 
     @Override
     public void start() {
         final CarlConfig fileConfig = computeConfig(config());
         this.config = new ConfigProcessor(vertx).override(fileConfig.toJson(), true, false).orElse(fileConfig);
-        this.eventbusClient = new DefaultEventClient(this.vertx.getDelegate(), this.config.getSystemConfig()
-                                                                                          .getEventBusConfig()
-                                                                                          .getDeliveryOptions());
-        this.registerEventbus(eventbusClient);
-        this.addSharedData(SharedDataDelegate.SHARED_EVENTBUS, this.eventbusClient)
-            .addSharedData(SharedDataDelegate.SHARED_DATADIR, this.config.getDataDir().toAbsolutePath().toString());
+        final EventbusDeliveryOption option = new EventbusDeliveryOption(
+            this.config.getSystemConfig().getEventBusConfig().getDeliveryOptions());
+        this.eventbus = EventbusClient.create(this.vertx.getDelegate(), option.get());
+        this.registerEventbus(eventbus);
+        this.addData(SharedDataLocalProxy.EVENTBUS_OPTION, option);
     }
 
     @Override
@@ -74,76 +67,113 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
 
     @Override
     public final Application addSharedData(String key, Object data) {
-        this.vertx.sharedData().getLocalMap(getSharedKey()).put(key, data);
+        this.addData(key, data);
         return this;
-    }
-
-    public void registerSuccessHandler(Handler<Void> successHandler) {
-        this.successHandler = successHandler;
     }
 
     @Override
     public final <T extends Component> Application addProvider(ComponentProvider<T> provider) {
-        this.components.put(provider.unitClass(), provider);
-        return this;
-    }
-
-    @Override
-    public final <C extends ComponentContext, T extends Component> Application addProvider(ComponentProvider<T> provider,
-                                                                                           Consumer<C> successHandler) {
-        this.addProvider(provider);
-        this.afterSuccesses.put(provider.unitClass(), successHandler);
+        this.providers.put(provider.componentClass(), provider);
         return this;
     }
 
     @Override
     public final void installComponents(Promise<Void> promise) {
-        ExecutorHelpers.blocking(getVertx(), components::entrySet)
-                       .flattenAsObservable(s -> s)
-                       .flatMapSingle(this::deployUnit)
-                       .count()
-                       .doOnSuccess(count -> {
-                           logger.info("Deployed {} component verticle(s)...", count);
-                           Optional.ofNullable(successHandler).ifPresent(handler -> handler.handle(null));
-                       })
-                       .subscribe(count -> promise.complete(), throwable -> fail(promise, throwable));
+        Observable.fromIterable(providers.values())
+                  .flatMapSingle(this::deployComponent)
+                  .count()
+                  .doOnSuccess(this::succeed)
+                  .subscribe(count -> promise.complete(), throwable -> fail(promise, throwable));
+    }
+
+    @Override
+    public void onInstallCompleted(ContextLookup lookup) { }
+
+    @Override
+    public SharedDataLocalProxy sharedData() {
+        return this;
     }
 
     @Override
     public final void uninstallComponents(Promise<Void> future) {
-        Flowable.fromIterable(this.deployments)
+        Flowable.fromIterable(((ContextLookupImpl) this.contexts).values())
                 .parallel()
-                .map(vertx::rxUndeploy)
+                .map(this::uninstallComponent)
                 .reduce(Completable::mergeWith)
                 .count()
-                .doOnSuccess(c -> logger.info("Uninstall {} verticle successfully", c))
+                .doOnSuccess(c -> logger.info("Uninstall {} component(s) successfully", c))
                 .subscribe(c -> future.complete(), future::fail);
     }
 
-    @SuppressWarnings("unchecked")
-    private Single<String> deployUnit(Map.Entry<Class<? extends Component>, ComponentProvider<? extends Component>> entry) {
-        Component component = entry.getValue().get().registerSharedKey(getSharedKey());
-        JsonObject deployConfig = IConfig.from(this.config, component.configClass()).toJson();
-        DeploymentOptions options = new DeploymentOptions().setConfig(deployConfig);
-        return vertx.rxDeployVerticle(component, options)
-                    .doOnSuccess(deployId -> succeed(component, deployId))
-                    .doOnError(t -> logger.error("Cannot start component verticle {}", component.getClass().getName(), t));
+    private Completable uninstallComponent(ComponentContext context) {
+        return vertx.rxUndeploy(context.deployId())
+                    .doOnComplete(() -> logger.info("Component '{}' is uninstalled", context.componentClz()));
     }
 
     @SuppressWarnings("unchecked")
-    private void succeed(Component component, String deployId) {
-        logger.info("Deployed Verticle '{}' successful with ID '{}'", component.getClass().getName(), deployId);
-        deployments.add(deployId);
-        Consumer<ComponentContext> consumer = (Consumer<ComponentContext>) this.afterSuccesses.get(component.getClass());
-        if (Objects.nonNull(consumer)) {
-            consumer.accept(component.getContext().registerDeployId(deployId));
-        }
+    private Single<String> deployComponent(ComponentProvider<? extends Component> provider) {
+        final Component component = provider.provide(this);
+        final JsonObject deployConfig = IConfig.from(this.config, component.configClass()).toJson();
+        return vertx.rxDeployVerticle(component, new DeploymentOptions().setConfig(deployConfig))
+                    .doOnSuccess(deployId -> deployComponentSuccess(component, deployId))
+                    .doOnError(t -> deployComponentError(component, t));
+    }
+
+    private void deployComponentError(Component component, Throwable t) {
+        logger.error("Cannot start component verticle {}", component.getClass().getName(), t);
+        component.hook().onError(t);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void deployComponentSuccess(Component component, String deployId) {
+        final Class<? extends Component> clazz = component.getClass();
+        logger.info("Deployed Verticle '{}' successful with ID '{}'", clazz.getName(), deployId);
+        final ComponentContext ctx = component.hook()
+                                              .onSuccess(component.getClass(), config.getDataDir(), getSharedKey(),
+                                                         deployId);
+        ((ContextLookupImpl) this.contexts).put(ctx.getClass(), component.setup(ctx));
+    }
+
+    private void succeed(Long count) {
+        logger.info("Deployed {}/{} component verticle(s)...", count, this.providers.size());
+        this.providers.clear();
+        this.onInstallCompleted(this.contexts);
     }
 
     private void fail(Promise<Void> promise, Throwable throwable) {
         CarlException t = CarlExceptionConverter.from(throwable);
         logger.error("Cannot start container verticle {}", this.getClass().getName(), t);
         promise.fail(t);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <D> D getData(String dataKey) {
+        return (D) this.vertx.sharedData().getLocalMap(getSharedKey()).get(dataKey);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public final <D> D getData(String dataKey, D fallback) {
+        final D data = (D) this.vertx.sharedData().getLocalMap(getSharedKey()).get(dataKey);
+        return Optional.ofNullable(data).orElse(fallback);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <D> D addData(String dataKey, D data) {
+        return (D) this.vertx.sharedData().getLocalMap(getSharedKey()).put(dataKey, data);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <D> D removeData(String dataKey) {
+        return (D) vertx.sharedData().getLocalMap(getSharedKey()).remove(dataKey);
+    }
+
+    @Override
+    public LocalMap<Object, Object> unwrap() {
+        return vertx.getDelegate().sharedData().getLocalMap(getSharedKey());
     }
 
 }

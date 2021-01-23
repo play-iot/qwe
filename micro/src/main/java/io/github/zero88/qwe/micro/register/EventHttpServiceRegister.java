@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.qwe.component.SharedDataDelegate;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.ServiceDiscoveryController;
 import io.github.zero88.qwe.micro.metadata.EventHttpService;
@@ -52,7 +51,7 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
      * @since 1.0.0
      */
     public Single<List<Record>> publish(@NonNull ServiceDiscoveryController discovery) {
-        final EventbusClient client = SharedDataDelegate.getEventController(vertx, sharedKey);
+        final EventbusClient client = EventbusClient.create(vertx, sharedKey);
         return ExecutorHelpers.blocking(vertx, eventServices::get)
                               .flattenAsObservable(s -> s)
                               .doOnEach(s -> Optional.ofNullable(s.getValue())

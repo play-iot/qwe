@@ -1,6 +1,7 @@
 package io.github.zero88.qwe.http.server.dynamic.mock;
 
 import io.github.zero88.qwe.component.ApplicationVerticle;
+import io.github.zero88.qwe.component.ContextLookup;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.MicroContext;
 import io.github.zero88.qwe.micro.MicroserviceProvider;
@@ -15,7 +16,12 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     @Override
     public void start() {
         super.start();
-        addProvider(new MicroserviceProvider(), this::publishService);
+        addProvider(new MicroserviceProvider());
+    }
+
+    @Override
+    public void onInstallCompleted(ContextLookup lookup) {
+        publishService(lookup.query(MicroContext.class));
     }
 
     @Override

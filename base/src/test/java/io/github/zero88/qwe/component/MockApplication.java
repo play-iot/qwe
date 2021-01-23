@@ -16,9 +16,13 @@ public final class MockApplication extends ApplicationVerticle {
         if (error) {
             throw new RuntimeException("Error when starting");
         }
-        registerSuccessHandler(errorInHandler ? v -> {
+    }
+
+    @Override
+    public void onInstallCompleted(ContextLookup lookup) {
+        if (errorInHandler) {
             throw new IllegalArgumentException("Error in success handler");
-        } : v -> logger.info("No error"));
+        }
     }
 
     @Override

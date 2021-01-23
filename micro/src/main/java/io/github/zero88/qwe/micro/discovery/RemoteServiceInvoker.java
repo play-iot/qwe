@@ -1,6 +1,6 @@
 package io.github.zero88.qwe.micro.discovery;
 
-import io.github.zero88.qwe.component.EventClientProxy;
+import io.github.zero88.qwe.event.EventClientProxy;
 import io.github.zero88.qwe.dto.msg.DataTransferObject.Headers;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.EventAction;

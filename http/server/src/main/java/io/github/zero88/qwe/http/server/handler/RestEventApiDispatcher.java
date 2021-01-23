@@ -18,6 +18,7 @@ import io.vertx.ext.web.RoutingContext;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * Represents for pushing data via {@code Eventbus} then listen {@code reply message}. After receiving {@code reply
@@ -31,7 +32,8 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter
     @NonNull
-    private final EventbusClient controller;
+    @Accessors(fluent = true)
+    private final EventbusClient eventbus;
     @NonNull
     private final String address;
     @NonNull
@@ -42,13 +44,13 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher {
 
     @SuppressWarnings("unchecked")
     public static <T extends RestEventApiDispatcher> RestEventApiDispatcher create(Class<T> handler,
-                                                                                   EventbusClient eventbusClient,
+                                                                                   EventbusClient eventbus,
                                                                                    String address, EventAction action,
                                                                                    EventPattern pattern,
                                                                                    boolean useRequestData) {
         Class<T> handlerClass = Objects.isNull(handler) ? (Class<T>) RestEventApiDispatcher.class : handler;
         LinkedHashMap<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(EventbusClient.class, eventbusClient);
+        inputs.put(EventbusClient.class, eventbus);
         inputs.put(String.class, Strings.requireNotBlank(address));
         inputs.put(EventAction.class, action);
         inputs.put(EventPattern.class, pattern);

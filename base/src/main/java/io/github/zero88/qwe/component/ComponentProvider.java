@@ -1,14 +1,14 @@
 package io.github.zero88.qwe.component;
 
-import java.util.function.Supplier;
-
 /**
  * Component Provider
  *
  * @param <T> Component type
  */
-public interface ComponentProvider<T extends Component> extends Supplier<T> {
+public interface ComponentProvider<T extends Component> {
 
-    Class<T> unitClass();
+    Class<T> componentClass();
+
+    T provide(SharedDataLocalProxy proxy);
 
 }

@@ -1,7 +1,10 @@
 package io.github.zero88.qwe.component;
 
 import io.github.zero88.qwe.IConfig;
+import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
+
+import lombok.NonNull;
 
 /**
  * Represents small and independent component that integrate with verticle.
@@ -16,56 +19,38 @@ import io.vertx.core.Verticle;
 public interface Component<C extends IConfig, T extends ComponentContext> extends HasConfig<C>, Verticle {
 
     /**
-     * Unit context
+     * Deployment hook when application install component
      *
-     * @return ComponentContext
+     * @return hook
+     * @see DeployHook
+     * @see Application#installComponents(Promise)
      */
-    T getContext();
+    @NonNull DeployHook<T> hook();
 
     /**
-     * Register {@code Vertx} local shared data key from {@code Application} to {@code Component}
+     * Register a component context after installed component successfully
      * <p>
      * This method will be called automatically by system before deploying verticle.
      *
-     * @param sharedKey shared data key
-     * @param <U>       Type of Component Verticle
+     * @param context shared data key
      * @return a reference to this, so the API can be used fluently
      * @see Application
      */
-    <U extends Component<C, T>> U registerSharedKey(String sharedKey);
+    T setup(T context);
 
     /**
-     * Retrieve {@code Vertx} shared data value by key data
+     * Get shared data proxy
      *
-     * @param <D>     Data value type
-     * @param dataKey given data key
-     * @return Data value. {@code nullable} if no data value by key or data value type doesn't match type with expected
-     *     value
+     * @return shared data proxy
+     * @see SharedDataLocalProxy
      */
-    default <D> D getSharedData(String dataKey) {
-        return getSharedData(dataKey, null);
-    }
+    @NonNull SharedDataLocalProxy sharedData();
 
     /**
-     * Retrieve {@code Vertx} shared data value by key data. If no data value by key or data value type doesn't match
-     * type with expected value, it will fallback to given value.
+     * Component context
      *
-     * @param <D>      T type of data value
-     * @param dataKey  given data key
-     * @param fallback Fallback value
-     * @return Data value.
+     * @return ComponentContext
      */
-    <D> D getSharedData(String dataKey, D fallback);
-
-    /**
-     * Add {@code Vertx} shared data value by key data. If no data value by key or data value type doesn't match type
-     * with expected value, it will fallback to given value.
-     *
-     * @param <D>     T type of data value
-     * @param dataKey given data key
-     * @param data    Data value
-     * @return Data value.
-     */
-    <D> D addSharedData(String dataKey, D data);
+    @NonNull T getContext();
 
 }

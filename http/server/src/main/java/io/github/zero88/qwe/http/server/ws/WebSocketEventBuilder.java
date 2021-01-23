@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.InvalidUrlException;
-import io.github.zero88.qwe.component.SharedDataDelegate;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.exceptions.InitializerError;
@@ -92,7 +91,7 @@ public final class WebSocketEventBuilder {
 
     public Router build() {
         SockJSHandler sockJSHandler = SockJSHandler.create(vertx, config().getSockjsOptions());
-        EventbusClient controller = SharedDataDelegate.getEventController(vertx, sharedKey);
+        EventbusClient controller = EventbusClient.create(vertx, sharedKey);
         validate().forEach((path, socketMapping) -> {
             String fullPath = Urls.combinePath(rootWs, path, ApiConstants.WILDCARDS_ANY_PATH);
             sockJSHandler.bridge(createBridgeOptions(fullPath, socketMapping),

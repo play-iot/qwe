@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.utils.mock;
+package io.github.zero88.qwe.component;
 
 import io.github.zero88.qwe.CarlConfig.AppConfig;
 import io.github.zero88.qwe.IConfig;

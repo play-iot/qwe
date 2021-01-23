@@ -5,12 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.github.zero88.qwe.component.SharedDataDelegate;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.qwe.http.event.RestEventApiMetadata;
@@ -24,27 +20,31 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class RestEventApisBuilder {
 
-    private final Logger logger = LoggerFactory.getLogger(RestEventApisBuilder.class);
+    private final Vertx vertx;
     private final Router router;
     private final Set<Class<? extends RestEventApi>> apis = new HashSet<>();
-    private Function<String, Object> sharedDataFunc;
+    private SharedDataLocalProxy proxy;
 
     /**
      * For test
      */
     RestEventApisBuilder() {
+        this.vertx = null;
         this.router = null;
     }
 
     public RestEventApisBuilder(Vertx vertx) {
+        this.vertx = vertx;
         this.router = Router.router(vertx);
     }
 
-    public RestEventApisBuilder addSharedDataFunc(@NonNull Function<String, Object> func) {
-        this.sharedDataFunc = func;
+    public RestEventApisBuilder addSharedDataProxy(@NonNull SharedDataLocalProxy proxy) {
+        this.proxy = proxy;
         return this;
     }
 
@@ -76,7 +76,7 @@ public final class RestEventApisBuilder {
     }
 
     private void createRouter(RestEventApi restApi) {
-        restApi.registerSharedData(sharedDataFunc)
+        restApi.registerProxy(proxy)
                .initRouter()
                .getRestMetadata()
                .forEach(metadata -> this.createRouter(metadata, restApi));
@@ -84,9 +84,9 @@ public final class RestEventApisBuilder {
 
     private void createRouter(RestEventApiMetadata metadata, RestEventApi api) {
         final EventMethodDefinition definition = metadata.getDefinition();
-        EventbusClient controller = (EventbusClient) sharedDataFunc.apply(SharedDataDelegate.SHARED_EVENTBUS);
+        EventbusClient eventbus = EventbusClient.create(vertx/*, proxy.getData(SharedDataDelegate.SHARED_EVENTBUS).get()*/);
         for (EventMethodMapping mapping : definition.getMapping()) {
-            RestEventApiDispatcher restHandler = RestEventApiDispatcher.create(api.dispatcher(), controller,
+            RestEventApiDispatcher restHandler = RestEventApiDispatcher.create(api.dispatcher(), eventbus,
                                                                                metadata.getAddress(),
                                                                                mapping.getAction(),
                                                                                metadata.getPattern(),
@@ -94,8 +94,8 @@ public final class RestEventApisBuilder {
             final String path = Strings.isBlank(mapping.getCapturePath())
                                 ? definition.getServicePath()
                                 : mapping.getCapturePath();
-            logger.info("Registering route | Event Binding:\t{} {} --- {} {} {}", mapping.getMethod(), path,
-                        metadata.getPattern(), mapping.getAction(), metadata.getAddress());
+            log.info("Registering route | Event Binding:\t{} {} --- {} {} {}", mapping.getMethod(), path,
+                     metadata.getPattern(), mapping.getAction(), metadata.getAddress());
             HttpServer.restrictJsonRoute(
                 router.route(mapping.getMethod(), path).order(definition.getOrder()).handler(restHandler));
         }

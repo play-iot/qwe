@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
-import io.github.zero88.qwe.component.SharedDataDelegate;
+import io.github.zero88.qwe.component.SharedLocalDataHelper;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.http.server.HttpServer;
 import io.github.zero88.qwe.http.server.ServerInfo;
@@ -28,8 +28,8 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor {
     default boolean register(Record record) {
         try {
             DynamicRestApi api = DynamicRestApi.create(record);
-            ServerInfo serverInfo = SharedDataDelegate.getLocalDataValue(getVertx(), getSharedKey(),
-                                                                         HttpServer.SERVER_INFO_DATA_KEY);
+            ServerInfo serverInfo = SharedLocalDataHelper.getLocalDataValue(getVertx(), getSharedKey(),
+                                                                            HttpServer.SERVER_INFO_DATA_KEY);
             Router router = serverInfo.getRouter();
             String gatewayPath = Urls.combinePath(serverInfo.getApiPath(), serverInfo.getServicePath());
             List<String> paths = api.alternativePaths()

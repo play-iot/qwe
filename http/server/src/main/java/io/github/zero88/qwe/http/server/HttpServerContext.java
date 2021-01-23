@@ -1,20 +1,21 @@
 package io.github.zero88.qwe.http.server;
 
+import java.nio.file.Path;
+
+import io.github.zero88.qwe.component.Component;
 import io.github.zero88.qwe.component.ComponentContext;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public final class HttpServerContext extends ComponentContext {
 
-    private ServerInfo serverInfo;
+    private final ServerInfo serverInfo;
 
-    HttpServerContext setup(ServerInfo serverInfo) {
+    protected HttpServerContext(Class<? extends Component> componentClz, Path dataDir, String sharedKey,
+                                String deployId, ServerInfo serverInfo) {
+        super(componentClz, dataDir, sharedKey, deployId);
         this.serverInfo = serverInfo;
-        return this;
     }
 
 }

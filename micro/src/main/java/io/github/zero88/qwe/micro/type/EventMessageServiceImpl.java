@@ -1,7 +1,7 @@
 package io.github.zero88.qwe.micro.type;
 
-import io.github.zero88.qwe.component.SharedDataDelegate;
 import io.github.zero88.qwe.dto.JsonData;
+import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -34,7 +34,7 @@ public class EventMessageServiceImpl implements EventMessageService {
 
         @Override
         protected EventMessagePusher retrieve() {
-            return new Pusher(SharedDataDelegate.getEventController(vertx, sharedKey),
+            return new Pusher(EventbusClient.create(vertx, sharedKey),
                               JsonData.from(this.record().getMetadata().getJsonObject(EVENT_METHOD_CONFIG),
                                             EventMethodDefinition.class), config,
                               record().getLocation().getString(Record.ENDPOINT));

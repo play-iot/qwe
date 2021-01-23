@@ -13,7 +13,6 @@ import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.TestHelper.EventbusHelper;
 import io.github.zero88.qwe.TestHelper.JsonHelper;
-import io.github.zero88.qwe.component.SharedDataDelegate;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.DeliveryEvent;
 import io.github.zero88.qwe.event.EventAction;
@@ -94,7 +93,7 @@ public class MicroContextTest {
                                              "\"type\":\"eventbus-service-proxy\"}");
         EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected));
-        EventbusClient controller = SharedDataDelegate.getEventController(vertx, MicroContext.class.getName());
+        EventbusClient controller = EventbusClient.create(vertx, MicroContext.class.getName());
         micro.getLocalController()
              .addRecord(EventBusService.createRecord("test", "address1", MockEventbusService.class))
              .subscribe(record -> {
@@ -125,7 +124,7 @@ public class MicroContextTest {
                                              "\"status\":\"UP\",\"type\":\"http-endpoint\"}");
         EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected));
-        EventbusClient controller = SharedDataDelegate.getEventController(vertx, MicroContext.class.getName());
+        EventbusClient controller = EventbusClient.create(vertx, MicroContext.class.getName());
         micro.getLocalController()
              .addHttpRecord("http.test", new HttpLocation().setHost("123.456.0.1").setPort(1234).setRoot("/api"),
                             new JsonObject().put("meta", "test"))
@@ -158,7 +157,7 @@ public class MicroContextTest {
             "\"name\":\"event-message\",\"status\":\"UP\",\"type\":\"eventbus-message-service\"}");
         EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected, JSONCompareMode.LENIENT));
-        EventbusClient controller = SharedDataDelegate.getEventController(vertx, MicroContext.class.getName());
+        EventbusClient client = EventbusClient.create(vertx, MicroContext.class.getName());
         micro.getLocalController()
              .addRecord(EventMessageService.createRecord("event-message", "address.1",
                                                          EventMethodDefinition.createDefault("/path", "/:param")))
@@ -173,7 +172,7 @@ public class MicroContextTest {
                                                                  "\"path\":\"/path\"},{\"method\":\"DELETE\"," +
                                                                  "\"path\":\"/path/:param\"},{\"method\":\"GET\"," +
                                                                  "\"path\":\"/path/:param\"}]}]}}");
-                 controller.fire(DeliveryEvent.builder()
+                 client.fire(DeliveryEvent.builder()
                                               .address(config.getGatewayConfig().getIndexAddress())
                                               .payload(RequestData.builder().build().toJson())
                                               .action(EventAction.GET_LIST)

@@ -1,19 +1,21 @@
 package io.github.zero88.qwe.micro;
 
+import java.nio.file.Path;
 import java.util.Objects;
+import java.util.UUID;
 
-import io.github.zero88.qwe.component.SharedDataDelegate;
+import io.github.zero88.qwe.component.Component;
 import io.github.zero88.qwe.component.ComponentContext;
+import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.MicroConfig.GatewayConfig;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Slf4j
 public final class MicroContext extends ComponentContext {
 
     @Getter
@@ -23,37 +25,38 @@ public final class MicroContext extends ComponentContext {
     @Getter
     private ServiceDiscoveryController localController;
 
-    /**
-     * For test only
-     */
-    MicroContext setup(Vertx vertx, MicroConfig config) {
-        return setup(vertx, config, MicroContext.class.getName());
+    MicroContext() {
+        //TODO
+        this(Microservice.class, null, MicroContext.class.getName(), UUID.randomUUID().toString());
     }
 
-    MicroContext setup(Vertx vertx, MicroConfig config, String sharedKey) {
+    protected MicroContext(Class<? extends Component> clazz, Path dataDir, String sharedKey, String deployId) {
+        super(clazz, dataDir, sharedKey, deployId);
+    }
+
+    MicroContext setup(Vertx vertx, MicroConfig config) {
         this.breakerController = CircuitBreakerController.create(vertx, config.getCircuitConfig());
-        this.clusterController = new ClusterSDController(vertx, config.getDiscoveryConfig(), sharedKey,
+        this.clusterController = new ClusterSDController(vertx, config.getDiscoveryConfig(), sharedKey(),
                                                          this.breakerController);
-        this.localController = new LocalSDController(vertx, config.getLocalDiscoveryConfig(), sharedKey,
+        this.localController = new LocalSDController(vertx, config.getLocalDiscoveryConfig(), sharedKey(),
                                                      this.breakerController);
-        setupGateway(vertx, config.getGatewayConfig(), clusterController, localController, sharedKey);
+        setupGateway(vertx, config.getGatewayConfig(), clusterController, localController, sharedKey());
         return this;
     }
 
     private void setupGateway(Vertx vertx, GatewayConfig config, ServiceDiscoveryController clusterController,
                               ServiceDiscoveryController localController, String sharedKey) {
         if (!config.isEnabled()) {
-            logger.info("Skip setup service discovery gateway");
+            log.info("Skip setup service discovery gateway");
             return;
         }
-        logger.info("Service Discovery Gateway Config : {}", config.toJson().encode());
+        log.info("Service Discovery Gateway Config : {}", config.toJson().encode());
         if (vertx.isClustered()) {
             clusterController.subscribe(vertx, config.getClusterAnnounceMonitorClass(),
                                         config.getClusterUsageMonitorClass());
         }
         localController.subscribe(vertx, config.getLocalAnnounceMonitorClass(), config.getLocalUsageMonitorClass());
-        SharedDataDelegate.getEventController(vertx, sharedKey)
-                          .register(config.getIndexAddress(), new ServiceGatewayIndex(this));
+        EventbusClient.create(vertx, sharedKey).register(config.getIndexAddress(), new ServiceGatewayIndex(this));
     }
 
     void unregister(Promise<Void> promise) {

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.InvalidUrlException;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.qwe.http.server.ApiConstants;
 import io.github.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;
@@ -41,7 +42,7 @@ public final class RestApisBuilder {
     @NonNull
     private final Set<Class<? extends RestEventApi>> restEventApiClass = new HashSet<>();
     private String rootApi = ApiConstants.ROOT_API_PATH;
-    private Function<String, Object> sharedDataFunc;
+    private SharedDataLocalProxy proxy;
     private DynamicRouteConfig dynamicRouteConfig;
 
     public RestApisBuilder registerApi(Collection<Class<? extends RestApi>> apiClass) {
@@ -65,8 +66,8 @@ public final class RestApisBuilder {
         return this;
     }
 
-    public RestApisBuilder addSharedDataFunc(@NonNull Function<String, Object> func) {
-        this.sharedDataFunc = func;
+    public RestApisBuilder addSharedDataProxy(@NonNull SharedDataLocalProxy proxy) {
+        this.proxy = proxy;
         return this;
     }
 
@@ -111,7 +112,7 @@ public final class RestApisBuilder {
             return null;
         }
         logger.info("Registering sub router REST Event API...");
-        return new RestEventApisBuilder(vertx).addSharedDataFunc(sharedDataFunc).register(restEventApiClass).build();
+        return new RestEventApisBuilder(vertx).addSharedDataProxy(proxy).register(restEventApiClass).build();
     }
 
     private Router initDynamicRouter() {

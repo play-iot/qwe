@@ -1,9 +1,14 @@
 package io.github.zero88.qwe.event;
 
+import java.util.Optional;
+
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
+import io.github.zero88.qwe.component.SharedLocalDataHelper;
 import io.github.zero88.qwe.transport.Transporter;
 import io.reactivex.Single;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -17,6 +22,20 @@ import lombok.NonNull;
  * It helps registering {@code listener} for specified address or send message to specified address
  */
 public interface EventbusClient extends Shareable, Transporter {
+
+    static EventbusClient create(Vertx vertx) {
+        return new DefaultEventClient(vertx);
+    }
+
+    static EventbusClient create(Vertx vertx, DeliveryOptions options) {
+        return new DefaultEventClient(vertx, options);
+    }
+
+    static EventbusClient create(Vertx vertx, String sharedKey) {
+        final EventbusDeliveryOption option = SharedLocalDataHelper.getLocalDataValue(vertx, sharedKey,
+                                                                                      SharedDataLocalProxy.EVENTBUS_OPTION);
+        return new DefaultEventClient(vertx, Optional.ofNullable(option).map(EventbusDeliveryOption::get).orElse(null));
+    }
 
     /**
      * Send message then wait and handle response to specific address

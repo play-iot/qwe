@@ -7,7 +7,10 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import io.github.zero88.qwe.component.SharedDataDelegate.AbstractSharedDataDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
@@ -18,11 +21,13 @@ import io.vertx.core.http.HttpMethod;
 
 import lombok.NonNull;
 
-public abstract class AbstractRestEventApi extends AbstractSharedDataDelegate<RestEventApi> implements RestEventApi {
+public abstract class AbstractRestEventApi implements RestEventApi {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final ActionMethodMapping mapping;
     private final SortedMap<String, RestEventApiMetadata> restMetadata = new TreeMap<>(
         Comparator.comparingInt(String::length));
-    private final ActionMethodMapping mapping;
+    protected SharedDataLocalProxy proxy;
 
     protected AbstractRestEventApi() {
         this.mapping = initHttpEventMap();
@@ -60,6 +65,12 @@ public abstract class AbstractRestEventApi extends AbstractSharedDataDelegate<Re
     @Override
     public Collection<RestEventApiMetadata> getRestMetadata() {
         return Collections.unmodifiableCollection(restMetadata.values());
+    }
+
+    @Override
+    public AbstractRestEventApi registerProxy(SharedDataLocalProxy proxy) {
+        this.proxy = proxy;
+        return this;
     }
 
     @Override

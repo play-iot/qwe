@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.TestHelper.JsonHelper;
-import io.github.zero88.qwe.component.SharedDataDelegate;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;
@@ -110,8 +109,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
     public void test_client_listen_only_publisher(TestContext context) {
         EventMessage echo = EventMessage.success(EventAction.GET_ONE, new JsonObject().put("echo", 1));
         EventModel publisher = MockWebSocketEvent.ONLY_PUBLISHER.getPublisher();
-        EventbusClient controller = SharedDataDelegate.getEventController(vertx.getDelegate(),
-                                                                          this.getClass().getName());
+        EventbusClient controller = EventbusClient.create(vertx.getDelegate(), this.getClass().getName());
         vertx.setPeriodic(1000, t -> controller.fire(publisher.getAddress(), publisher.getPattern(), echo));
         Async async = context.async(1);
         assertJsonData(async, publisher.getAddress(), JsonHelper.asserter(context, async, echo.toJson()));
@@ -122,8 +120,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         EventModel publisher = MockWebSocketEvent.ONLY_PUBLISHER.getPublisher();
         EventMessage echo = EventMessage.success(EventAction.GET_ONE, new JsonObject().put("echo", 1));
         JsonObject expected = createWebsocketMsg(publisher.getAddress(), echo, BridgeEventType.RECEIVE);
-        EventbusClient controller = SharedDataDelegate.getEventController(vertx.getDelegate(),
-                                                                          this.getClass().getName());
+        EventbusClient controller = EventbusClient.create(vertx.getDelegate(), this.getClass().getName());
         startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ONLY_PUBLISHER));
         vertx.setPeriodic(1000, t -> controller.fire(publisher.getAddress(), publisher.getPattern(), echo));
         Async async = context.async(1);
