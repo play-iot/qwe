@@ -16,7 +16,7 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ApplicationVerticle
  */
-public interface Application extends HasConfig<CarlConfig>, HasSharedKey, Verticle {
+public interface Application extends HasConfig<CarlConfig>, HasSharedKey, HasSharedData, Verticle {
 
     @Override
     default Class<CarlConfig> configClass() {
@@ -41,19 +41,6 @@ public interface Application extends HasConfig<CarlConfig>, HasSharedKey, Vertic
      * @see EventbusClient#register(String, boolean, EventListener)
      */
     void registerEventbus(EventbusClient eventClient);
-
-    /**
-     * Add local shared data to between different verticles
-     *
-     * @param key  Data key
-     * @param data Data value
-     * @return a reference to this, so the API can be used fluently
-     * @deprecated Use {@link #sharedData()}
-     */
-    @Deprecated
-    Application addSharedData(String key, Object data);
-
-    SharedDataLocalProxy sharedData();
 
     /**
      * Add component provider to startup

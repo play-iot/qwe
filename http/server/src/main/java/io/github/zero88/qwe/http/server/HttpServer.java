@@ -261,12 +261,11 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
             return router;
         }
         logger.info("Init Websocket router...");
-        final String sharedKey = getContext().sharedKey();
-        return new WebSocketEventBuilder(vertx, router, sharedKey).rootWs(websocketCfg.getRootWs())
-                                                                  .register(httpRouter.getWebSocketEvents())
-                                                                  .handler(WebSocketBridgeEventHandler.class)
-                                                                  .options(websocketCfg)
-                                                                  .build();
+        return new WebSocketEventBuilder(sharedData(), router).rootWs(websocketCfg.getRootWs())
+                                                              .register(httpRouter.getWebSocketEvents())
+                                                              .handler(WebSocketBridgeEventHandler.class)
+                                                              .options(websocketCfg)
+                                                              .build();
     }
 
     private Router initHttp2Router(Router router) { return router; }
@@ -277,7 +276,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         }
         logger.info("Init Upload router: '{}'...", uploadCfg.getPath());
         final String sharedKey = getContext().sharedKey();
-        EventbusClient controller = EventbusClient.create(vertx, sharedKey);
+        final EventbusClient eventbus = EventbusClient.create(sharedData());
         EventModel listenerEvent = EventModel.builder()
                                              .address(Strings.fallback(uploadCfg.getListenerAddress(),
                                                                        sharedKey + ".upload"))
@@ -287,11 +286,11 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
                                              .build();
         String handlerClass = uploadCfg.getHandlerClass();
         String listenerClass = uploadCfg.getListenerClass();
-        controller.register(listenerEvent, UploadListener.create(vertx, listenerClass, sharedKey,
-                                                                 new ArrayList<>(listenerEvent.getEvents())));
+        eventbus.register(listenerEvent, UploadListener.create(sharedData(), listenerClass,
+                                                               new ArrayList<>(listenerEvent.getEvents())));
         router.post(uploadCfg.getPath())
               .handler(BodyHandler.create(storageDir.toString()).setBodyLimit(uploadCfg.getMaxBodySizeMB() * MB))
-              .handler(UploadFileHandler.create(handlerClass, controller, listenerEvent, storageDir, publicUrl))
+              .handler(UploadFileHandler.create(handlerClass, eventbus, listenerEvent, storageDir, publicUrl))
               .handler(new RestEventResponseHandler())
               .produces(HttpUtils.JSON_CONTENT_TYPE)
               .produces(HttpUtils.JSON_UTF8_CONTENT_TYPE);

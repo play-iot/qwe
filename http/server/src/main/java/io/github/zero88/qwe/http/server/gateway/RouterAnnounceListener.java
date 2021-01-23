@@ -2,9 +2,9 @@ package io.github.zero88.qwe.http.server.gateway;
 
 import org.slf4j.Logger;
 
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.micro.ServiceDiscoveryController;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
-import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
 
@@ -49,8 +49,9 @@ import lombok.NonNull;
  */
 public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implements DynamicRouterRegister {
 
-    public RouterAnnounceListener(Vertx vertx, ServiceDiscoveryController controller, String sharedKey) {
-        super(vertx, controller, sharedKey);
+    protected RouterAnnounceListener(@NonNull SharedDataLocalProxy proxy,
+                                     @NonNull ServiceDiscoveryController controller) {
+        super(proxy, controller);
     }
 
     @Override

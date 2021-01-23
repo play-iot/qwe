@@ -5,16 +5,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventContractor;
 import io.github.zero88.qwe.event.EventListener;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.reactivex.Single;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -24,20 +23,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UploadListener implements EventListener {
 
-    @Getter
-    private final Vertx vertx;
-    @Getter
-    private final String sharedKey;
-    private final List<EventAction> actions;
+    protected final SharedDataLocalProxy proxy;
+    protected final List<EventAction> actions;
 
-    public static UploadListener create(Vertx vertx, String listenerClass, String sharedKey,
+    public static UploadListener create(SharedDataLocalProxy proxy, String listenerClass,
                                         @NonNull List<EventAction> actions) {
         if (Strings.isBlank(listenerClass) || UploadListener.class.getName().equals(listenerClass)) {
-            return new UploadListener(vertx, sharedKey, actions);
+            return new UploadListener(proxy, actions);
         }
         Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(Vertx.class, vertx);
-        inputs.put(String.class, sharedKey);
+        inputs.put(SharedDataLocalProxy.class, proxy);
         inputs.put(List.class, actions);
         return ReflectionClass.createObject(listenerClass, inputs);
     }

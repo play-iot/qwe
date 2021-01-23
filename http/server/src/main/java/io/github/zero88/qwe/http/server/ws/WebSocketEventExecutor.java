@@ -23,7 +23,7 @@ public class WebSocketEventExecutor {
 
     private static final String WEBSOCKET_SERVER = "WEBSOCKET_SERVER";
     private static final Logger logger = LoggerFactory.getLogger(WebSocketEventExecutor.class);
-    private final EventbusClient controller;
+    private final EventbusClient eventbus;
 
     public void execute(@NonNull WebSocketEventMessage socketMessage, @NonNull WebSocketServerEventMetadata metadata,
                         @NonNull Consumer<EventMessage> callback) {
@@ -38,9 +38,9 @@ public class WebSocketEventExecutor {
                                                          .action(msg.getAction())
                                                          .success(callback(metadata.getPublisher(), callback))
                                                          .build();
-            controller.fire(processor.getAddress(), processor.getPattern(), msg, handler);
+            eventbus.fire(processor.getAddress(), processor.getPattern(), msg, handler);
         } else {
-            controller.fire(processor.getAddress(), processor.getPattern(), msg);
+            eventbus.fire(processor.getAddress(), processor.getPattern(), msg);
             callback.accept(EventMessage.success(EventAction.RETURN));
         }
     }
@@ -49,7 +49,7 @@ public class WebSocketEventExecutor {
         if (Objects.isNull(publisher)) {
             return defCallback;
         }
-        return eventMessage -> controller.fire(publisher.getAddress(), publisher.getPattern(), eventMessage);
+        return eventMessage -> eventbus.fire(publisher.getAddress(), publisher.getPattern(), eventMessage);
     }
 
 }

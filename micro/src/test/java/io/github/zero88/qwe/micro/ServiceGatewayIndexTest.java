@@ -118,8 +118,8 @@ public class ServiceGatewayIndexTest extends BaseMicroServiceTest {
         final JsonObject response = new JsonObject().put("status", status)
                                                     .put("action", action.action())
                                                     .put(dataKey, expected);
-        eventClient.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData),
-                            EventbusHelper.replyAsserter(context, async, response, JSONCompareMode.LENIENT));
+        eventbus.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData),
+                         EventbusHelper.replyAsserter(context, async, response, JSONCompareMode.LENIENT));
     }
 
 }

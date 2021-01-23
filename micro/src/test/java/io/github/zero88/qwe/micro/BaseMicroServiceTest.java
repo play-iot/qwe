@@ -30,7 +30,7 @@ public abstract class BaseMicroServiceTest {
     public static final String EVENT_ADDRESS_2 = "event.address.2";
     public static final String HTTP_RECORD = "http.test";
     protected MicroConfig config;
-    protected EventbusClient eventClient;
+    protected EventbusClient eventbus;
     private Vertx vertx;
     private MicroContext micro;
 
@@ -45,7 +45,7 @@ public abstract class BaseMicroServiceTest {
         config = IConfig.fromClasspath("local.json", MicroConfig.class);
         vertx = Vertx.vertx();
         micro = new MicroContext().setup(vertx, config);
-        eventClient = EventbusClient.create(vertx, MicroContext.class.getName());
+        eventbus = EventbusClient.create(vertx, MicroContext.class.getName());
         final ServiceDiscoveryController discovery = micro.getLocalController();
         final Single<Record> record1 = discovery.addHttpRecord(HTTP_RECORD, new HttpLocation().setHost("123.456.0.1")
                                                                                               .setPort(1234)

@@ -16,7 +16,8 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ComponentVerticle
  */
-public interface Component<C extends IConfig, T extends ComponentContext> extends HasConfig<C>, Verticle {
+public interface Component<C extends IConfig, T extends ComponentContext>
+    extends HasConfig<C>, HasSharedData, Verticle {
 
     /**
      * Deployment hook when application install component
@@ -37,14 +38,6 @@ public interface Component<C extends IConfig, T extends ComponentContext> extend
      * @see Application
      */
     T setup(T context);
-
-    /**
-     * Get shared data proxy
-     *
-     * @return shared data proxy
-     * @see SharedDataLocalProxy
-     */
-    @NonNull SharedDataLocalProxy sharedData();
 
     /**
      * Component context

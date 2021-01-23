@@ -2,7 +2,6 @@ package io.github.zero88.qwe.component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import io.reactivex.Single;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.shareddata.LocalMap;
 import io.vertx.reactivex.core.AbstractVerticle;
 
 import lombok.Getter;
@@ -64,12 +62,6 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
 
     @Override
     public void registerEventbus(EventbusClient eventClient) { }
-
-    @Override
-    public final Application addSharedData(String key, Object data) {
-        this.addData(key, data);
-        return this;
-    }
 
     @Override
     public final <T extends Component> Application addProvider(ComponentProvider<T> provider) {
@@ -144,36 +136,6 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
         CarlException t = CarlExceptionConverter.from(throwable);
         logger.error("Cannot start container verticle {}", this.getClass().getName(), t);
         promise.fail(t);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <D> D getData(String dataKey) {
-        return (D) this.vertx.sharedData().getLocalMap(getSharedKey()).get(dataKey);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public final <D> D getData(String dataKey, D fallback) {
-        final D data = (D) this.vertx.sharedData().getLocalMap(getSharedKey()).get(dataKey);
-        return Optional.ofNullable(data).orElse(fallback);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <D> D addData(String dataKey, D data) {
-        return (D) this.vertx.sharedData().getLocalMap(getSharedKey()).put(dataKey, data);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <D> D removeData(String dataKey) {
-        return (D) vertx.sharedData().getLocalMap(getSharedKey()).remove(dataKey);
-    }
-
-    @Override
-    public LocalMap<Object, Object> unwrap() {
-        return vertx.getDelegate().sharedData().getLocalMap(getSharedKey());
     }
 
 }

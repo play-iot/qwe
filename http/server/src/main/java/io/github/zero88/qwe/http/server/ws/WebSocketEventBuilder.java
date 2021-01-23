@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.InvalidUrlException;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.exceptions.InitializerError;
@@ -23,7 +24,6 @@ import io.github.zero88.qwe.http.server.handler.WebSocketBridgeEventHandler;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
-import io.vertx.core.Vertx;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
@@ -38,9 +38,8 @@ import lombok.RequiredArgsConstructor;
 public final class WebSocketEventBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(WebSocketEventBuilder.class);
-    private final Vertx vertx;
+    private final SharedDataLocalProxy proxy;
     private final Router router;
-    private final String sharedKey;
     private final Map<String, List<WebSocketServerEventMetadata>> socketsByPath = new HashMap<>();
     private WebSocketConfig webSocketConfig;
     private Class<? extends WebSocketBridgeEventHandler> bridgeHandlerClass = WebSocketBridgeEventHandler.class;
@@ -51,7 +50,7 @@ public final class WebSocketEventBuilder {
      * For test
      */
     WebSocketEventBuilder() {
-        this(null, null, WebSocketEventBuilder.class.getName());
+        this(null, null);
     }
 
     public WebSocketEventBuilder rootWs(String rootWs) {
@@ -90,8 +89,8 @@ public final class WebSocketEventBuilder {
     }
 
     public Router build() {
-        SockJSHandler sockJSHandler = SockJSHandler.create(vertx, config().getSockjsOptions());
-        EventbusClient controller = EventbusClient.create(vertx, sharedKey);
+        SockJSHandler sockJSHandler = SockJSHandler.create(proxy.getVertx(), config().getSockjsOptions());
+        EventbusClient controller = EventbusClient.create(proxy);
         validate().forEach((path, socketMapping) -> {
             String fullPath = Urls.combinePath(rootWs, path, ApiConstants.WILDCARDS_ANY_PATH);
             sockJSHandler.bridge(createBridgeOptions(fullPath, socketMapping),

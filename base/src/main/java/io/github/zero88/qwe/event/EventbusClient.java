@@ -12,7 +12,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.shareddata.Shareable;
 
 import lombok.NonNull;
 
@@ -31,10 +30,15 @@ public interface EventbusClient extends Transporter {
         return new DefaultEventClient(vertx, options);
     }
 
+    static EventbusClient create(@NonNull SharedDataLocalProxy localProxy) {
+        final EventbusDeliveryOption option = localProxy.getData(SharedDataLocalProxy.EVENTBUS_OPTION);
+        return create(localProxy.getVertx(), Optional.ofNullable(option).map(EventbusDeliveryOption::get).orElse(null));
+    }
+
     static EventbusClient create(Vertx vertx, String sharedKey) {
         final EventbusDeliveryOption option = SharedLocalDataHelper.getLocalDataValue(vertx, sharedKey,
                                                                                       SharedDataLocalProxy.EVENTBUS_OPTION);
-        return new DefaultEventClient(vertx, Optional.ofNullable(option).map(EventbusDeliveryOption::get).orElse(null));
+        return create(vertx, Optional.ofNullable(option).map(EventbusDeliveryOption::get).orElse(null));
     }
 
     /**

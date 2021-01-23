@@ -12,6 +12,8 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.zero88.qwe.component.HasSharedData;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.dto.msg.ResponseData;
 import io.github.zero88.qwe.exceptions.NotFoundException;
@@ -48,14 +50,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract class ServiceDiscoveryController implements Supplier<ServiceDiscovery> {
+public abstract class ServiceDiscoveryController implements Supplier<ServiceDiscovery>, HasSharedData {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceDiscoveryController.class);
+    @Getter
+    @Accessors(fluent = true)
+    private final SharedDataLocalProxy sharedData;
     @Getter(value = AccessLevel.PACKAGE)
     protected final ServiceDiscoveryConfig config;
-    private final String sharedKey;
     private final ServiceDiscovery serviceDiscovery;
     private final CircuitBreakerController circuitController;
     private final Map<String, Record> registrationMap = new ConcurrentHashMap<>();
@@ -82,8 +87,8 @@ public abstract class ServiceDiscoveryController implements Supplier<ServiceDisc
     abstract String computeINet(String host);
 
     final void subscribe(Vertx vertx, String announceMonitorClass, String usageMonitorClass) {
-        subscribe(vertx.eventBus(), ServiceGatewayAnnounceMonitor.create(vertx, this, sharedKey, announceMonitorClass));
-        subscribe(vertx.eventBus(), ServiceGatewayUsageMonitor.create(vertx, this, sharedKey, usageMonitorClass));
+        subscribe(vertx.eventBus(), ServiceGatewayAnnounceMonitor.create(sharedData, this, announceMonitorClass));
+        subscribe(vertx.eventBus(), ServiceGatewayUsageMonitor.create(sharedData, this, usageMonitorClass));
     }
 
     // TODO: find better way instead force rescan in every register call
@@ -146,7 +151,7 @@ public abstract class ServiceDiscoveryController implements Supplier<ServiceDisc
             HttpClientDelegate delegate = HttpClientDelegate.create(reference.getAs(HttpClient.class));
             return circuitController.wrap(delegate.request(path, method, requestData, false))
                                     .doFinally(reference::release);
-        }).doOnError(t -> logger.error("Failed when redirect to {}::{}", t, method, path));
+        }).doOnError(t -> logger.error("Failed when redirect to {}::{}", method, path, t));
     }
 
     public Single<ResponseData> executeEventMessageService(Predicate<Record> filter, String path, HttpMethod method,
@@ -166,7 +171,7 @@ public abstract class ServiceDiscoveryController implements Supplier<ServiceDisc
             r -> EventMethodDefinition.from(r.getMetadata().getJsonObject(EventMessageService.EVENT_METHOD_CONFIG))
                                       .getOrder());
         return findRecord(filter, EventMessageService.TYPE).sorted(comparator).firstOrError().flatMap(record -> {
-            JsonObject config = new JsonObject().put(EventMessageService.SHARED_KEY_CONFIG, sharedKey)
+            JsonObject config = new JsonObject().put(EventMessageService.SHARED_KEY_CONFIG, sharedData().getSharedKey())
                                                 .put(EventMessageService.DELIVERY_OPTIONS_CONFIG,
                                                      Objects.isNull(options) ? new JsonObject() : options.toJson());
             ServiceReference ref = get().getReferenceWithConfiguration(record, config);
@@ -174,7 +179,7 @@ public abstract class ServiceDiscoveryController implements Supplier<ServiceDisc
                                                                       .execute(path, method, requestData,
                                                                                source::onSuccess, source::onError));
             return circuitController.wrap(command).doFinally(ref::release);
-        }).doOnError(t -> logger.error("Failed when redirect to {} :: {}", t, method, path));
+        }).doOnError(t -> logger.error("Failed when redirect to {} :: {}", method, path, t));
     }
 
     private Observable<Record> findRecord(Predicate<Record> filter, String type) {
@@ -215,7 +220,7 @@ public abstract class ServiceDiscoveryController implements Supplier<ServiceDisc
             if (logger.isTraceEnabled()) {
                 logger.trace("Published {} Service: {}", kind(), rec.toJson());
             }
-        }).doOnError(t -> logger.error("Cannot publish {} record: {}", t, kind(), record.toJson()));
+        }).doOnError(t -> logger.error("Cannot publish {} record: {}", kind(), record.toJson(), t));
     }
 
     private Record decorator(Record record) {

@@ -1,18 +1,18 @@
 package io.github.zero88.qwe.micro;
 
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.micro.MicroConfig.LocalServiceDiscoveryConfig;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
 import lombok.NonNull;
 
 final class LocalSDController extends ServiceDiscoveryController {
 
-    LocalSDController(Vertx vertx, LocalServiceDiscoveryConfig config, String sharedKey,
+    LocalSDController(SharedDataLocalProxy proxy, LocalServiceDiscoveryConfig config,
                       CircuitBreakerController circuitController) {
-        super(config, sharedKey, createServiceDiscovery(vertx, config, ServiceKind.LOCAL, v -> true),
+        super(proxy, config, createServiceDiscovery(proxy.getVertx(), config, ServiceKind.LOCAL, v -> true),
               circuitController);
     }
 

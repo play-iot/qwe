@@ -1,5 +1,6 @@
 package io.github.zero88.qwe.micro;
 
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
@@ -12,9 +13,9 @@ import lombok.NonNull;
 
 final class ClusterSDController extends ServiceDiscoveryController {
 
-    ClusterSDController(Vertx vertx, ServiceDiscoveryConfig config, String sharedKey,
+    ClusterSDController(SharedDataLocalProxy proxy, ServiceDiscoveryConfig config,
                         CircuitBreakerController circuitController) {
-        super(config, sharedKey, createServiceDiscovery(vertx, config, ServiceKind.CLUSTER, Vertx::isClustered),
+        super(proxy, config, createServiceDiscovery(proxy.getVertx(), config, ServiceKind.CLUSTER, Vertx::isClustered),
               circuitController);
     }
 

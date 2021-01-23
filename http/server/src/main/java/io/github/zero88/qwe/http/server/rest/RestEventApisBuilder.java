@@ -84,7 +84,7 @@ public final class RestEventApisBuilder {
 
     private void createRouter(RestEventApiMetadata metadata, RestEventApi api) {
         final EventMethodDefinition definition = metadata.getDefinition();
-        EventbusClient eventbus = EventbusClient.create(vertx/*, proxy.getData(SharedDataDelegate.SHARED_EVENTBUS).get()*/);
+        final EventbusClient eventbus = EventbusClient.create(proxy);
         for (EventMethodMapping mapping : definition.getMapping()) {
             RestEventApiDispatcher restHandler = RestEventApiDispatcher.create(api.dispatcher(), eventbus,
                                                                                metadata.getAddress(),

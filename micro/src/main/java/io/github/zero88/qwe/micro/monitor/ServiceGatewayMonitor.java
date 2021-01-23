@@ -7,27 +7,28 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.zero88.qwe.component.HasSharedData;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.micro.ServiceDiscoveryController;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
-public interface ServiceGatewayMonitor extends Handler<Message<Object>> {
+public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasSharedData {
 
-    static <T extends ServiceGatewayMonitor> T create(@NonNull Vertx vertx,
-                                                      @NonNull ServiceDiscoveryController controller, String sharedKey,
-                                                      String className, @NonNull Class<T> fallback) {
+    static <T extends ServiceGatewayMonitor> T create(@NonNull SharedDataLocalProxy proxy,
+                                                      @NonNull ServiceDiscoveryController controller, String className,
+                                                      @NonNull Class<T> fallback) {
         Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(Vertx.class, vertx);
+        inputs.put(SharedDataLocalProxy.class, proxy);
         inputs.put(ServiceDiscoveryController.class, controller);
-        inputs.put(String.class, Strings.requireNotBlank(sharedKey));
         if (fallback.getName().equals(className) || Strings.isBlank(className)) {
             return ReflectionClass.createObject(fallback, inputs);
         }
@@ -35,11 +36,7 @@ public interface ServiceGatewayMonitor extends Handler<Message<Object>> {
         return Objects.isNull(monitor) ? ReflectionClass.createObject(fallback, inputs) : monitor;
     }
 
-    @NonNull Vertx getVertx();
-
     @NonNull ServiceDiscoveryController getController();
-
-    @NonNull String getSharedKey();
 
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -47,11 +44,10 @@ public interface ServiceGatewayMonitor extends Handler<Message<Object>> {
 
         protected final Logger logger = LoggerFactory.getLogger(this.getClass());
         @NonNull
-        private final Vertx vertx;
+        @Accessors(fluent = true)
+        private final SharedDataLocalProxy sharedData;
         @NonNull
         private final ServiceDiscoveryController controller;
-        @NonNull
-        private final String sharedKey;
 
     }
 

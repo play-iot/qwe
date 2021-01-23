@@ -1,24 +1,26 @@
 package io.github.zero88.qwe.micro.monitor;
 
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.micro.ServiceDiscoveryController;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class ServiceGatewayUsageMonitor extends AbstractServiceGatewayMonitor {
 
-    protected ServiceGatewayUsageMonitor(Vertx vertx, ServiceDiscoveryController controller, String sharedKey) {
-        super(vertx, controller, sharedKey);
+    protected ServiceGatewayUsageMonitor(@NonNull SharedDataLocalProxy sharedData,
+                                         @NonNull ServiceDiscoveryController controller) {
+        super(sharedData, controller);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends ServiceGatewayUsageMonitor> T create(Vertx vertx, ServiceDiscoveryController controller,
-                                                                  String sharedKey, String className) {
-        return (T) ServiceGatewayMonitor.create(vertx, controller, sharedKey, className,
-                                                ServiceGatewayUsageMonitor.class);
+    public static <T extends ServiceGatewayUsageMonitor> T create(SharedDataLocalProxy sharedData,
+                                                                  ServiceDiscoveryController controller,
+                                                                  String className) {
+        return (T) ServiceGatewayMonitor.create(sharedData, controller, className, ServiceGatewayUsageMonitor.class);
     }
 
     @Override
