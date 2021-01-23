@@ -21,7 +21,7 @@ import lombok.NonNull;
  * <p>
  * It helps registering {@code listener} for specified address or send message to specified address
  */
-public interface EventbusClient extends Shareable, Transporter {
+public interface EventbusClient extends Transporter {
 
     static EventbusClient create(Vertx vertx) {
         return new DefaultEventClient(vertx);

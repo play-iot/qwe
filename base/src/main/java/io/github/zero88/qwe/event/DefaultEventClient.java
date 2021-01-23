@@ -14,7 +14,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.shareddata.Shareable;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -86,11 +85,6 @@ final class DefaultEventClient implements EventbusClient {
             vertx.eventBus().consumer(address, msgHandler);
         }
         return this;
-    }
-
-    @Override
-    public Shareable copy() {
-        return new DefaultEventClient(vertx, new DeliveryOptions(deliveryOptions.toJson()));
     }
 
 }
