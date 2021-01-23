@@ -47,6 +47,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
         this.eventbus = EventbusClient.create(this.vertx.getDelegate(), option.get());
         this.registerEventbus(eventbus);
         this.addData(SharedDataLocalProxy.EVENTBUS_OPTION, option);
+        this.addData(SharedDataLocalProxy.APP_DATADIR, this.config.getDataDir().toAbsolutePath().toString());
     }
 
     @Override

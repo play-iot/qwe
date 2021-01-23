@@ -13,6 +13,7 @@ public interface SharedDataLocalProxy extends HasSharedKey {
      * @see EventbusClient
      */
     String EVENTBUS_OPTION = "EVENTBUS_OPTION";
+    String APP_DATADIR = "APP_DATADIR";
 
     Vertx getVertx();
 
