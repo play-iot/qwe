@@ -17,10 +17,11 @@ import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.DeliveryEvent;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventbusClient;
-import io.github.zero88.qwe.micro.ServiceGatewayIndex.Params;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
+import io.github.zero88.qwe.micro.filter.ServiceLocatorParams;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
+import io.github.zero88.qwe.micro.type.ServiceScope;
 import io.github.zero88.qwe.micro.mock.MockEventbusService;
-import io.github.zero88.qwe.micro.type.EventMessageService;
+import io.github.zero88.qwe.micro.servicetype.EventMessageService;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -102,7 +103,7 @@ public class MicroContextTest {
                      "\"type\":\"eventbus-service-proxy\",\"status\":\"UP\",\"location\":\"address1\"}]}}");
                  final JsonObject payload = RequestData.builder()
                                                        .filter(
-                                                           new JsonObject().put(Params.SCOPE, ServiceScope.INTERNAL))
+                                                           new JsonObject().put(ServiceLocatorParams.SCOPE, ServiceScope.INTERNAL))
                                                        .build()
                                                        .toJson();
                  controller.fire(DeliveryEvent.builder()

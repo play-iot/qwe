@@ -14,7 +14,7 @@ import io.github.zero88.qwe.http.server.HttpServerRouter;
 import io.github.zero88.qwe.http.server.ServerInfo;
 import io.github.zero88.qwe.http.server.rest.RestApi;
 import io.github.zero88.qwe.micro.MicroContext;
-import io.github.zero88.qwe.micro.MicroserviceProvider;
+import io.github.zero88.qwe.micro.MicroVerticleProvider;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.types.HttpLocation;
 
@@ -24,7 +24,7 @@ public class MockHttpServiceServer extends ApplicationVerticle {
     public void start() {
         super.start();
         this.addProvider(new HttpServerProvider(new HttpServerRouter().registerApi(MockAPI.class)))
-            .addProvider(new MicroserviceProvider());
+            .addProvider(new MicroVerticleProvider());
     }
 
     public String configFile() { return "httpService.json"; }

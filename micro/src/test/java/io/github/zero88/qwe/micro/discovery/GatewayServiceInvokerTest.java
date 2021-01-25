@@ -10,15 +10,15 @@ import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
-import io.github.zero88.qwe.micro.BaseMicroServiceTest;
+import io.github.zero88.qwe.micro.BaseMicroVerticleTest;
 import io.github.zero88.qwe.micro.discovery.mock.MockServiceInvoker;
 import io.github.zero88.qwe.micro.discovery.mock.MockServiceListener;
-import io.github.zero88.qwe.micro.metadata.ServiceNotFoundException;
+import io.github.zero88.qwe.micro.ServiceNotFoundException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
-public class GatewayServiceInvokerTest extends BaseMicroServiceTest {
+public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
 
     @Before
     public void setup(TestContext context) {

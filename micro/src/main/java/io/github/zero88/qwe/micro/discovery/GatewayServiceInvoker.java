@@ -10,13 +10,13 @@ import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.micro.ServiceGatewayIndex.Params;
-import io.github.zero88.qwe.micro.ServiceKind;
-import io.github.zero88.qwe.micro.ServiceScope;
+import io.github.zero88.qwe.micro.ServiceNotFoundException;
 import io.github.zero88.qwe.micro.filter.ByPredicate;
-import io.github.zero88.qwe.micro.metadata.ServiceNotFoundException;
+import io.github.zero88.qwe.micro.filter.ServiceLocatorParams;
 import io.github.zero88.qwe.micro.transfomer.RecordOutput;
 import io.github.zero88.qwe.micro.transfomer.RecordTransformer.RecordView;
+import io.github.zero88.qwe.micro.type.ServiceKind;
+import io.github.zero88.qwe.micro.type.ServiceScope;
 import io.github.zero88.utils.Strings;
 import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
@@ -25,7 +25,7 @@ import io.vertx.servicediscovery.Status;
 import lombok.NonNull;
 
 /**
- * Helps invoking event service by delegating to {@code service gateway} finds service by name then executes with given
+ * Helps invoking event service by delegating to {@code service locator} finds service by name then executes with given
  * {@code event action} and {@code request data}
  *
  * @see <a href="https://en.wikipedia.org/wiki/Remote_procedure_call">Remote procedure call</a>
@@ -91,13 +91,16 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      */
     default Single<String> search(@NonNull EventAction action) {
         final RequestData searchReq = RequestData.builder()
-                                                 .body(new JsonObject().put(Params.IDENTIFIER, destination()))
-                                                 .filter(new JsonObject().put(Params.BY, ByPredicate.BY_NAME)
-                                                                         .put(Params.STATUS, Status.UP)
-                                                                         .put(Params.SCOPE, scope())
-                                                                         .put(Params.KIND, kind())
-                                                                         .put(Params.VIEW, RecordView.TECHNICAL)
-                                                                         .put(Params.ACTION, action.action()))
+                                                 .body(new JsonObject().put(ServiceLocatorParams.IDENTIFIER,
+                                                                            destination()))
+                                                 .filter(
+                                                     new JsonObject().put(ServiceLocatorParams.BY, ByPredicate.BY_NAME)
+                                                                     .put(ServiceLocatorParams.STATUS, Status.UP)
+                                                                     .put(ServiceLocatorParams.SCOPE, scope())
+                                                                     .put(ServiceLocatorParams.KIND, kind())
+                                                                     .put(ServiceLocatorParams.VIEW,
+                                                                          RecordView.TECHNICAL)
+                                                                     .put(ServiceLocatorParams.ACTION, action.action()))
                                                  .build();
         final Single<EventMessage> invoker = invoke(gatewayAddress(), EventAction.GET_ONE, searchReq);
         return invoker.flatMap(out -> out.isError()

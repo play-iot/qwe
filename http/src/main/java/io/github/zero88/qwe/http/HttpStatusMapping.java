@@ -17,7 +17,7 @@ import io.github.zero88.qwe.exceptions.SecurityException;
 import io.github.zero88.qwe.exceptions.SecurityException.AuthenticationException;
 import io.github.zero88.qwe.exceptions.SecurityException.InsufficientPermissionError;
 import io.github.zero88.qwe.exceptions.TimeoutException;
-import io.github.zero88.qwe.micro.metadata.ServiceNotFoundException;
+import io.github.zero88.qwe.micro.ServiceNotFoundException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 

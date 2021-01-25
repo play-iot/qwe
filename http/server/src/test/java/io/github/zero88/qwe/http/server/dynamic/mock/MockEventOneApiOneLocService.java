@@ -4,9 +4,9 @@ import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.component.ContextLookup;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.MicroContext;
-import io.github.zero88.qwe.micro.MicroserviceProvider;
-import io.github.zero88.qwe.micro.ServiceDiscoveryController;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
+import io.github.zero88.qwe.micro.MicroVerticleProvider;
+import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
 import io.reactivex.Single;
 
 public class MockEventOneApiOneLocService extends ApplicationVerticle {
@@ -16,7 +16,7 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     @Override
     public void start() {
         super.start();
-        addProvider(new MicroserviceProvider());
+        addProvider(new MicroVerticleProvider());
     }
 
     @Override
@@ -32,7 +32,7 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     }
 
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryController controller = microContext.getLocalController();
+        final ServiceDiscoveryInvoker controller = microContext.getLocalController();
         Single.concat(controller.addEventMessageRecord("ems-1", MockEventServiceListener.TEST_EVENT_1.getAddress(),
                                                        EventMethodDefinition.createDefault("/hey", "/:id")),
                       controller.addEventMessageRecord("ems-2", MockEventServiceListener.TEST_EVENT_2.getAddress(),

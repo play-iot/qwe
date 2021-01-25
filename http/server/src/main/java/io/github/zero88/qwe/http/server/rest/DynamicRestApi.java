@@ -6,7 +6,7 @@ import java.util.Set;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.http.HttpUtils;
-import io.github.zero88.qwe.micro.type.EventMessageService;
+import io.github.zero88.qwe.micro.servicetype.EventMessageService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;

@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.qwe.event.EventbusClient;
-import io.github.zero88.qwe.micro.ServiceDiscoveryController;
-import io.github.zero88.qwe.micro.metadata.EventHttpService;
+import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.github.zero88.qwe.micro.http.EventHttpService;
 import io.github.zero88.qwe.utils.ExecutorHelpers;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -50,7 +50,7 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
      * @see Record
      * @since 1.0.0
      */
-    public Single<List<Record>> publish(@NonNull ServiceDiscoveryController discovery) {
+    public Single<List<Record>> publish(@NonNull ServiceDiscoveryInvoker discovery) {
         final EventbusClient client = EventbusClient.create(vertx, sharedKey);
         return ExecutorHelpers.blocking(vertx, eventServices::get)
                               .flattenAsObservable(s -> s)
@@ -67,7 +67,7 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
         Optional.ofNullable(afterRegisterEventbusAddress).ifPresent(func -> func.accept(service));
     }
 
-    private Observable<Record> registerEndpoint(@NonNull ServiceDiscoveryController discovery, @NonNull S service) {
+    private Observable<Record> registerEndpoint(@NonNull ServiceDiscoveryInvoker discovery, @NonNull S service) {
         if (!discovery.isEnabled()) {
             return Observable.empty();
         }

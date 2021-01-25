@@ -9,9 +9,9 @@ import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.github.zero88.qwe.http.server.handler.DynamicContextDispatcher.AbstractDynamicContextDispatcher;
 import io.github.zero88.qwe.http.server.rest.DynamicEventRestApi;
-import io.github.zero88.qwe.micro.ServiceDiscoveryController;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
-import io.github.zero88.qwe.micro.type.EventMessageService;
+import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
+import io.github.zero88.qwe.micro.servicetype.EventMessageService;
 import io.github.zero88.utils.Functions;
 import io.reactivex.Single;
 import io.vertx.core.http.HttpMethod;
@@ -21,7 +21,7 @@ import io.vertx.servicediscovery.Record;
 public final class DynamicEventApiDispatcher<T extends DynamicEventRestApi>
     extends AbstractDynamicContextDispatcher<T> {
 
-    DynamicEventApiDispatcher(T api, String gatewayPath, ServiceDiscoveryController dispatcher) {
+    DynamicEventApiDispatcher(T api, String gatewayPath, ServiceDiscoveryInvoker dispatcher) {
         super(api, gatewayPath, dispatcher);
     }
 

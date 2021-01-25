@@ -1,5 +1,6 @@
 package io.github.zero88.qwe.micro.discovery.mock;
 
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.discovery.GatewayServiceInvoker;
 
@@ -36,6 +37,11 @@ public final class MockServiceInvoker implements GatewayServiceInvoker {
     @Override
     public EventbusClient transporter() {
         return client;
+    }
+
+    @Override
+    public @NonNull SharedDataLocalProxy sharedData() {
+        return null;
     }
 
 }

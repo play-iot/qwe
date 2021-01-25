@@ -1,11 +1,13 @@
 package io.github.zero88.qwe.micro.discovery;
 
-import io.github.zero88.qwe.event.EventClientProxy;
+import io.github.zero88.qwe.component.HasSharedData;
 import io.github.zero88.qwe.dto.msg.DataTransferObject.Headers;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;
-import io.github.zero88.qwe.micro.metadata.ServiceNotFoundException;
+import io.github.zero88.qwe.event.EventbusClient;
+import io.github.zero88.qwe.event.EventbusProxy;
+import io.github.zero88.qwe.micro.ServiceNotFoundException;
 import io.reactivex.Single;
 
 import lombok.NonNull;
@@ -16,7 +18,7 @@ import lombok.NonNull;
  * @see <a href="https://en.wikipedia.org/wiki/Remote_procedure_call">Remote procedure call</a>
  * @since 1.0.0
  */
-public interface RemoteServiceInvoker extends EventClientProxy {
+public interface RemoteServiceInvoker extends EventbusProxy, HasSharedData {
 
     /**
      * Request by string.
@@ -85,6 +87,11 @@ public interface RemoteServiceInvoker extends EventClientProxy {
         return transporter().request(address, message).onErrorReturn(t -> {
             throw new ServiceNotFoundException(notFoundMessage(serviceLabel()), t);
         });
+    }
+
+    @Override
+    default EventbusClient transporter() {
+        return EventbusClient.create(sharedData());
     }
 
 }

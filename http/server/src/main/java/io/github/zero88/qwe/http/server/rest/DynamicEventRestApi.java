@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.zero88.qwe.dto.JsonData;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
-import io.github.zero88.qwe.micro.metadata.EventMethodMapping;
-import io.github.zero88.qwe.micro.type.EventMessageService;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
+import io.github.zero88.qwe.micro.http.EventMethodMapping;
+import io.github.zero88.qwe.micro.servicetype.EventMessageService;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;

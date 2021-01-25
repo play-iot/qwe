@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventPattern;
-import io.github.zero88.qwe.micro.metadata.ActionMethodMapping;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
+import io.github.zero88.qwe.micro.http.ActionMethodMapping;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpMethod;
 

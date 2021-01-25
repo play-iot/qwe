@@ -38,7 +38,7 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor {
                                     .collect(Collectors.toList());
             if (record.getStatus() == Status.UP) {
                 DynamicContextDispatcher<DynamicRestApi> handler = DynamicContextDispatcher.create(api, gatewayPath,
-                                                                                                   getController());
+                                                                                                   getInvoker());
                 paths.forEach(path -> {
                     logger().info("Enable dynamic route | API: {} | Order: {} | Path: {}", api.name(), api.order(),
                                   path);

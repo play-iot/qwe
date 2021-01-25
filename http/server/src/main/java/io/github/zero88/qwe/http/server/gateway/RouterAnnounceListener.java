@@ -3,7 +3,7 @@ package io.github.zero88.qwe.http.server.gateway;
 import org.slf4j.Logger;
 
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
-import io.github.zero88.qwe.micro.ServiceDiscoveryController;
+import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
@@ -50,7 +50,7 @@ import lombok.NonNull;
 public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implements DynamicRouterRegister {
 
     protected RouterAnnounceListener(@NonNull SharedDataLocalProxy proxy,
-                                     @NonNull ServiceDiscoveryController controller) {
+                                     @NonNull ServiceDiscoveryInvoker controller) {
         super(proxy, controller);
     }
 
@@ -71,7 +71,7 @@ public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implem
     // TODO: find better way instead force rescan in every register call
     // TODO: for checking in cluster mode
     private void rescanService() {
-        getController().getRecords().subscribe(records -> records.forEach(this::register));
+        getInvoker().getRecords().subscribe(records -> records.forEach(this::register));
     }
 
 }

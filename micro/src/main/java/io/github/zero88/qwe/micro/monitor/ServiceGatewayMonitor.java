@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.zero88.qwe.component.HasSharedData;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
-import io.github.zero88.qwe.micro.ServiceDiscoveryController;
+import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
@@ -24,11 +24,11 @@ import lombok.experimental.Accessors;
 public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasSharedData {
 
     static <T extends ServiceGatewayMonitor> T create(@NonNull SharedDataLocalProxy proxy,
-                                                      @NonNull ServiceDiscoveryController controller, String className,
+                                                      @NonNull ServiceDiscoveryInvoker controller, String className,
                                                       @NonNull Class<T> fallback) {
         Map<Class, Object> inputs = new LinkedHashMap<>();
         inputs.put(SharedDataLocalProxy.class, proxy);
-        inputs.put(ServiceDiscoveryController.class, controller);
+        inputs.put(ServiceDiscoveryInvoker.class, controller);
         if (fallback.getName().equals(className) || Strings.isBlank(className)) {
             return ReflectionClass.createObject(fallback, inputs);
         }
@@ -36,7 +36,7 @@ public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasShar
         return Objects.isNull(monitor) ? ReflectionClass.createObject(fallback, inputs) : monitor;
     }
 
-    @NonNull ServiceDiscoveryController getController();
+    @NonNull ServiceDiscoveryInvoker getInvoker();
 
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -47,7 +47,7 @@ public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasShar
         @Accessors(fluent = true)
         private final SharedDataLocalProxy sharedData;
         @NonNull
-        private final ServiceDiscoveryController controller;
+        private final ServiceDiscoveryInvoker invoker;
 
     }
 

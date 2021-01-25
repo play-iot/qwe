@@ -22,13 +22,13 @@ public final class MicroContext extends ComponentContext {
     @Getter
     private CircuitBreakerController breakerController;
     @Getter
-    private ServiceDiscoveryController clusterController;
+    private ServiceDiscoveryInvoker clusterController;
     @Getter
-    private ServiceDiscoveryController localController;
+    private ServiceDiscoveryInvoker localController;
 
     MicroContext() {
-        //TODO
-        this(Microservice.class, null, MicroContext.class.getName(), UUID.randomUUID().toString());
+        //FIXME data dir for test
+        this(MicroVerticle.class, null, MicroContext.class.getName(), UUID.randomUUID().toString());
     }
 
     protected MicroContext(Class<? extends Component> clazz, Path dataDir, String sharedKey, String deployId) {
@@ -38,27 +38,26 @@ public final class MicroContext extends ComponentContext {
     MicroContext setup(Vertx vertx, MicroConfig config) {
         final SharedDataLocalProxy proxy = SharedDataLocalProxy.create(vertx, sharedKey());
         this.breakerController = CircuitBreakerController.create(vertx, config.getCircuitConfig());
-        this.clusterController = new ClusterSDController(proxy, config.getDiscoveryConfig(), this.breakerController);
-        this.localController = new LocalSDController(proxy, config.getLocalDiscoveryConfig(), this.breakerController);
+        this.clusterController = new ServiceDiscoveryClusterInvoker(proxy, config.getDiscoveryConfig(), this.breakerController);
+        this.localController = new ServiceDiscoveryLocalInvoker(proxy, config.getLocalDiscoveryConfig(), this.breakerController);
         setupGateway(proxy, config.getGatewayConfig(), clusterController, localController);
         return this;
     }
 
     private void setupGateway(SharedDataLocalProxy proxy, GatewayConfig config,
-                              ServiceDiscoveryController clusterController,
-                              ServiceDiscoveryController localController) {
+                              ServiceDiscoveryInvoker clusterDiscovery, ServiceDiscoveryInvoker localDiscovery) {
         if (!config.isEnabled()) {
             log.info("Skip setup service discovery gateway");
             return;
         }
         log.info("Service Discovery Gateway Config : {}", config.toJson().encode());
         if (proxy.getVertx().isClustered()) {
-            clusterController.subscribe(proxy.getVertx(), config.getClusterAnnounceMonitorClass(),
-                                        config.getClusterUsageMonitorClass());
+            clusterDiscovery.subscribe(proxy.getVertx(), config.getClusterAnnounceMonitorClass(),
+                                       config.getClusterUsageMonitorClass());
         }
-        localController.subscribe(proxy.getVertx(), config.getLocalAnnounceMonitorClass(),
-                                  config.getLocalUsageMonitorClass());
-        EventbusClient.create(proxy).register(config.getIndexAddress(), new ServiceGatewayIndex(this));
+        localDiscovery.subscribe(proxy.getVertx(), config.getLocalAnnounceMonitorClass(),
+                                 config.getLocalUsageMonitorClass());
+        EventbusClient.create(proxy).register(config.getIndexAddress(), new ServiceLocator(this));
     }
 
     void unregister(Promise<Void> promise) {

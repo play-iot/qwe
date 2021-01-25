@@ -1,7 +1,7 @@
 package io.github.zero88.qwe.http.event;
 
 import io.github.zero88.qwe.event.EventPattern;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

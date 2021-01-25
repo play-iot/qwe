@@ -3,8 +3,8 @@ package io.github.zero88.qwe.http.server.gateway;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.http.server.HttpServer;
 import io.github.zero88.qwe.http.server.rest.AbstractRestEventApi;
-import io.github.zero88.qwe.micro.metadata.ActionMethodMapping;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
+import io.github.zero88.qwe.micro.http.ActionMethodMapping;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
 
 public final class GatewayIndexApi extends AbstractRestEventApi {
 

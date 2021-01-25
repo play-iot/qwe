@@ -10,9 +10,9 @@ import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.MicroContext;
-import io.github.zero88.qwe.micro.ServiceDiscoveryController;
-import io.github.zero88.qwe.micro.metadata.ActionMethodMapping;
-import io.github.zero88.qwe.micro.metadata.EventMethodDefinition;
+import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.github.zero88.qwe.micro.http.ActionMethodMapping;
+import io.github.zero88.qwe.micro.http.EventMethodDefinition;
 import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 
@@ -35,7 +35,7 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
 
     @Override
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryController controller = microContext.getLocalController();
+        final ServiceDiscoveryInvoker controller = microContext.getLocalController();
         Single.concat(controller.addEventMessageRecord("ems-5", EVENT_1.getAddress(),
                                                        EventMethodDefinition.createDefault("/client/:cId/site",
                                                                                            "/:sId")),
