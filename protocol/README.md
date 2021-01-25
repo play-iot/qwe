@@ -1,0 +1,3 @@
+# Protocol
+
+`Unified protocol interface` for hardware physical protocol such as `ip`, `tcp`, `serial port`, `usb`, `mqtt`, `BACnet`, etc...
