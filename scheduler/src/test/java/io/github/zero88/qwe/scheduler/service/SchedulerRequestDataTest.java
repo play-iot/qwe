@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler;
+package io.github.zero88.qwe.scheduler.service;
 
 import org.json.JSONException;
 import org.junit.Assert;
@@ -8,7 +8,6 @@ import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.scheduler.MockEventScheduler.MockJobModel;
 import io.github.zero88.qwe.scheduler.job.JobModel;
-import io.github.zero88.qwe.scheduler.service.SchedulerRequestData;
 import io.github.zero88.qwe.scheduler.trigger.CronTriggerModel;
 import io.github.zero88.qwe.scheduler.trigger.PeriodicTriggerModel;
 import io.github.zero88.qwe.scheduler.trigger.TriggerModel;
@@ -54,6 +53,7 @@ public class SchedulerRequestDataTest {
     public void test_periodic_deserialize() {
         final JobModel j1 = MockJobModel.create("abc");
         final TriggerModel t1 = PeriodicTriggerModel.builder().name("tr2").intervalInSeconds(5).build();
+        System.out.println(SchedulerRequestData.create(j1, t1).toJson().encodePrettily());
         final SchedulerRequestData data = JsonData.from("{\"job\":{\"type\":\"EVENT_JOB\",\"name\":\"abc\"," +
                                                         "\"group\":\"DEFAULT\",\"process\":{\"address\":\"event.job" +
                                                         ".model" + ".test\",\"pattern\":\"REQUEST_RESPONSE\"," +

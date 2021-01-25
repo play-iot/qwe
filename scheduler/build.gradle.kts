@@ -1,6 +1,9 @@
 dependencies {
     api(project(":base"))
-    api(UtilLibs.quartz)
+    api(UtilLibs.quartz) {
+        exclude("com.mchange")
+        exclude("com.zaxxer")
+    }
 
     testImplementation(TestLibs.junit)
     testImplementation(TestLibs.junit5Vintage)
