@@ -1,0 +1,12 @@
+{
+  "registerAddress": "",
+  "monitorAddress": "",
+  "__schedule_worker__": {
+    "poolName": "worker-pool-scheduler-abc",
+    "poolSize": 5,
+    "maxExecuteTime": 60,
+    "maxExecuteTimeUnit": "SECONDS"
+  },
+  "schedulerName": ""
+}
+

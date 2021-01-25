@@ -5,11 +5,13 @@ object UtilLibs {
         const val lombok = "1.18.16"
         const val classgraph = "4.8.98"
         const val ip = "5.3.3"
+        const val quartz = "2.3.2"
     }
 
     const val lombok = "org.projectlombok:lombok:${Version.lombok}"
     const val classgraph = "io.github.classgraph:classgraph:${Version.classgraph}"
     const val ip = "com.github.seancfoley:ipaddress:${Version.ip}"
+    const val quartz = "org.quartz-scheduler:quartz:${Version.quartz}"
 }
 
 object PluginLibs {
