@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import io.github.zero88.qwe.dto.EnumType;
 import io.github.zero88.qwe.dto.EnumType.AbstractEnumType;
-import io.github.zero88.utils.Strings;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -46,7 +45,7 @@ public class EventAction extends AbstractEnumType implements EnumType, Serializa
     public static final EventAction BATCH_DELETE = new EventAction("BATCH_DELETE");
 
     public static EventAction parse(String action) {
-        return Strings.isBlank(action) ? UNKNOWN : EnumType.factory(action.toUpperCase(), EventAction.class);
+        return EnumType.factory(action, EventAction.class, true, UNKNOWN);
     }
 
     @JsonValue

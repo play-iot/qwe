@@ -30,7 +30,7 @@ public final class ErrorCode extends AbstractEnumType implements io.github.zero8
     }
 
     public static ErrorCode parse(String code) {
-        return EnumType.factory(code, ErrorCode.class);
+        return EnumType.factory(code, ErrorCode.class, true);
     }
 
     public int hashCode() {

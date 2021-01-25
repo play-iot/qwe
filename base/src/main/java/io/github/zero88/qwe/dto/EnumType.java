@@ -19,24 +19,79 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Declares enum type that similar to {@link Enum} but able to serialize as json and extendable
+ */
 public interface EnumType extends JsonData, Serializable {
 
+    /**
+     * Create enum type
+     * <p>
+     * It is equivalent with invoke {@link #factory(String, Class, boolean)} with {@code uppercase = false}
+     *
+     * @param type  type in string
+     * @param clazz class of EnumType
+     * @param <E>   Type of EnumType
+     * @return enum type
+     * @see #factory(String, Class, boolean, EnumType)
+     */
     static <E extends EnumType> E factory(String type, @NonNull Class<E> clazz) {
-        return factory(type, clazz, null);
+        return factory(type, clazz, false);
     }
 
+    /**
+     * Create enum type
+     * <p>
+     * It is equivalent with invoke {@link #factory(String, Class, boolean, EnumType)} with {@code uppercase = false}
+     *
+     * @param type        type in string
+     * @param clazz       class of EnumType
+     * @param defaultType Fallback type if {@code given type} is blank or null
+     * @param <E>         Type of EnumType
+     * @return enum type
+     * @see #factory(String, Class, boolean, EnumType)
+     */
     static <E extends EnumType> E factory(String type, @NonNull Class<E> clazz, E defaultType) {
+        return factory(type, clazz, false, defaultType);
+    }
+
+    /**
+     * Create enum type
+     *
+     * @param type      type
+     * @param clazz     class of EnumType
+     * @param uppercase {@code true} if force {@code given type} is uppercase, otherwise keep it as it is
+     * @param <E>       Type of EnumType
+     * @return enum type
+     * @see #factory(String, Class, boolean, EnumType)
+     */
+    static <E extends EnumType> E factory(String type, @NonNull Class<E> clazz, boolean uppercase) {
+        return factory(type, clazz, uppercase, null);
+    }
+
+    /**
+     * Create enum type by searching {@code given type} in {@code given enum class}
+     *
+     * @param type        type
+     * @param clazz       class of EnumType
+     * @param uppercase   {@code true} if force {@code given type} is uppercase, otherwise keep it as it is
+     * @param defaultType Fallback type if {@code given type} is blank or null
+     * @param <E>         Type of EnumType
+     * @return enum type
+     */
+    static <E extends EnumType> E factory(String type, @NonNull Class<E> clazz, boolean uppercase, E defaultType) {
         if (Strings.isBlank(type)) {
             return defaultType;
         }
-        String t = Strings.optimizeMultipleSpace(type).toUpperCase(Locale.ENGLISH);
+        final String t = Strings.optimizeMultipleSpace(type);
+        final String st = uppercase ? t.toUpperCase(Locale.ENGLISH) : t;
         return ReflectionField.streamConstants(clazz)
-                              .filter(enumType -> enumType.type().equals(t) ||
-                                                  Objects.nonNull(enumType.alternatives()) &&
-                                                  enumType.alternatives().contains(t))
+                              .filter(et -> et.type().equals(st) ||
+                                            Objects.nonNull(et.alternatives()) && et.alternatives().contains(st))
                               .findAny()
-                              .orElseGet(
-                                  () -> ReflectionClass.createObject(clazz, Collections.singletonMap(String.class, t)));
+                              .orElseGet(() -> ReflectionClass.createObject(clazz,
+                                                                            Collections.singletonMap(String.class,
+                                                                                                     st)));
     }
 
     @JsonProperty(value = "type")
