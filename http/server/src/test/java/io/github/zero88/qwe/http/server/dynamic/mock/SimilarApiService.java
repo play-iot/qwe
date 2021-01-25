@@ -35,7 +35,7 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
 
     @Override
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryInvoker controller = microContext.getLocalController();
+        final ServiceDiscoveryInvoker controller = microContext.getLocalInvoker();
         Single.concat(controller.addEventMessageRecord("ems-5", EVENT_1.getAddress(),
                                                        EventMethodDefinition.createDefault("/client/:cId/site",
                                                                                            "/:sId")),

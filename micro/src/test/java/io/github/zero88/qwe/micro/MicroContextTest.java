@@ -58,29 +58,29 @@ public class MicroContextTest {
     @Test(expected = NullPointerException.class)
     public void test_not_enable_serviceDiscovery_cluster() {
         new MicroContext().setup(vertx, IConfig.fromClasspath("micro.json", MicroConfig.class))
-                          .getClusterController()
+                          .getClusterInvoker()
                           .get();
     }
 
     @Test(expected = NullPointerException.class)
     public void test_not_enable_serviceDiscovery_local() {
         new MicroContext().setup(vertx, IConfig.fromClasspath("micro.json", MicroConfig.class))
-                          .getLocalController()
+                          .getLocalInvoker()
                           .get();
     }
 
     @Test(expected = NullPointerException.class)
     public void test_not_enable_circuitBreaker() {
         new MicroContext().setup(vertx, IConfig.fromClasspath("micro.json", MicroConfig.class))
-                          .getBreakerController()
+                          .getBreakerInvoker()
                           .get();
     }
 
     @Test
     public void test_enable_serviceDiscovery_local_and_circuitBreaker() {
         MicroContext context = new MicroContext().setup(vertx, IConfig.fromClasspath("local.json", MicroConfig.class));
-        context.getLocalController().get();
-        context.getBreakerController().get();
+        context.getLocalInvoker().get();
+        context.getBreakerInvoker().get();
     }
 
     @Test
@@ -92,10 +92,10 @@ public class MicroContextTest {
                                              ".interface\":\"io.github.zero88.qwe.micro.mock" +
                                              ".MockEventbusService\"}," + "\"name\":\"test\",\"status\":\"UP\"," +
                                              "\"type\":\"eventbus-service-proxy\"}");
-        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),
+        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected));
         EventbusClient controller = EventbusClient.create(vertx, MicroContext.class.getName());
-        micro.getLocalController()
+        micro.getLocalInvoker()
              .addRecord(EventBusService.createRecord("test", "address1", MockEventbusService.class))
              .subscribe(record -> {
                  final JsonObject indexExpected = new JsonObject(
@@ -123,10 +123,10 @@ public class MicroContextTest {
                                              "\"host\":\"123.456.0.1\",\"port\":1234,\"root\":\"/api\"," +
                                              "\"ssl\":false},\"metadata\":{\"meta\":\"test\"},\"name\":\"http.test\"," +
                                              "\"status\":\"UP\",\"type\":\"http-endpoint\"}");
-        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),
+        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected));
         EventbusClient controller = EventbusClient.create(vertx, MicroContext.class.getName());
-        micro.getLocalController()
+        micro.getLocalInvoker()
              .addHttpRecord("http.test", new HttpLocation().setHost("123.456.0.1").setPort(1234).setRoot("/api"),
                             new JsonObject().put("meta", "test"))
              .subscribe(record -> {
@@ -156,10 +156,10 @@ public class MicroContextTest {
             "\"regexPath\":\"/path/.+\"},{\"action\":\"REMOVE\",\"method\":\"DELETE\"," +
             "\"capturePath\":\"/path/:param\",\"regexPath\":\"/path/.+\"}],\"useRequestData\":true}}," +
             "\"name\":\"event-message\",\"status\":\"UP\",\"type\":\"eventbus-message-service\"}");
-        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalController().getConfig().getAnnounceAddress(),
+        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected, JSONCompareMode.LENIENT));
         EventbusClient client = EventbusClient.create(vertx, MicroContext.class.getName());
-        micro.getLocalController()
+        micro.getLocalInvoker()
              .addRecord(EventMessageService.createRecord("event-message", "address.1",
                                                          EventMethodDefinition.createDefault("/path", "/:param")))
              .subscribe(record -> {

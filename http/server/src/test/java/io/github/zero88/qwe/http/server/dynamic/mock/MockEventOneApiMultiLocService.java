@@ -15,7 +15,7 @@ public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService
 
     @Override
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryInvoker controller = microContext.getLocalController();
+        final ServiceDiscoveryInvoker controller = microContext.getLocalInvoker();
         Single.concat(controller.addEventMessageRecord("ems-4", MockEventServiceListener.TEST_EVENT_4.getAddress(),
                                                        EventMethodDefinition.createDefault("/p", "/:pId")),
                       controller.addEventMessageRecord("ems-4", MockEventServiceListener.TEST_EVENT_4.getAddress(),

@@ -12,7 +12,7 @@ import lombok.NonNull;
 final class ServiceDiscoveryLocalInvoker extends ServiceDiscoveryInvoker {
 
     ServiceDiscoveryLocalInvoker(SharedDataLocalProxy proxy, LocalServiceDiscoveryConfig config,
-                                 CircuitBreakerController circuitController) {
+                                 CircuitBreakerInvoker circuitController) {
         super(proxy, config, createServiceDiscovery(proxy.getVertx(), config, ServiceKind.LOCAL, v -> true),
               circuitController);
     }

@@ -34,7 +34,7 @@ public class MockHttpServiceServer extends ApplicationVerticle {
         final HttpServerContext httpContext = lookup.query(HttpServerContext.class);
         final MicroContext microContext = lookup.query(MicroContext.class);
         final ServerInfo info = httpContext.getServerInfo();
-        microContext.getLocalController()
+        microContext.getLocalInvoker()
                     .addHttpRecord("httpService", new HttpLocation(info.toJson()).setRoot(info.getApiPath()),
                                    new JsonObject())
                     .subscribe();

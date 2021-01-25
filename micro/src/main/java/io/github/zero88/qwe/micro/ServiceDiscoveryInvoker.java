@@ -62,7 +62,7 @@ public abstract class ServiceDiscoveryInvoker implements Supplier<ServiceDiscove
     @Getter(value = AccessLevel.PACKAGE)
     protected final ServiceDiscoveryConfig config;
     private final ServiceDiscovery serviceDiscovery;
-    private final CircuitBreakerController circuitController;
+    private final CircuitBreakerInvoker circuitController;
     private final Map<String, Record> registrationMap = new ConcurrentHashMap<>();
 
     static ServiceDiscovery createServiceDiscovery(Vertx vertx, ServiceDiscoveryConfig config, ServiceKind kind,

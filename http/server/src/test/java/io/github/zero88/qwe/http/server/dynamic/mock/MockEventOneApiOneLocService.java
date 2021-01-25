@@ -32,7 +32,7 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     }
 
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryInvoker controller = microContext.getLocalController();
+        final ServiceDiscoveryInvoker controller = microContext.getLocalInvoker();
         Single.concat(controller.addEventMessageRecord("ems-1", MockEventServiceListener.TEST_EVENT_1.getAddress(),
                                                        EventMethodDefinition.createDefault("/hey", "/:id")),
                       controller.addEventMessageRecord("ems-2", MockEventServiceListener.TEST_EVENT_2.getAddress(),

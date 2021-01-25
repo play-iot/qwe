@@ -71,7 +71,7 @@ public final class ServiceLocator implements EventListener {
 
     private ServiceDiscoveryInvoker getController(JsonObject filter) {
         ServiceKind scope = ServiceKind.parse((String) filter.remove(ServiceLocatorParams.KIND));
-        return ServiceKind.LOCAL == scope ? context.getLocalController() : context.getClusterController();
+        return ServiceKind.LOCAL == scope ? context.getLocalInvoker() : context.getClusterInvoker();
     }
 
 }

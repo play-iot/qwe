@@ -46,7 +46,7 @@ public abstract class BaseMicroVerticleTest {
         vertx = Vertx.vertx();
         micro = new MicroContext().setup(vertx, config);
         eventbus = EventbusClient.create(vertx, MicroContext.class.getName());
-        final ServiceDiscoveryInvoker discovery = micro.getLocalController();
+        final ServiceDiscoveryInvoker discovery = micro.getLocalInvoker();
         final Single<Record> record1 = discovery.addHttpRecord(HTTP_RECORD, new HttpLocation().setHost("123.456.0.1")
                                                                                               .setPort(1234)
                                                                                               .setRoot("/api"),

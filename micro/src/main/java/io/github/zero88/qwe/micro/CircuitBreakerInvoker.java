@@ -15,20 +15,20 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class CircuitBreakerController implements Supplier<CircuitBreaker> {
+public final class CircuitBreakerInvoker implements Supplier<CircuitBreaker> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CircuitBreakerController.class);
+    private static final Logger logger = LoggerFactory.getLogger(CircuitBreakerInvoker.class);
 
     private final CircuitBreaker circuitBreaker;
 
-    static CircuitBreakerController create(Vertx vertx, CircuitBreakerConfig config) {
+    static CircuitBreakerInvoker create(Vertx vertx, CircuitBreakerConfig config) {
         if (config.isEnabled()) {
             logger.info("Circuit Breaker Config : {}", config.toJson().encode());
-            return new CircuitBreakerController(
+            return new CircuitBreakerInvoker(
                 CircuitBreaker.create(config.getCircuitName(), vertx, config.getOptions()));
         }
         logger.info("Skip setup circuit breaker");
-        return new CircuitBreakerController(null);
+        return new CircuitBreakerInvoker(null);
     }
 
     @Override

@@ -20,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 public final class MicroContext extends ComponentContext {
 
     @Getter
-    private CircuitBreakerController breakerController;
+    private CircuitBreakerInvoker breakerInvoker;
     @Getter
-    private ServiceDiscoveryInvoker clusterController;
+    private ServiceDiscoveryInvoker clusterInvoker;
     @Getter
-    private ServiceDiscoveryInvoker localController;
+    private ServiceDiscoveryInvoker localInvoker;
 
     MicroContext() {
         //FIXME data dir for test
@@ -37,10 +37,12 @@ public final class MicroContext extends ComponentContext {
 
     MicroContext setup(Vertx vertx, MicroConfig config) {
         final SharedDataLocalProxy proxy = SharedDataLocalProxy.create(vertx, sharedKey());
-        this.breakerController = CircuitBreakerController.create(vertx, config.getCircuitConfig());
-        this.clusterController = new ServiceDiscoveryClusterInvoker(proxy, config.getDiscoveryConfig(), this.breakerController);
-        this.localController = new ServiceDiscoveryLocalInvoker(proxy, config.getLocalDiscoveryConfig(), this.breakerController);
-        setupGateway(proxy, config.getGatewayConfig(), clusterController, localController);
+        this.breakerInvoker = CircuitBreakerInvoker.create(vertx, config.getCircuitConfig());
+        this.clusterInvoker = new ServiceDiscoveryClusterInvoker(proxy, config.getDiscoveryConfig(),
+                                                                 this.breakerInvoker);
+        this.localInvoker = new ServiceDiscoveryLocalInvoker(proxy, config.getLocalDiscoveryConfig(),
+                                                             this.breakerInvoker);
+        setupGateway(proxy, config.getGatewayConfig(), clusterInvoker, localInvoker);
         return this;
     }
 
@@ -61,16 +63,16 @@ public final class MicroContext extends ComponentContext {
     }
 
     void unregister(Promise<Void> promise) {
-        this.clusterController.unregister(promise);
-        this.localController.unregister(promise);
+        this.clusterInvoker.unregister(promise);
+        this.localInvoker.unregister(promise);
     }
 
     public void rescanService(EventBus eventBus) {
-        if (Objects.nonNull(clusterController)) {
-            clusterController.rescanService(eventBus);
+        if (Objects.nonNull(clusterInvoker)) {
+            clusterInvoker.rescanService(eventBus);
         }
-        if (Objects.nonNull(localController)) {
-            localController.rescanService(eventBus);
+        if (Objects.nonNull(localInvoker)) {
+            localInvoker.rescanService(eventBus);
         }
     }
 

@@ -15,7 +15,7 @@ import lombok.NonNull;
 final class ServiceDiscoveryClusterInvoker extends ServiceDiscoveryInvoker {
 
     ServiceDiscoveryClusterInvoker(SharedDataLocalProxy proxy, ServiceDiscoveryConfig config,
-                                   CircuitBreakerController circuitController) {
+                                   CircuitBreakerInvoker circuitController) {
         super(proxy, config, createServiceDiscovery(proxy.getVertx(), config, ServiceKind.CLUSTER, Vertx::isClustered),
               circuitController);
     }
