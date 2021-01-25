@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.JsonHelper;
+import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;

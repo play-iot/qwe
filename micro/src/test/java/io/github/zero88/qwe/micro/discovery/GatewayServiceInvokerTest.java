@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.JsonHelper;
+import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.dto.msg.DataTransferObject.Headers;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.EventAction;

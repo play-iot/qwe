@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.skyscreamer.jsonassert.Customization;
 
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.VertxHelper;
+import io.github.zero88.qwe.VertxHelper;
 import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.http.server.HttpServerTestBase;
 import io.github.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;

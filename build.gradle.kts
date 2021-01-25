@@ -65,6 +65,8 @@ subprojects {
                 println("- Project Group:    ${project.group}")
                 println("- Project Artifact: ${project.name}")
                 println("- Project Version:  ${project.version}")
+                println("- Gradle Version:   ${GradleVersion.current()}")
+                println("- Java Version:     ${Jvm.current()}")
             }
 
             archiveBaseName.set(project.ext.get("baseName") as String)

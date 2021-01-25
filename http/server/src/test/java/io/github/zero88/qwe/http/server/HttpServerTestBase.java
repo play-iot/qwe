@@ -10,15 +10,16 @@ import java.util.function.Consumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import io.github.zero88.qwe.EventbusHelper;
 import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.EventbusHelper;
-import io.github.zero88.qwe.TestHelper.VertxHelper;
-import io.github.zero88.qwe.component.ComponentSharedDataHelper;
+import io.github.zero88.qwe.component.ComponentTestHelper;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.dto.msg.ResponseData;
 import io.github.zero88.qwe.event.EventMessage;
@@ -28,7 +29,6 @@ import io.github.zero88.qwe.http.server.ws.WebSocketEventMessage;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.reactivex.Single;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
@@ -48,6 +48,9 @@ import io.vertx.reactivex.core.http.HttpClient;
 public abstract class HttpServerTestBase {
 
     protected static final String DEFAULT_HOST = "127.0.0.1";
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
     protected Vertx vertx;
     protected HttpConfig httpConfig;
     protected HttpClient client;
@@ -127,13 +130,13 @@ public abstract class HttpServerTestBase {
     }
 
     protected HttpServer startServer(TestContext context, HttpServerRouter httpRouter) {
-        return VertxHelper.deploy(vertx.getDelegate(), context, new DeploymentOptions().setConfig(httpConfig.toJson()),
-                                  createHttpServer(httpRouter));
+        return ComponentTestHelper.deploy(vertx.getDelegate(), context, httpConfig.toJson(),
+                                          new HttpServerProvider(httpRouter), folder.getRoot().toPath());
     }
 
     protected void startServer(TestContext context, HttpServerRouter httpRouter, Handler<Throwable> consumer) {
-        VertxHelper.deployFailed(vertx.getDelegate(), context, new DeploymentOptions().setConfig(httpConfig.toJson()),
-                                 createHttpServer(httpRouter), consumer);
+        ComponentTestHelper.deployFailed(vertx.getDelegate(), context, httpConfig.toJson(),
+                                         new HttpServerProvider(httpRouter), consumer);
     }
 
     protected JsonObject notFoundResponse(int port, String path) {
@@ -200,11 +203,6 @@ public abstract class HttpServerTestBase {
 
     protected JsonObject createWebsocketMsg(String address, EventMessage body, BridgeEventType send) {
         return WebSocketEventMessage.builder().type(send).address(address).body(body).build().toJson();
-    }
-
-    private HttpServer createHttpServer(HttpServerRouter httpRouter) {
-        final HttpServerProvider provider = new HttpServerProvider(httpRouter);
-        return provider.provide(ComponentSharedDataHelper.create(vertx.getDelegate(), provider.componentClass()));
     }
 
 }

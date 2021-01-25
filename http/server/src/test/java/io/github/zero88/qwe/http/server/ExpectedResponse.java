@@ -11,7 +11,7 @@ import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.JsonHelper;
+import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.dto.msg.ResponseData;
 import io.github.zero88.qwe.http.HttpUtils;
 import io.vertx.core.http.HttpHeaders;

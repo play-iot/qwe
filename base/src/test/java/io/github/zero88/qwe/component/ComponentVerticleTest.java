@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.VertxHelper;
+import io.github.zero88.qwe.VertxHelper;
 import io.github.zero88.qwe.component.MockProvider.MockComponent;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.vertx.core.DeploymentOptions;
@@ -41,9 +41,9 @@ public class ComponentVerticleTest {
 
     @Test
     public void not_have_config_file_should_deploy_success(TestContext context) {
-        MockComponent unitVerticle = new MockComponent(ComponentSharedDataHelper.create(vertx, MockComponent.class));
+        MockComponent component = new MockComponent(ComponentTestHelper.createSharedData(vertx, MockComponent.class));
         Async async = context.async();
-        VertxHelper.deploy(vertx, context, new DeploymentOptions(), unitVerticle, deployId -> {
+        VertxHelper.deploy(vertx, context, new DeploymentOptions(), component, deployId -> {
             context.assertNotNull(deployId);
             TestHelper.testComplete(async);
         });
@@ -51,10 +51,10 @@ public class ComponentVerticleTest {
 
     @Test
     public void invalid_config_should_deploy_failed(TestContext context) {
-        MockComponent unitVerticle = new MockComponent(ComponentSharedDataHelper.create(vertx, MockComponent.class));
+        MockComponent component = new MockComponent(ComponentTestHelper.createSharedData(vertx, MockComponent.class));
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
-        VertxHelper.deployFailed(vertx, context, options, unitVerticle, t -> {
+        VertxHelper.deployFailed(vertx, context, options, component, t -> {
             TestHelper.testComplete(async);
             Assert.assertTrue(t instanceof CarlException);
             Assert.assertEquals("Invalid config format", t.getMessage());
@@ -64,7 +64,7 @@ public class ComponentVerticleTest {
     @Test
     @Ignore("Need the information from Zero")
     public void test_register_shared_data(TestContext context) {
-        MockComponent component = new MockComponent(ComponentSharedDataHelper.create(vertx, MockComponent.class));
+        MockComponent component = new MockComponent(ComponentTestHelper.createSharedData(vertx, MockComponent.class));
         final String key = MockProvider.MockComponent.class.getName();
         //        component.setup(key);
 
@@ -77,7 +77,8 @@ public class ComponentVerticleTest {
 
     @Test
     public void throw_unexpected_error_cannot_start(TestContext context) {
-        MockComponent component = new MockComponent(ComponentSharedDataHelper.create(vertx, MockComponent.class), true);
+        MockComponent component = new MockComponent(ComponentTestHelper.createSharedData(vertx, MockComponent.class),
+                                                    true);
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
         VertxHelper.deployFailed(vertx, context, options, component, t -> {

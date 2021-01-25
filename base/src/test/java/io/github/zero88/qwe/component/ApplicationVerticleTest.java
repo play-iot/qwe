@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.VertxHelper;
+import io.github.zero88.qwe.VertxHelper;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.unit.Async;

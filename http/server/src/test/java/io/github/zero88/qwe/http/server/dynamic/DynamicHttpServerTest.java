@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.github.zero88.qwe.TestHelper;
-import io.github.zero88.qwe.TestHelper.JsonHelper;
+import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.component.ApplicationVerticle;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.http.server.dynamic.mock.MockHttpServiceServer;

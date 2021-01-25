@@ -1,6 +1,6 @@
 package io.github.zero88.qwe.component;
 
-import io.github.zero88.qwe.TestHelper.JsonHelper;
+import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.component.ApplicationProbeHandler.ApplicationReadinessHandler;
 import io.github.zero88.qwe.dto.ErrorData;
 import io.github.zero88.qwe.dto.msg.RequestData;

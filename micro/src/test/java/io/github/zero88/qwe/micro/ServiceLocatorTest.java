@@ -3,7 +3,7 @@ package io.github.zero88.qwe.micro;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.github.zero88.qwe.TestHelper.EventbusHelper;
+import io.github.zero88.qwe.EventbusHelper;
 import io.github.zero88.qwe.dto.msg.Filters;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.EventAction;
