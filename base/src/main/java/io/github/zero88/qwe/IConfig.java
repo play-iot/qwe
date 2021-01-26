@@ -5,12 +5,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.utils.Configs;
 import io.github.zero88.utils.Functions;
+import io.github.zero88.utils.Functions.Provider;
 import io.github.zero88.utils.Functions.Silencer;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Reflections.ReflectionField;
@@ -155,10 +159,12 @@ public interface IConfig extends JsonData, Shareable {
         private final Class<T> clazz;
         private final JsonObject entries;
         private final ObjectMapper mapper;
+        private final static Logger log = LoggerFactory.getLogger(IConfig.class);
 
         static <T extends IConfig> T create(Class<T> clazz, JsonObject data, ObjectMapper mapper) {
-            final T temp = Functions.getOrDefault(() -> mapper.convertValue(data, clazz),
-                                                  () -> ReflectionClass.createObject(clazz));
+            final Provider<T> p = () -> ReflectionClass.createObject(clazz, new Class[] {}, new Object[] {});
+            final T temp = Functions.getIfThrow(t -> log.trace("Cannot init " + clazz, t), p)
+                                    .orElseGet(() -> mapper.convertValue(data, clazz));
             final CreateConfig<T> creator = new CreateConfig<>(clazz, data, mapper);
             creator.accept(temp, null);
             return creator.get();
