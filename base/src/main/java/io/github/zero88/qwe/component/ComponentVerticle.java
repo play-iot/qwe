@@ -36,7 +36,7 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
 
     @Override
     public final T setup(T context) {
-        return (this.componentContext = context);
+        return this.componentContext = context;
     }
 
     @Override

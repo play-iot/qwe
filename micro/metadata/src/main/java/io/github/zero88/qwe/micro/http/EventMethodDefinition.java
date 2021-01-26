@@ -4,9 +4,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.EventAction;
@@ -27,6 +24,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * It helps define a mapping between dynamic route by {@code regex path} and {@code HttpMethod} with {@code EventAction}
@@ -34,14 +32,13 @@ import lombok.NonNull;
  *
  * @see EventMethodMapping
  */
+@Slf4j
 @Getter
 @Builder(builderClassName = "Builder")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = EventMethodDefinition.Builder.class)
 public final class EventMethodDefinition implements JsonData {
-
-    private static final Logger logger = LoggerFactory.getLogger(EventMethodDefinition.class);
 
     @EqualsAndHashCode.Include
     private final String servicePath;
@@ -51,6 +48,8 @@ public final class EventMethodDefinition implements JsonData {
     @JsonIgnore
     private final int order;
     private final Set<EventMethodMapping> mapping;
+    @JsonIgnore
+    private final HttpPathRule rule;
     /**
      * Identify using {@link RequestData} or not. Default is {@code True}
      * <p>
@@ -61,26 +60,18 @@ public final class EventMethodDefinition implements JsonData {
 
     private EventMethodDefinition(String servicePath, boolean useRequestData,
                                   @NonNull Set<EventMethodMapping> mapping) {
-        this.servicePath = toRegex(Strings.requireNotBlank(servicePath));
+        this.rule = new HttpPathRule();
+        this.servicePath = this.rule.createRegex(servicePath);
         if (this.servicePath.endsWith("/.+")) {
             throw new IllegalArgumentException("Service path cannot ends with capture parameter");
         }
         this.useRequestData = useRequestData;
         if (!useRequestData) {
-            logger.warn("HTTP Path '{}' is not using `RequestData` that will omit data in `HTTP Request Query` and " +
-                        "`HTTP Request Header`", this.servicePath);
+            log.warn("HTTP Path '{}' is not using `RequestData` that will omit data in `HTTP Request Query` and " +
+                     "`HTTP Request Header`", this.servicePath);
         }
         this.order = Networks.priorityOrder(this.servicePath.length());
         this.mapping = mapping;
-    }
-
-    static String toRegex(String capturePath) {
-        //FIXME check with forward url
-        return capturePath.replaceFirst("/:[^/]+(/?)$", "/.+$1").replaceAll("/:[^/]+", "/[^/]+");
-    }
-
-    private static String searchRegex(String servicePath) {
-        return servicePath + (servicePath.endsWith("/") ? "(.+)?" : "(/.+)?");
     }
 
     /**
@@ -216,7 +207,7 @@ public final class EventMethodDefinition implements JsonData {
 
     public Optional<String> search(String actualPath) {
         return Optional.of(Strings.requireNotBlank(actualPath))
-                       .filter(path -> path.matches(searchRegex(this.servicePath)));
+                       .filter(path -> path.matches(this.rule.createRegexPathForSearch(this.servicePath)));
     }
 
     public EventAction search(String actualPath, @NonNull HttpMethod method) {

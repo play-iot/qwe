@@ -4,8 +4,6 @@ import java.util.Objects;
 
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.event.EventAction;
-import io.github.zero88.qwe.utils.HttpMethods;
-import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpMethod;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -51,21 +49,23 @@ public final class EventMethodMapping implements JsonData {
     }
 
     @JsonPOJOBuilder(withPrefix = "")
-    static class Builder {
+    public static class Builder {
 
         private String servicePath;
 
-        Builder servicePath(String servicePath) {
+        public Builder servicePath(String servicePath) {
             this.servicePath = servicePath;
             return this;
         }
 
-        EventMethodMapping build() {
-            boolean singular = HttpMethods.isSingular(method) && action != EventAction.GET_LIST ||
-                               action == EventAction.GET_ONE;
-            capturePath = Strings.isBlank(servicePath) || singular ? capturePath : servicePath;
+        public EventMethodMapping build() {
+            return build(new HttpPathRule());
+        }
+
+        public EventMethodMapping build(@NonNull HttpPathRule rule) {
+            capturePath = rule.createCapture(method, action, servicePath, capturePath);
             if (Objects.nonNull(capturePath) && Objects.isNull(regexPath)) {
-                regexPath = EventMethodDefinition.toRegex(capturePath);
+                regexPath = rule.createRegex(capturePath);
             }
             return new EventMethodMapping(action, method, capturePath, regexPath);
         }
