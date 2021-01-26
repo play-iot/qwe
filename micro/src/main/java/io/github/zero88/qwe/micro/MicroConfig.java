@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public final class MicroConfig implements IConfig {
 
-    public static final String NAME = "__micro__";
+    public static final String KEY = "__micro__";
 
     private String serviceName;
     @JsonProperty(value = GatewayConfig.NAME)
@@ -41,7 +41,7 @@ public final class MicroConfig implements IConfig {
     private CircuitBreakerConfig circuitConfig = new CircuitBreakerConfig();
 
     @Override
-    public String key() { return NAME; }
+    public String key() { return KEY; }
 
     @Override
     public Class<? extends IConfig> parent() { return AppConfig.class; }

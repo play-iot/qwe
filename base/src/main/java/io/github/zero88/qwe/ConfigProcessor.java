@@ -35,6 +35,7 @@ import io.vertx.core.json.JsonObject;
 import lombok.NonNull;
 
 @Deprecated
+//TODO must refactor
 public final class ConfigProcessor {
 
     private static final int DOMAIN_CFG_INDEX = 2;

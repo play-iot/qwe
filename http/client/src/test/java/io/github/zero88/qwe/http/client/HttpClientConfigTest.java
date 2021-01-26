@@ -11,7 +11,7 @@ import io.github.zero88.utils.Strings;
 public class HttpClientConfigTest {
 
     @Test
-    public void test_default() throws JSONException {
+    public void test_serialize_deserialize() throws JSONException {
         HttpClientConfig def = new HttpClientConfig();
         System.out.println(def.toJson().encodePrettily());
         HttpClientConfig config = IConfig.fromClasspath("httpClient.json", HttpClientConfig.class);

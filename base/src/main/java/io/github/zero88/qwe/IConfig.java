@@ -10,6 +10,7 @@ import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.utils.Configs;
+import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Functions.Silencer;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Reflections.ReflectionField;
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+//TODO Should simplify
 public interface IConfig extends JsonData, Shareable {
 
     ObjectMapper MAPPER = JsonData.MAPPER.copy().setSerializationInclusion(Include.NON_NULL);
@@ -55,7 +57,7 @@ public interface IConfig extends JsonData, Shareable {
             JsonObject entries = data instanceof String
                                  ? new JsonObject((String) data)
                                  : JsonObject.mapFrom(Objects.requireNonNull(data));
-            return ReflectionClass.createObject(clazz, new CreateConfig<>(clazz, entries, MAPPER)).get();
+            return CreateConfig.create(clazz, entries, MAPPER);
         } catch (IllegalArgumentException | NullPointerException | DecodeException | HiddenException ex) {
             HiddenException hidden = ex instanceof HiddenException ? (HiddenException) ex : new HiddenException(ex);
             if (Objects.nonNull(cause)) {
@@ -154,8 +156,16 @@ public interface IConfig extends JsonData, Shareable {
         private final JsonObject entries;
         private final ObjectMapper mapper;
 
+        static <T extends IConfig> T create(Class<T> clazz, JsonObject data, ObjectMapper mapper) {
+            final T temp = Functions.getOrDefault(() -> mapper.convertValue(data, clazz),
+                                                  () -> ReflectionClass.createObject(clazz));
+            final CreateConfig<T> creator = new CreateConfig<>(clazz, data, mapper);
+            creator.accept(temp, null);
+            return creator.get();
+        }
+
         @Override
-        public void accept(T temp, io.github.zero88.exceptions.HiddenException throwable) {
+        public void accept(T temp, HiddenException throwable) {
             if (Objects.nonNull(throwable)) {
                 throw new HiddenException(throwable.getCause());
             }
