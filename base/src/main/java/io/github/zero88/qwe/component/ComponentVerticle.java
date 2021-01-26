@@ -17,6 +17,7 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter
+    @NonNull
     @Accessors(fluent = true)
     private final SharedDataLocalProxy sharedData;
     private T componentContext;
