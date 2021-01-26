@@ -1,0 +1,9 @@
+{
+  "subDir": "storage",
+  "maxSizeInMB": 10,
+  "option": {
+    "autoCreate": true,
+    "filePerms": "rw-r--r--",
+    "folderPerms": "rwxr-xr-x"
+  }
+}

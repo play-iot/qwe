@@ -1,0 +1,105 @@
+package io.github.zero88.jp.json;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import io.github.zero88.qwe.utils.Configs;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.pointer.JsonPointer;
+
+class JsonPointerTest {
+
+    @Test
+    void test_read_all_json() {
+        final JsonPointer pointer = JsonPointer.create();
+        Assertions.assertTrue(pointer.isRootPointer());
+        Assertions.assertTrue(pointer.isLocalPointer());
+        final Object obj = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        Assertions.assertEquals("{\"abc\":{\"1\":\"a\",\"2\":\"b\"},\"xyz\":{},\"array\":[1],\"array2\":[1,2]}",
+                                obj.toString());
+    }
+
+    @Test
+    void test_read_json_pointer() {
+        final JsonPointer pointer = JsonPointer.from("/abc/1");
+        Assertions.assertFalse(pointer.isRootPointer());
+        Assertions.assertTrue(pointer.isParent(JsonPointer.from("/abc/1/2")));
+        final Object obj = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        Assertions.assertEquals("a", obj);
+    }
+
+    @Test
+    void test_write_json() {
+        final JsonPointer pointer = JsonPointer.from("/xyz");
+        final Object obj = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        Assertions.assertTrue(obj instanceof JsonObject);
+        Assertions.assertTrue(((JsonObject) obj).isEmpty());
+        final Object alo = pointer.writeJson(obj, new JsonObject().put("alo", 222));
+        System.out.println(alo);
+        Assertions.assertTrue(alo instanceof JsonObject);
+        Assertions.assertEquals(new JsonObject().put("xyz", new JsonObject().put("alo", 222)), alo);
+    }
+
+    @Test
+    public void testWriteJsonArrayAppend() {
+        JsonObject obj = new JsonObject().put("hello", new JsonObject().put("world", 1).put("worl", "wrong"))
+                                         .put("helo", new JsonObject().put("world", "wrong").put("worl", "wrong"));
+        JsonArray array = new JsonArray();
+        array.add(obj);
+        array.add(obj);
+        Object toInsert = new JsonObject().put("github", "slinkydeveloper");
+        Assertions.assertEquals(array, JsonPointer.from("/-").writeJson(array, toInsert));
+        Assertions.assertEquals(toInsert, JsonPointer.from("/2").queryJson(array));
+        Assertions.assertEquals(array.getValue(0), array.getValue(1));
+    }
+
+    @Test
+    public void testNestedWriteJsonArraySubstitute() {
+        JsonObject obj = new JsonObject().put("hello", new JsonObject().put("world", 1).put("worl", "wrong"))
+                                         .put("helo", new JsonObject().put("world", "wrong").put("worl", "wrong"));
+        JsonArray array = new JsonArray();
+        array.add(obj);
+        array.add(obj);
+        JsonObject root = new JsonObject().put("array", array);
+
+        Object toInsert = new JsonObject().put("github", "slinkydeveloper");
+        Assertions.assertEquals(root, JsonPointer.from("/array/0").writeJson(root, toInsert));
+        System.out.println(root);
+        Assertions.assertEquals(toInsert, JsonPointer.from("/array/0").queryJson(root));
+    }
+
+    @Test
+    void test_append_json_array() {
+        JsonPointer pointer = JsonPointer.create();
+        final JsonPointer arrayPointer = JsonPointer.from("/array");
+        final Object root = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        System.out.println(root);
+        final Object newRoot = arrayPointer.copy().append(0).writeJson(root, 2);
+        System.out.println(newRoot);
+        Assertions.assertTrue(newRoot instanceof JsonObject);
+        final Object updated = arrayPointer.queryJson(newRoot);
+        Assertions.assertEquals(new JsonArray().add(2).add(1), updated);
+    }
+
+    @Test
+    void test_remove_item_in_json_array() {
+        JsonPointer rootPointer = JsonPointer.create();
+        JsonPointer array2Pointer = JsonPointer.from("/array2");
+        final Object root = rootPointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        System.out.println(root);
+        final Object array2 = array2Pointer.queryJson(root);
+        System.out.println(array2);
+        Assertions.assertTrue(array2 instanceof JsonArray);
+        Assertions.assertEquals(2, ((JsonArray) array2).remove(1));
+        final JsonArray updated = ((JsonArray) array2).add(3);
+        final Object newRoot = array2Pointer.writeJson(root, updated);
+        System.out.println(newRoot);
+        Assertions.assertTrue(newRoot instanceof JsonObject);
+        Assertions.assertEquals(root, newRoot);
+        Assertions.assertEquals(root, newRoot);
+        final Object newOne = array2Pointer.queryJson(root);
+        Assertions.assertEquals(new JsonArray().add(1).add(3), newOne);
+    }
+
+}
