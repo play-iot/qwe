@@ -102,11 +102,12 @@ public interface EnumType extends JsonData, Serializable {
         return null;
     }
 
-    @EqualsAndHashCode
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     abstract class AbstractEnumType implements EnumType {
 
         @NonNull
+        @EqualsAndHashCode.Include
         private final String type;
         private final Collection<String> aliases;
 

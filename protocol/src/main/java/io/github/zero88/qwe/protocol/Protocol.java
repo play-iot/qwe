@@ -24,6 +24,7 @@ public final class Protocol extends AbstractEnumType implements PlainType {
     public static final Protocol Bluetooth = new Protocol("Bluetooth");
     public static final Protocol Websocket = new Protocol("Websocket");
     public static final Protocol UNKNOWN = new Protocol("UNKNOWN");
+    public static final Protocol Unification = new Protocol("Unification");
 
     private Protocol(String type) { super(type); }
 
