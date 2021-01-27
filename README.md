@@ -1,7 +1,7 @@
 # QWE
 
 It
-is [Carl](https://static.wikia.nocookie.net/dota2_gamepedia/images/e/eb/Vo_invoker_invo_spawn_01.mp3/revision/latest): "
+is [Carl](https://static.wikia.nocookie.net/dota2_gamepedia/images/e/eb/Vo_invoker_invo_spawn_01.mp3): "
 Invoke my abilities when you need"
 
 Microservice adapt
