@@ -37,6 +37,8 @@ public abstract class AsyncFileHelper {
 
     /**
      * Max file size in Megabytes (MB)
+     *
+     * @return max file size
      */
     public abstract int maxSize();
 

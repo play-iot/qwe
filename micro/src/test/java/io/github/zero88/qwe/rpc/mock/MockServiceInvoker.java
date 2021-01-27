@@ -1,8 +1,8 @@
-package io.github.zero88.qwe.micro.discovery.mock;
+package io.github.zero88.qwe.rpc.mock;
 
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventbusClient;
-import io.github.zero88.qwe.micro.discovery.GatewayServiceInvoker;
+import io.github.zero88.qwe.rpc.GatewayServiceInvoker;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

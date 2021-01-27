@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.micro.discovery;
+package io.github.zero88.qwe.rpc;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,8 +11,8 @@ import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.micro.BaseMicroVerticleTest;
-import io.github.zero88.qwe.micro.discovery.mock.MockServiceInvoker;
-import io.github.zero88.qwe.micro.discovery.mock.MockServiceListener;
+import io.github.zero88.qwe.rpc.mock.MockServiceInvoker;
+import io.github.zero88.qwe.rpc.mock.MockServiceListener;
 import io.github.zero88.qwe.micro.ServiceNotFoundException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;

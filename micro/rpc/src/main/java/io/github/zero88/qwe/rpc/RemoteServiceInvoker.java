@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.micro.discovery;
+package io.github.zero88.qwe.rpc;
 
 import io.github.zero88.qwe.component.HasSharedData;
 import io.github.zero88.qwe.dto.msg.DataTransferObject.Headers;

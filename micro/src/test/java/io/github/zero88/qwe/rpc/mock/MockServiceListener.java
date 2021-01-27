@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.micro.discovery.mock;
+package io.github.zero88.qwe.rpc.mock;
 
 import java.util.Collection;
 

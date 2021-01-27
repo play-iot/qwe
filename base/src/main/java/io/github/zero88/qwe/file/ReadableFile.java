@@ -106,7 +106,8 @@ public class ReadableFile extends AsyncFileHelper {
      *
      * @param filePath  File path
      * @param option    File option
-     * @param converter data converter
+     * @param data      Data
+     * @param converter Data converter
      * @param <T>       Type of data
      * @return a converted object
      * @see #read(Path, FileOption)

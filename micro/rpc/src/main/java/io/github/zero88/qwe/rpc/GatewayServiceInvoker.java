@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.micro.discovery;
+package io.github.zero88.qwe.rpc;
 
 import java.util.Optional;
 import java.util.function.Function;
