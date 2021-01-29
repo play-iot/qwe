@@ -6,8 +6,7 @@ import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.vertx.core.json.JsonObject;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -15,32 +14,30 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * It bundles all information for single event to delivery
  */
-@EqualsAndHashCode(doNotUseGetters = true, onlyExplicitlyIncluded = true)
+@Getter
+@Jacksonized
 @Builder(builderClassName = "Builder")
 @ToString(onlyExplicitlyIncluded = true)
-@JsonDeserialize(builder = DeliveryEvent.Builder.class)
+@EqualsAndHashCode(doNotUseGetters = true, onlyExplicitlyIncluded = true)
 public final class DeliveryEvent implements JsonData {
 
-    @Getter
     @NonNull
     @EqualsAndHashCode.Include
     @ToString.Include
     private final String address;
-    @Getter
     @Default
     @EqualsAndHashCode.Include
     @ToString.Include
     private final EventPattern pattern = EventPattern.REQUEST_RESPONSE;
-    @Getter
     @NonNull
     @EqualsAndHashCode.Include
     @ToString.Include
     private final EventAction action;
-
     private final JsonObject payload;
 
     public static DeliveryEvent from(JsonObject data) {
@@ -78,11 +75,11 @@ public final class DeliveryEvent implements JsonData {
         return new DeliveryEvent(address, pattern, action, payload);
     }
 
-    public EventMessage payload() {
+    @JsonIgnore
+    public EventMessage getPayload() {
         return EventMessage.initial(action, payload);
     }
 
-    @JsonPOJOBuilder(withPrefix = "")
     public static class Builder {
 
         public Builder addPayload(@NonNull RequestData payload) {

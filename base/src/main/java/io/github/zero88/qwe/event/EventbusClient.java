@@ -88,7 +88,7 @@ public interface EventbusClient extends Transporter {
      * @see EventMessage
      */
     default Single<EventMessage> request(@NonNull DeliveryEvent event) {
-        return request(event.getAddress(), event.payload(), (DeliveryOptions) null);
+        return request(event.getAddress(), event.getPayload(), (DeliveryOptions) null);
     }
 
     /**
@@ -160,7 +160,7 @@ public interface EventbusClient extends Transporter {
      */
     default void fire(@NonNull DeliveryEvent deliveryEvent, DeliveryOptions deliveryOptions,
                       Handler<AsyncResult<Message<Object>>> replyHandler) {
-        fire(deliveryEvent.getAddress(), deliveryEvent.getPattern(), deliveryEvent.payload(), replyHandler,
+        fire(deliveryEvent.getAddress(), deliveryEvent.getPattern(), deliveryEvent.getPayload(), replyHandler,
              deliveryOptions);
     }
 
