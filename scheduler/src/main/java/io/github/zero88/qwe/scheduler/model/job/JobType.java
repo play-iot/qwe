@@ -1,13 +1,16 @@
-package io.github.zero88.qwe.scheduler.job;
+package io.github.zero88.qwe.scheduler.model.job;
 
 import io.github.zero88.qwe.dto.EnumType;
 import io.github.zero88.qwe.dto.EnumType.AbstractEnumType;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+/**
+ * Defines job type
+ *
+ * @see QWEJobModel
+ */
 public final class JobType extends AbstractEnumType {
-
-    public static final JobType EVENT_JOB = new JobType("EVENT_JOB");
 
     private JobType(String type) {
         super(type);

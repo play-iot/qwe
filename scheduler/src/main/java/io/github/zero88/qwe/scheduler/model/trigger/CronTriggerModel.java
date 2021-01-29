@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler.trigger;
+package io.github.zero88.qwe.scheduler.model.trigger;
 
 import java.text.ParseException;
 import java.time.ZoneOffset;
@@ -14,23 +14,24 @@ import org.quartz.TriggerKey;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.scheduler.trigger.TriggerModel.AbstractTriggerModel;
+import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel.AbstractTriggerModel;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.FieldNameConstants;
+import lombok.extern.jackson.Jacksonized;
 
 @Getter
+@Jacksonized
+@FieldNameConstants
 @Builder(builderClassName = "Builder")
-@JsonDeserialize(builder = CronTriggerModel.Builder.class)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public final class CronTriggerModel extends AbstractTriggerModel {
 
@@ -52,20 +53,20 @@ public final class CronTriggerModel extends AbstractTriggerModel {
         return CronScheduleBuilder.cronSchedule(expression).inTimeZone(timezone);
     }
 
-    @JsonProperty("expression")
+    @JsonProperty(Fields.expression)
     @EqualsAndHashCode.Include
     private String expr() {
         return expression.getCronExpression();
     }
 
-    @JsonProperty("timezone")
+    @JsonProperty(Fields.timezone)
     private String tz() {
         return timezone.getID();
     }
 
     @Override
     public JsonObject toDetail() {
-        return new JsonObject().put("expression", expr()).put("timezone", tz());
+        return new JsonObject().put(Fields.expression, expr()).put(Fields.timezone, tz());
     }
 
     @Override
@@ -73,12 +74,11 @@ public final class CronTriggerModel extends AbstractTriggerModel {
         return expr() + "::" + tz();
     }
 
-    @JsonPOJOBuilder(withPrefix = "")
     public static class Builder extends AbstractTriggerModelBuilder<CronTriggerModel, Builder> {
 
-        @JsonProperty("expression")
+        @JsonProperty(Fields.expression)
         private String expr;
-        @JsonProperty("timezone")
+        @JsonProperty(Fields.timezone)
         private String tz;
 
         static CronExpression toCronExpr(String expression) {

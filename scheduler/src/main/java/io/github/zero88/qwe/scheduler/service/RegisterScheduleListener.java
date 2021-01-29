@@ -1,7 +1,7 @@
 package io.github.zero88.qwe.scheduler.service;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -24,8 +24,8 @@ import io.github.zero88.qwe.event.EventListener;
 import io.github.zero88.qwe.exceptions.AlreadyExistException;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
-import io.github.zero88.qwe.scheduler.job.JobModel;
-import io.github.zero88.qwe.scheduler.trigger.TriggerModel;
+import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
+import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
 import io.github.zero88.qwe.utils.JsonUtils;
 import io.vertx.core.json.JsonObject;
 
@@ -38,15 +38,14 @@ import lombok.extern.slf4j.Slf4j;
 public final class RegisterScheduleListener implements EventListener {
 
     private final Scheduler scheduler;
-    private final Set<EventAction> events;
 
     @Override
     public @NonNull Collection<EventAction> getAvailableEvents() {
-        return Collections.unmodifiableSet(events);
+        return Arrays.asList(EventAction.CREATE, EventAction.REMOVE, EventAction.GET_ONE);
     }
 
     @EventContractor(action = "GET_ONE")
-    public JsonObject get(@Param(SchedulerRequestData.JOB_KEY) JobModel jobModel,
+    public JsonObject get(@Param(SchedulerRequestData.JOB_KEY) QWEJobModel jobModel,
                           @Param(SchedulerRequestData.TRIGGER_KEY) TriggerModel triggerModel) {
         try {
             final JobDetail jobDetail = jobModel.toJobDetail();
@@ -67,7 +66,7 @@ public final class RegisterScheduleListener implements EventListener {
     }
 
     @EventContractor(action = "CREATE")
-    public JsonObject create(@Param(SchedulerRequestData.JOB_KEY) JobModel jobModel,
+    public JsonObject create(@Param(SchedulerRequestData.JOB_KEY) QWEJobModel jobModel,
                              @Param(SchedulerRequestData.TRIGGER_KEY) TriggerModel triggerModel) {
         try {
             final JobDetail jobDetail = jobModel.toJobDetail();

@@ -1,8 +1,8 @@
 package io.github.zero88.qwe.scheduler.service;
 
 import io.github.zero88.qwe.dto.JsonData;
-import io.github.zero88.qwe.scheduler.job.JobModel;
-import io.github.zero88.qwe.scheduler.trigger.TriggerModel;
+import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
+import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
 import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -25,13 +25,13 @@ public final class SchedulerRequestData implements JsonData {
     static final String TRIGGER_KEY = "trigger";
     @Include
     @JsonProperty(JOB_KEY)
-    private final JobModel job;
+    private final QWEJobModel job;
     @Include
     @JsonProperty(TRIGGER_KEY)
     private final TriggerModel trigger;
 
     @JsonCreator
-    public static SchedulerRequestData create(@JsonProperty(JOB_KEY) JobModel job,
+    public static SchedulerRequestData create(@JsonProperty(JOB_KEY) QWEJobModel job,
                                               @JsonProperty(TRIGGER_KEY) TriggerModel trigger) {
         return new SchedulerRequestData(job, trigger);
     }

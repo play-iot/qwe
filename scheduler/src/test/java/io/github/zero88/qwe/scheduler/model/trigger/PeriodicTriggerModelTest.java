@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler.trigger;
+package io.github.zero88.qwe.scheduler.model.trigger;
 
 import org.json.JSONException;
 import org.junit.Assert;
@@ -8,6 +8,8 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.qwe.dto.JsonData;
+import io.github.zero88.qwe.scheduler.model.trigger.PeriodicTriggerModel;
+import io.github.zero88.qwe.scheduler.model.trigger.TriggerType;
 import io.vertx.core.json.JsonObject;
 
 public class PeriodicTriggerModelTest {

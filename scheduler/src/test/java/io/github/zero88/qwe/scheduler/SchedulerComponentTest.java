@@ -29,11 +29,11 @@ import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.scheduler.MockEventScheduler.FailureProcessEventSchedulerListener;
 import io.github.zero88.qwe.scheduler.MockEventScheduler.MockJobModel;
 import io.github.zero88.qwe.scheduler.MockEventScheduler.MockProcessEventSchedulerListener;
-import io.github.zero88.qwe.scheduler.job.JobModel;
+import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
+import io.github.zero88.qwe.scheduler.model.trigger.CronTriggerModel;
+import io.github.zero88.qwe.scheduler.model.trigger.PeriodicTriggerModel;
+import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
 import io.github.zero88.qwe.scheduler.service.SchedulerRequestData;
-import io.github.zero88.qwe.scheduler.trigger.CronTriggerModel;
-import io.github.zero88.qwe.scheduler.trigger.PeriodicTriggerModel;
-import io.github.zero88.qwe.scheduler.trigger.TriggerModel;
 import io.github.zero88.utils.DateTimes.Iso8601Parser;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
@@ -242,11 +242,11 @@ public class SchedulerComponentTest {
         eventbus.fire(removeEvent, EventbusHelper.replyAsserter(context, async, r));
     }
 
-    private DeliveryEvent initRegisterEvent(JobModel job, TriggerModel trigger) {
+    private DeliveryEvent initRegisterEvent(QWEJobModel job, TriggerModel trigger) {
         return initRegisterEvent(job, trigger, EventAction.CREATE);
     }
 
-    private DeliveryEvent initRegisterEvent(JobModel job, TriggerModel trigger, EventAction action) {
+    private DeliveryEvent initRegisterEvent(QWEJobModel job, TriggerModel trigger, EventAction action) {
         return DeliveryEvent.builder()
                             .address(config.getRegisterAddress())
                             .pattern(EventPattern.REQUEST_RESPONSE)

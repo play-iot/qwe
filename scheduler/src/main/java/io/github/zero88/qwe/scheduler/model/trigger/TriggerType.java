@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler.trigger;
+package io.github.zero88.qwe.scheduler.model.trigger;
 
 import io.github.zero88.qwe.dto.EnumType;
 import io.github.zero88.qwe.dto.EnumType.AbstractEnumType;
@@ -16,7 +16,7 @@ public final class TriggerType extends AbstractEnumType {
 
     @JsonCreator
     public static TriggerType factory(String type) {
-        return EnumType.factory(type, TriggerType.class);
+        return EnumType.factory(type, TriggerType.class, true);
     }
 
 }

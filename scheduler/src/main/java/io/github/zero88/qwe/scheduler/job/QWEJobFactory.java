@@ -9,15 +9,22 @@ import org.quartz.spi.TriggerFiredBundle;
 
 import io.github.zero88.qwe.component.HasSharedData;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
-
 import io.github.zero88.qwe.scheduler.SchedulerConfig;
+import io.vertx.core.shareddata.SharedData;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+/**
+ * Represents for QWE Job factory to create new QWE job instance
+ *
+ * @see JobFactory
+ * @see SharedData
+ * @see QWEJob
+ */
 @RequiredArgsConstructor
-public final class VertxJobFactory extends SimpleJobFactory implements JobFactory, HasSharedData {
+public final class QWEJobFactory extends SimpleJobFactory implements JobFactory, HasSharedData {
 
     @Getter
     @Accessors(fluent = true)
@@ -25,11 +32,12 @@ public final class VertxJobFactory extends SimpleJobFactory implements JobFactor
     private final SchedulerConfig config;
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
         Job job = super.newJob(bundle, scheduler);
         final Class<? extends Job> jobClass = bundle.getJobDetail().getJobClass();
-        if (VertxJob.class.isAssignableFrom(jobClass)) {
-            return ((VertxJob) job).init(sharedData, config);
+        if (QWEJob.class.isAssignableFrom(jobClass)) {
+            return ((QWEJob) job).init(sharedData, config);
         }
         return job;
     }

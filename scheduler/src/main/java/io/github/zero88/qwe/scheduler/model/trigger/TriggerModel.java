@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler.trigger;
+package io.github.zero88.qwe.scheduler.model.trigger;
 
 import org.quartz.ScheduleBuilder;
 import org.quartz.Trigger;
@@ -21,6 +21,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Declares a {@code Trigger model} that is define 'mechanism' by which {@code job} is scheduled
+ */
 @JsonTypeInfo(use = Id.NAME, property = "type")
 @JsonSubTypes( {
     @JsonSubTypes.Type(value = CronTriggerModel.class, name = "CRON"),

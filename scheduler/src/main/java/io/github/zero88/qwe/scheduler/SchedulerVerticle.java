@@ -32,17 +32,13 @@ public final class SchedulerVerticle extends ComponentVerticle<SchedulerConfig, 
                        .subscribe(s -> future.complete(), future::fail);
     }
 
-    private void initRegisterListener(SchedulerContext ctx) {
-        EventbusClient.create(sharedData())
-                      .register(ctx.getRegisterModel(),
-                                new RegisterScheduleListener(ctx.getScheduler(), ctx.getRegisterModel().getEvents()));
-    }
-
     @Override
     public SchedulerContext onSuccess(@NonNull Class<Component<IConfig, SchedulerContext>> aClass, Path dataDir,
                                       String sharedKey, String deployId) {
-        final SchedulerContext ctx = new SchedulerContext(aClass, dataDir, sharedKey, deployId);
-        this.initRegisterListener(ctx.init(sharedData(), config));
+        final SchedulerContext ctx = new SchedulerContext(aClass, dataDir, sharedKey, deployId).init(sharedData(),
+                                                                                                     config);
+        EventbusClient.create(sharedData())
+                      .register(config.getRegisterAddress(), new RegisterScheduleListener(ctx.getScheduler()));
         return ctx;
     }
 

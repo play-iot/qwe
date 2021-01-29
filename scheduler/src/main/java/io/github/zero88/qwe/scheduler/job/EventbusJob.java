@@ -5,12 +5,20 @@ import org.quartz.JobExecutionContext;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.event.ReplyEventHandler;
+import io.github.zero88.qwe.scheduler.model.job.EventbusJobModel;
 
-public final class EventJob extends AbstractVertxJob<EventJobModel> {
+/**
+ * Eventbus job.
+ * <p>
+ * The execution mechanism is relied on message bus pattern
+ *
+ * @see EventbusClient
+ */
+public final class EventbusJob extends AbstractQWEJob<EventbusJobModel> {
 
     @Override
     public void execute(JobExecutionContext context) {
-        EventJobModel jobModel = getJobModel(context.getMergedJobDataMap());
+        final EventbusJobModel jobModel = queryJobModel(context);
         ReplyEventHandler handler = null;
         if (jobModel.getProcess().getPattern() == EventPattern.REQUEST_RESPONSE) {
             handler = ReplyEventHandler.builder()
@@ -23,7 +31,7 @@ public final class EventJob extends AbstractVertxJob<EventJobModel> {
         }
         EventbusClient.create(sharedData())
                       .fire(jobModel.getProcess().getAddress(), jobModel.getProcess().getPattern(),
-                            jobModel.getProcess().payload(), handler);
+                            jobModel.getProcess().getPayload(), handler);
     }
 
 }

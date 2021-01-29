@@ -1,25 +1,25 @@
-package io.github.zero88.qwe.scheduler.trigger;
+package io.github.zero88.qwe.scheduler.model.trigger;
 
 import org.quartz.ScheduleBuilder;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerKey;
 
-import io.github.zero88.qwe.scheduler.trigger.TriggerModel.AbstractTriggerModel;
+import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel.AbstractTriggerModel;
 import io.vertx.core.json.JsonObject;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.FieldNameConstants;
+import lombok.extern.jackson.Jacksonized;
 
 @Getter
+@Jacksonized
+@FieldNameConstants
 @Builder(builderClassName = "Builder")
-@JsonDeserialize(builder = PeriodicTriggerModel.Builder.class)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public final class PeriodicTriggerModel extends AbstractTriggerModel {
 
@@ -47,7 +47,7 @@ public final class PeriodicTriggerModel extends AbstractTriggerModel {
 
     @Override
     public JsonObject toDetail() {
-        return new JsonObject().put("intervalInSeconds", intervalInSeconds).put("repeat", repeat);
+        return new JsonObject().put(Fields.intervalInSeconds, intervalInSeconds).put(Fields.repeat, repeat);
     }
 
     @Override
@@ -55,7 +55,6 @@ public final class PeriodicTriggerModel extends AbstractTriggerModel {
         return null;
     }
 
-    @JsonPOJOBuilder(withPrefix = "")
     public static class Builder extends AbstractTriggerModelBuilder<PeriodicTriggerModel, Builder> {
 
         public PeriodicTriggerModel build() {

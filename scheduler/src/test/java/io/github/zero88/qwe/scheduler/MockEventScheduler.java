@@ -9,9 +9,8 @@ import io.github.zero88.qwe.event.EventContractor;
 import io.github.zero88.qwe.event.EventListener;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
+import io.github.zero88.qwe.scheduler.model.job.EventbusJobModel;
 import io.vertx.core.json.JsonObject;
-
-import io.github.zero88.qwe.scheduler.job.EventJobModel;
 
 import lombok.NonNull;
 
@@ -65,21 +64,21 @@ public class MockEventScheduler {
 
     public static class MockJobModel {
 
-        public static EventJobModel create(String name) {
-            return EventJobModel.builder()
-                                .name(name)
-                                .process(DeliveryEvent.from(PROCESS_EVENT, EventAction.CREATE))
-                                .callback(DeliveryEvent.from(CALLBACK_EVENT, EventAction.PUBLISH))
-                                .build();
+        public static EventbusJobModel create(String name) {
+            return EventbusJobModel.builder()
+                                   .name(name)
+                                   .process(DeliveryEvent.from(PROCESS_EVENT, EventAction.CREATE))
+                                   .callback(DeliveryEvent.from(CALLBACK_EVENT, EventAction.PUBLISH))
+                                   .build();
         }
 
-        public static EventJobModel create(String name, @NonNull EventModel processEvent) {
-            return EventJobModel.builder()
-                                .name(name)
-                                .process(DeliveryEvent.from(processEvent, EventAction.CREATE))
-                                .callback(DeliveryEvent.from(CALLBACK_EVENT, EventAction.PUBLISH))
-                                .forwardIfFailure(false)
-                                .build();
+        public static EventbusJobModel create(String name, @NonNull EventModel processEvent) {
+            return EventbusJobModel.builder()
+                                   .name(name)
+                                   .process(DeliveryEvent.from(processEvent, EventAction.CREATE))
+                                   .callback(DeliveryEvent.from(CALLBACK_EVENT, EventAction.PUBLISH))
+                                   .forwardIfFailure(false)
+                                   .build();
         }
 
     }
