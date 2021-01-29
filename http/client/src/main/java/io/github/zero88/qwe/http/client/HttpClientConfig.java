@@ -124,7 +124,7 @@ public final class HttpClientConfig implements IConfig {
                       @JsonProperty(Fields.httpErrorHandlerCls) String httpErrorHandlerCls,
                       @JsonProperty(Fields.webSocketConnectErrorHandlerCls) String webSocketConnectErrorHandlerCls,
                       @JsonProperty(Fields.webSocketErrorHandlerCls) String webSocketErrorHandlerCls,
-                      @JsonProperty(Fields.webSocketErrorHandlerCls) String webSocketResponseDispatcherCls) {
+                      @JsonProperty(Fields.webSocketResponseDispatcherCls) String webSocketResponseDispatcherCls) {
             this.reqComposerCls = Strings.isBlank(reqComposerCls)
                                   ? HttpRequestMessageComposer.class
                                   : ReflectionClass.findClass(reqComposerCls);
