@@ -2,7 +2,6 @@ package io.github.zero88.qwe.http.server;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,10 +10,6 @@ import java.util.stream.Stream;
 import io.github.zero88.qwe.component.ComponentContext;
 import io.github.zero88.qwe.component.ComponentVerticle;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
-import io.github.zero88.qwe.event.EventAction;
-import io.github.zero88.qwe.event.EventModel;
-import io.github.zero88.qwe.event.EventPattern;
-import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.qwe.exceptions.converter.CarlExceptionConverter;
@@ -28,21 +23,19 @@ import io.github.zero88.qwe.http.server.HttpConfig.RestConfig;
 import io.github.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;
 import io.github.zero88.qwe.http.server.HttpConfig.StaticWebConfig;
 import io.github.zero88.qwe.http.server.HttpConfig.WebSocketConfig;
+import io.github.zero88.qwe.http.server.download.DownloadRouterCreator;
 import io.github.zero88.qwe.http.server.gateway.GatewayIndexApi;
-import io.github.zero88.qwe.http.server.handler.DownloadFileHandler;
+import io.github.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 import io.github.zero88.qwe.http.server.handler.FailureContextHandler;
 import io.github.zero88.qwe.http.server.handler.NotFoundContextHandler;
-import io.github.zero88.qwe.http.server.handler.RestEventResponseHandler;
-import io.github.zero88.qwe.http.server.handler.UploadFileHandler;
-import io.github.zero88.qwe.http.server.handler.UploadListener;
-import io.github.zero88.qwe.http.server.handler.WebSocketBridgeEventHandler;
-import io.github.zero88.qwe.http.server.rest.RestApisBuilder;
-import io.github.zero88.qwe.http.server.rest.RestEventApi;
-import io.github.zero88.qwe.http.server.rest.RestEventApisBuilder;
-import io.github.zero88.qwe.http.server.ws.WebSocketEventBuilder;
+import io.github.zero88.qwe.http.server.rest.RestApisRouterCreator;
+import io.github.zero88.qwe.http.server.rest.RestEventApisCreator;
+import io.github.zero88.qwe.http.server.rest.api.RestEventApi;
+import io.github.zero88.qwe.http.server.upload.UploadRouterCreator;
+import io.github.zero88.qwe.http.server.web.StaticWebRouterCreator;
+import io.github.zero88.qwe.http.server.ws.WebSocketRouterCreator;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Strings;
-import io.github.zero88.utils.Urls;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Route;
@@ -51,7 +44,6 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.ResponseContentTypeHandler;
 import io.vertx.ext.web.handler.ResponseTimeHandler;
-import io.vertx.ext.web.handler.StaticHandler;
 
 import lombok.NonNull;
 
@@ -145,7 +137,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
 
     private Router initRouter() {
         try {
-            Router mainRouter = Router.router(vertx);
+            Router root = Router.router(vertx);
             CorsOptions corsOptions = config.getCorsOptions();
             CorsHandler corsHandler = CorsHandler.create(corsOptions.getAllowedOriginPattern())
                                                  .allowedMethods(corsOptions.allowedMethods())
@@ -153,59 +145,40 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
                                                  .allowCredentials(corsOptions.isAllowCredentials())
                                                  .exposedHeaders(corsOptions.getExposedHeaders())
                                                  .maxAgeSeconds(corsOptions.getMaxAgeSeconds());
-            mainRouter.route()
-                      .handler(corsHandler)
-                      .handler(ResponseContentTypeHandler.create())
-                      .handler(ResponseTimeHandler.create())
-                      .failureHandler(ResponseTimeHandler.create())
-                      .failureHandler(new FailureContextHandler());
-            String pathNoUpload = "(?!" + config.getFileStorageConfig().getUploadConfig().getPath() + ").+";
-            initFileStorageRouter(mainRouter, config.getFileStorageConfig(), config.publicServerUrl());
-            mainRouter.routeWithRegex(pathNoUpload)
-                      .handler(BodyHandler.create(false).setBodyLimit(config.getMaxBodySizeMB() * MB));
-            initWebSocketRouter(mainRouter, config.getWebSocketConfig());
-            initHttp2Router(mainRouter);
-            initRestRouter(mainRouter, config.getRestConfig());
-            initGatewayRouter(mainRouter, config.getApiGatewayConfig());
-            initStaticWebRouter(mainRouter, config.getStaticWebConfig());
-            mainRouter.route().last().handler(new NotFoundContextHandler());
-            return mainRouter;
+            root.route()
+                .handler(corsHandler)
+                .handler(ResponseContentTypeHandler.create())
+                .handler(ResponseTimeHandler.create())
+                .failureHandler(ResponseTimeHandler.create())
+                .failureHandler(new FailureContextHandler());
+            final FileStorageConfig storageCfg = config.getFileStorageConfig();
+            final String pathNoUpload = "(?!" + storageCfg.getUploadConfig().getPath() + ").+";
+            initFileStorageRouter(root, storageCfg, config.publicServerUrl());
+            root.routeWithRegex(pathNoUpload)
+                .handler(BodyHandler.create(false).setBodyLimit(config.getMaxBodySizeMB() * MB));
+            initHttp2Router(root);
+            new WebSocketRouterCreator(httpRouter.getWebSocketEvents()).mount(root, config.getWebSocketConfig(),
+                                                                              sharedData());
+            initRestRouter(root, config.getRestConfig());
+            initGatewayRouter(root, config.getApiGatewayConfig());
+            new StaticWebRouterCreator().mount(root, config.getStaticWebConfig(), sharedData());
+            root.route().last().handler(new NotFoundContextHandler());
+            return root;
         } catch (CarlException e) {
             throw new InitializerError("Error when initializing http server route", e);
         }
-    }
-
-    private void initStaticWebRouter(Router mainRouter, StaticWebConfig webConfig) {
-        if (!webConfig.isEnabled()) {
-            return;
-        }
-        final StaticHandler staticHandler = StaticHandler.create();
-        if (webConfig.isInResource()) {
-            staticHandler.setWebRoot(webConfig.getWebRoot());
-        } else {
-            String webDir = FileUtils.createFolder(getContext().dataDir(), webConfig.getWebRoot());
-            logger.info("Static web dir {}", webDir);
-            staticHandler.setEnableRangeSupport(true)
-                         .setSendVaryHeader(true)
-                         .setFilesReadOnly(false)
-                         .setAllowRootFileSystemAccess(true)
-                         .setIncludeHidden(false)
-                         .setWebRoot(webDir);
-        }
-        mainRouter.route(Urls.combinePath(webConfig.getWebPath(), ApiConstants.WILDCARDS_ANY_PATH))
-                  .handler(staticHandler);
     }
 
     private Router initRestRouter(Router mainRouter, RestConfig restConfig) {
         if (!restConfig.isEnabled()) {
             return mainRouter;
         }
-        return new RestApisBuilder(vertx, mainRouter).rootApi(restConfig.getRootApi())
-                                                     .registerApi(httpRouter.getRestApiClasses())
-                                                     .registerEventBusApi(httpRouter.getRestEventApiClasses())
-                                                     .dynamicRouteConfig(restConfig.getDynamicConfig())
-                                                     .addSharedDataProxy(this.sharedData())
-                                                     .build();
+        return new RestApisRouterCreator(vertx, mainRouter).rootApi(restConfig.getRootApi())
+                                                           .registerApi(httpRouter.getRestApiClasses())
+                                                           .registerEventBusApi(httpRouter.getRestEventApiClasses())
+                                                           .dynamicRouteConfig(restConfig.getDynamicConfig())
+                                                           .addSharedDataProxy(this.sharedData())
+                                                           .build();
     }
 
     private Router initFileStorageRouter(Router router, FileStorageConfig storageCfg, String publicUrl) {
@@ -213,8 +186,15 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
             return router;
         }
         final Path storageDir = Paths.get(FileUtils.createFolder(getContext().dataDir(), storageCfg.getDir()));
-        initUploadRouter(router, storageDir, storageCfg.getUploadConfig(), publicUrl);
-        initDownloadRouter(router, storageDir, storageCfg.getDownloadConfig());
+        UploadRouterCreator.builder()
+                           .storageDir(storageDir)
+                           .publicUrl(publicUrl)
+                           .build()
+                           .mount(router, storageCfg.getUploadConfig(), sharedData());
+        DownloadRouterCreator.builder()
+                             .storageDir(storageDir)
+                             .build()
+                             .mount(router, storageCfg.getDownloadConfig(), sharedData());
         return router;
     }
 
@@ -229,70 +209,14 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
                                                                              Stream.of(GatewayIndexApi.class))
                                                                      .collect(Collectors.toSet());
         logger.info("Registering sub routers in Gateway API: '{}'...", apiGatewayConfig.getPath());
-        final Router gatewayRouter = new RestEventApisBuilder(vertx).register(gatewayApis)
+        final Router gatewayRouter = new RestEventApisCreator(vertx).register(gatewayApis)
                                                                     .addSharedDataProxy(this.sharedData())
                                                                     .build();
-        final String wildcardsPath = Urls.combinePath(apiGatewayConfig.getPath(), ApiConstants.WILDCARDS_ANY_PATH);
         mainRouter.mountSubRouter(apiGatewayConfig.getPath(), gatewayRouter);
-        restrictJsonRoute(mainRouter.route(wildcardsPath).handler(new RestEventResponseHandler()));
-    }
-
-    private Router initDownloadRouter(Router router, Path storageDir, DownloadConfig downloadCfg) {
-        if (!downloadCfg.isEnabled()) {
-            return router;
-        }
-        logger.info("Init Download router: '{}'...", downloadCfg.getPath());
-        router.get(Urls.combinePath(downloadCfg.getPath(), ApiConstants.WILDCARDS_ANY_PATH))
-              .handler(StaticHandler.create()
-                                    .setEnableRangeSupport(true)
-                                    .setSendVaryHeader(true)
-                                    .setFilesReadOnly(false)
-                                    .setAllowRootFileSystemAccess(true)
-                                    .setIncludeHidden(false)
-                                    .setWebRoot(storageDir.toString()))
-              .handler(DownloadFileHandler.create(downloadCfg.getHandlerClass(), downloadCfg.getPath(), storageDir));
-        return router;
-    }
-
-    private Router initWebSocketRouter(Router router, WebSocketConfig websocketCfg) {
-        if (!websocketCfg.isEnabled()) {
-            return router;
-        }
-        logger.info("Init Websocket router...");
-        return new WebSocketEventBuilder(sharedData(), router).rootWs(websocketCfg.getRootWs())
-                                                              .register(httpRouter.getWebSocketEvents())
-                                                              .handler(WebSocketBridgeEventHandler.class)
-                                                              .options(websocketCfg)
-                                                              .build();
+        restrictJsonRoute(mainRouter.route(BasePaths.addWildcards(apiGatewayConfig.getPath()))
+                                    .handler(new EventMessageResponseHandler()));
     }
 
     private Router initHttp2Router(Router router) { return router; }
-
-    private Router initUploadRouter(Router router, Path storageDir, UploadConfig uploadCfg, String publicUrl) {
-        if (!uploadCfg.isEnabled()) {
-            return router;
-        }
-        logger.info("Init Upload router: '{}'...", uploadCfg.getPath());
-        final String sharedKey = getContext().sharedKey();
-        final EventbusClient eventbus = EventbusClient.create(sharedData());
-        EventModel listenerEvent = EventModel.builder()
-                                             .address(Strings.fallback(uploadCfg.getListenerAddress(),
-                                                                       sharedKey + ".upload"))
-                                             .event(EventAction.CREATE)
-                                             .pattern(EventPattern.REQUEST_RESPONSE)
-                                             .local(true)
-                                             .build();
-        String handlerClass = uploadCfg.getHandlerClass();
-        String listenerClass = uploadCfg.getListenerClass();
-        eventbus.register(listenerEvent, UploadListener.create(sharedData(), listenerClass,
-                                                               new ArrayList<>(listenerEvent.getEvents())));
-        router.post(uploadCfg.getPath())
-              .handler(BodyHandler.create(storageDir.toString()).setBodyLimit(uploadCfg.getMaxBodySizeMB() * MB))
-              .handler(UploadFileHandler.create(handlerClass, eventbus, listenerEvent, storageDir, publicUrl))
-              .handler(new RestEventResponseHandler())
-              .produces(HttpUtils.JSON_CONTENT_TYPE)
-              .produces(HttpUtils.JSON_UTF8_CONTENT_TYPE);
-        return router;
-    }
 
 }

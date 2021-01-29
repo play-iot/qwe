@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.JsonHelper;
+import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;
@@ -25,7 +24,6 @@ import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.UpgradeRejectedException;
 import io.vertx.core.http.WebSocket;
-import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.unit.Async;
@@ -35,9 +33,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.reactivex.core.http.HttpClientRequest;
 import io.vertx.reactivex.core.http.HttpClientResponse;
 
-@Ignore
 @RunWith(VertxUnitRunner.class)
-// FIXME FIX websocket
 public class WebSocketEventServerTest extends HttpServerTestBase {
 
     @Rule
@@ -177,8 +173,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
     }
 
     private void assertNotFound(TestContext context, Async async, String uri) {
-        WebSocketConnectOptions opt = new WebSocketConnectOptions(requestOptions.setURI(uri).toJson());
-        client.webSocket(opt, ar -> {
+        client.webSocket(wsOpt(requestOptions.setURI(uri)), ar -> {
             if (ar.succeeded()) {
                 testComplete(async);
                 return;

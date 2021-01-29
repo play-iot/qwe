@@ -11,7 +11,7 @@ import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.http.server.HttpServer;
 import io.github.zero88.qwe.http.server.ServerInfo;
 import io.github.zero88.qwe.http.server.handler.DynamicContextDispatcher;
-import io.github.zero88.qwe.http.server.rest.DynamicRestApi;
+import io.github.zero88.qwe.http.server.rest.api.DynamicRestApi;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayMonitor;
 import io.github.zero88.utils.Urls;
 import io.vertx.ext.web.Router;

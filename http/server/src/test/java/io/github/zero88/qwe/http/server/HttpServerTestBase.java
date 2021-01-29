@@ -44,6 +44,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.core.http.HttpClient;
 
+import lombok.NonNull;
+
 @RunWith(VertxUnitRunner.class)
 public abstract class HttpServerTestBase {
 
@@ -170,21 +172,20 @@ public abstract class HttpServerTestBase {
         throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<WebSocket> wsReference = new AtomicReference<>();
-        client.webSocket(
-            new WebSocketConnectOptions(requestOptions.setURI(Urls.combinePath(path, "websocket")).toJson()), ar -> {
-                if (ar.succeeded()) {
-                    final io.vertx.reactivex.core.http.WebSocket ws = ar.result();
-                    if (Objects.nonNull(writerBeforeHandler)) {
-                        writerBeforeHandler.accept(ws.getDelegate());
-                    }
-                    wsReference.set(ws.getDelegate());
-                    latch.countDown();
-                    ws.endHandler(v -> testComplete(async, "CLIENT END"));
-                    ws.exceptionHandler(error::accept);
-                } else {
-                    error.accept(ar.cause());
+        client.webSocket(wsOpt(requestOptions.setURI(Urls.combinePath(path, "websocket"))), ar -> {
+            if (ar.succeeded()) {
+                final io.vertx.reactivex.core.http.WebSocket ws = ar.result();
+                if (Objects.nonNull(writerBeforeHandler)) {
+                    writerBeforeHandler.accept(ws.getDelegate());
                 }
-            });
+                wsReference.set(ws.getDelegate());
+                latch.countDown();
+                ws.endHandler(v -> testComplete(async, "CLIENT END"));
+                ws.exceptionHandler(error::accept);
+            } else {
+                error.accept(ar.cause());
+            }
+        });
         context.assertTrue(latch.await(TestHelper.TEST_TIMEOUT_SEC, TimeUnit.SECONDS), "Timeout");
         return wsReference.get();
     }
@@ -203,6 +204,12 @@ public abstract class HttpServerTestBase {
 
     protected JsonObject createWebsocketMsg(String address, EventMessage body, BridgeEventType send) {
         return WebSocketEventMessage.builder().type(send).address(address).body(body).build().toJson();
+    }
+
+    protected WebSocketConnectOptions wsOpt(@NonNull RequestOptions opt) {
+//        HttpMethod method = opt.getMethod();
+        //        .put("method", method.name())
+        return new WebSocketConnectOptions(opt.setMethod(null).toJson());
     }
 
 }

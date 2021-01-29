@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -13,10 +12,13 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.exceptions.InvalidUrlException;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.exceptions.InitializerError;
-import io.github.zero88.qwe.http.server.ApiConstants;
+import io.github.zero88.qwe.http.server.BasePaths;
 import io.github.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;
 import io.github.zero88.qwe.http.server.HttpServer;
-import io.github.zero88.qwe.http.server.handler.RestEventResponseHandler;
+import io.github.zero88.qwe.http.server.RouterCreator;
+import io.github.zero88.qwe.http.server.handler.EventMessageResponseHandler;
+import io.github.zero88.qwe.http.server.rest.api.RestApi;
+import io.github.zero88.qwe.http.server.rest.api.RestEventApi;
 import io.github.zero88.qwe.micro.MicroContext;
 import io.github.zero88.utils.Reflections;
 import io.github.zero88.utils.Strings;
@@ -27,10 +29,14 @@ import io.vertx.ext.web.Router;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * @see RouterCreator
+ */
+//TODO Refactor it as RouterCreator
 @RequiredArgsConstructor
-public final class RestApisBuilder {
+public final class RestApisRouterCreator {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestApisBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestApisRouterCreator.class);
 
     @NonNull
     private final Vertx vertx;
@@ -41,21 +47,21 @@ public final class RestApisBuilder {
     private final Set<Class<? extends RestApi>> restApiClass = new HashSet<>();
     @NonNull
     private final Set<Class<? extends RestEventApi>> restEventApiClass = new HashSet<>();
-    private String rootApi = ApiConstants.ROOT_API_PATH;
+    private String rootApi = BasePaths.ROOT_API_PATH;
     private SharedDataLocalProxy proxy;
     private DynamicRouteConfig dynamicRouteConfig;
 
-    public RestApisBuilder registerApi(Collection<Class<? extends RestApi>> apiClass) {
+    public RestApisRouterCreator registerApi(Collection<Class<? extends RestApi>> apiClass) {
         restApiClass.addAll(apiClass);
         return this;
     }
 
-    public RestApisBuilder registerEventBusApi(Collection<Class<? extends RestEventApi>> eventBusApiClasses) {
+    public RestApisRouterCreator registerEventBusApi(Collection<Class<? extends RestEventApi>> eventBusApiClasses) {
         restEventApiClass.addAll(eventBusApiClasses);
         return this;
     }
 
-    public RestApisBuilder rootApi(String rootApi) {
+    public RestApisRouterCreator rootApi(String rootApi) {
         if (Strings.isNotBlank(rootApi)) {
             String root = Urls.combinePath(rootApi);
             if (!Urls.validatePath(root)) {
@@ -66,12 +72,12 @@ public final class RestApisBuilder {
         return this;
     }
 
-    public RestApisBuilder addSharedDataProxy(@NonNull SharedDataLocalProxy proxy) {
+    public RestApisRouterCreator addSharedDataProxy(@NonNull SharedDataLocalProxy proxy) {
         this.proxy = proxy;
         return this;
     }
 
-    public RestApisBuilder dynamicRouteConfig(DynamicRouteConfig dynamicRouteConfig) {
+    public RestApisRouterCreator dynamicRouteConfig(DynamicRouteConfig dynamicRouteConfig) {
         this.dynamicRouteConfig = dynamicRouteConfig;
         return this;
     }
@@ -84,12 +90,12 @@ public final class RestApisBuilder {
         this.addSubRouter(this::initRestApiRouter)
             .addSubRouter(this::initEventBusApiRouter)
             .addSubRouter(this::initDynamicRouter);
-        HttpServer.restrictJsonRoute(mainRouter.route(Urls.combinePath(rootApi, ApiConstants.WILDCARDS_ANY_PATH))
-                                               .handler(new RestEventResponseHandler()));
+        HttpServer.restrictJsonRoute(
+            mainRouter.route(BasePaths.addWildcards(rootApi)).handler(new EventMessageResponseHandler()));
         return mainRouter;
     }
 
-    private RestApisBuilder addSubRouter(Supplier<Router> supplier) {
+    private RestApisRouterCreator addSubRouter(Supplier<Router> supplier) {
         final Router subRouter = supplier.get();
         if (Objects.nonNull(subRouter)) {
             mainRouter.mountSubRouter(rootApi, subRouter);
@@ -112,7 +118,7 @@ public final class RestApisBuilder {
             return null;
         }
         logger.info("Registering sub router REST Event API...");
-        return new RestEventApisBuilder(vertx).addSharedDataProxy(proxy).register(restEventApiClass).build();
+        return new RestEventApisCreator(vertx).addSharedDataProxy(proxy).register(restEventApiClass).build();
     }
 
     private Router initDynamicRouter() {
@@ -125,7 +131,7 @@ public final class RestApisBuilder {
             throw new InitializerError("To enabled dynamic route, you have to put on qwe-core-micro.jar in classpath",
                                        e);
         }
-        String path = Urls.combinePath(dynamicRouteConfig.getPath(), ApiConstants.WILDCARDS_ANY_PATH);
+        String path = BasePaths.addWildcards(dynamicRouteConfig.getPath());
         logger.info("Registering sub router REST Dynamic API '{}' in disable mode...", path);
         Router dynamicRouter = Router.router(vertx);
         dynamicRouter.route(path).disable();

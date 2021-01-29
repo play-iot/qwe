@@ -14,15 +14,15 @@ import lombok.Getter;
 @JsonDeserialize(builder = ServerInfo.Builder.class)
 public final class ServerInfo extends HostInfo implements JsonData, Shareable {
 
-    private String publicHost;
-    private String apiPath;
-    private String wsPath;
-    private String gatewayPath;
-    private String downloadPath;
-    private String uploadPath;
-    private String servicePath;
-    private String webPath;
-    private Router router;
+    private final String publicHost;
+    private final String apiPath;
+    private final String wsPath;
+    private final String gatewayPath;
+    private final String downloadPath;
+    private final String uploadPath;
+    private final String servicePath;
+    private final String webPath;
+    private final Router router;
 
     @lombok.Builder(builderMethodName = "siBuilder")
     ServerInfo(String host, int port, boolean ssl, String publicHost, String apiPath, String wsPath, String gatewayPath,

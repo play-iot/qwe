@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.rest;
+package io.github.zero88.qwe.http.server.rest.api;
 
 import java.util.Optional;
 import java.util.Set;

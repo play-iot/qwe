@@ -13,8 +13,10 @@ import io.vertx.ext.web.RoutingContext;
 
 /**
  * Rest response end handler for {@code eventbus}
+ *
+ * @see EventMessage
  */
-public final class RestEventResponseHandler implements Handler<RoutingContext> {
+public final class EventMessageResponseHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext context) {

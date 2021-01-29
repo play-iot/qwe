@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.handler;
+package io.github.zero88.qwe.http.server.rest.handler;
 
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;

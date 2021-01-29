@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.handler;
+package io.github.zero88.qwe.http.server.upload;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

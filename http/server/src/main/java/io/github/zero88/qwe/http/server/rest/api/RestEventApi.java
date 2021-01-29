@@ -1,10 +1,10 @@
-package io.github.zero88.qwe.http.server.rest;
+package io.github.zero88.qwe.http.server.rest.api;
 
 import java.util.Collection;
 
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.http.event.RestEventApiMetadata;
-import io.github.zero88.qwe.http.server.handler.RestEventApiDispatcher;
+import io.github.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
 import io.github.zero88.qwe.micro.http.ActionMethodMapping;
 
 /**

@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.handler;
+package io.github.zero88.qwe.http.server.download;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;

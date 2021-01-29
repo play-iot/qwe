@@ -1,10 +1,12 @@
 package io.github.zero88.qwe.http.server;
 
+import io.github.zero88.utils.Urls;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ApiConstants {
+public final class BasePaths {
 
     public static final String WEB_PATH = "/web";
     public static final String ROOT_API_PATH = "/api";
@@ -15,5 +17,9 @@ public final class ApiConstants {
     public static final String ROOT_UPLOAD_PATH = "/u";
     public static final String ROOT_DOWNLOAD_PATH = "/f";
     public static final String WILDCARDS_ANY_PATH = "*";
+
+    public static String addWildcards(String path) {
+        return Urls.combinePath(path, WILDCARDS_ANY_PATH);
+    }
 
 }

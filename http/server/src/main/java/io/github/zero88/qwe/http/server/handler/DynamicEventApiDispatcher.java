@@ -8,7 +8,7 @@ import io.github.zero88.qwe.dto.msg.ResponseData;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.github.zero88.qwe.http.server.handler.DynamicContextDispatcher.AbstractDynamicContextDispatcher;
-import io.github.zero88.qwe.http.server.rest.DynamicEventRestApi;
+import io.github.zero88.qwe.http.server.rest.api.DynamicEventRestApi;
 import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
 import io.github.zero88.qwe.micro.http.EventMethodDefinition;
 import io.github.zero88.qwe.micro.servicetype.EventMessageService;

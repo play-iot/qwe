@@ -3,7 +3,7 @@ package io.github.zero88.qwe.http.server.handler;
 import io.github.zero88.qwe.dto.msg.ResponseData;
 import io.github.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.github.zero88.qwe.http.server.handler.DynamicContextDispatcher.AbstractDynamicContextDispatcher;
-import io.github.zero88.qwe.http.server.rest.DynamicHttpRestApi;
+import io.github.zero88.qwe.http.server.rest.api.DynamicHttpRestApi;
 import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
 import io.reactivex.Single;
 import io.vertx.core.http.HttpMethod;

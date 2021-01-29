@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.github.zero88.qwe.http.server.rest.RestApi;
-import io.github.zero88.qwe.http.server.rest.RestEventApi;
+import io.github.zero88.qwe.http.server.rest.api.RestApi;
+import io.github.zero88.qwe.http.server.rest.api.RestEventApi;
 
 import lombok.Getter;
 

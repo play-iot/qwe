@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.ws;
+package io.github.zero88.qwe.http.server.ws.jackson;
 
 import java.io.IOException;
 

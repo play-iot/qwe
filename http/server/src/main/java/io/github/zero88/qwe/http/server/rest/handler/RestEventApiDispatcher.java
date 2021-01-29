@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.handler;
+package io.github.zero88.qwe.http.server.rest.handler;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -11,6 +11,7 @@ import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.http.server.converter.RequestDataConverter;
+import io.github.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.ext.web.RoutingContext;
@@ -24,7 +25,7 @@ import lombok.experimental.Accessors;
  * Represents for pushing data via {@code Eventbus} then listen {@code reply message}. After receiving {@code reply
  * message}, redirect it to {@code next Context handler}
  *
- * @see RestEventResponseHandler
+ * @see EventMessageResponseHandler
  */
 @RequiredArgsConstructor
 public class RestEventApiDispatcher implements RestEventRequestDispatcher {

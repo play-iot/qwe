@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.handler;
+package io.github.zero88.qwe.http.server.upload;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +10,7 @@ import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
+import io.github.zero88.qwe.http.server.rest.handler.RestEventRequestDispatcher;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Reflections.ReflectionClass;

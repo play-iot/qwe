@@ -1,11 +1,10 @@
-package io.github.zero88.qwe.http.server.rest;
+package io.github.zero88.qwe.http.server.rest.api;
 
 import java.util.Optional;
 import java.util.Set;
 
-import io.github.zero88.qwe.http.server.ApiConstants;
+import io.github.zero88.qwe.http.server.BasePaths;
 import io.github.zero88.qwe.utils.Networks;
-import io.github.zero88.utils.Urls;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
@@ -18,7 +17,7 @@ public interface DynamicHttpRestApi extends DynamicRestApi {
     static DynamicHttpRestApi create(@NonNull Record record) {
         final HttpLocation location = record.getLocation().mapTo(HttpLocation.class);
         final int order = Networks.priorityOrder(location.getRoot().length());
-        final String path = Urls.combinePath(location.getRoot(), ApiConstants.WILDCARDS_ANY_PATH);
+        final String path = BasePaths.addWildcards(location.getRoot());
         return new DynamicHttpRestApi() {
             @Override
             public String path() { return path; }

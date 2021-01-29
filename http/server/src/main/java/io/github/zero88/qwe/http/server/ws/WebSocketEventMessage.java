@@ -6,6 +6,8 @@ import java.util.Objects;
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.exceptions.InitializerError;
+import io.github.zero88.qwe.http.server.ws.jackson.BridgeEventTypeDeserialize;
+import io.github.zero88.qwe.http.server.ws.jackson.BridgeEventTypeSerialize;
 import io.github.zero88.utils.Strings;
 import io.vertx.ext.bridge.BridgeEventType;
 

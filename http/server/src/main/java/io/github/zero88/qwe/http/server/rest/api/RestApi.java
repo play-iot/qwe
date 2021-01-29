@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.rest;
+package io.github.zero88.qwe.http.server.rest.api;
 
 /**
  * Represents for REST API

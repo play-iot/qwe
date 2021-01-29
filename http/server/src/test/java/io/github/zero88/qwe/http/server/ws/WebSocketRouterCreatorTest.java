@@ -1,38 +1,36 @@
 package io.github.zero88.qwe.http.server.ws;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.github.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.qwe.http.event.WebSocketServerEventMetadata;
+import io.github.zero88.qwe.http.server.HttpConfig.WebSocketConfig;
 import io.github.zero88.qwe.http.server.mock.MockWebSocketEvent;
 
-public class WebSocketEventBuilderTest {
+public class WebSocketRouterCreatorTest {
 
     @Test
     public void test_no_register_metadata() {
-        Assertions.assertThrows(InitializerError.class, () -> new WebSocketEventBuilder().validate());
-    }
-
-    @Test
-    public void test_register_null() {
-        Assertions.assertThrows(NullPointerException.class,
-                                () -> new WebSocketEventBuilder().register((WebSocketServerEventMetadata) null));
+        Assertions.assertThrows(InitializerError.class,
+                                () -> new WebSocketRouterCreator(Collections.emptyList()).validate());
     }
 
     @Test
     public void test_customize_root() {
-        WebSocketEventBuilder builder = new WebSocketEventBuilder();
-        Assertions.assertEquals("/ws", builder.getRootWs());
-        builder.rootWs("rtc");
-        Assertions.assertEquals("/rtc", builder.getRootWs());
+        final WebSocketRouterCreator creator = new WebSocketRouterCreator(Collections.emptySet());
+        final String s = creator.mountPoint(WebSocketConfig.builder().build());
+        Assertions.assertEquals("/ws", s);
     }
 
     @Test
     public void test_one_metadata() {
         WebSocketServerEventMetadata metadata = WebSocketServerEventMetadata.create(MockWebSocketEvent.SERVER_LISTENER,
                                                                                     MockWebSocketEvent.SERVER_PROCESSOR);
-        Assertions.assertEquals(1, new WebSocketEventBuilder().register(metadata).validate().size());
+        Assertions.assertEquals(1, new WebSocketRouterCreator(Collections.singletonList(metadata)).validate().size());
     }
 
     @Test
@@ -43,7 +41,7 @@ public class WebSocketEventBuilderTest {
         WebSocketServerEventMetadata metadata2 = WebSocketServerEventMetadata.create("xy",
                                                                                      MockWebSocketEvent.SERVER_LISTENER,
                                                                                      MockWebSocketEvent.SERVER_PROCESSOR);
-        Assertions.assertEquals(1, new WebSocketEventBuilder().register(metadata1, metadata2).validate().size());
+        Assertions.assertEquals(1, new WebSocketRouterCreator(Arrays.asList(metadata1, metadata2)).validate().size());
     }
 
     @Test
@@ -54,7 +52,7 @@ public class WebSocketEventBuilderTest {
         WebSocketServerEventMetadata metadata2 = WebSocketServerEventMetadata.create("abc",
                                                                                      MockWebSocketEvent.SERVER_LISTENER,
                                                                                      MockWebSocketEvent.SERVER_PROCESSOR);
-        Assertions.assertEquals(2, new WebSocketEventBuilder().register(metadata1, metadata2).validate().size());
+        Assertions.assertEquals(2, new WebSocketRouterCreator(Arrays.asList(metadata1, metadata2)).validate().size());
     }
 
 }

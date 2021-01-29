@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.http.server.handler;
+package io.github.zero88.qwe.http.server.ws;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,17 +6,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;
-import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.github.zero88.qwe.http.server.ws.WebSocketEventExecutor;
-import io.github.zero88.qwe.http.server.ws.WebSocketEventMessage;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
@@ -25,20 +20,21 @@ import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * WebSocket event bus handler
  */
 //TODO handle auth with socket header
+@Slf4j
 public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketBridgeEventHandler.class);
     private final Map<String, WebSocketServerEventMetadata> metadataByListener = new HashMap<>();
     private final WebSocketEventExecutor executor;
 
-    public WebSocketBridgeEventHandler(@NonNull EventbusClient eventbusClient,
+    public WebSocketBridgeEventHandler(@NonNull SharedDataLocalProxy sharedData,
                                        @NonNull List<WebSocketServerEventMetadata> addressMap) {
-        this.executor = new WebSocketEventExecutor(eventbusClient);
+        this.executor = new WebSocketEventExecutor(sharedData);
         addressMap.forEach(this::initMetadata);
     }
 
@@ -56,25 +52,23 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
         } else {
             logEvent(event, true);
         }
-        if (!event.tryComplete()) {
-            event.complete(true);
-        }
+        event.tryComplete(true);
     }
 
     private void logEvent(BridgeEvent event, boolean debug) {
         String msg = "Websocket::Event: {} - Remote: {} - Path: {} - Id: {}";
         SockJSSocket socket = event.socket();
         if (debug) {
-            logger.debug(msg, event.type(), socket.remoteAddress(), socket.uri(), socket.writeHandlerID());
+            log.debug(msg, event.type(), socket.remoteAddress(), socket.uri(), socket.writeHandlerID());
         } else {
-            logger.info(msg, event.type(), socket.remoteAddress(), socket.uri(), socket.writeHandlerID());
+            log.info(msg, event.type(), socket.remoteAddress(), socket.uri(), socket.writeHandlerID());
         }
     }
 
     private void clientToServer(BridgeEvent event) {
         logEvent(event, false);
         SockJSSocket socket = event.socket();
-        socket.exceptionHandler(t -> logger.error("WEBSOCKET::Backend error", t));
+        socket.exceptionHandler(t -> log.error("WEBSOCKET::Backend error", t));
         String address = event.getRawMessage().getString("address");
         WebSocketServerEventMetadata metadata = this.metadataByListener.get(address);
         if (Objects.isNull(metadata)) {
@@ -83,7 +77,7 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
             return;
         }
         try {
-            logger.info("WEBSOCKET::Redirect message from address: {}", address);
+            log.info("WEBSOCKET::Redirect message from address: {}", address);
             executor.execute(WebSocketEventMessage.from(event.getRawMessage()), metadata, handleMessage(socket));
         } catch (CarlException e) {
             handleMessage(socket).accept(EventMessage.error(EventAction.RETURN, e));

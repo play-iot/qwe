@@ -12,7 +12,7 @@ import io.github.zero88.qwe.http.server.HttpServerContext;
 import io.github.zero88.qwe.http.server.HttpServerProvider;
 import io.github.zero88.qwe.http.server.HttpServerRouter;
 import io.github.zero88.qwe.http.server.ServerInfo;
-import io.github.zero88.qwe.http.server.rest.RestApi;
+import io.github.zero88.qwe.http.server.rest.api.RestApi;
 import io.github.zero88.qwe.micro.MicroContext;
 import io.github.zero88.qwe.micro.MicroVerticleProvider;
 import io.vertx.core.json.JsonObject;
