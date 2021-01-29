@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -101,6 +102,7 @@ public final class HttpClientConfig implements IConfig {
     }
 
     @Getter
+    @FieldNameConstants
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class HandlerConfig {
 
@@ -116,13 +118,13 @@ public final class HttpClientConfig implements IConfig {
             = WebSocketResponseDispatcher.class;
 
         @JsonCreator
-        HandlerConfig(@JsonProperty("reqComposerCls") String reqComposerCls,
-                      @JsonProperty("respTextHandlerCls") String respTextHandlerCls,
-                      @JsonProperty("respBinaryHandlerCls") String respBinaryHandlerCls,
-                      @JsonProperty("httpErrorHandlerCls") String httpErrorHandlerCls,
-                      @JsonProperty("webSocketConnectErrorHandlerCls") String webSocketConnectErrorHandlerCls,
-                      @JsonProperty("webSocketErrorHandlerCls") String webSocketErrorHandlerCls,
-                      @JsonProperty("webSocketResponseDispatcherCls") String webSocketResponseDispatcherCls) {
+        HandlerConfig(@JsonProperty(Fields.reqComposerCls) String reqComposerCls,
+                      @JsonProperty(Fields.respTextHandlerCls) String respTextHandlerCls,
+                      @JsonProperty(Fields.respBinaryHandlerCls) String respBinaryHandlerCls,
+                      @JsonProperty(Fields.httpErrorHandlerCls) String httpErrorHandlerCls,
+                      @JsonProperty(Fields.webSocketConnectErrorHandlerCls) String webSocketConnectErrorHandlerCls,
+                      @JsonProperty(Fields.webSocketErrorHandlerCls) String webSocketErrorHandlerCls,
+                      @JsonProperty(Fields.webSocketErrorHandlerCls) String webSocketResponseDispatcherCls) {
             this.reqComposerCls = Strings.isBlank(reqComposerCls)
                                   ? HttpRequestMessageComposer.class
                                   : ReflectionClass.findClass(reqComposerCls);
