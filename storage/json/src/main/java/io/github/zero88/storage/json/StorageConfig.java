@@ -8,9 +8,12 @@ import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.file.FileOption;
 import io.github.zero88.utils.Strings;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.extern.jackson.Jacksonized;
@@ -18,6 +21,8 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Jacksonized
 @Builder(builderClassName = "Builder")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StorageConfig implements IConfig {
 
     @Accessors(fluent = true)

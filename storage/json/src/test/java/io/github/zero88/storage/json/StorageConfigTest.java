@@ -15,6 +15,18 @@ import io.vertx.core.json.JsonObject;
 class StorageConfigTest {
 
     @Test
+    void test_default() throws JSONException {
+        final StorageConfig config = IConfig.fromClasspath("storage.json", StorageConfig.class);
+        JsonHelper.assertJson(StorageConfig.create().toJson(), config.toJson());
+    }
+
+    @Test
+    void test_under_app() throws JSONException {
+        final StorageConfig config = IConfig.fromClasspath("app-cfg.json", StorageConfig.class);
+        JsonHelper.assertJson(StorageConfig.create().toJson(), config.toJson());
+    }
+
+    @Test
     void serialize() throws JSONException {
         final StorageConfig config = StorageConfig.create();
         Assertions.assertTrue(config.getOption().isAutoCreate());
@@ -34,13 +46,6 @@ class StorageConfigTest {
         JsonObject json = config.toJson();
         System.out.println(json);
         JsonHelper.assertJson(json, IConfig.from(json, StorageConfig.class).toJson());
-    }
-
-    @Test
-    void from_file() throws JSONException {
-        final StorageConfig config = IConfig.fromClasspath("storage.json", StorageConfig.class);
-        System.out.println(config.toJson());
-        JsonHelper.assertJson(StorageConfig.create().toJson(), config.toJson());
     }
 
     @Test

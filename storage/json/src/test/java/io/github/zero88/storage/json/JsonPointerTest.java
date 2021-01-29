@@ -1,4 +1,4 @@
-package io.github.zero88.jp.json;
+package io.github.zero88.storage.json;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
