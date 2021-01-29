@@ -3,8 +3,9 @@ package io.github.zero88.qwe.scheduler.service;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.quartz.CronTrigger;
@@ -17,6 +18,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.utils.Key;
 
+import io.github.zero88.qwe.component.HasSharedData;
+import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventContractor;
 import io.github.zero88.qwe.event.EventContractor.Param;
@@ -26,18 +29,37 @@ import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
 import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
+import io.github.zero88.qwe.scheduler.service.SchedulerRequestData.Fields;
 import io.github.zero88.qwe.utils.JsonUtils;
+import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.json.JsonObject;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
-public final class RegisterScheduleListener implements EventListener {
+@Getter
+@Accessors(fluent = true)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class SchedulerService implements EventListener, HasSharedData {
 
+    public static <T extends SchedulerService> T create(@NonNull Scheduler scheduler,
+                                                        @NonNull SharedDataLocalProxy sharedData,
+                                                        @NonNull Class<T> clazz) {
+        Map<Class, Object> inputs = new LinkedHashMap<>();
+        inputs.put(Scheduler.class, scheduler);
+        inputs.put(SharedDataLocalProxy.class, sharedData);
+        return ReflectionClass.createObject(clazz, inputs);
+    }
+
+    @NonNull
     private final Scheduler scheduler;
+    @NonNull
+    private final SharedDataLocalProxy sharedData;
 
     @Override
     public @NonNull Collection<EventAction> getAvailableEvents() {
@@ -45,8 +67,7 @@ public final class RegisterScheduleListener implements EventListener {
     }
 
     @EventContractor(action = "GET_ONE")
-    public JsonObject get(@Param(SchedulerRequestData.JOB_KEY) QWEJobModel jobModel,
-                          @Param(SchedulerRequestData.TRIGGER_KEY) TriggerModel triggerModel) {
+    public JsonObject get(@Param(Fields.job) QWEJobModel jobModel, @Param(Fields.trigger) TriggerModel triggerModel) {
         try {
             final JobDetail jobDetail = jobModel.toJobDetail();
             final Trigger trigger = triggerModel.toTrigger();
@@ -66,8 +87,8 @@ public final class RegisterScheduleListener implements EventListener {
     }
 
     @EventContractor(action = "CREATE")
-    public JsonObject create(@Param(SchedulerRequestData.JOB_KEY) QWEJobModel jobModel,
-                             @Param(SchedulerRequestData.TRIGGER_KEY) TriggerModel triggerModel) {
+    public JsonObject create(@Param(Fields.job) QWEJobModel jobModel,
+                             @Param(Fields.trigger) TriggerModel triggerModel) {
         try {
             final JobDetail jobDetail = jobModel.toJobDetail();
             final Trigger trigger = triggerModel.toTrigger();
@@ -98,7 +119,7 @@ public final class RegisterScheduleListener implements EventListener {
     }
 
     @EventContractor(action = "REMOVE")
-    public JsonObject remove(@Param(SchedulerRequestData.JOB_KEY) JsonObject jobKey) {
+    public JsonObject remove(@Param(Fields.job) JsonObject jobKey) {
         final JobKey key = JobKey.jobKey(jobKey.getString("name"), jobKey.getString("group", null));
         try {
             return new JsonObject().put("unschedule", scheduler.deleteJob(key));

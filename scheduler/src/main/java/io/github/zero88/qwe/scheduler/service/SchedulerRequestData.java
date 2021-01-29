@@ -3,42 +3,34 @@ package io.github.zero88.qwe.scheduler.service;
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
 import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
-import io.vertx.core.json.JsonObject;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldNameConstants;
+import lombok.extern.jackson.Jacksonized;
 
+@SuppressWarnings("rawtypes")
 @Getter
+@FieldNameConstants
+@Jacksonized
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class SchedulerRequestData implements JsonData {
 
-    static final String JOB_KEY = "job";
-    static final String TRIGGER_KEY = "trigger";
     @Include
-    @JsonProperty(JOB_KEY)
+    @JsonProperty(Fields.job)
     private final QWEJobModel job;
     @Include
-    @JsonProperty(TRIGGER_KEY)
+    @JsonProperty(Fields.trigger)
     private final TriggerModel trigger;
-
-    @JsonCreator
-    public static SchedulerRequestData create(@JsonProperty(JOB_KEY) QWEJobModel job,
-                                              @JsonProperty(TRIGGER_KEY) TriggerModel trigger) {
-        return new SchedulerRequestData(job, trigger);
-    }
-
-    @Override
-    public JsonObject toJson() {
-        return new JsonObject().put(JOB_KEY, job.toJson()).put(TRIGGER_KEY, trigger.toJson());
-    }
 
 }

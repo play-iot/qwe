@@ -8,8 +8,12 @@ import org.quartz.simpl.RAMJobStore;
 import io.github.zero88.qwe.component.ComponentContext;
 import io.github.zero88.qwe.component.ComponentContext.DefaultComponentContext;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
+import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.qwe.scheduler.job.QWEJobFactory;
+import io.github.zero88.qwe.scheduler.service.SchedulerService;
+import io.github.zero88.qwe.utils.ExecutorHelpers;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 
 import lombok.AccessLevel;
@@ -28,6 +32,11 @@ public final class SchedulerContext extends DefaultComponentContext {
 
     SchedulerContext init(SharedDataLocalProxy sharedData, SchedulerConfig config) {
         final Vertx vertx = sharedData.getVertx();
+        ExecutorHelpers.blocking(vertx, () -> this.init(sharedData, config, vertx)).subscribe();
+        return this;
+    }
+
+    private SchedulerContext init(SharedDataLocalProxy sharedData, SchedulerConfig config, Vertx vertx) {
         try {
             final DirectSchedulerFactory factory = DirectSchedulerFactory.getInstance();
             factory.createScheduler(config.getSchedulerName(), config.getSchedulerName(),
@@ -35,13 +44,20 @@ public final class SchedulerContext extends DefaultComponentContext {
             scheduler = factory.getScheduler(config.getSchedulerName());
             scheduler.setJobFactory(new QWEJobFactory(sharedData, config));
             scheduler.start();
+            EventbusClient.create(sharedData)
+                          .register(config.getRegisterAddress(),
+                                    SchedulerService.create(scheduler, sharedData, config.schedulerServiceClass()));
             return this;
         } catch (SchedulerException e) {
             throw new InitializerError("Cannot start QWE Scheduler", e);
         }
     }
 
-    SchedulerContext shutdown() {
+    void shutdown(Vertx vertx, Promise<Void> future) {
+        ExecutorHelpers.blocking(vertx, this::shutdown).subscribe(s -> future.complete(), future::fail);
+    }
+
+    private SchedulerContext shutdown() {
         try {
             scheduler.shutdown();
             scheduler = null;

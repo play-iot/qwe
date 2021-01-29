@@ -1,0 +1,16 @@
+{
+  "__app__": {
+    "__scheduler__": {
+      "schedulerName": "qwe",
+      "schedulerServiceClass": "io.github.zero88.qwe.scheduler.service.SchedulerService",
+      "registerAddress": "qwe.scheduler.register",
+      "monitorAddress": "qwe.scheduler.monitor",
+      "__schedule_worker__": {
+        "poolName": "worker-pool-scheduler-qwe",
+        "poolSize": 5,
+        "maxExecuteTime": 60,
+        "maxExecuteTimeUnit": "SECONDS"
+      }
+    }
+  }
+}

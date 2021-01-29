@@ -26,9 +26,10 @@ import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.event.EventbusClient;
-import io.github.zero88.qwe.scheduler.MockEventScheduler.FailureProcessEventSchedulerListener;
-import io.github.zero88.qwe.scheduler.MockEventScheduler.MockJobModel;
-import io.github.zero88.qwe.scheduler.MockEventScheduler.MockProcessEventSchedulerListener;
+import io.github.zero88.qwe.scheduler.mock.MockEventScheduler;
+import io.github.zero88.qwe.scheduler.mock.MockEventScheduler.FailureProcessEventSchedulerListener;
+import io.github.zero88.qwe.scheduler.mock.JobModelCreator;
+import io.github.zero88.qwe.scheduler.mock.MockEventScheduler.MockProcessEventSchedulerListener;
 import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
 import io.github.zero88.qwe.scheduler.model.trigger.CronTriggerModel;
 import io.github.zero88.qwe.scheduler.model.trigger.PeriodicTriggerModel;
@@ -36,6 +37,7 @@ import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
 import io.github.zero88.qwe.scheduler.service.SchedulerRequestData;
 import io.github.zero88.utils.DateTimes.Iso8601Parser;
 import io.github.zero88.utils.Strings;
+import io.github.zero88.utils.UUID64;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -70,7 +72,7 @@ public class SchedulerComponentTest {
     @Before
     public void before(TestContext context) {
         vertx = Vertx.vertx();
-        config = new SchedulerConfig(UUID.randomUUID().toString());
+        config = SchedulerConfig.builder().schedulerName(UUID64.random()).build();
         SchedulerVerticle verticle = ComponentTestHelper.deploy(vertx, context, config.toJson(),
                                                                 new SchedulerProvider(), folder.getRoot().toPath());
         eventbus = EventbusClient.create(verticle.sharedData());
@@ -85,10 +87,10 @@ public class SchedulerComponentTest {
     public void test_add_cron_schedule_success(TestContext context) {
         final Async async = context.async(3);
         eventbus.register(MockEventScheduler.PROCESS_EVENT, new MockProcessEventSchedulerListener());
-        DeliveryEvent event = initRegisterEvent(MockJobModel.create("abc"), CronTriggerModel.builder()
-                                                                                            .name("t1")
-                                                                                            .expr("0 0/1 * 1/1 * ? *")
-                                                                                            .build());
+        DeliveryEvent event = initRegisterEvent(JobModelCreator.create("abc"), CronTriggerModel.builder()
+                                                                                               .name("t1")
+                                                                                               .expr("0 0/1 * 1/1 * ? *")
+                                                                                               .build());
         eventbus.fire(event, EventbusHelper.replyAsserter(context, registerAsserter(context, async, "t1", "abc")));
         EventbusHelper.assertReceivedData(vertx, async, MockEventScheduler.CALLBACK_EVENT.getAddress(),
                                           JsonHelper.asserter(context, async, countResp(0)));
@@ -98,11 +100,11 @@ public class SchedulerComponentTest {
     public void test_add_periodic_schedule_success(TestContext context) throws InterruptedException {
         final Async async = context.async(4);
         eventbus.register(MockEventScheduler.PROCESS_EVENT, new MockProcessEventSchedulerListener());
-        DeliveryEvent event = initRegisterEvent(MockJobModel.create("xxx"), PeriodicTriggerModel.builder()
-                                                                                                .name("t2")
-                                                                                                .intervalInSeconds(3)
-                                                                                                .repeat(1)
-                                                                                                .build());
+        DeliveryEvent event = initRegisterEvent(JobModelCreator.create("xxx"), PeriodicTriggerModel.builder()
+                                                                                                   .name("t2")
+                                                                                                   .intervalInSeconds(3)
+                                                                                                   .repeat(1)
+                                                                                                   .build());
         eventbus.fire(event, EventbusHelper.replyAsserter(context, registerAsserter(context, async, "t2", "xxx")));
         final String addr = MockEventScheduler.CALLBACK_EVENT.getAddress();
         CountDownLatch latch = new CountDownLatch(1);
@@ -110,7 +112,7 @@ public class SchedulerComponentTest {
             latch.countDown();
             JsonHelper.asserter(context, async, countResp(0)).accept(o);
         });
-        latch.await(3, TimeUnit.SECONDS);
+        latch.await(4, TimeUnit.SECONDS);
         EventbusHelper.assertReceivedData(vertx, async, addr, JsonHelper.asserter(context, async, countResp(1)));
     }
 
@@ -120,8 +122,8 @@ public class SchedulerComponentTest {
         eventbus.register(MockEventScheduler.PROCESS_EVENT, new MockProcessEventSchedulerListener());
         CronTriggerModel cronTrigger = CronTriggerModel.builder().name("t1").expr("0 0/1 * 1/1 * ? *").build();
         PeriodicTriggerModel periodicTrigger = PeriodicTriggerModel.builder().name("t2").intervalInSeconds(3).build();
-        DeliveryEvent event1 = initRegisterEvent(MockJobModel.create("abc"), cronTrigger);
-        DeliveryEvent event2 = initRegisterEvent(MockJobModel.create("abc"), periodicTrigger);
+        DeliveryEvent event1 = initRegisterEvent(JobModelCreator.create("abc"), cronTrigger);
+        DeliveryEvent event2 = initRegisterEvent(JobModelCreator.create("abc"), periodicTrigger);
         CountDownLatch latch = new CountDownLatch(1);
         eventbus.fire(event1, e -> {
             latch.countDown();
@@ -143,8 +145,8 @@ public class SchedulerComponentTest {
                                                                    .repeat(10)
                                                                    .intervalInSeconds(100)
                                                                    .build();
-        DeliveryEvent event1 = initRegisterEvent(MockJobModel.create("j1"), periodicTrigger);
-        DeliveryEvent event2 = initRegisterEvent(MockJobModel.create("j2"), periodicTrigger);
+        DeliveryEvent event1 = initRegisterEvent(JobModelCreator.create("j1"), periodicTrigger);
+        DeliveryEvent event2 = initRegisterEvent(JobModelCreator.create("j2"), periodicTrigger);
         CountDownLatch latch = new CountDownLatch(1);
         eventbus.fire(event1, e -> {
             latch.countDown();
@@ -168,9 +170,9 @@ public class SchedulerComponentTest {
                                                                    .intervalInSeconds(1)
                                                                    .repeat(10)
                                                                    .build();
-        DeliveryEvent event1 = initRegisterEvent(MockJobModel.create("j1"), periodicTrigger);
-        DeliveryEvent event2 = initRegisterEvent(MockJobModel.create("j1"), cron1Trigger);
-        DeliveryEvent event3 = initRegisterEvent(MockJobModel.create("j2"), cron2Trigger);
+        DeliveryEvent event1 = initRegisterEvent(JobModelCreator.create("j1"), periodicTrigger);
+        DeliveryEvent event2 = initRegisterEvent(JobModelCreator.create("j1"), cron1Trigger);
+        DeliveryEvent event3 = initRegisterEvent(JobModelCreator.create("j2"), cron2Trigger);
         CountDownLatch latch = new CountDownLatch(3);
         eventbus.fire(event1, e -> {
             latch.countDown();
@@ -192,7 +194,7 @@ public class SchedulerComponentTest {
             "{\"status\":\"SUCCESS\",\"action\":\"GET_ONE\",\"data\":{\"prev_fire_time\":null," +
             "\"trigger\":{\"group\":\"DEFAULT\",\"name\":\"tr2\"},\"job\":{\"group\":\"DEFAULT\",\"name\":\"j2\"}," +
             "\"next_fire_time\":{\"local\":\"\",\"utc\":\"\"}}}");
-        eventbus.fire(initRegisterEvent(MockJobModel.create("j2"), cron2Trigger, EventAction.GET_ONE),
+        eventbus.fire(initRegisterEvent(JobModelCreator.create("j2"), cron2Trigger, EventAction.GET_ONE),
                       EventbusHelper.replyAsserter(context, async, expected, LOCAL_DATE.apply("next_fire_time"),
                                                    UTC_DATE.apply("next_fire_time")));
     }
@@ -203,7 +205,7 @@ public class SchedulerComponentTest {
         final EventModel processEvent = EventModel.clone(MockEventScheduler.PROCESS_EVENT, "event.job.test.failure");
         eventbus.register(processEvent, new FailureProcessEventSchedulerListener());
         PeriodicTriggerModel periodicTrigger = PeriodicTriggerModel.builder().name("tr2").intervalInSeconds(5).build();
-        DeliveryEvent event1 = initRegisterEvent(MockJobModel.create("abc", processEvent), periodicTrigger);
+        DeliveryEvent event1 = initRegisterEvent(JobModelCreator.create("abc", processEvent), periodicTrigger);
         eventbus.fire(event1,
                       e -> EventbusHelper.replyAsserter(context, async, registerResponse("tr2", "abc"), SKIP_LOCAL_DATE,
                                                         SKIP_UTC_DATE).handle(e));
@@ -227,10 +229,10 @@ public class SchedulerComponentTest {
                                                        .build();
         JsonObject r = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":{\"unschedule\":false}}");
         eventbus.fire(removeEvent, EventbusHelper.replyAsserter(context, async, r));
-        DeliveryEvent event = initRegisterEvent(MockJobModel.create("abc"), CronTriggerModel.builder()
-                                                                                            .name("tr1")
-                                                                                            .expr("0 0/1 * 1/1 * ? *")
-                                                                                            .build());
+        DeliveryEvent event = initRegisterEvent(JobModelCreator.create("abc"), CronTriggerModel.builder()
+                                                                                               .name("tr1")
+                                                                                               .expr("0 0/1 * 1/1 * ? *")
+                                                                                               .build());
         CountDownLatch latch = new CountDownLatch(1);
         eventbus.fire(event, e -> {
             latch.countDown();
@@ -251,7 +253,7 @@ public class SchedulerComponentTest {
                             .address(config.getRegisterAddress())
                             .pattern(EventPattern.REQUEST_RESPONSE)
                             .action(action)
-                            .payload(SchedulerRequestData.create(job, trigger).toJson())
+                            .payload(SchedulerRequestData.builder().job(job).trigger(trigger).build().toJson())
                             .build();
     }
 

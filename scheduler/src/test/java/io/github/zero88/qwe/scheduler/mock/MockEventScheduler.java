@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler;
+package io.github.zero88.qwe.scheduler.mock;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -57,28 +57,6 @@ public class MockEventScheduler {
         @EventContractor(action = "CREATE")
         public JsonObject increaseNumber() {
             throw new IllegalArgumentException("Failed");
-        }
-
-    }
-
-
-    public static class MockJobModel {
-
-        public static EventbusJobModel create(String name) {
-            return EventbusJobModel.builder()
-                                   .name(name)
-                                   .process(DeliveryEvent.from(PROCESS_EVENT, EventAction.CREATE))
-                                   .callback(DeliveryEvent.from(CALLBACK_EVENT, EventAction.PUBLISH))
-                                   .build();
-        }
-
-        public static EventbusJobModel create(String name, @NonNull EventModel processEvent) {
-            return EventbusJobModel.builder()
-                                   .name(name)
-                                   .process(DeliveryEvent.from(processEvent, EventAction.CREATE))
-                                   .callback(DeliveryEvent.from(CALLBACK_EVENT, EventAction.PUBLISH))
-                                   .forwardIfFailure(false)
-                                   .build();
         }
 
     }

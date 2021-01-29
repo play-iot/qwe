@@ -4,11 +4,10 @@ import java.util.Objects;
 
 import org.quartz.spi.ThreadPool;
 
+import io.github.zero88.qwe.scheduler.SchedulerConfig.WorkerPoolConfig;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.WorkerExecutor;
-
-import io.github.zero88.qwe.scheduler.SchedulerConfig.WorkerPoolConfig;
 
 import lombok.NonNull;
 
@@ -17,7 +16,7 @@ public final class QuartzVertxThreadPool implements ThreadPool {
     private final WorkerExecutor worker;
     private final WorkerPoolConfig config;
 
-    QuartzVertxThreadPool(@NonNull Vertx vertx, WorkerPoolConfig config) {
+    QuartzVertxThreadPool(@NonNull Vertx vertx, @NonNull WorkerPoolConfig config) {
         this.worker = vertx.createSharedWorkerExecutor(config.getPoolName(), config.getPoolSize(),
                                                        config.getMaxExecuteTime(), config.getMaxExecuteTimeUnit());
         this.config = config;

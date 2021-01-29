@@ -11,7 +11,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventPattern;
-import io.github.zero88.qwe.scheduler.MockEventScheduler.MockJobModel;
+import io.github.zero88.qwe.scheduler.mock.JobModelCreator;
 import io.github.zero88.qwe.scheduler.job.EventbusJob;
 import io.vertx.core.json.JsonObject;
 
@@ -19,7 +19,7 @@ public class EventbusJobModelTest {
 
     @Test
     public void test_serialize() throws JSONException {
-        final QWEJobModel jobModel = MockJobModel.create("abc");
+        final QWEJobModel jobModel = JobModelCreator.create("abc");
         System.out.println(jobModel.toJson());
         JSONAssert.assertEquals("{\"type\":\"EVENTBUS_JOB\",\"name\":\"abc\",\"group\":\"DEFAULT\"," +
                                 "\"process\":{\"address\":\"event.job.model.test\",\"pattern\":\"REQUEST_RESPONSE\"," +
@@ -30,7 +30,7 @@ public class EventbusJobModelTest {
 
     @Test
     public void test_to_job_detail() {
-        final JobDetail jobDetail = MockJobModel.create("xyz").toJobDetail();
+        final JobDetail jobDetail = JobModelCreator.create("xyz").toJobDetail();
         Assert.assertEquals(new JobKey("xyz"), jobDetail.getKey());
         Assert.assertEquals(EventbusJob.class, jobDetail.getJobClass());
         final Object object = jobDetail.getJobDataMap().get(QWEJobModel.JOB_DATA_KEY);

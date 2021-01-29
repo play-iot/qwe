@@ -1,55 +1,48 @@
 package io.github.zero88.qwe.scheduler;
 
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import io.github.zero88.qwe.CarlConfig.AppConfig;
 import io.github.zero88.qwe.IConfig;
+import io.github.zero88.qwe.scheduler.service.SchedulerService;
+import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.extern.jackson.Jacksonized;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Builder
+@Jacksonized
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SchedulerConfig implements IConfig {
 
-    private static final String BASE_ADDRESS = "qwe.scheduler";
-    public static final String NAME = "__scheduler__";
-    private String schedulerName;
-    private String registerAddress;
-    private String monitorAddress;
+    @Default
+    private final String schedulerName = "qwe";
+    @Default
+    private final String schedulerServiceClass = SchedulerService.class.getName();
+    @Default
+    private final String registerAddress = "qwe.scheduler.register";
+    @Default
+    private final String monitorAddress = "qwe.scheduler.monitor";
+    @Default
     @JsonProperty(WorkerPoolConfig.NAME)
-    private WorkerPoolConfig workerConfig;
-
-    SchedulerConfig(String schedulerName) {
-        this(schedulerName, null, null, null);
-    }
-
-    @JsonCreator
-    SchedulerConfig(@JsonProperty(value = "schedulerName", required = true) String schedulerName,
-                    @JsonProperty("registerAddress") String registerAddress,
-                    @JsonProperty("monitorAddress") String monitorAddress,
-                    @JsonProperty(WorkerPoolConfig.NAME) WorkerPoolConfig workerConfig) {
-        this.schedulerName = schedulerName;
-        this.registerAddress = Strings.isBlank(registerAddress)
-                               ? BASE_ADDRESS + ".register." + this.schedulerName
-                               : registerAddress;
-        this.monitorAddress = Strings.isBlank(monitorAddress)
-                              ? BASE_ADDRESS + ".monitor." + this.schedulerName
-                              : monitorAddress;
-        this.workerConfig = Objects.isNull(workerConfig)
-                            ? new WorkerPoolConfig().injectPoolName(this.schedulerName)
-                            : workerConfig.injectPoolName(this.schedulerName);
-    }
+    private final WorkerPoolConfig workerConfig = WorkerPoolConfig.builder().build();
 
     @Override
     public String key() {
-        return NAME;
+        return "__scheduler__";
     }
 
     @Override
@@ -57,15 +50,36 @@ public final class SchedulerConfig implements IConfig {
         return AppConfig.class;
     }
 
+    @NonNull
+    public Class<? extends SchedulerService> schedulerServiceClass() {
+        return Optional.ofNullable(ReflectionClass.<SchedulerService>findClass(schedulerServiceClass))
+                       .orElse(SchedulerService.class);
+    }
+
+    public WorkerPoolConfig getWorkerConfig() {
+        if (Strings.isBlank(workerConfig.getPoolName())) {
+            workerConfig.createPoolName(schedulerName);
+        }
+        return workerConfig;
+    }
+
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PACKAGE)
+    @Builder
+    @Jacksonized
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class WorkerPoolConfig implements IConfig {
 
         public static final String NAME = "__schedule_worker__";
-        private String poolName;
-        private int poolSize = 5;
-        private long maxExecuteTime = 60;
-        private TimeUnit maxExecuteTimeUnit = TimeUnit.SECONDS;
+        @Default
+        @Setter(value = AccessLevel.PACKAGE)
+        private String poolName = "";
+        @Default
+        private final int poolSize = 5;
+        @Default
+        private final long maxExecuteTime = 60;
+        @Default
+        private final TimeUnit maxExecuteTimeUnit = TimeUnit.SECONDS;
 
         @Override
         public String key() {
@@ -77,10 +91,8 @@ public final class SchedulerConfig implements IConfig {
             return SchedulerConfig.class;
         }
 
-        WorkerPoolConfig injectPoolName(String poolName) {
-            this.poolName = Strings.isBlank(this.poolName) ? "worker-pool-scheduler-" +
-                                                             Strings.requireNotBlank(poolName) : this.poolName;
-            return this;
+        public void createPoolName(@NonNull String schedulerName) {
+            this.poolName = "worker-pool-scheduler-" + schedulerName;
         }
 
     }
