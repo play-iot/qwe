@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":http"))
+    api(project(":http:metadata"))
 
     testImplementation(TestLibs.junit)
     testImplementation(TestLibs.junit5Vintage)

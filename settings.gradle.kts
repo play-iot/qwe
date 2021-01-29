@@ -10,7 +10,7 @@
 rootProject.name = "qwe"
 include("base")
 include("cache")
-include("http")
+include("http:metadata")
 include("http:client")
 include("http:server")
 include("micro")
