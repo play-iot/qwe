@@ -1,9 +1,6 @@
 package io.github.zero88.qwe.scheduler;
 
-import java.nio.file.Path;
-
-import io.github.zero88.qwe.IConfig;
-import io.github.zero88.qwe.component.Component;
+import io.github.zero88.qwe.component.ComponentContext;
 import io.github.zero88.qwe.component.ComponentVerticle;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventbusClient;
@@ -33,10 +30,8 @@ public final class SchedulerVerticle extends ComponentVerticle<SchedulerConfig, 
     }
 
     @Override
-    public SchedulerContext onSuccess(@NonNull Class<Component<IConfig, SchedulerContext>> aClass, Path dataDir,
-                                      String sharedKey, String deployId) {
-        final SchedulerContext ctx = new SchedulerContext(aClass, dataDir, sharedKey, deployId).init(sharedData(),
-                                                                                                     config);
+    public SchedulerContext onSuccess(@NonNull ComponentContext context) {
+        final SchedulerContext ctx = new SchedulerContext(context).init(sharedData(), config);
         EventbusClient.create(sharedData())
                       .register(config.getRegisterAddress(), new RegisterScheduleListener(ctx.getScheduler()));
         return ctx;

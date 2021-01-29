@@ -1,11 +1,10 @@
 package io.github.zero88.qwe.micro;
 
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 
-import io.github.zero88.qwe.component.Component;
 import io.github.zero88.qwe.component.ComponentContext;
+import io.github.zero88.qwe.component.ComponentContext.DefaultComponentContext;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.MicroConfig.GatewayConfig;
@@ -14,10 +13,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class MicroContext extends ComponentContext {
+public final class MicroContext extends DefaultComponentContext {
 
     @Getter
     private CircuitBreakerInvoker breakerInvoker;
@@ -28,11 +28,11 @@ public final class MicroContext extends ComponentContext {
 
     MicroContext() {
         //FIXME data dir for test
-        this(MicroVerticle.class, null, MicroContext.class.getName(), UUID.randomUUID().toString());
+        super(MicroVerticle.class, null, MicroContext.class.getName(), UUID.randomUUID().toString());
     }
 
-    protected MicroContext(Class<? extends Component> clazz, Path dataDir, String sharedKey, String deployId) {
-        super(clazz, dataDir, sharedKey, deployId);
+    protected MicroContext(@NonNull ComponentContext context) {
+        super(context);
     }
 
     MicroContext setup(Vertx vertx, MicroConfig config) {

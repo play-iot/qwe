@@ -1,14 +1,12 @@
 package io.github.zero88.qwe.scheduler;
 
-import java.nio.file.Path;
-
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.DirectSchedulerFactory;
 import org.quartz.simpl.RAMJobStore;
 
-import io.github.zero88.qwe.component.Component;
 import io.github.zero88.qwe.component.ComponentContext;
+import io.github.zero88.qwe.component.ComponentContext.DefaultComponentContext;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.qwe.scheduler.job.QWEJobFactory;
@@ -19,14 +17,13 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class SchedulerContext extends ComponentContext {
+public final class SchedulerContext extends DefaultComponentContext {
 
     @Getter(value = AccessLevel.PACKAGE)
     private Scheduler scheduler;
 
-    protected SchedulerContext(Class<? extends Component> componentClz, Path dataDir, String sharedKey,
-                               String deployId) {
-        super(componentClz, dataDir, sharedKey, deployId);
+    protected SchedulerContext(ComponentContext context) {
+        super(context);
     }
 
     SchedulerContext init(SharedDataLocalProxy sharedData, SchedulerConfig config) {

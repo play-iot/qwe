@@ -117,14 +117,12 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
         component.hook().onError(t);
     }
 
-    @SuppressWarnings("unchecked")
     private void deployComponentSuccess(Component component, String deployId) {
         final Class<? extends Component> clazz = component.getClass();
         logger.info("Deployed Verticle '{}' successful with ID '{}'", clazz.getName(), deployId);
-        final ComponentContext ctx = component.hook()
-                                              .onSuccess(component.getClass(), config.getDataDir(), getSharedKey(),
-                                                         deployId);
-        ((ContextLookupImpl) this.contexts).put(ctx.getClass(), component.setup(ctx));
+        final ComponentContext def = ComponentContext.create(clazz, config.getDataDir(), getSharedKey(), deployId);
+        final ComponentContext ctx = component.hook().onSuccess(def);
+        ((ContextLookupImpl) this.contexts).put(ctx.getClass(), ctx);
     }
 
     private void succeed(Long count) {

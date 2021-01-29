@@ -24,10 +24,9 @@ public interface ComponentTestHelper {
         final T component = provider.provide(proxy);
         return VertxHelper.deploy(vertx, context, new DeploymentOptions().setConfig(config), component,
                                   TestHelper.TEST_TIMEOUT_SEC, s -> {
-                final ComponentContext ctx = component.hook()
-                                                      .onSuccess(component.getClass(), testDir,
-                                                                 provider.componentClass().getName(), s);
-                component.setup(ctx);
+                final ComponentContext ctx = ComponentContext.create(component.getClass(), testDir,
+                                                                     provider.componentClass().getName(), s);
+                component.setup(component.hook().onSuccess(ctx));
             });
     }
 

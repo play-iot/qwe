@@ -1,25 +1,22 @@
 package io.github.zero88.qwe.component;
 
-import java.nio.file.Path;
-
-import io.github.zero88.qwe.IConfig;
-
 import lombok.NonNull;
 
 public interface DeployHook<T extends ComponentContext> {
 
     /**
-     * It will be called after deployed componentClass success from application
+     * It will be called after deployed {@code component} success from {@code application}
+     * <p>
+     * Each implementation can enrich any useful information in {@code component context} then it can be used later on
+     * {@code application} after all components are deployed successfully
      *
-     * @param aClass    an associate componentClass class
-     * @param dataDir   a current application data dir
-     * @param sharedKey a key to access shared data from {@code Application}
-     * @param deployId  a deployment id
+     * @param context an associate context of component
      * @return ComponentContext
+     * @see Application#onInstallCompleted(ContextLookup)
      */
     @SuppressWarnings("unchecked")
-    default T onSuccess(@NonNull Class<Component<IConfig, T>> aClass, Path dataDir, String sharedKey, String deployId) {
-        return (T) new ComponentContext(aClass, dataDir, sharedKey, deployId);
+    default T onSuccess(@NonNull ComponentContext context) {
+        return (T) context;
     }
 
     default void onError(Throwable error) {

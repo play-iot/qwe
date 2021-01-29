@@ -8,8 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.github.zero88.qwe.IConfig;
-import io.github.zero88.qwe.component.Component;
+import io.github.zero88.qwe.component.ComponentContext;
 import io.github.zero88.qwe.component.ComponentVerticle;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventAction;
@@ -110,9 +109,8 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
     }
 
     @Override
-    public HttpServerContext onSuccess(@NonNull Class<Component<IConfig, HttpServerContext>> aClass, Path dataDir,
-                                       String sharedKey, String deployId) {
-        return new HttpServerContext(aClass, dataDir, sharedKey, deployId, sharedData().getData(SERVER_INFO_DATA_KEY));
+    public HttpServerContext onSuccess(@NonNull ComponentContext context) {
+        return new HttpServerContext(context, sharedData().getData(SERVER_INFO_DATA_KEY));
     }
 
     private ServerInfo createServerInfo(Router handler, int port) {

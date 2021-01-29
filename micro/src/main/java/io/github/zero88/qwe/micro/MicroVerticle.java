@@ -1,9 +1,6 @@
 package io.github.zero88.qwe.micro;
 
-import java.nio.file.Path;
-
-import io.github.zero88.qwe.IConfig;
-import io.github.zero88.qwe.component.Component;
+import io.github.zero88.qwe.component.ComponentContext;
 import io.github.zero88.qwe.component.ComponentVerticle;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.vertx.core.Promise;
@@ -26,10 +23,9 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
     public String configFile() { return "micro.json"; }
 
     @Override
-    public MicroContext onSuccess(@NonNull Class<Component<IConfig, MicroContext>> aClass, Path dataDir,
-                                  String sharedKey, String deployId) {
+    public MicroContext onSuccess(@NonNull ComponentContext context) {
         logger.info("Setup micro-service...");
-        return new MicroContext(aClass, dataDir, sharedKey, deployId).setup(vertx, config);
+        return new MicroContext(context).setup(vertx, config);
     }
 
 }

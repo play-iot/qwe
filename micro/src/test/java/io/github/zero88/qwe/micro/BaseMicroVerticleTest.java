@@ -45,7 +45,7 @@ public abstract class BaseMicroVerticleTest {
         config = IConfig.fromClasspath("local.json", MicroConfig.class);
         vertx = Vertx.vertx();
         micro = new MicroContext().setup(vertx, config);
-        eventbus = EventbusClient.create(vertx, MicroContext.class.getName());
+        eventbus = EventbusClient.create(vertx, micro.sharedKey());
         final ServiceDiscoveryInvoker discovery = micro.getLocalInvoker();
         final Single<Record> record1 = discovery.addHttpRecord(HTTP_RECORD, new HttpLocation().setHost("123.456.0.1")
                                                                                               .setPort(1234)
@@ -61,11 +61,11 @@ public abstract class BaseMicroVerticleTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown(TestContext context) {
         if (Objects.nonNull(micro)) {
             micro.unregister(Promise.promise());
         }
-        vertx.close();
+        vertx.close(context.asyncAssertSuccess());
     }
 
 }
