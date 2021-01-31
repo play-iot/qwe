@@ -121,7 +121,8 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
         final Class<? extends Component> clazz = component.getClass();
         logger.info("Deployed Verticle '{}' successful with ID '{}'", clazz.getName(), deployId);
         final ComponentContext def = ComponentContext.create(clazz, config.getDataDir(), getSharedKey(), deployId);
-        final ComponentContext ctx = component.hook().onSuccess(def);
+        @SuppressWarnings("unchecked")
+        final ComponentContext ctx = component.setup(component.hook().onSuccess(def));
         ((ContextLookupImpl) this.contexts).put(ctx.getClass(), ctx);
     }
 
