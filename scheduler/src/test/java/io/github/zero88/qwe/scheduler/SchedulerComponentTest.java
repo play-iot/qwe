@@ -1,7 +1,6 @@
 package io.github.zero88.qwe.scheduler;
 
 import java.time.ZoneOffset;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -34,7 +33,7 @@ import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
 import io.github.zero88.qwe.scheduler.model.trigger.CronTriggerModel;
 import io.github.zero88.qwe.scheduler.model.trigger.PeriodicTriggerModel;
 import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
-import io.github.zero88.qwe.scheduler.service.SchedulerRequestData;
+import io.github.zero88.qwe.scheduler.service.SchedulerArgs;
 import io.github.zero88.utils.DateTimes.Iso8601Parser;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.UUID64;
@@ -253,7 +252,7 @@ public class SchedulerComponentTest {
                             .address(config.getRegisterAddress())
                             .pattern(EventPattern.REQUEST_RESPONSE)
                             .action(action)
-                            .payload(SchedulerRequestData.builder().job(job).trigger(trigger).build().toJson())
+                            .payload(SchedulerArgs.builder().job(job).trigger(trigger).build().toJson())
                             .build();
     }
 

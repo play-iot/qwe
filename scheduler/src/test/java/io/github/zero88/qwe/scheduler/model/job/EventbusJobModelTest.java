@@ -20,7 +20,7 @@ public class EventbusJobModelTest {
     @Test
     public void test_serialize() throws JSONException {
         final QWEJobModel jobModel = JobModelCreator.create("abc");
-        System.out.println(jobModel.toJson());
+        System.out.println(jobModel.toJson().encodePrettily());
         JSONAssert.assertEquals("{\"type\":\"EVENTBUS_JOB\",\"name\":\"abc\",\"group\":\"DEFAULT\"," +
                                 "\"process\":{\"address\":\"event.job.model.test\",\"pattern\":\"REQUEST_RESPONSE\"," +
                                 "\"action\":\"CREATE\"},\"callback\":{\"address\":\"event.job.model.callback.test\"," +

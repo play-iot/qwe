@@ -51,8 +51,6 @@ public interface QWEJobModel<T extends QWEJob> extends JsonData {
     @JsonProperty(value = "forwardIfFailure")
     boolean forwardIfFailure();
 
-    JsonObject toDetail();
-
     String toString();
 
     default JobDetail toJobDetail() {

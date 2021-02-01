@@ -24,7 +24,7 @@ import lombok.extern.jackson.Jacksonized;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class SchedulerRequestData implements JsonData {
+public final class SchedulerArgs implements JsonData {
 
     @Include
     @JsonProperty(Fields.job)

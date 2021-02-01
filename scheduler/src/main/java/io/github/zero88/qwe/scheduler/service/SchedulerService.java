@@ -29,7 +29,7 @@ import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
 import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
-import io.github.zero88.qwe.scheduler.service.SchedulerRequestData.Fields;
+import io.github.zero88.qwe.scheduler.service.SchedulerArgs.Fields;
 import io.github.zero88.qwe.utils.JsonUtils;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.json.JsonObject;

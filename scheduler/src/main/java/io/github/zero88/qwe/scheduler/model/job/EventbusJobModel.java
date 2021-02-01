@@ -60,12 +60,6 @@ public final class EventbusJobModel extends AbstractQWEJobModel {
     public Class<EventbusJob> implementation() { return EventbusJob.class; }
 
     @Override
-    public JsonObject toDetail() {
-        return new JsonObject().put(Fields.process, process.toJson())
-                               .put(Fields.callback, Optional.ofNullable(callback).map(JsonData::toJson).orElse(null));
-    }
-
-    @Override
     public String toString() {
         return Strings.format("Type: \"{0}\" - Process Address: \"{1}\" - Callback Address: \"{2}\"", type(),
                               process.getAddress(), Objects.isNull(callback) ? "" : callback.getAddress());
