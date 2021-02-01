@@ -73,7 +73,8 @@ final class AnnotationHandler<T extends EventListener> {
 
     private static boolean isVertxOrSystemClass(@NonNull Class<?> clazz) {
         return ReflectionClass.isSystemClass(clazz.getName()) ||
-               ReflectionClass.belongsTo("io.vertx.core", "io.netty.", "com.fasterxml.jackson");
+               ReflectionClass.belongsTo(clazz.getName(), "io.vertx", "io.reactivex", "io.netty",
+                                         "com.fasterxml.jackson");
     }
 
     private static MethodInfo to(Method method) {
@@ -174,8 +175,7 @@ final class AnnotationHandler<T extends EventListener> {
             }
             return mapper.convertValue(d, paramClass);
         } catch (ClassCastException | IllegalArgumentException e) {
-            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
-                                    new HiddenException(e));
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid", new HiddenException(e));
         }
     }
 
@@ -183,18 +183,17 @@ final class AnnotationHandler<T extends EventListener> {
         try {
             return mapper.convertValue(data.getMap(), paramClass);
         } catch (IllegalArgumentException e) {
-            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
-                                    new HiddenException(e));
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid", new HiddenException(e));
         }
     }
 
     private EventMessage convertError(Throwable throwable, EventAction action, Logger logger) {
         if (throwable instanceof DesiredException) {
-            logger.debug("Failed when handle event {}", throwable, action);
+            logger.debug("Failed when handle event {}", action, throwable);
         } else if (throwable instanceof ImplementationError) {
-            logger.error("Failed when handle event {}", throwable, action);
+            logger.error("Failed when handle event {}", action, throwable);
         } else {
-            logger.warn("Failed when handle event {}", throwable, action);
+            logger.warn("Failed when handle event {}", action, throwable);
         }
         final String overrideMsg = throwable instanceof ImplementationError ? "No reply from event " + action : "";
         return EventMessage.error(action, CarlExceptionConverter.friendly(throwable, overrideMsg));
