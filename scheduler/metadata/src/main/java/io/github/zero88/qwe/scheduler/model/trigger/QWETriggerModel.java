@@ -5,6 +5,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.utils.Key;
 
+import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.scheduler.model.SchedulerModel;
 import io.github.zero88.utils.Strings;
 
@@ -31,6 +32,11 @@ public interface QWETriggerModel extends SchedulerModel {
 
     static TriggerKey createKey(String group, String name) {
         return new TriggerKey(Strings.isBlank(name) ? Key.createUniqueName(group) : name, group);
+    }
+
+    static QWETriggerModel from(String group, String name, TriggerOption option) {
+        return JsonData.from(option.toJson().put("group", group).put("name", name), QWETriggerModel.class,
+                             JsonData.LENIENT_MAPPER);
     }
 
     @JsonUnwrapped
