@@ -69,9 +69,9 @@ public abstract class TransportProtocol implements Ethernet {
                                   ? Ipv6Network.getActiveIpByName(ifName)
                                   : Ipv4Network.getActiveIpByName(ifName);
         if (splitter[0].toLowerCase().startsWith("udp")) {
-            return UdpProtocol.builder().ip(network).port(port).build();
+            return UdpProtocol.builder().ip(network).port(port).canReusePort(true).build();
         }
-        return TcpProtocol.builder().ip(network).port(port).build();
+        return TcpProtocol.builder().ip(network).port(port).canReusePort(true).build();
     }
 
     @Override
