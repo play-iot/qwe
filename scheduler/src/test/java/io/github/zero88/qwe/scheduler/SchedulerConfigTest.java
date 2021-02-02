@@ -9,6 +9,7 @@ import org.junit.Test;
 import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.scheduler.mock.MockSchedulerService;
+import io.github.zero88.qwe.scheduler.service.SchedulerMonitorService;
 import io.github.zero88.qwe.scheduler.service.SchedulerRegisterService;
 
 public class SchedulerConfigTest {
@@ -18,6 +19,8 @@ public class SchedulerConfigTest {
         final SchedulerConfig def = SchedulerConfig.builder().build();
         final SchedulerConfig cfg = IConfig.fromClasspath("scheduler.json", SchedulerConfig.class);
         System.out.println(def.toJson().encodePrettily());
+        Assert.assertEquals(SchedulerRegisterService.class, cfg.registerServiceClass());
+        Assert.assertEquals(SchedulerMonitorService.class, cfg.monitorServiceClass());
         JsonHelper.assertJson(def.toJson(), cfg.toJson());
     }
 
@@ -26,6 +29,8 @@ public class SchedulerConfigTest {
         final SchedulerConfig def = SchedulerConfig.builder().build();
         final SchedulerConfig cfg = IConfig.fromClasspath("app-cfg.json", SchedulerConfig.class);
         System.out.println(def.toJson().encodePrettily());
+        Assert.assertEquals(SchedulerRegisterService.class, cfg.registerServiceClass());
+        Assert.assertEquals(SchedulerMonitorService.class, cfg.monitorServiceClass());
         JsonHelper.assertJson(def.toJson(), cfg.toJson());
     }
 
@@ -36,7 +41,6 @@ public class SchedulerConfigTest {
         Assert.assertEquals("abc", config.getSchedulerName());
         Assert.assertEquals("qwe.scheduler.register", config.getRegisterAddress());
         Assert.assertEquals("qwe.scheduler.monitor", config.getMonitorAddress());
-        Assert.assertEquals(SchedulerRegisterService.class, config.registerServiceClass());
         Assert.assertNotNull(config.getWorkerConfig());
         Assert.assertEquals("worker-pool-scheduler-abc", config.getWorkerConfig().getPoolName());
         Assert.assertEquals(5, config.getWorkerConfig().getPoolSize());

@@ -1,12 +1,13 @@
 {
-  "schedulerName": "qwe",
-  "registerServiceClass": "io.github.zero88.qwe.scheduler.service.SchedulerRegisterService",
-  "registerAddress": "qwe.scheduler.register",
-  "monitorAddress": "qwe.scheduler.monitor",
-  "__schedule_worker__": {
-    "poolName": "worker-pool-scheduler-qwe",
-    "poolSize": 5,
-    "maxExecuteTime": 60,
-    "maxExecuteTimeUnit": "SECONDS"
+  "schedulerName" : "qwe",
+  "registerAddress" : "qwe.scheduler.register",
+  "registerServiceClass" : "io.github.zero88.qwe.scheduler.service.SchedulerRegisterService",
+  "monitorAddress" : "qwe.scheduler.monitor",
+  "monitorServiceClass" : "io.github.zero88.qwe.scheduler.service.SchedulerMonitorService",
+  "__schedule_worker__" : {
+    "poolName" : "worker-pool-scheduler-qwe",
+    "poolSize" : 5,
+    "maxExecuteTime" : 60,
+    "maxExecuteTimeUnit" : "SECONDS"
   }
 }
