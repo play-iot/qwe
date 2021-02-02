@@ -24,7 +24,7 @@ based on [Vertx](https://vertx.io/)
 ## More QWE
 
 - [QWE SQL](https://github.com/zero88/qwe-sql) `SQL` ability in event-driven architecture.
-- [QWE IoT Gateway](https://github.com/zero88/qwe-iot-gatway) `IoT Gateway` ability.
+- [QWE IoT Gateway](https://github.com/zero88/qwe-iot-gateway) `IoT Gateway` ability.
 - [QWE IoT Provision](https://github.com/zero88/qwe-provision) `Software Provision` ability for `IoT device`.
 
 ## Overview
