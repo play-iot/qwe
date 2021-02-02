@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.HiddenException;
+import io.github.zero88.qwe.dto.ErrorMessage;
 import io.github.zero88.qwe.dto.JsonData.SerializerFunction;
 import io.github.zero88.qwe.event.EventContractor.Param;
 import io.github.zero88.qwe.exceptions.CarlException;
@@ -116,7 +118,7 @@ final class AnnotationHandler<T extends EventListener> {
             MethodInfo methodInfo = getMethodByAnnotation(eventHandler.getClass(), action);
             Object response = ReflectionMethod.execute(eventHandler, methodInfo.getMethod(), methodInfo.getOutput(),
                                                        methodInfo.getParams().values(),
-                                                       parseMessage(message, methodInfo.getParams()));
+                                                       parseInputMessage(message, methodInfo.getParams()));
             return convertResult(response).map(data -> EventMessage.success(action, data))
                                           .onErrorReturn(t -> convertError(t, action, eventHandler.logger()));
         } catch (Exception e) {
@@ -140,16 +142,25 @@ final class AnnotationHandler<T extends EventListener> {
      * @return data inputs
      * @throws CarlException if message format is invalid
      */
-    private Object[] parseMessage(EventMessage message, Map<String, Class<?>> params) {
+    private Object[] parseInputMessage(EventMessage message, Map<String, Class<?>> params) {
         if (params.isEmpty()) {
             return new Object[] {};
         }
-        JsonObject data = message.isError() ? message.getError().toJson() : message.getData();
+        JsonObject data = message.isError() ? Optional.ofNullable(message.getError())
+                                                      .map(ErrorMessage::toJson)
+                                                      .orElse(null) : message.getData();
         if (Objects.isNull(data)) {
             throw new IllegalArgumentException(Strings.format("Event Message Data is null: {0}", message.toJson()));
         }
         if (params.size() == 1) {
             return new Object[] {convertParam(data, params.entrySet().iterator().next(), true)};
+        }
+        if (params.size() == 2 && JsonObject.class.equals(params.get("data")) &&
+            ErrorMessage.class.equals(params.get("error"))) {
+            final String first = params.entrySet().iterator().next().getKey();
+            return "data".equals(first)
+                   ? new Object[] {message.getData(), message.getError()}
+                   : new Object[] {message.getError(), message.getData()};
         }
         return params.entrySet().stream().map(entry -> convertParam(data, entry, false)).toArray();
     }

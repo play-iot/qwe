@@ -8,16 +8,17 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.LoggerFactory;
 
+import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.dto.msg.RequestData;
-import io.github.zero88.qwe.event.MockEventListener.MockChildEventListener;
-import io.github.zero88.qwe.event.MockEventListener.MockEventUnsupportedListener;
-import io.github.zero88.qwe.event.MockEventListener.MockEventWithDiffParam;
-import io.github.zero88.qwe.event.MockEventListener.MockParam;
+import io.github.zero88.qwe.event.mock.MockListener;
+import io.github.zero88.qwe.event.mock.MockListener.MockChildEventListener;
+import io.github.zero88.qwe.event.mock.MockListener.MockEventUnsupportedListener;
+import io.github.zero88.qwe.event.mock.MockListener.MockEventWithDiffParam;
+import io.github.zero88.qwe.event.mock.MockListener.MockKeepEventMessageListener;
+import io.github.zero88.qwe.event.mock.MockListener.MockParam;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.qwe.exceptions.ImplementationError;
@@ -30,14 +31,16 @@ import ch.qos.logback.classic.Logger;
 
 public class AnnotationHandlerTest {
 
-    private static Supplier<AnnotationHandler<MockEventListener>> MH = () -> new AnnotationHandler<>(
-        new MockEventListener());
+    private static Supplier<AnnotationHandler<MockListener.MockEventListener>> MH = () -> new AnnotationHandler<>(
+        new MockListener.MockEventListener());
     private static Supplier<AnnotationHandler<MockChildEventListener>> MCH = () -> new AnnotationHandler<>(
         new MockChildEventListener());
     private static Supplier<AnnotationHandler<MockEventUnsupportedListener>> MEH = () -> new AnnotationHandler<>(
         new MockEventUnsupportedListener());
     private static Supplier<AnnotationHandler<MockEventWithDiffParam>> MPH = () -> new AnnotationHandler<>(
         new MockEventWithDiffParam());
+    private static Supplier<AnnotationHandler<MockKeepEventMessageListener>> MKH = () -> new AnnotationHandler<>(
+        new MockKeepEventMessageListener());
 
     @BeforeAll
     public static void beforeClass() {
@@ -70,8 +73,8 @@ public class AnnotationHandlerTest {
 
     @Test
     public void test_get_method_one_contractor() {
-        Method method = AnnotationHandler.getMethodByAnnotation(MockEventListener.class, EventAction.UPDATE)
-                                         .getMethod();
+        Method method = AnnotationHandler.getMethodByAnnotation(MockListener.MockEventListener.class,
+                                                                EventAction.UPDATE).getMethod();
         Assertions.assertNotNull(method);
         Assertions.assertEquals("throwException", method.getName());
     }
@@ -103,28 +106,28 @@ public class AnnotationHandlerTest {
     @Test
     public void test_get_method_public_static() {
         Assertions.assertThrows(ImplementationError.class,
-                                () -> AnnotationHandler.getMethodByAnnotation(MockEventListener.class,
+                                () -> AnnotationHandler.getMethodByAnnotation(MockListener.MockEventListener.class,
                                                                               EventAction.GET_ONE));
     }
 
     @Test
     public void test_more_than_one_method_defined() {
         Assertions.assertThrows(ImplementationError.class,
-                                () -> AnnotationHandler.getMethodByAnnotation(MockEventListener.class,
+                                () -> AnnotationHandler.getMethodByAnnotation(MockListener.MockEventListener.class,
                                                                               EventAction.RETURN));
     }
 
     @Test
     public void test_get_method_none_public_method() {
         Assertions.assertThrows(ImplementationError.class,
-                                () -> AnnotationHandler.getMethodByAnnotation(MockEventListener.class,
+                                () -> AnnotationHandler.getMethodByAnnotation(MockListener.MockEventListener.class,
                                                                               EventAction.MIGRATE));
     }
 
     @Test
     public void test_get_method_no_output() {
         Assertions.assertThrows(ImplementationError.class,
-                                () -> AnnotationHandler.getMethodByAnnotation(MockEventListener.class,
+                                () -> AnnotationHandler.getMethodByAnnotation(MockListener.MockEventListener.class,
                                                                               EventAction.PATCH));
     }
 
@@ -151,9 +154,10 @@ public class AnnotationHandlerTest {
 
     @Test
     public void test_get_method_with_multiple_contractor() {
-        Method method1 = AnnotationHandler.getMethodByAnnotation(MockEventListener.class, EventAction.HALT).getMethod();
-        Method method2 = AnnotationHandler.getMethodByAnnotation(MockEventListener.class, EventAction.REMOVE)
+        Method method1 = AnnotationHandler.getMethodByAnnotation(MockListener.MockEventListener.class, EventAction.HALT)
                                           .getMethod();
+        Method method2 = AnnotationHandler.getMethodByAnnotation(MockListener.MockEventListener.class,
+                                                                 EventAction.REMOVE).getMethod();
         Assertions.assertNotNull(method1);
         Assertions.assertNotNull(method2);
         Assertions.assertEquals("delete", method1.getName());
@@ -286,9 +290,31 @@ public class AnnotationHandlerTest {
             "\":\"ENABLED\"},\"appConfig\":{},\"service_id\":\"io.zero88.edge.module:installer\"}");
         Single<EventMessage> response = MPH.get().execute(EventMessage.initial(EventAction.UNKNOWN, data));
 
-        JSONAssert.assertEquals(
-            "{\"service_name\":\"bios-installer\",\"version\":\"1.0.0-SNAPSHOT\",\"state\":\"ENABLED\"}",
-            response.blockingGet().getData().toString(), JSONCompareMode.STRICT);
+        JsonHelper.assertJson(new JsonObject(
+                                  "{\"service_name\":\"bios-installer\",\"version\":\"1.0.0-SNAPSHOT\"," + "\"state" + "\":\"ENABLED\"}"),
+                              response.blockingGet().getData());
+    }
+
+    @Test
+    public void test_keep_event_message() {
+        final JsonObject data = MKH.get()
+                                   .execute(EventMessage.initial(EventAction.MONITOR, new JsonObject()))
+                                   .blockingGet()
+                                   .getData();
+        Assertions.assertNotNull(data);
+        Assertions.assertNotNull(data.getInteger("data"));
+        Assertions.assertEquals(1, data.getInteger("data"));
+    }
+
+    @Test
+    public void test_keep_event_message_but_swap() {
+        final JsonObject data = MKH.get()
+                                   .execute(EventMessage.error(EventAction.NOTIFY, ErrorCode.DESIRED_ERROR, ""))
+                                   .blockingGet()
+                                   .getData();
+        Assertions.assertNotNull(data);
+        Assertions.assertNotNull(data.getInteger("data"));
+        Assertions.assertEquals(0, data.getInteger("data"));
     }
 
 }
