@@ -9,7 +9,7 @@ import org.junit.Test;
 import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.scheduler.mock.MockSchedulerService;
-import io.github.zero88.qwe.scheduler.service.SchedulerService;
+import io.github.zero88.qwe.scheduler.service.SchedulerRegisterService;
 
 public class SchedulerConfigTest {
 
@@ -36,7 +36,7 @@ public class SchedulerConfigTest {
         Assert.assertEquals("abc", config.getSchedulerName());
         Assert.assertEquals("qwe.scheduler.register", config.getRegisterAddress());
         Assert.assertEquals("qwe.scheduler.monitor", config.getMonitorAddress());
-        Assert.assertEquals(SchedulerService.class, config.schedulerServiceClass());
+        Assert.assertEquals(SchedulerRegisterService.class, config.registerServiceClass());
         Assert.assertNotNull(config.getWorkerConfig());
         Assert.assertEquals("worker-pool-scheduler-abc", config.getWorkerConfig().getPoolName());
         Assert.assertEquals(5, config.getWorkerConfig().getPoolSize());
@@ -59,14 +59,14 @@ public class SchedulerConfigTest {
     @Test
     public void deserialize_custom() {
         SchedulerConfig from = IConfig.from(
-            "{\"schedulerServiceClass\":\"io.github.zero88.qwe.scheduler.mock.MockSchedulerService\"," +
+            "{\"registerServiceClass\":\"io.github.zero88.qwe.scheduler.mock.MockSchedulerService\"," +
             "\"schedulerName\":\"hello\",\"registerAddress\":\"qwe.scheduler.register.abc\"," +
             "\"monitorAddress\":\"qwe.scheduler.monitor.abc\"," +
             "\"__schedule_worker__\":{\"poolName\":\"worker-pool-scheduler-abc\"," +
             "\"poolSize\":3,\"maxExecuteTime\":1,\"maxExecuteTimeUnit\":\"MINUTES\"}}", SchedulerConfig.class);
         Assert.assertEquals("hello", from.getSchedulerName());
         Assert.assertEquals("qwe.scheduler.register.abc", from.getRegisterAddress());
-        Assert.assertEquals(MockSchedulerService.class, from.schedulerServiceClass());
+        Assert.assertEquals(MockSchedulerService.class, from.registerServiceClass());
         Assert.assertEquals("qwe.scheduler.monitor.abc", from.getMonitorAddress());
         Assert.assertEquals("worker-pool-scheduler-abc", from.getWorkerConfig().getPoolName());
         Assert.assertEquals(3, from.getWorkerConfig().getPoolSize());
@@ -77,8 +77,8 @@ public class SchedulerConfigTest {
     @Test
     public void deserialize_invalid_service_class_then_fallback() {
         final SchedulerConfig config = IConfig.from(
-            "{\"schedulerServiceClass\":\"io.github.zero88.qwe.MockSchedulerService\"}", SchedulerConfig.class);
-        Assert.assertEquals(SchedulerService.class, config.schedulerServiceClass());
+            "{\"registerServiceClass\":\"io.github.zero88.qwe.MockSchedulerService\"}", SchedulerConfig.class);
+        Assert.assertEquals(SchedulerRegisterService.class, config.registerServiceClass());
     }
 
 }

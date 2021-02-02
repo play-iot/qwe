@@ -9,19 +9,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.github.zero88.qwe.IConfig;
-import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.EventbusHelper;
+import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.JsonHelper;
+import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.dto.msg.RequestData;
 import io.github.zero88.qwe.event.DeliveryEvent;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.filter.ServiceLocatorParams;
 import io.github.zero88.qwe.micro.http.EventMethodDefinition;
-import io.github.zero88.qwe.micro.type.ServiceScope;
 import io.github.zero88.qwe.micro.mock.MockEventbusService;
 import io.github.zero88.qwe.micro.servicetype.EventMessageService;
+import io.github.zero88.qwe.micro.type.ServiceScope;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -64,9 +64,7 @@ public class MicroContextTest {
 
     @Test(expected = NullPointerException.class)
     public void test_not_enable_serviceDiscovery_local() {
-        new MicroContext().setup(vertx, IConfig.fromClasspath("micro.json", MicroConfig.class))
-                          .getLocalInvoker()
-                          .get();
+        new MicroContext().setup(vertx, IConfig.fromClasspath("micro.json", MicroConfig.class)).getLocalInvoker().get();
     }
 
     @Test(expected = NullPointerException.class)
@@ -101,11 +99,10 @@ public class MicroContextTest {
                  final JsonObject indexExpected = new JsonObject(
                      "{\"status\":\"SUCCESS\",\"action\":\"GET_LIST\",\"data\":{\"apis\":[{\"name\":\"test\"," +
                      "\"type\":\"eventbus-service-proxy\",\"status\":\"UP\",\"location\":\"address1\"}]}}");
-                 final JsonObject payload = RequestData.builder()
-                                                       .filter(
-                                                           new JsonObject().put(ServiceLocatorParams.SCOPE, ServiceScope.INTERNAL))
-                                                       .build()
-                                                       .toJson();
+                 final RequestData payload = RequestData.builder()
+                                                        .filter(new JsonObject().put(ServiceLocatorParams.SCOPE,
+                                                                                     ServiceScope.INTERNAL))
+                                                        .build();
                  controller.fire(DeliveryEvent.builder()
                                               .address(config.getGatewayConfig().getIndexAddress())
                                               .payload(payload)
@@ -135,7 +132,7 @@ public class MicroContextTest {
                      "\"status\":\"UP\",\"type\":\"http-endpoint\",\"location\":\"http://123.456.0.1:1234/api\"}]}}");
                  controller.fire(DeliveryEvent.builder()
                                               .address(config.getGatewayConfig().getIndexAddress())
-                                              .payload(RequestData.builder().build().toJson())
+                                              .payload(RequestData.builder().build())
                                               .action(EventAction.GET_LIST)
                                               .build(), EventbusHelper.replyAsserter(context, async, indexExpected));
              });
@@ -174,11 +171,11 @@ public class MicroContextTest {
                                                                  "\"path\":\"/path/:param\"},{\"method\":\"GET\"," +
                                                                  "\"path\":\"/path/:param\"}]}]}}");
                  client.fire(DeliveryEvent.builder()
-                                              .address(config.getGatewayConfig().getIndexAddress())
-                                              .payload(RequestData.builder().build().toJson())
-                                              .action(EventAction.GET_LIST)
-                                              .build(),
-                                 EventbusHelper.replyAsserter(context, async, indexExpected, JSONCompareMode.LENIENT));
+                                          .address(config.getGatewayConfig().getIndexAddress())
+                                          .payload(RequestData.builder().build())
+                                          .action(EventAction.GET_LIST)
+                                          .build(),
+                             EventbusHelper.replyAsserter(context, async, indexExpected, JSONCompareMode.LENIENT));
              });
     }
 

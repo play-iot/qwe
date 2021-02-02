@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler;
+package io.github.zero88.qwe.scheduler.quartz;
 
 import java.util.Objects;
 
@@ -11,12 +11,12 @@ import io.vertx.core.WorkerExecutor;
 
 import lombok.NonNull;
 
-public final class QuartzVertxThreadPool implements ThreadPool {
+public final class QWEThreadPool implements ThreadPool {
 
     private final WorkerExecutor worker;
     private final WorkerPoolConfig config;
 
-    QuartzVertxThreadPool(@NonNull Vertx vertx, @NonNull WorkerPoolConfig config) {
+    public QWEThreadPool(@NonNull Vertx vertx, @NonNull WorkerPoolConfig config) {
         this.worker = vertx.createSharedWorkerExecutor(config.getPoolName(), config.getPoolSize(),
                                                        config.getMaxExecuteTime(), config.getMaxExecuteTimeUnit());
         this.config = config;

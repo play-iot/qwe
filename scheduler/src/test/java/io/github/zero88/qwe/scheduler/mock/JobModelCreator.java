@@ -22,7 +22,7 @@ public class JobModelCreator {
                                .name(name)
                                .process(DeliveryEvent.from(processEvent, EventAction.CREATE))
                                .callback(DeliveryEvent.from(MockEventScheduler.CALLBACK_EVENT, EventAction.PUBLISH))
-                               .forwardIfFailure(false)
+                               .forwardIfFailure(true)
                                .build();
     }
 

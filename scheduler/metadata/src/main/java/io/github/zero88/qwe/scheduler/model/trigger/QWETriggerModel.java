@@ -2,13 +2,11 @@ package io.github.zero88.qwe.scheduler.model.trigger;
 
 import org.quartz.ScheduleBuilder;
 import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.utils.Key;
 
-import io.github.zero88.qwe.dto.JsonData;
+import io.github.zero88.qwe.scheduler.model.SchedulerModel;
 import io.github.zero88.utils.Strings;
-import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -29,7 +27,7 @@ import lombok.RequiredArgsConstructor;
     @JsonSubTypes.Type(value = CronTriggerModel.class, name = "CRON"),
     @JsonSubTypes.Type(value = PeriodicTriggerModel.class, name = "PERIODIC")
 })
-public interface TriggerModel extends JsonData {
+public interface QWETriggerModel extends SchedulerModel {
 
     static TriggerKey createKey(String group, String name) {
         return new TriggerKey(Strings.isBlank(name) ? Key.createUniqueName(group) : name, group);
@@ -42,15 +40,11 @@ public interface TriggerModel extends JsonData {
     @JsonUnwrapped
     TriggerType type();
 
-    Trigger toTrigger();
-
-    JsonObject toDetail();
-
     String logicalThread();
 
     @RequiredArgsConstructor
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-    abstract class AbstractTriggerModel implements TriggerModel {
+    abstract class AbstractTriggerModel implements QWETriggerModel {
 
         @Getter
         @EqualsAndHashCode.Include
@@ -64,13 +58,8 @@ public interface TriggerModel extends JsonData {
         @Override
         public final TriggerType type() { return type; }
 
-        @Override
-        public final Trigger toTrigger() {
-            return TriggerBuilder.newTrigger().withIdentity(getKey()).withSchedule(scheduleBuilder()).build();
-        }
-
         @SuppressWarnings("unchecked")
-        static abstract class AbstractTriggerModelBuilder<T extends TriggerModel,
+        static abstract class AbstractTriggerModelBuilder<T extends QWETriggerModel,
                                                                      B extends AbstractTriggerModelBuilder> {
 
             String name;

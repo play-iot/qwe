@@ -9,9 +9,6 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.scheduler.model.trigger.CronTriggerModel;
-import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel;
-import io.github.zero88.qwe.scheduler.model.trigger.TriggerType;
 import io.vertx.core.json.JsonObject;
 
 public class CronTriggerModelTest {
@@ -35,7 +32,7 @@ public class CronTriggerModelTest {
     public void test_deserialize() {
         CronTriggerModel from = (CronTriggerModel) JsonData.from(
             "{\"type\":\"CRON\",\"name\":\"test\",\"group\":\"DEFAULT\",\"expression\":\"0 0 12 1/1 * ? *\"," +
-            "\"timezone\":\"UTC\"}", TriggerModel.class);
+            "\"timezone\":\"UTC\"}", QWETriggerModel.class);
         Assert.assertEquals(TriggerType.CRON, from.type());
         Assert.assertEquals(TriggerKey.triggerKey("test"), from.getKey());
         Assert.assertEquals("UTC", from.getTimezone().getID());

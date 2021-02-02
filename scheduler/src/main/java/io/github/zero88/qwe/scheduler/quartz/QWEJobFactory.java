@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler.job;
+package io.github.zero88.qwe.scheduler.quartz;
 
 import org.quartz.Job;
 import org.quartz.Scheduler;
@@ -10,6 +10,7 @@ import org.quartz.spi.TriggerFiredBundle;
 import io.github.zero88.qwe.component.HasSharedData;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.scheduler.SchedulerConfig;
+import io.github.zero88.qwe.scheduler.job.QWEJob;
 import io.vertx.core.shareddata.SharedData;
 
 import lombok.Getter;
@@ -29,15 +30,14 @@ public final class QWEJobFactory extends SimpleJobFactory implements JobFactory,
     @Getter
     @Accessors(fluent = true)
     private final SharedDataLocalProxy sharedData;
-    private final SchedulerConfig config;
 
     @Override
     @SuppressWarnings("rawtypes")
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
-        Job job = super.newJob(bundle, scheduler);
+        final Job job = super.newJob(bundle, scheduler);
         final Class<? extends Job> jobClass = bundle.getJobDetail().getJobClass();
         if (QWEJob.class.isAssignableFrom(jobClass)) {
-            return ((QWEJob) job).init(sharedData, config);
+            return ((QWEJob) job).init(sharedData);
         }
         return job;
     }

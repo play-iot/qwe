@@ -14,9 +14,8 @@ import org.quartz.TriggerKey;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel.AbstractTriggerModel;
+import io.github.zero88.qwe.scheduler.model.trigger.QWETriggerModel.AbstractTriggerModel;
 import io.github.zero88.utils.Strings;
-import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -62,11 +61,6 @@ public final class CronTriggerModel extends AbstractTriggerModel {
     @JsonProperty(Fields.timezone)
     private String tz() {
         return timezone.getID();
-    }
-
-    @Override
-    public JsonObject toDetail() {
-        return new JsonObject().put(Fields.expression, expr()).put(Fields.timezone, tz());
     }
 
     @Override

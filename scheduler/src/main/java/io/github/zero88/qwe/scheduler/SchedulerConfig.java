@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.github.zero88.qwe.CarlConfig.AppConfig;
 import io.github.zero88.qwe.IConfig;
-import io.github.zero88.qwe.scheduler.service.SchedulerService;
+import io.github.zero88.qwe.scheduler.service.SchedulerRegisterService;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 
@@ -31,7 +31,7 @@ public final class SchedulerConfig implements IConfig {
     @Default
     private final String schedulerName = "qwe";
     @Default
-    private final String schedulerServiceClass = SchedulerService.class.getName();
+    private final String registerServiceClass = SchedulerRegisterService.class.getName();
     @Default
     private final String registerAddress = "qwe.scheduler.register";
     @Default
@@ -51,9 +51,9 @@ public final class SchedulerConfig implements IConfig {
     }
 
     @NonNull
-    public Class<? extends SchedulerService> schedulerServiceClass() {
-        return Optional.ofNullable(ReflectionClass.<SchedulerService>findClass(schedulerServiceClass))
-                       .orElse(SchedulerService.class);
+    public Class<? extends SchedulerRegisterService> registerServiceClass() {
+        return Optional.ofNullable(ReflectionClass.<SchedulerRegisterService>findClass(registerServiceClass))
+                       .orElse(SchedulerRegisterService.class);
     }
 
     public WorkerPoolConfig getWorkerConfig() {

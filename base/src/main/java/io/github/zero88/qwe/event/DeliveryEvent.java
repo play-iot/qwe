@@ -82,7 +82,17 @@ public final class DeliveryEvent implements JsonData {
 
     public static class Builder {
 
-        public Builder addPayload(@NonNull RequestData payload) {
+        @JsonProperty("payload")
+        public Builder payload(@NonNull JsonObject payload) {
+            this.payload = payload;
+            return this;
+        }
+
+        public Builder payload(@NonNull RequestData payload) {
+            return payload(payload.toJson());
+        }
+
+        public Builder payload(@NonNull JsonData payload) {
             return payload(payload.toJson());
         }
 

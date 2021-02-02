@@ -1,6 +1,6 @@
 {
   "schedulerName": "qwe",
-  "schedulerServiceClass": "io.github.zero88.qwe.scheduler.service.SchedulerService",
+  "registerServiceClass": "io.github.zero88.qwe.scheduler.service.SchedulerRegisterService",
   "registerAddress": "qwe.scheduler.register",
   "monitorAddress": "qwe.scheduler.monitor",
   "__schedule_worker__": {

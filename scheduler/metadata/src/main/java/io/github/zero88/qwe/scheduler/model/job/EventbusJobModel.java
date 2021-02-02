@@ -1,18 +1,14 @@
 package io.github.zero88.qwe.scheduler.model.job;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import org.quartz.JobKey;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.github.zero88.qwe.dto.JsonData;
 import io.github.zero88.qwe.event.DeliveryEvent;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.scheduler.job.EventbusJob;
 import io.github.zero88.utils.Strings;
-import io.vertx.core.json.JsonObject;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -34,6 +30,7 @@ import lombok.extern.jackson.Jacksonized;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public final class EventbusJobModel extends AbstractQWEJobModel {
 
+    public static final JobType EVENTBUS_JOB = JobType.factory("EVENTBUS_JOB");
     /**
      * Defines an input information to execute job
      */
@@ -53,11 +50,8 @@ public final class EventbusJobModel extends AbstractQWEJobModel {
 
     @Override
     public JobType type() {
-        return JobType.factory("EVENTBUS_JOB");
+        return EVENTBUS_JOB;
     }
-
-    @Override
-    public Class<EventbusJob> implementation() { return EventbusJob.class; }
 
     @Override
     public String toString() {

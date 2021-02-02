@@ -5,8 +5,7 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerKey;
 
-import io.github.zero88.qwe.scheduler.model.trigger.TriggerModel.AbstractTriggerModel;
-import io.vertx.core.json.JsonObject;
+import io.github.zero88.qwe.scheduler.model.trigger.QWETriggerModel.AbstractTriggerModel;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -43,11 +42,6 @@ public final class PeriodicTriggerModel extends AbstractTriggerModel {
     @Override
     protected @NonNull ScheduleBuilder<SimpleTrigger> scheduleBuilder() {
         return SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(intervalInSeconds).withRepeatCount(repeat);
-    }
-
-    @Override
-    public JsonObject toDetail() {
-        return new JsonObject().put(Fields.intervalInSeconds, intervalInSeconds).put(Fields.repeat, repeat);
     }
 
     @Override

@@ -10,8 +10,12 @@ import io.github.zero88.qwe.component.ComponentContext.DefaultComponentContext;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.exceptions.InitializerError;
-import io.github.zero88.qwe.scheduler.job.QWEJobFactory;
-import io.github.zero88.qwe.scheduler.service.SchedulerService;
+import io.github.zero88.qwe.scheduler.job.QWEJob;
+import io.github.zero88.qwe.scheduler.quartz.QWEJobFactory;
+import io.github.zero88.qwe.scheduler.quartz.QWEThreadPool;
+import io.github.zero88.qwe.scheduler.service.SchedulerConverterHelper;
+import io.github.zero88.qwe.scheduler.service.SchedulerMonitorService;
+import io.github.zero88.qwe.scheduler.service.SchedulerRegisterService;
 import io.github.zero88.qwe.utils.ExecutorHelpers;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -40,17 +44,24 @@ public final class SchedulerContext extends DefaultComponentContext {
         try {
             final DirectSchedulerFactory factory = DirectSchedulerFactory.getInstance();
             factory.createScheduler(config.getSchedulerName(), config.getSchedulerName(),
-                                    new QuartzVertxThreadPool(vertx, config.getWorkerConfig()), new RAMJobStore());
+                                    new QWEThreadPool(vertx, config.getWorkerConfig()), new RAMJobStore());
             scheduler = factory.getScheduler(config.getSchedulerName());
-            scheduler.setJobFactory(new QWEJobFactory(sharedData, config));
+            scheduler.setJobFactory(new QWEJobFactory(sharedData));
             scheduler.start();
-            EventbusClient.create(sharedData)
-                          .register(config.getRegisterAddress(),
-                                    SchedulerService.create(scheduler, sharedData, config.schedulerServiceClass()));
+            registerSchedulerEvent(sharedData, config);
             return this;
         } catch (SchedulerException e) {
             throw new InitializerError("Cannot start QWE Scheduler", e);
         }
+    }
+
+    private void registerSchedulerEvent(SharedDataLocalProxy sharedData, SchedulerConfig config) {
+        final EventbusClient eventbus = EventbusClient.create(sharedData);
+        sharedData.addData(QWEJob.MONITOR_ADDRESS_KEY, config.getMonitorAddress());
+        eventbus.register(config.getRegisterAddress(),
+                          SchedulerRegisterService.create(scheduler, sharedData, SchedulerConverterHelper.create(),
+                                                          config.registerServiceClass()));
+        eventbus.register(config.getMonitorAddress(), new SchedulerMonitorService(sharedData));
     }
 
     void shutdown(Vertx vertx, Promise<Void> future) {
