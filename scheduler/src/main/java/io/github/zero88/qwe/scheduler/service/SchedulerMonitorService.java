@@ -11,6 +11,7 @@ import io.github.zero88.qwe.event.EventContractor.Param;
 import io.github.zero88.qwe.event.EventListener;
 import io.github.zero88.qwe.event.Status;
 import io.github.zero88.qwe.scheduler.model.JobResult;
+import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.json.JsonObject;
 
 import lombok.AccessLevel;
@@ -23,8 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Accessors(fluent = true)
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class SchedulerMonitorService implements EventListener, HasSharedData {
+
+    public static <T extends SchedulerMonitorService> T create(@NonNull SharedDataLocalProxy sharedData,
+                                                               @NonNull Class<T> clazz) {
+        return ReflectionClass.createObject(clazz, Collections.singletonMap(SharedDataLocalProxy.class, sharedData));
+    }
 
     @NonNull
     private final SharedDataLocalProxy sharedData;

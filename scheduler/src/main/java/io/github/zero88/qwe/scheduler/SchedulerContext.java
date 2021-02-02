@@ -61,7 +61,8 @@ public final class SchedulerContext extends DefaultComponentContext {
         eventbus.register(config.getRegisterAddress(),
                           SchedulerRegisterService.create(scheduler, sharedData, SchedulerConverterHelper.create(),
                                                           config.registerServiceClass()));
-        eventbus.register(config.getMonitorAddress(), new SchedulerMonitorService(sharedData));
+        eventbus.register(config.getMonitorAddress(),
+                          SchedulerMonitorService.create(sharedData, config.monitorServiceClass()));
     }
 
     void shutdown(Vertx vertx, Promise<Void> future) {

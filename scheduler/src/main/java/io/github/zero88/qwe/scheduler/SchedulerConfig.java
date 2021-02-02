@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.github.zero88.qwe.CarlConfig.AppConfig;
 import io.github.zero88.qwe.IConfig;
+import io.github.zero88.qwe.scheduler.service.SchedulerMonitorService;
 import io.github.zero88.qwe.scheduler.service.SchedulerRegisterService;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
@@ -31,11 +32,13 @@ public final class SchedulerConfig implements IConfig {
     @Default
     private final String schedulerName = "qwe";
     @Default
-    private final String registerServiceClass = SchedulerRegisterService.class.getName();
-    @Default
     private final String registerAddress = "qwe.scheduler.register";
     @Default
+    private final String registerServiceClass = SchedulerRegisterService.class.getName();
+    @Default
     private final String monitorAddress = "qwe.scheduler.monitor";
+    @Default
+    private final String monitorServiceClass = SchedulerMonitorService.class.getName();
     @Default
     @JsonProperty(WorkerPoolConfig.NAME)
     private final WorkerPoolConfig workerConfig = WorkerPoolConfig.builder().build();
@@ -54,6 +57,12 @@ public final class SchedulerConfig implements IConfig {
     public Class<? extends SchedulerRegisterService> registerServiceClass() {
         return Optional.ofNullable(ReflectionClass.<SchedulerRegisterService>findClass(registerServiceClass))
                        .orElse(SchedulerRegisterService.class);
+    }
+
+    @NonNull
+    public Class<? extends SchedulerMonitorService> monitorServiceClass() {
+        return Optional.ofNullable(ReflectionClass.<SchedulerMonitorService>findClass(monitorServiceClass))
+                       .orElse(SchedulerMonitorService.class);
     }
 
     public WorkerPoolConfig getWorkerConfig() {

@@ -2,10 +2,18 @@ package io.github.zero88.qwe.scheduler.job;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
 
 import io.github.zero88.qwe.component.HasSharedData;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
+import io.github.zero88.qwe.dto.ErrorMessage;
+import io.github.zero88.qwe.event.EventAction;
+import io.github.zero88.qwe.event.EventMessage;
+import io.github.zero88.qwe.event.EventbusClient;
+import io.github.zero88.qwe.event.Status;
+import io.github.zero88.qwe.scheduler.model.JobResult;
 import io.github.zero88.qwe.scheduler.model.job.QWEJobModel;
+import io.vertx.core.json.JsonObject;
 
 import lombok.NonNull;
 
@@ -37,8 +45,20 @@ public interface QWEJob<J extends QWEJobModel> extends Job, HasSharedData {
         return (J) executionContext.getMergedJobDataMap().get(JOB_DATA_KEY);
     }
 
-    default String monitorAddress() {
-        return sharedData().getData(MONITOR_ADDRESS_KEY);
+    default void publishToMonitor(@NonNull JobExecutionContext context, @NonNull JobKey jobKey, @NonNull Status status,
+                                  JsonObject result, ErrorMessage error) {
+        final JobResult monitor = JobResult.builder()
+                                           .status(status)
+                                           .error(error)
+                                           .result(result)
+                                           .jobKey(jobKey.toString())
+                                           .triggerKey(context.getTrigger().getKey().toString())
+                                           .fireId(context.getFireInstanceId())
+                                           .fireTime(context.getFireTime())
+                                           .build();
+        EventbusClient.create(sharedData())
+                      .publish(sharedData().getData(MONITOR_ADDRESS_KEY),
+                               EventMessage.success(EventAction.MONITOR, new JsonObject().put("result", monitor)));
     }
 
 }
