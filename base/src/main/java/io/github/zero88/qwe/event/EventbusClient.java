@@ -83,12 +83,12 @@ public interface EventbusClient extends Transporter {
     /**
      * Send message then return single response message
      *
-     * @param event Delivery event
+     * @param waybill a waybill
      * @return response message
      * @see EventMessage
      */
-    default Single<EventMessage> request(@NonNull DeliveryEvent event) {
-        return request(event.getAddress(), event.getPayload(), (DeliveryOptions) null);
+    default Single<EventMessage> request(@NonNull Waybill waybill) {
+        return request(waybill.getAddress(), waybill.toMessage(), (DeliveryOptions) null);
     }
 
     /**
@@ -129,39 +129,38 @@ public interface EventbusClient extends Transporter {
     /**
      * Fire the request to specific address
      * <p>
-     * It is equivalent to call {@link #fire(DeliveryEvent, Handler)} with no {@code reply handler}
+     * It is equivalent to call {@link #fire(Waybill, Handler)} with no {@code reply handler}
      *
-     * @param deliveryEvent Delivery Event
+     * @param wayBill a waybill
      */
-    default void fire(@NonNull DeliveryEvent deliveryEvent) {
-        fire(deliveryEvent, null);
+    default void fire(@NonNull Waybill wayBill) {
+        fire(wayBill, null);
     }
 
     /**
      * Fire the request to specific address
      * <p>
-     * It is equivalent to call {@link #fire(DeliveryEvent, DeliveryOptions, Handler)} with {@code deliveryOptions} is
-     * {@code null}
+     * It is equivalent to call {@link #fire(Waybill, DeliveryOptions, Handler)} with {@code deliveryOptions} is {@code
+     * null}
      *
-     * @param deliveryEvent Delivery Event
-     * @param replyHandler  Reply message handler
+     * @param wayBill      a waybill
+     * @param replyHandler a reply message handler
      */
-    default void fire(@NonNull DeliveryEvent deliveryEvent, Handler<AsyncResult<Message<Object>>> replyHandler) {
-        fire(deliveryEvent, null, replyHandler);
+    default void fire(@NonNull Waybill wayBill, Handler<AsyncResult<Message<Object>>> replyHandler) {
+        fire(wayBill, null, replyHandler);
     }
 
     /**
      * Fire the request to specific address
      * <p>
      *
-     * @param deliveryEvent   Delivery Event
-     * @param deliveryOptions Delivery Options
-     * @param replyHandler    Reply message handler
+     * @param wayBill         a waybill
+     * @param deliveryOptions a delivery options
+     * @param replyHandler    a reply message handler
      */
-    default void fire(@NonNull DeliveryEvent deliveryEvent, DeliveryOptions deliveryOptions,
+    default void fire(@NonNull Waybill wayBill, DeliveryOptions deliveryOptions,
                       Handler<AsyncResult<Message<Object>>> replyHandler) {
-        fire(deliveryEvent.getAddress(), deliveryEvent.getPattern(), deliveryEvent.getPayload(), replyHandler,
-             deliveryOptions);
+        fire(wayBill.getAddress(), wayBill.getPattern(), wayBill.toMessage(), replyHandler, deliveryOptions);
     }
 
     /**

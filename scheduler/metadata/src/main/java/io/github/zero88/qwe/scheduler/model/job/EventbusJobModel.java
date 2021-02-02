@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.quartz.JobKey;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.github.zero88.qwe.event.DeliveryEvent;
+import io.github.zero88.qwe.event.Waybill;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.utils.Strings;
@@ -21,7 +21,7 @@ import lombok.extern.jackson.Jacksonized;
  * Represents for eventbus job model
  *
  * @see QWEJobModel
- * @see DeliveryEvent
+ * @see Waybill
  */
 @Getter
 @Jacksonized
@@ -35,14 +35,14 @@ public final class EventbusJobModel extends AbstractQWEJobModel {
      * Defines an input information to execute job
      */
     @Include
-    private final DeliveryEvent process;
+    private final Waybill process;
     /**
      * Defines an callback information to share result after finish job
      */
     @Include
-    private final DeliveryEvent callback;
+    private final Waybill callback;
 
-    private EventbusJobModel(JobKey key, DeliveryEvent process, DeliveryEvent callback, boolean forwardIfFailure) {
+    private EventbusJobModel(JobKey key, Waybill process, Waybill callback, boolean forwardIfFailure) {
         super(key, forwardIfFailure);
         this.process = Objects.requireNonNull(process, "Job detail cannot be null");
         this.callback = callback;

@@ -26,7 +26,7 @@ import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.event.EventbusClient;
-import io.github.zero88.qwe.event.DeliveryEvent;
+import io.github.zero88.qwe.event.Waybill;
 import io.github.zero88.qwe.scheduler.mock.JobModelCreator;
 import io.github.zero88.qwe.scheduler.mock.MockEventScheduler;
 import io.github.zero88.qwe.scheduler.mock.MockEventScheduler.FailureProcessEventSchedulerListener;
@@ -93,8 +93,8 @@ public class SchedulerComponentTest {
     public void test_add_cron_schedule_success(TestContext context) {
         final Async async = context.async(3);
         eventbus.register(MockEventScheduler.PROCESS_EVENT, new MockProcessEventSchedulerListener());
-        DeliveryEvent event = initRegisterWaybill(JobModelCreator.create("abc"),
-                                                  CronTriggerModel.builder().name("t1").expr("0 0/1 * 1/1 * ? *").build());
+        Waybill event = initRegisterWaybill(JobModelCreator.create("abc"),
+                                            CronTriggerModel.builder().name("t1").expr("0 0/1 * 1/1 * ? *").build());
         eventbus.fire(event, EventbusHelper.replyAsserter(context, registerAsserter(context, async, "t1", "abc")));
         EventbusHelper.assertReceivedData(vertx, async, MockEventScheduler.CALLBACK_EVENT.getAddress(),
                                           JsonHelper.asserter(context, async, countResp(0)));
@@ -126,8 +126,8 @@ public class SchedulerComponentTest {
         eventbus.register(MockEventScheduler.PROCESS_EVENT, new MockProcessEventSchedulerListener());
         CronTriggerModel cronTrigger = CronTriggerModel.builder().name("t1").expr("0 0/1 * 1/1 * ? *").build();
         PeriodicTriggerModel periodicTrigger = PeriodicTriggerModel.builder().name("t2").intervalInSeconds(3).build();
-        DeliveryEvent event1 = initRegisterWaybill(JobModelCreator.create("abc"), cronTrigger);
-        DeliveryEvent event2 = initRegisterWaybill(JobModelCreator.create("abc"), periodicTrigger);
+        Waybill event1 = initRegisterWaybill(JobModelCreator.create("abc"), cronTrigger);
+        Waybill event2 = initRegisterWaybill(JobModelCreator.create("abc"), periodicTrigger);
         CountDownLatch latch = new CountDownLatch(1);
         eventbus.fire(event1, e -> {
             latch.countDown();
@@ -149,8 +149,8 @@ public class SchedulerComponentTest {
                                                                    .repeat(10)
                                                                    .intervalInSeconds(100)
                                                                    .build();
-        DeliveryEvent event1 = initRegisterWaybill(JobModelCreator.create("j1"), periodicTrigger);
-        DeliveryEvent event2 = initRegisterWaybill(JobModelCreator.create("j2"), periodicTrigger);
+        Waybill event1 = initRegisterWaybill(JobModelCreator.create("j1"), periodicTrigger);
+        Waybill event2 = initRegisterWaybill(JobModelCreator.create("j2"), periodicTrigger);
         CountDownLatch latch = new CountDownLatch(1);
         eventbus.fire(event1, e -> {
             latch.countDown();
@@ -175,9 +175,9 @@ public class SchedulerComponentTest {
                                                                    .intervalInSeconds(1)
                                                                    .repeat(10)
                                                                    .build();
-        DeliveryEvent event1 = initRegisterWaybill(JobModelCreator.create("j1"), periodicTrigger);
-        DeliveryEvent event2 = initRegisterWaybill(JobModelCreator.create("j1"), cron1Trigger);
-        DeliveryEvent event3 = initRegisterWaybill(j2, cron2Trigger);
+        Waybill event1 = initRegisterWaybill(JobModelCreator.create("j1"), periodicTrigger);
+        Waybill event2 = initRegisterWaybill(JobModelCreator.create("j1"), cron1Trigger);
+        Waybill event3 = initRegisterWaybill(j2, cron2Trigger);
         CountDownLatch latch = new CountDownLatch(3);
         eventbus.fire(event1, e -> {
             latch.countDown();
@@ -216,7 +216,7 @@ public class SchedulerComponentTest {
         final EventModel processEvent = EventModel.clone(MockEventScheduler.PROCESS_EVENT, "event.job.test.failure");
         eventbus.register(processEvent, new FailureProcessEventSchedulerListener());
         PeriodicTriggerModel periodicTrigger = PeriodicTriggerModel.builder().name("tr2").intervalInSeconds(5).build();
-        DeliveryEvent event1 = initRegisterWaybill(JobModelCreator.create("abc", processEvent), periodicTrigger);
+        Waybill event1 = initRegisterWaybill(JobModelCreator.create("abc", processEvent), periodicTrigger);
         eventbus.fire(event1,
                       e -> EventbusHelper.replyAsserter(context, async, registerResponse("tr2", "abc"), SKIP_LOCAL_DATE,
                                                         SKIP_UTC_DATE).handle(e));
@@ -234,15 +234,15 @@ public class SchedulerComponentTest {
         final CronTriggerModel cron = CronTriggerModel.builder().name("tr1").expr("0 0/1 * 1/1 * ? *").build();
         eventbus.register(MockEventScheduler.PROCESS_EVENT, new MockProcessEventSchedulerListener());
         final JsonObject payload = new JsonObject().put("jobKey", JobKey.jobKey("abc").toString());
-        final DeliveryEvent waybill = DeliveryEvent.builder()
-                                                   .address(config.getRegisterAddress())
-                                                   .pattern(EventPattern.REQUEST_RESPONSE)
-                                                   .action(EventAction.REMOVE)
-                                                   .payload(RequestData.builder().body(payload).build())
-                                                   .build();
+        final Waybill waybill = Waybill.builder()
+                                       .address(config.getRegisterAddress())
+                                       .pattern(EventPattern.REQUEST_RESPONSE)
+                                       .action(EventAction.REMOVE)
+                                       .payload(RequestData.builder().body(payload).build())
+                                       .build();
         JsonObject r = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":{\"unschedule\":false}}");
         eventbus.fire(waybill, EventbusHelper.replyAsserter(context, async, r));
-        DeliveryEvent event = initRegisterWaybill(job, cron);
+        Waybill event = initRegisterWaybill(job, cron);
         CountDownLatch latch = new CountDownLatch(1);
         eventbus.fire(event, e -> {
             latch.countDown();
@@ -254,19 +254,19 @@ public class SchedulerComponentTest {
         eventbus.fire(waybill, EventbusHelper.replyAsserter(context, async, r));
     }
 
-    private DeliveryEvent initRegisterWaybill(QWEJobModel job, QWETriggerModel trigger) {
-        return DeliveryEvent.builder()
-                            .address(config.getRegisterAddress())
-                            .pattern(EventPattern.REQUEST_RESPONSE)
-                            .action(EventAction.CREATE)
-                            .payload(RequestData.builder()
+    private Waybill initRegisterWaybill(QWEJobModel job, QWETriggerModel trigger) {
+        return Waybill.builder()
+                      .address(config.getRegisterAddress())
+                      .pattern(EventPattern.REQUEST_RESPONSE)
+                      .action(EventAction.CREATE)
+                      .payload(RequestData.builder()
                                           .body(SchedulerRegisterArgs.builder()
                                                                      .job(job)
                                                                      .trigger(trigger)
                                                                      .build()
                                                                      .toJson())
                                           .build())
-                            .build();
+                      .build();
     }
 
     private Handler<JsonObject> registerAsserter(TestContext context, Async async, String triggerName, String jobName) {

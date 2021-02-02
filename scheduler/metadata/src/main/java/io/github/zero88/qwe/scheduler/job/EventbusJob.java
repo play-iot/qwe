@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.quartz.JobExecutionContext;
 
-import io.github.zero88.qwe.event.DeliveryEvent;
+import io.github.zero88.qwe.event.Waybill;
 import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.scheduler.model.job.EventbusJobModel;
@@ -24,8 +24,8 @@ public final class EventbusJob extends AbstractQWEJob<EventbusJobModel> {
     @Override
     public void execute(JobExecutionContext context) {
         final EventbusJobModel jobModel = queryJobModel(context);
-        final DeliveryEvent process = jobModel.getProcess();
-        final DeliveryEvent callback = jobModel.getCallback();
+        final Waybill process = jobModel.getProcess();
+        final Waybill callback = jobModel.getCallback();
         final EventbusClient eventbus = EventbusClient.create(sharedData());
         eventbus.request(process)
                 .onErrorReturn(t -> EventMessage.error(process.getAction(), t))

@@ -14,7 +14,7 @@ import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.JsonHelper;
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.dto.msg.RequestData;
-import io.github.zero88.qwe.event.DeliveryEvent;
+import io.github.zero88.qwe.event.Waybill;
 import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.micro.filter.ServiceLocatorParams;
@@ -103,11 +103,11 @@ public class MicroContextTest {
                                                         .filter(new JsonObject().put(ServiceLocatorParams.SCOPE,
                                                                                      ServiceScope.INTERNAL))
                                                         .build();
-                 controller.fire(DeliveryEvent.builder()
-                                              .address(config.getGatewayConfig().getIndexAddress())
-                                              .payload(payload)
-                                              .action(EventAction.GET_LIST)
-                                              .build(), EventbusHelper.replyAsserter(context, async, indexExpected));
+                 controller.fire(Waybill.builder()
+                                        .address(config.getGatewayConfig().getIndexAddress())
+                                        .payload(payload)
+                                        .action(EventAction.GET_LIST)
+                                        .build(), EventbusHelper.replyAsserter(context, async, indexExpected));
              });
     }
 
@@ -130,11 +130,11 @@ public class MicroContextTest {
                  final JsonObject indexExpected = new JsonObject(
                      "{\"status\":\"SUCCESS\",\"action\":\"GET_LIST\",\"data\":{\"apis\":[{\"name\":\"http.test\"," +
                      "\"status\":\"UP\",\"type\":\"http-endpoint\",\"location\":\"http://123.456.0.1:1234/api\"}]}}");
-                 controller.fire(DeliveryEvent.builder()
-                                              .address(config.getGatewayConfig().getIndexAddress())
-                                              .payload(RequestData.builder().build())
-                                              .action(EventAction.GET_LIST)
-                                              .build(), EventbusHelper.replyAsserter(context, async, indexExpected));
+                 controller.fire(Waybill.builder()
+                                        .address(config.getGatewayConfig().getIndexAddress())
+                                        .payload(RequestData.builder().build())
+                                        .action(EventAction.GET_LIST)
+                                        .build(), EventbusHelper.replyAsserter(context, async, indexExpected));
              });
     }
 
@@ -170,11 +170,11 @@ public class MicroContextTest {
                                                                  "\"path\":\"/path\"},{\"method\":\"DELETE\"," +
                                                                  "\"path\":\"/path/:param\"},{\"method\":\"GET\"," +
                                                                  "\"path\":\"/path/:param\"}]}]}}");
-                 client.fire(DeliveryEvent.builder()
-                                          .address(config.getGatewayConfig().getIndexAddress())
-                                          .payload(RequestData.builder().build())
-                                          .action(EventAction.GET_LIST)
-                                          .build(),
+                 client.fire(Waybill.builder()
+                                    .address(config.getGatewayConfig().getIndexAddress())
+                                    .payload(RequestData.builder().build())
+                                    .action(EventAction.GET_LIST)
+                                    .build(),
                              EventbusHelper.replyAsserter(context, async, indexExpected, JSONCompareMode.LENIENT));
              });
     }
