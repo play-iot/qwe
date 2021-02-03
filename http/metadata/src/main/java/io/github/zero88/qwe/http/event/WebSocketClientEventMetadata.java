@@ -29,7 +29,7 @@ public class WebSocketClientEventMetadata {
      */
     private final EventModel listener;
     /**
-     * Push message to {@code publisher} address, it will send {@code websocket message} to subscriber
+     * Push message to {@code publisher} address, it will send {@code websocket message} to subscriber/client
      */
     private final EventModel publisher;
 

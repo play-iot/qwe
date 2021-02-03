@@ -55,7 +55,7 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
         final Router router = Router.router(sharedData.getVertx());
         validate().forEach((path, socketMapping) -> {
             final SockJSBridgeOptions options = createBridgeOptions(config.getBridgeOptions(), socketMapping,
-                                                                    BasePaths.addWildcards("/"));
+                                                                    BasePaths.addWildcards(path));
             final WebSocketBridgeEventHandler handler = createHandler(sharedData, socketMapping,
                                                                       config.bridgeHandlerClass());
             router.mountSubRouter(path, sockJSHandler.bridge(options, handler));
@@ -77,12 +77,12 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
             EventModel listener = m.getListener();
             EventModel publisher = m.getPublisher();
             if (Objects.nonNull(listener)) {
-                log.info("Registering websocket | Event Listener :\t{} --- {} {}", fullPath, listener.getPattern(),
-                         listener.getAddress());
+                log.info("Registering websocket | Event Listener :\t'{}' --- '{}' '{}'", fullPath,
+                         listener.getPattern(), listener.getAddress());
                 opts.addInboundPermitted(new PermittedOptions().setAddress(listener.getAddress()));
             } else if (Objects.nonNull(publisher)) {
-                log.info("Registering websocket | Event Publisher:\t{} --- {} {}", fullPath, publisher.getPattern(),
-                         publisher.getAddress());
+                log.info("Registering websocket | Event Publisher:\t'{}' --- '{}' '{}'", fullPath,
+                         publisher.getPattern(), publisher.getAddress());
                 opts.addOutboundPermitted(new PermittedOptions().setAddress(publisher.getAddress()));
             }
         });

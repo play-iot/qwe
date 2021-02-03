@@ -6,9 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.EqualsAndHashCode;
@@ -16,6 +13,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * Keep event bus {@code address}, {@code pattern} and {@code available event types} for this {@code address}.
@@ -24,10 +22,10 @@ import lombok.ToString;
  * @see EventPattern
  */
 @Getter
-@EqualsAndHashCode(doNotUseGetters = true, onlyExplicitlyIncluded = true)
+@Jacksonized
 @Builder(builderClassName = "Builder")
 @ToString(onlyExplicitlyIncluded = true)
-@JsonDeserialize(builder = EventModel.Builder.class)
+@EqualsAndHashCode(doNotUseGetters = true, onlyExplicitlyIncluded = true)
 public final class EventModel {
 
     @NonNull
@@ -59,7 +57,6 @@ public final class EventModel {
         return Collections.unmodifiableSet(this.events.stream().filter(Objects::nonNull).collect(Collectors.toSet()));
     }
 
-    @JsonPOJOBuilder(withPrefix = "")
     public static class Builder {
 
         public Builder addEvents(EventAction... actions) {

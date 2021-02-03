@@ -56,12 +56,12 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
     }
 
     private void logEvent(BridgeEvent event, boolean debug) {
-        String msg = "Websocket::Event: {} - Remote: {} - Path: {} - Id: {}";
+        String msg = "Websocket::RemoteAddr: '{}' - SocketAddr: '{}' - Path: '{}' - Event: '{}'";
         SockJSSocket socket = event.socket();
         if (debug) {
-            log.debug(msg, event.type(), socket.remoteAddress(), socket.uri(), socket.writeHandlerID());
+            log.debug(msg, socket.remoteAddress(), socket.localAddress(), socket.uri(), event.type());
         } else {
-            log.info(msg, event.type(), socket.remoteAddress(), socket.uri(), socket.writeHandlerID());
+            log.info(msg, socket.remoteAddress(), socket.localAddress(), socket.uri(), event.type());
         }
     }
 
