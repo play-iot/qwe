@@ -27,6 +27,8 @@ dependencies {
     testFixturesApi(TestLibs.jsonAssert)
     testFixturesApi(TestLibs.junit)
     testFixturesApi(VertxLibs.junit)
+    testFixturesApi(VertxLibs.junit5)
+    testFixturesApi(TestLibs.junit5Vintage)
     testFixturesApi(LogLibs.logback)
     testFixturesCompileOnly(UtilLibs.lombok)
     testFixturesAnnotationProcessor(UtilLibs.lombok)
