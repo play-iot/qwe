@@ -99,7 +99,7 @@ class ReadableFileTest {
     void write_json_array_file(VertxTestContext testContext, @TempDir Path tempDir) {
         final JsonArray object = new JsonArray().add("ab").add("cd");
         final Path axy = tempDir.resolve("axy");
-        helper.writeWithConverter(axy, FileOption.create(), object, BufferConverter.JSON_ARRAY_CONVERTER)
+        helper.write(axy, FileOption.create(), object, BufferConverter.JSON_ARRAY_CONVERTER)
               .map(p -> Configs.readAsArray(new FileInputStream(p.toFile())))
               .subscribe(array -> testContext.verify(() -> {
                   System.out.println(array);
@@ -125,9 +125,9 @@ class ReadableFileTest {
     void write_same_file_without_overwrite_option(VertxTestContext testContext, @TempDir Path tempDir) {
         final Path a1 = tempDir.resolve("1");
         final FileOption option = FileOption.builder().overwrite(false).build();
-        helper.writeWithConverter(a1, option, new JsonObject(), BufferConverter.JSON_OBJECT_CONVERTER)
-              .flatMap(b -> helper.writeWithConverter(a1, option, new JsonObject().put("1", "2"),
-                                                      BufferConverter.JSON_OBJECT_CONVERTER))
+        helper.write(a1, option, new JsonObject(), BufferConverter.JSON_OBJECT_CONVERTER)
+              .flatMap(b -> helper.write(a1, option, new JsonObject().put("1", "2"),
+                                         BufferConverter.JSON_OBJECT_CONVERTER))
               .subscribe(array -> testContext.completeNow(), err -> testContext.verify(() -> {
                   Assertions.assertTrue(err instanceof FileException);
                   Assertions.assertEquals("Disallow overwriting file. Need to enable an overwrite option",
@@ -140,9 +140,9 @@ class ReadableFileTest {
     void write_overwrite_file(VertxTestContext testContext, @TempDir Path tempDir) {
         final Path a1 = tempDir.resolve("1");
         final FileOption option = FileOption.create();
-        helper.writeWithConverter(a1, option, new JsonObject(), BufferConverter.JSON_OBJECT_CONVERTER)
-              .flatMap(b -> helper.writeWithConverter(a1, option, new JsonObject().put("1", "2"),
-                                                      BufferConverter.JSON_OBJECT_CONVERTER))
+        helper.write(a1, option, new JsonObject(), BufferConverter.JSON_OBJECT_CONVERTER)
+              .flatMap(b -> helper.write(a1, option, new JsonObject().put("1", "2"),
+                                         BufferConverter.JSON_OBJECT_CONVERTER))
               .map(p -> Configs.readAsJson(new FileInputStream(p.toFile())))
               .subscribe(json -> testContext.verify(() -> {
                   System.out.println(json);

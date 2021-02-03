@@ -39,7 +39,7 @@ public interface BufferConverter<T> {
 
         @Override
         public JsonObject from(@NonNull Buffer buffer) {
-            return (JsonObject) buffer.toJson();
+            return buffer.length() == 0 ? new JsonObject() : (JsonObject) buffer.toJson();
         }
 
         @Override
@@ -56,7 +56,7 @@ public interface BufferConverter<T> {
 
         @Override
         public JsonArray from(@NonNull Buffer buffer) {
-            return (JsonArray) buffer.toJson();
+            return buffer.length() == 0 ? new JsonArray() : (JsonArray) buffer.toJson();
         }
 
         @Override

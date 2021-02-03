@@ -58,8 +58,7 @@ public class ReadableFile extends AsyncFileHelper {
      * @see FileOption
      * @see BufferConverter
      */
-    public <T> Single<T> readThenConvert(@NonNull Path path, @NonNull FileOption option,
-                                         @NonNull BufferConverter<T> converter) {
+    public <T> Single<T> read(@NonNull Path path, @NonNull FileOption option, @NonNull BufferConverter<T> converter) {
         return this.read(path, option).flatMap(createDataConverterWrapper(converter::from));
     }
 
@@ -69,11 +68,11 @@ public class ReadableFile extends AsyncFileHelper {
      * @param path   File path
      * @param option File option
      * @return json array value
-     * @see #readThenConvert(Path, FileOption, BufferConverter)
+     * @see #read(Path, FileOption, BufferConverter)
      * @see FileOption
      */
     public Single<JsonArray> loadArray(@NonNull Path path, @NonNull FileOption option) {
-        return readThenConvert(path, option, BufferConverter.JSON_ARRAY_CONVERTER);
+        return read(path, option, BufferConverter.JSON_ARRAY_CONVERTER);
     }
 
     /**
@@ -82,11 +81,11 @@ public class ReadableFile extends AsyncFileHelper {
      * @param path   File path
      * @param option File option
      * @return json object value
-     * @see #readThenConvert(Path, FileOption, BufferConverter)
+     * @see #read(Path, FileOption, BufferConverter)
      * @see FileOption
      */
     public Single<JsonObject> loadJson(@NonNull Path path, @NonNull FileOption option) {
-        return readThenConvert(path, option, BufferConverter.JSON_OBJECT_CONVERTER);
+        return read(path, option, BufferConverter.JSON_OBJECT_CONVERTER);
     }
 
     /**
@@ -98,11 +97,11 @@ public class ReadableFile extends AsyncFileHelper {
      * @return a reference to path for fluent API
      */
     public Single<Path> write(@NonNull Path filePath, @NonNull FileOption option, @NonNull Buffer data) {
-        return writeWithConverter(filePath, option, data, BufferConverter.ITSELF);
+        return write(filePath, option, data, BufferConverter.ITSELF);
     }
 
     /**
-     * Read file then convert to specific type
+     * Write file with converter
      *
      * @param filePath  File path
      * @param option    File option
@@ -113,8 +112,8 @@ public class ReadableFile extends AsyncFileHelper {
      * @see #read(Path, FileOption)
      * @see FileOption
      */
-    public <T> Single<Path> writeWithConverter(@NonNull Path filePath, @NonNull FileOption option, @NonNull T data,
-                                               @NonNull BufferConverter<T> converter) {
+    public <T> Single<Path> write(@NonNull Path filePath, @NonNull FileOption option, @NonNull T data,
+                                  @NonNull BufferConverter<T> converter) {
         final Path path = filePath.toAbsolutePath();
         return verifyFile(path).filter(FileVerifiedOutput::isExisted)
                                .flatMap(o -> Single.just(option.isOverwrite())

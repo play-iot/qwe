@@ -18,7 +18,7 @@ public class JsonDataBufferConverter<T extends JsonData> implements BufferConver
 
     @Override
     public T from(@NonNull Buffer buffer) {
-        return JsonData.from(buffer.toJson(), dataClass());
+        return JsonData.from(JSON_OBJECT_CONVERTER.from(buffer), dataClass());
     }
 
     @Override
