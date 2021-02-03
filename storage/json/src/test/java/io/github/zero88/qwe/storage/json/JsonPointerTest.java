@@ -1,4 +1,4 @@
-package io.github.zero88.storage.json;
+package io.github.zero88.qwe.storage.json;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class JsonPointerTest {
     }
 
     @Test
-    void test_write_json() {
+    void test_write_into_existing_json_element() {
         final JsonPointer pointer = JsonPointer.from("/xyz");
         final Object obj = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
         Assertions.assertTrue(obj instanceof JsonObject);
@@ -39,6 +39,49 @@ class JsonPointerTest {
         System.out.println(alo);
         Assertions.assertTrue(alo instanceof JsonObject);
         Assertions.assertEquals(new JsonObject().put("xyz", new JsonObject().put("alo", 222)), alo);
+    }
+
+    @Test
+    public void testRootPointerWrite() {
+        JsonPointer pointer = JsonPointer.create();
+        JsonObject obj = new JsonObject();
+        JsonObject toInsert = new JsonObject().put("n", 1);
+        final Object actual = pointer.writeJson(obj, toInsert, true);
+        System.out.println(actual);
+        System.out.println(obj);
+        Assertions.assertSame(toInsert, actual);
+    }
+
+    @Test
+    void test_write_new_json_element() {
+        final JsonPointer pointer = JsonPointer.from("/hey");
+        final JsonObject json = Configs.loadJsonConfig("jp.json");
+        final JsonObject toInsert = new JsonObject().put("alo", 222);
+        final Object obj = pointer.queryJson(json);
+        Assertions.assertNull(obj);
+
+        final Object parent = pointer.copy().parent().queryJson(json);
+        System.out.println(parent);
+        Assertions.assertEquals(json, parent);
+        final Object alo = pointer.writeJson(json, toInsert, true);
+        System.out.println(json);
+        Assertions.assertEquals(json, alo);
+        Assertions.assertEquals(toInsert, pointer.queryJson(json));
+    }
+
+    @Test
+    public void testWriteWithCreateOnMissingJsonObject() {
+        JsonObject obj = new JsonObject().put("hello", new JsonObject().put("world", 1).put("worl", "wrong"))
+                                         .put("helo", new JsonObject().put("world", "wrong").put("worl", "wrong"));
+        Object toInsert = new JsonObject().put("github", "slinkydeveloper");
+        final JsonPointer pointer = JsonPointer.from("/hello/users/francesco");
+        Assertions.assertNull(pointer.queryJson(obj));
+        Assertions.assertNull(pointer.copy().parent().queryJson(obj));
+        Assertions.assertNotNull(pointer.copy().parent().parent().queryJson(obj));
+        final Object write = pointer.writeJson(obj, toInsert, true);
+        System.out.println(write);
+        Assertions.assertEquals(obj, write);
+        Assertions.assertEquals(toInsert, pointer.queryJson(obj));
     }
 
     @Test

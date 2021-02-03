@@ -1,4 +1,4 @@
-package io.github.zero88.storage.json;
+package io.github.zero88.qwe.storage.json;
 
 import java.nio.file.Path;
 

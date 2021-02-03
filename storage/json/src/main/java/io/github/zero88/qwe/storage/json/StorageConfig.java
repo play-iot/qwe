@@ -1,11 +1,14 @@
-package io.github.zero88.storage.json;
+package io.github.zero88.qwe.storage.json;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import io.github.zero88.qwe.CarlConfig.AppConfig;
 import io.github.zero88.qwe.IConfig;
 import io.github.zero88.qwe.file.FileOption;
+import io.github.zero88.qwe.storage.json.service.JsonStorageService;
+import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 
 import lombok.AccessLevel;
@@ -23,7 +26,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder(builderClassName = "Builder")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class StorageConfig implements IConfig {
+public final class StorageConfig implements IConfig {
 
     @Accessors(fluent = true)
     private Path fullPath;
@@ -31,13 +34,22 @@ public class StorageConfig implements IConfig {
     private final String subDir = "storage";
     @Default
     private final int maxSizeInMB = 10;
+    @Default
+    private final String serviceAddress = "qwe.storage.json";
+    @Default
+    private final String serviceHandlerClass = JsonStorageService.class.getName();
     /**
      * If {@code chunk} is enabled, it means each key will be persisted in each file that corresponding name
      */
     @Default
-    private final boolean chunk = true;
+    private final boolean chunk = false;
     @Default
     private final FileOption option = FileOption.create();
+
+    public Class<? extends JsonStorageService> serviceHandlerClass() {
+        return Optional.ofNullable(ReflectionClass.<JsonStorageService>findClass(serviceHandlerClass))
+                       .orElse(JsonStorageService.class);
+    }
 
     @Override
     public String key() {

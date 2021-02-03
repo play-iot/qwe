@@ -1,9 +1,12 @@
 {
   "subDir": "storage",
   "maxSizeInMB": 10,
+  "chunk": false,
   "option": {
     "autoCreate": true,
+    "overwrite": true,
     "filePerms": "rw-r--r--",
     "folderPerms": "rwxr-xr-x"
-  }
+  },
+  "serviceAddress": "qwe.storage.json"
 }
