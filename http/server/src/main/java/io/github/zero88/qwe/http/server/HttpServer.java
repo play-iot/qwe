@@ -186,15 +186,8 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
             return router;
         }
         final Path storageDir = Paths.get(FileUtils.createFolder(getContext().dataDir(), storageCfg.getDir()));
-        UploadRouterCreator.builder()
-                           .storageDir(storageDir)
-                           .publicUrl(publicUrl)
-                           .build()
-                           .mount(router, storageCfg.getUploadConfig(), sharedData());
-        DownloadRouterCreator.builder()
-                             .storageDir(storageDir)
-                             .build()
-                             .mount(router, storageCfg.getDownloadConfig(), sharedData());
+        new UploadRouterCreator(storageDir, publicUrl).mount(router, storageCfg.getUploadConfig(), sharedData());
+        new DownloadRouterCreator(storageDir).mount(router, storageCfg.getDownloadConfig(), sharedData());
         return router;
     }
 
@@ -208,7 +201,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         final Set<Class<? extends RestEventApi>> gatewayApis = Stream.concat(httpRouter.getGatewayApiClasses().stream(),
                                                                              Stream.of(GatewayIndexApi.class))
                                                                      .collect(Collectors.toSet());
-        logger.info("Registering sub routers in Gateway API: '{}'...", apiGatewayConfig.getPath());
+        logger.info("GATEWAY::Registering sub routers in Gateway API: '{}'...", apiGatewayConfig.getPath());
         final Router gatewayRouter = new RestEventApisCreator(vertx).register(gatewayApis)
                                                                     .addSharedDataProxy(this.sharedData())
                                                                     .build();

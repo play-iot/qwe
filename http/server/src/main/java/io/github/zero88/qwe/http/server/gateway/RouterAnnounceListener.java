@@ -1,7 +1,5 @@
 package io.github.zero88.qwe.http.server.gateway;
 
-import org.slf4j.Logger;
-
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.micro.ServiceDiscoveryInvoker;
 import io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
@@ -49,8 +47,7 @@ import lombok.NonNull;
  */
 public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implements DynamicRouterRegister {
 
-    protected RouterAnnounceListener(@NonNull SharedDataLocalProxy proxy,
-                                     @NonNull ServiceDiscoveryInvoker controller) {
+    protected RouterAnnounceListener(@NonNull SharedDataLocalProxy proxy, @NonNull ServiceDiscoveryInvoker controller) {
         super(proxy, controller);
     }
 
@@ -61,11 +58,6 @@ public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implem
         } else {
             register(record);
         }
-    }
-
-    @Override
-    public @NonNull Logger logger() {
-        return logger;
     }
 
     // TODO: find better way instead force rescan in every register call

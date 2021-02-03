@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.qwe.exceptions.NotFoundException;
+import io.github.zero88.qwe.http.server.HttpLogSystem.DownloadLogSystem;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class DownloadFileHandler implements Handler<RoutingContext> {
+public abstract class DownloadFileHandler implements Handler<RoutingContext>, DownloadLogSystem {
 
     private final Logger logger = LoggerFactory.getLogger(DownloadFileHandler.class);
     private final String downloadPath;
@@ -54,11 +55,11 @@ public abstract class DownloadFileHandler implements Handler<RoutingContext> {
                    .setStatusCode(HttpResponseStatus.OK.code())
                    .sendFile(filePath.toString(), ar -> {
                        if (!ar.succeeded()) {
-                           logger.warn("Something wrong when sending file", ar.cause());
+                           logger.warn(decor("Something wrong when sending file"), ar.cause());
                        }
                    });
         } else {
-            throw new NotFoundException("Not found");
+            throw new NotFoundException(decor("Not found file: " + fileId + " in system"));
         }
     }
 

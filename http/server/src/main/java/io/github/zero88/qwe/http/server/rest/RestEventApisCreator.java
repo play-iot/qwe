@@ -22,14 +22,12 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @see RouterCreator
  */
-@Slf4j
 //TODO Refactor it as RouterCreator
-public final class RestEventApisCreator {
+public final class RestEventApisCreator implements ApisCreator {
 
     private final Vertx vertx;
     private final Router router;
@@ -100,8 +98,9 @@ public final class RestEventApisCreator {
             final String path = Strings.isBlank(mapping.getCapturePath())
                                 ? definition.getServicePath()
                                 : mapping.getCapturePath();
-            log.info("Registering route | Event Binding:\t{} {} --- {} {} {}", mapping.getMethod(), path,
-                     metadata.getPattern(), mapping.getAction(), metadata.getAddress());
+            final String format = "Path:{}::{} --- Event:{}::{}::{}";
+            log().info(decor("Registering route: " + format), mapping.getMethod(), path, metadata.getAddress(),
+                       mapping.getAction(), metadata.getPattern());
             HttpServer.restrictJsonRoute(
                 router.route(mapping.getMethod(), path).order(definition.getOrder()).handler(restHandler));
         }

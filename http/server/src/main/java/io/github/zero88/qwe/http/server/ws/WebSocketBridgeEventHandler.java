@@ -12,7 +12,7 @@ import io.github.zero88.qwe.event.EventMessage;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.github.zero88.utils.Strings;
+import io.github.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
 import io.vertx.ext.bridge.BridgeEventType;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 //TODO handle auth with socket header
 @Slf4j
-public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
+public class WebSocketBridgeEventHandler implements Handler<BridgeEvent>, WebSocketLogSystem {
 
     private final Map<String, WebSocketServerEventMetadata> metadataByListener = new HashMap<>();
     private final WebSocketEventExecutor executor;
@@ -56,7 +56,7 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
     }
 
     private void logEvent(BridgeEvent event, boolean debug) {
-        String msg = "Websocket::RemoteAddr: '{}' - SocketAddr: '{}' - Path: '{}' - Event: '{}'";
+        String msg = decor("RemoteAddr:'{}'-SocketAddr:'{}'-Path:'{}'-Event:'{}'");
         SockJSSocket socket = event.socket();
         if (debug) {
             log.debug(msg, socket.remoteAddress(), socket.localAddress(), socket.uri(), event.type());
@@ -68,16 +68,15 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent> {
     private void clientToServer(BridgeEvent event) {
         logEvent(event, false);
         SockJSSocket socket = event.socket();
-        socket.exceptionHandler(t -> log.error("WEBSOCKET::Backend error", t));
+        socket.exceptionHandler(t -> log.error(decor("WebSocket server raise error"), t));
         String address = event.getRawMessage().getString("address");
         WebSocketServerEventMetadata metadata = this.metadataByListener.get(address);
         if (Objects.isNull(metadata)) {
-            String errorMsg = Strings.format("Address {0} is not found", address);
-            socket.close(HttpResponseStatus.NOT_FOUND.code(), errorMsg);
+            socket.close(HttpResponseStatus.NOT_FOUND.code(), decor("Unsupported address " + address));
             return;
         }
         try {
-            log.info("WEBSOCKET::Redirect message from address: {}", address);
+            log.info(decor("Redirect message from address: {}"), address);
             executor.execute(WebSocketEventMessage.from(event.getRawMessage()), metadata, handleMessage(socket));
         } catch (CarlException e) {
             handleMessage(socket).accept(EventMessage.error(EventAction.RETURN, e));

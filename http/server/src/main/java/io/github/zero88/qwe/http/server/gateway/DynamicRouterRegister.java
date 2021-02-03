@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.github.zero88.qwe.exceptions.CarlException;
+import io.github.zero88.qwe.http.server.HttpLogSystem.GatewayLogSystem;
 import io.github.zero88.qwe.http.server.HttpServer;
+import io.github.zero88.qwe.http.server.RouterCreator;
 import io.github.zero88.qwe.http.server.ServerInfo;
 import io.github.zero88.qwe.http.server.handler.DynamicContextDispatcher;
 import io.github.zero88.qwe.http.server.rest.api.DynamicRestApi;
@@ -20,9 +23,11 @@ import io.vertx.servicediscovery.Status;
 
 import lombok.NonNull;
 
-public interface DynamicRouterRegister extends ServiceGatewayMonitor {
+public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLogSystem {
 
-    @NonNull Logger logger();
+    default @NonNull Logger log() {
+        return LoggerFactory.getLogger(RouterCreator.class);
+    }
 
     default boolean register(Record record) {
         try {
@@ -40,19 +45,19 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor {
                 DynamicContextDispatcher<DynamicRestApi> handler = DynamicContextDispatcher.create(api, gatewayPath,
                                                                                                    getInvoker());
                 paths.forEach(path -> {
-                    logger().info("Enable dynamic route | API: {} | Order: {} | Path: {}", api.name(), api.order(),
-                                  path);
+                    log().info(decor("Enable dynamic route | API: {} | Order: {} | Path: {}"), api.name(),
+                               api.order(), path);
                     router.route(path).order(api.order()).handler(handler).enable();
                 });
             } else {
                 paths.forEach(path -> {
-                    logger().info("Disable dynamic route | API: {} | Path: {}", api.name(), path);
+                    log().info(decor("Disable dynamic route | API: {} | Path: {}"), api.name(), path);
                     router.route(path).disable();
                 });
             }
             return true;
         } catch (CarlException e) {
-            logger().warn("Cannot register Dynamic service", e);
+            log().warn(decor("Cannot register Dynamic service"), e);
             return false;
         }
     }

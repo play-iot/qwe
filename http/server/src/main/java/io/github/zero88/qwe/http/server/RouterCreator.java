@@ -1,11 +1,18 @@
 package io.github.zero88.qwe.http.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.vertx.ext.web.Router;
 
 import lombok.NonNull;
 
 public interface RouterCreator<T extends RouterConfig> {
+
+    default Logger log() {
+        return LoggerFactory.getLogger(RouterCreator.class);
+    }
 
     /**
      * Mount sub router into root router

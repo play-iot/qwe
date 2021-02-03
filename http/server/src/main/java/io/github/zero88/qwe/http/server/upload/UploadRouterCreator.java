@@ -12,6 +12,7 @@ import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.http.HttpUtils;
 import io.github.zero88.qwe.http.server.HttpConfig.FileStorageConfig.UploadConfig;
+import io.github.zero88.qwe.http.server.HttpLogSystem.UploadLogSystem;
 import io.github.zero88.qwe.http.server.RouterCreator;
 import io.github.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 import io.github.zero88.utils.Strings;
@@ -19,13 +20,11 @@ import io.reactivex.annotations.Nullable;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 
-import lombok.Builder;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
-@Builder
-public class UploadRouterCreator implements RouterCreator<UploadConfig> {
+@RequiredArgsConstructor
+public class UploadRouterCreator implements RouterCreator<UploadConfig>, UploadLogSystem {
 
     private final Path storageDir;
     private final String publicUrl;
@@ -33,7 +32,7 @@ public class UploadRouterCreator implements RouterCreator<UploadConfig> {
     @Nullable
     @Override
     public Router router(@NonNull UploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
-        log.info("Init Upload router: '{}'...", config.getPath());
+        log().info(decor("Registering route: '{}' in storage '{}'..."), config.getPath(), storageDir);
         final EventbusClient eventbus = EventbusClient.create(sharedData);
         final String address = Strings.fallback(config.getListenerAddress(), sharedData.getSharedKey() + ".upload");
         final EventModel listenerEvent = EventModel.builder()

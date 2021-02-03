@@ -13,6 +13,7 @@ import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.event.EventbusClient;
 import io.github.zero88.qwe.event.ReplyEventHandler;
 import io.github.zero88.qwe.http.event.WebSocketServerEventMetadata;
+import io.github.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,9 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Accessors(fluent = true)
 @RequiredArgsConstructor
-public class WebSocketEventExecutor implements HasSharedData {
+public class WebSocketEventExecutor implements HasSharedData, WebSocketLogSystem {
 
-    private static final String WEBSOCKET_SERVER = "WEBSOCKET_SERVER";
     private final SharedDataLocalProxy sharedData;
 
     public void execute(@NonNull WebSocketEventMessage socketMessage, @NonNull WebSocketServerEventMetadata metadata,
@@ -34,11 +34,11 @@ public class WebSocketEventExecutor implements HasSharedData {
         final EventMessage msg = EventMessage.success(socketMessage.getBody().getAction(),
                                                       RequestData.from(socketMessage.getBody()));
         final EventbusClient eventbus = EventbusClient.create(sharedData);
-        log.info("WEBSOCKET::Client Request: {}", msg.toJson().encode());
+        log.info(decor("Handle action '{}' from client"), msg.getAction());
         EventModel processor = metadata.getProcessor();
         if (processor.getPattern() == EventPattern.REQUEST_RESPONSE) {
             ReplyEventHandler handler = ReplyEventHandler.builder()
-                                                         .system(WEBSOCKET_SERVER)
+                                                         .system(function())
                                                          .address(processor.getAddress())
                                                          .action(msg.getAction())
                                                          .success(callback(eventbus, metadata.getPublisher(), callback))

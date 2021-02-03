@@ -16,6 +16,7 @@ import io.github.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.github.zero88.qwe.http.server.BasePaths;
 import io.github.zero88.qwe.http.server.HttpConfig.WebSocketConfig;
 import io.github.zero88.qwe.http.server.HttpConfig.WebSocketConfig.SocketBridgeConfig;
+import io.github.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
 import io.github.zero88.qwe.http.server.RouterCreator;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Urls;
@@ -25,10 +26,8 @@ import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public final class WebSocketRouterCreator implements RouterCreator<WebSocketConfig> {
+public final class WebSocketRouterCreator implements RouterCreator<WebSocketConfig>, WebSocketLogSystem {
 
     private final Map<String, List<WebSocketServerEventMetadata>> socketsByPath = new HashMap<>();
 
@@ -65,7 +64,7 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
 
     Map<String, List<WebSocketServerEventMetadata>> validate() {
         if (this.socketsByPath.isEmpty()) {
-            throw new InitializerError("No socket handler given, register at least one.");
+            throw new InitializerError("Register at least WebSocket handler");
         }
         return socketsByPath;
     }
@@ -73,16 +72,17 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
     private SockJSBridgeOptions createBridgeOptions(SocketBridgeConfig config,
                                                     List<WebSocketServerEventMetadata> metadata, String fullPath) {
         SockJSBridgeOptions opts = new SockJSBridgeOptions(config);
+        String msgFormat = "Path:'{}'-Address:'{}'-Pattern:'{}'";
         metadata.forEach(m -> {
             EventModel listener = m.getListener();
             EventModel publisher = m.getPublisher();
             if (Objects.nonNull(listener)) {
-                log.info("Registering websocket | Event Listener :\t'{}' --- '{}' '{}'", fullPath,
-                         listener.getPattern(), listener.getAddress());
+                log().info(decor("Init Inbound WebSocket: " + msgFormat), fullPath, listener.getPattern(),
+                           listener.getAddress());
                 opts.addInboundPermitted(new PermittedOptions().setAddress(listener.getAddress()));
             } else if (Objects.nonNull(publisher)) {
-                log.info("Registering websocket | Event Publisher:\t'{}' --- '{}' '{}'", fullPath,
-                         publisher.getPattern(), publisher.getAddress());
+                log().info(decor("Init Outbound WebSocket: " + msgFormat), fullPath, publisher.getPattern(),
+                           publisher.getAddress());
                 opts.addOutboundPermitted(new PermittedOptions().setAddress(publisher.getAddress()));
             }
         });

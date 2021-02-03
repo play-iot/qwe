@@ -6,9 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.github.zero88.exceptions.InvalidUrlException;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.exceptions.InitializerError;
@@ -34,9 +31,7 @@ import lombok.RequiredArgsConstructor;
  */
 //TODO Refactor it as RouterCreator
 @RequiredArgsConstructor
-public final class RestApisRouterCreator {
-
-    private static final Logger logger = LoggerFactory.getLogger(RestApisRouterCreator.class);
+public final class RestApisRouterCreator implements ApisCreator {
 
     @NonNull
     private final Vertx vertx;
@@ -86,7 +81,7 @@ public final class RestApisRouterCreator {
         if (restApiClass.isEmpty() && restEventApiClass.isEmpty() && !dynamicRouteConfig.isEnabled()) {
             throw new InitializerError("No REST API given, register at least one.");
         }
-        logger.info("Registering sub routers in root API: '{}'...", rootApi);
+        log().info(decor("Registering sub routers in root API: '{}'..."), rootApi);
         this.addSubRouter(this::initRestApiRouter)
             .addSubRouter(this::initEventBusApiRouter)
             .addSubRouter(this::initDynamicRouter);
@@ -108,7 +103,7 @@ public final class RestApisRouterCreator {
             return null;
         }
         Object[] classes = restApiClass.toArray(new Class[] {});
-        logger.info("Registering sub router REST API...");
+        log().info(decor("Registering sub router REST API..."));
         //TODO register RestAPI
         return null;
     }
@@ -117,7 +112,7 @@ public final class RestApisRouterCreator {
         if (restEventApiClass.isEmpty()) {
             return null;
         }
-        logger.info("Registering sub router REST Event API...");
+        log().info(decor("Registering sub router REST Event API..."));
         return new RestEventApisCreator(vertx).addSharedDataProxy(proxy).register(restEventApiClass).build();
     }
 
@@ -132,7 +127,7 @@ public final class RestApisRouterCreator {
                                        e);
         }
         String path = BasePaths.addWildcards(dynamicRouteConfig.getPath());
-        logger.info("Registering sub router REST Dynamic API '{}' in disable mode...", path);
+        log().info(decor("Registering sub router REST Dynamic API '{}' in disable mode..."), path);
         Router dynamicRouter = Router.router(vertx);
         dynamicRouter.route(path).disable();
         return dynamicRouter;

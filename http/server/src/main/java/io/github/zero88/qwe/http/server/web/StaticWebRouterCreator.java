@@ -3,16 +3,15 @@ package io.github.zero88.qwe.http.server.web;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.http.server.BasePaths;
 import io.github.zero88.qwe.http.server.HttpConfig.StaticWebConfig;
+import io.github.zero88.qwe.http.server.HttpLogSystem.WebLogSystem;
 import io.github.zero88.qwe.http.server.RouterCreator;
 import io.github.zero88.utils.FileUtils;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class StaticWebRouterCreator implements RouterCreator<StaticWebConfig> {
+public class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, WebLogSystem {
 
     @Override
     public @NonNull Router router(@NonNull StaticWebConfig config, @NonNull SharedDataLocalProxy sharedData) {
@@ -22,7 +21,7 @@ public class StaticWebRouterCreator implements RouterCreator<StaticWebConfig> {
         } else {
             String webDir = FileUtils.createFolder(sharedData.getData(SharedDataLocalProxy.APP_DATADIR),
                                                    config.getWebRoot());
-            log.info("Static web dir {}", webDir);
+            log().info(decor("Registering route '{}' with web dir '{}'"), config.getWebPath(), webDir);
             staticHandler.setEnableRangeSupport(true)
                          .setSendVaryHeader(true)
                          .setFilesReadOnly(false)

@@ -5,23 +5,22 @@ import java.nio.file.Path;
 import io.github.zero88.qwe.component.SharedDataLocalProxy;
 import io.github.zero88.qwe.http.server.BasePaths;
 import io.github.zero88.qwe.http.server.HttpConfig.FileStorageConfig.DownloadConfig;
+import io.github.zero88.qwe.http.server.HttpLogSystem.DownloadLogSystem;
 import io.github.zero88.qwe.http.server.RouterCreator;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
-import lombok.Builder;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
-@Builder
-public class DownloadRouterCreator implements RouterCreator<DownloadConfig> {
+@RequiredArgsConstructor
+public class DownloadRouterCreator implements RouterCreator<DownloadConfig>, DownloadLogSystem {
 
     private final Path storageDir;
 
     @Override
     public Router router(@NonNull DownloadConfig config, @NonNull SharedDataLocalProxy sharedData) {
-        log.info("Init Download router: '{}'...", config.getPath());
+        log().info(decor("Registering route: '{}' in storage '{}'..."), config.getPath(), storageDir);
         final Router router = Router.router(sharedData.getVertx());
         router.get(BasePaths.addWildcards("/"))
               .handler(StaticHandler.create()

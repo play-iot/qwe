@@ -15,13 +15,14 @@ import io.github.zero88.qwe.event.EventAction;
 import io.github.zero88.qwe.event.EventModel;
 import io.github.zero88.qwe.event.EventPattern;
 import io.github.zero88.qwe.http.event.RestEventApiMetadata;
+import io.github.zero88.qwe.http.server.HttpLogSystem.ApisLogSystem;
 import io.github.zero88.qwe.micro.http.ActionMethodMapping;
 import io.github.zero88.qwe.micro.http.EventMethodDefinition;
 import io.vertx.core.http.HttpMethod;
 
 import lombok.NonNull;
 
-public abstract class AbstractRestEventApi implements RestEventApi {
+public abstract class AbstractRestEventApi implements RestEventApi, ApisLogSystem {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ActionMethodMapping mapping;
@@ -52,7 +53,7 @@ public abstract class AbstractRestEventApi implements RestEventApi {
     protected void addRouter(@NonNull String address, @NonNull EventPattern pattern,
                              @NonNull EventMethodDefinition definition) {
         if (restMetadata.containsKey(definition.getServicePath())) {
-            logger.warn("HTTP path '{}' is already registered, but might different Event address '{}'",
+            logger.warn(decor("HTTP path '{}' is already registered, but might different Event address '{}'"),
                         definition.getServicePath(), restMetadata.get(definition.getServicePath()).getAddress());
         }
         restMetadata.putIfAbsent(definition.getServicePath(), RestEventApiMetadata.builder()
