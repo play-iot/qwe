@@ -83,6 +83,16 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
     }
 
     /**
+     * Defines whether throw exception if response is error
+     *
+     * @return {@code true} if want to throw exception
+     * @apiNote Default is {@code false}
+     */
+    default boolean throwIfResponseError() {
+        return false;
+    }
+
+    /**
      * Do search {@code destination service}.
      *
      * @param action event action to execute
@@ -156,7 +166,14 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      */
     default Single<JsonObject> execute(@NonNull String address, @NonNull EventAction action,
                                        @NonNull RequestData reqData) {
-        return invoke(address, action, reqData).map(out -> out.isError() ? out.getError().toJson() : out.getData());
+        return this.invoke(address, action, reqData).map(out -> {
+            if (out.isError() && throwIfResponseError()) {
+                throw new CarlException(out.getError().getCode(), out.getError().getMessage());
+            }
+            return Optional.ofNullable(out.getError())
+                           .map(ErrorMessage::toJson)
+                           .orElseGet(() -> Optional.ofNullable(out.getData()).orElseGet(JsonObject::new));
+        });
     }
 
     /**
