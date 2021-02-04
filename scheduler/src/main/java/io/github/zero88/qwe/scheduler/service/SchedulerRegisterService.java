@@ -113,7 +113,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
                             })
                             .findFirst()
                             .orElseThrow(() -> new NotFoundException(
-                                "Not found trigger " + triggerKey + " that associated to job " + jobKey));
+                                "Not found trigger '" + triggerKey + "' that associated to job '" + jobKey + "'"));
         } catch (SchedulerException e) {
             throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot get trigger and job in scheduler", e);
         }
@@ -132,7 +132,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
             if (scheduler.checkExists(triggerKey)) {
                 final JobKey jobKey = scheduler.getTrigger(triggerKey).getJobKey();
                 throw new AlreadyExistException(
-                    "Trigger " + triggerKey + " is already assigned to another job " + jobKey);
+                    "Trigger '" + triggerKey + "' is already assigned to another job '" + jobKey + "'");
             }
             Date firstFire;
             TimeZone tz;
@@ -166,7 +166,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
         try {
             return SchedulerRegisterResp.builder().removed(scheduler.deleteJob(key)).build();
         } catch (SchedulerException e) {
-            throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot remove job id " + key.toString(), e);
+            throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot remove job id '" + key.toString() + "'", e);
         }
     }
 
