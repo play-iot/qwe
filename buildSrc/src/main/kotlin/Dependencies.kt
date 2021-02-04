@@ -44,12 +44,10 @@ object TestLibs {
 
     object Version {
 
-        const val junit = "4.12"
         const val junit5 = "5.7.0"
         const val jsonAssert = "1.5.0"
     }
 
-    const val junit = "junit:junit:${Version.junit}"
     const val junit5Api = "org.junit.jupiter:junit-jupiter-api:${Version.junit5}"
     const val junit5Engine = "org.junit.jupiter:junit-jupiter-engine:${Version.junit5}"
     const val junit5Vintage = "org.junit.vintage:junit-vintage-engine:${Version.junit5}"
