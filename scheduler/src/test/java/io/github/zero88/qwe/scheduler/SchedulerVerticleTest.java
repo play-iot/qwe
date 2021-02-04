@@ -51,7 +51,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class SchedulerComponentTest {
+public class SchedulerVerticleTest {
 
     private static final Function<String, Customization> UTC_DATE = timeKey -> new Customization(
         "data." + timeKey + ".utc", (o1, o2) -> true);
@@ -240,7 +240,7 @@ public class SchedulerComponentTest {
                                        .action(EventAction.REMOVE)
                                        .payload(RequestData.builder().body(payload).build())
                                        .build();
-        JsonObject r = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":{\"unschedule\":false}}");
+        JsonObject r = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":{\"removed\":false}}");
         eventbus.fire(waybill, EventbusHelper.replyAsserter(context, async, r));
         Waybill event = initRegisterWaybill(job, cron);
         CountDownLatch latch = new CountDownLatch(1);
@@ -250,7 +250,7 @@ public class SchedulerComponentTest {
             EventbusHelper.replyAsserter(context, async, resp, SKIP_LOCAL_DATE, SKIP_UTC_DATE).handle(e);
         });
         context.assertTrue(latch.await(1, TimeUnit.SECONDS));
-        r = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":{\"unschedule\":true}}");
+        r = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":{\"removed\":true}}");
         eventbus.fire(waybill, EventbusHelper.replyAsserter(context, async, r));
     }
 

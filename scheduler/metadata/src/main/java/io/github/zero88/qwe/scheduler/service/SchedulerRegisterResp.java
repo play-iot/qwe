@@ -28,6 +28,7 @@ public final class SchedulerRegisterResp implements JsonData {
     private final JsonObject firstFireTime;
     private final JsonObject nextFireTime;
     private final JsonObject prevFireTime;
+    private final Boolean removed;
 
 
     public static class SchedulerRegisterRespBuilder {

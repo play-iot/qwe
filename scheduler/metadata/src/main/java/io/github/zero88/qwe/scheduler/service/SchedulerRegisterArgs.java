@@ -36,6 +36,10 @@ public final class SchedulerRegisterArgs implements JsonData {
         return JsonData.from(reqData.body(), SchedulerRegisterArgs.class);
     }
 
+    public static String createKey(@NonNull String group, @NonNull String name) {
+        return group + "." + name;
+    }
+
     public JobKey jobKey() {
         String[] splitter = parse(jobKey);
         if (Objects.nonNull(splitter)) {

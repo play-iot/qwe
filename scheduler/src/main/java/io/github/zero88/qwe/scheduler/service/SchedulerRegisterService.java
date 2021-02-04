@@ -159,12 +159,12 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
         }
     }
 
-    @EventContractor(action = "REMOVE")
-    public JsonObject remove(@NonNull RequestData requestData) {
+    @EventContractor(action = "REMOVE", returnType = SchedulerRegisterResp.class)
+    public SchedulerRegisterResp remove(@NonNull RequestData requestData) {
         final SchedulerRegisterArgs args = SchedulerRegisterArgs.parse(requestData);
         final JobKey key = args.requiredJobKey();
         try {
-            return new JsonObject().put("unschedule", scheduler.deleteJob(key));
+            return SchedulerRegisterResp.builder().removed(scheduler.deleteJob(key)).build();
         } catch (SchedulerException e) {
             throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot remove job id " + key.toString(), e);
         }
