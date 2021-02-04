@@ -35,6 +35,8 @@ public final class JsonInput implements JsonData {
     private final String pointer;
     private final Object dataToInsert;
     private final Object keyToRemove;
+    @Default
+    private final boolean skipRemovedKeyInOutput = false;
 
     public @NonNull JsonPointer pointer() {
         return Strings.isBlank(pointer) ? JsonPointer.create() : JsonPointer.from(pointer);

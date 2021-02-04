@@ -75,7 +75,7 @@ public class JsonStorageService implements EventListener, HasSharedData {
         }
         final JsonPointer pointer = ji.pointer();
         return this.loadJson(ji)
-                   .flatMapMaybe(json -> this.remove(pointer, ji.getKeyToRemove().toString(), json)
+                   .flatMapMaybe(json -> this.remove(pointer, ji, json)
                                              .flatMapSingleElement(o -> this.writeJson(ji, json).map(ignore -> o)))
                    .map(o -> new JsonObject().put(ji.getOutputKey(), o))
                    .switchIfEmpty(Single.just(new JsonObject()));
@@ -94,11 +94,12 @@ public class JsonStorageService implements EventListener, HasSharedData {
                    .map(json -> new JsonObject().put(ji.getOutputKey(), Objects.nonNull(ji.pointer().queryJson(json))));
     }
 
-    protected Maybe<?> remove(JsonPointer pointer, String keyToRemove, JsonObject json) {
+    protected Maybe<?> remove(JsonPointer pointer, JsonInput ji, JsonObject json) {
+        final String keyToRemove = ji.getKeyToRemove().toString();
         final Object o = pointer.queryJson(json);
         if (o instanceof JsonObject) {
             return Optional.ofNullable(((JsonObject) o).remove(keyToRemove))
-                           .map(v -> new JsonObject().put(keyToRemove, v))
+                           .map(v -> ji.isSkipRemovedKeyInOutput() ? v : new JsonObject().put(keyToRemove, v))
                            .map(Maybe::just)
                            .orElse(Maybe.empty());
         }
