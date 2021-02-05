@@ -160,7 +160,7 @@ public class SchedulerVerticleTest {
         latch.await(1, TimeUnit.SECONDS);
         eventbus.fire(event2, EventbusHelper.replyAsserter(context, async, new JsonObject(
             "{\"status\":\"FAILED\",\"action\":\"CREATE\",\"error\":{\"code\":\"ALREADY_EXIST\"," +
-            "\"message\":\"Trigger DEFAULT.tr3 is already assigned to another job DEFAULT.j1\"}}")));
+            "\"message\":\"Trigger 'DEFAULT.tr3' is already assigned to another job 'DEFAULT.j1'\"}}")));
     }
 
     @Test
