@@ -14,7 +14,8 @@ on:
     branches: [ main ]
 
 env:
-  ENABLE_TEST: false
+  ENABLE_TEST: true
+  ENABLE_GH_MAVEN: false
 
 jobs:
   context:
@@ -92,7 +93,7 @@ jobs:
                           -PbuildBy="GitHub Action" -PbuildHash=${{ github.sha }}
 
       - name: Publish GitHub Package
-        if: needs.context.outputs.isRelease == 'true'
+        if: needs.context.outputs.isRelease == 'true' && env.ENABLE_GH_MAVEN == 'true'
         run: |
           args=( -Pversion=${{ needs.context.outputs.version }} \
                  -PsemanticVersion=${{needs.context.outputs.semanticVersion }} \
