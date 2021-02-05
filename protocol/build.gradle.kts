@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":base"))
+    api(project(":qwe-base"))
     api(UtilLibs.ip)
 
-    testImplementation(testFixtures(project(":base")))
+    testImplementation(testFixtures(project(":qwe-base")))
 }

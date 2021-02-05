@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":http:metadata"))
+    api(project(":http:http-metadata"))
 
     testImplementation(VertxLibs.junit)
-    testImplementation(testFixtures(project(":base")))
+    testImplementation(testFixtures(project(":qwe-base")))
 }

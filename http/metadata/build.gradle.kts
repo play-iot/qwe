@@ -1,4 +1,4 @@
 dependencies {
-    api(project(":base"))
-    implementation(project(":micro:metadata"))
+    api(project(":qwe-base"))
+    implementation(project(":micro:micro-metadata"))
 }

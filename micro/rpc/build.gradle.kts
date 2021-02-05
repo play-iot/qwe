@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":base"))
-    api(project(":micro:metadata"))
+    api(project(":qwe-base"))
+    api(project(":micro:micro-metadata"))
     implementation(VertxLibs.serviceDiscovery)
 }

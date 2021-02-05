@@ -14,6 +14,8 @@ plugins {
 val jacocoHtml: String? by project
 val semanticVersion: String by project
 val buildHash: String by project
+project.tasks["sonarqube"].group = "analysis"
+project.tasks["sonarqube"].dependsOn("build", "jacocoRootReport")
 
 allprojects {
     group = "io.github.zero88.qwe"
@@ -35,9 +37,8 @@ subprojects {
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
     project.version = "$version$semanticVersion"
-    project.group = ProjectUtils.computeGroup(project)
-    project.ext.set("title", findProperty("title") ?: project.name)
     project.ext.set("baseName", ProjectUtils.computeBaseName(project))
+    project.ext.set("title", findProperty("title") ?: project.ext.get("baseName"))
     project.ext.set("description", findProperty("description") ?: "A Vertx framework for microservice: ${project.name}")
 
     java {
@@ -61,20 +62,17 @@ subprojects {
     tasks {
         jar {
             doFirst {
-                println("- Project Name:     ${project.ext.get("baseName")}")
+                println("- Project Name:     ${archiveBaseName.get()}")
                 println("- Project Title:    ${project.ext.get("title")}")
                 println("- Project Group:    ${project.group}")
-                println("- Project Artifact: ${project.name}")
                 println("- Project Version:  ${project.version}")
                 println("- Gradle Version:   ${GradleVersion.current()}")
                 println("- Java Version:     ${Jvm.current()}")
             }
-
-            archiveBaseName.set(project.ext.get("baseName") as String)
             manifest {
                 attributes(
                     mapOf(Name.MANIFEST_VERSION.toString() to "1.0",
-                          Name.IMPLEMENTATION_TITLE.toString() to archiveBaseName,
+                          Name.IMPLEMENTATION_TITLE.toString() to archiveBaseName.get(),
                           Name.IMPLEMENTATION_VERSION.toString() to project.version,
                           "Created-By" to GradleVersion.current(),
                           "Build-Jdk" to Jvm.current(),
@@ -96,6 +94,9 @@ subprojects {
             useJUnitPlatform()
         }
 
+        withType<Jar>().configureEach {
+            archiveBaseName.set(project.ext.get("baseName") as String)
+        }
         withType<Sign>().configureEach {
             onlyIf { project.hasProperty("release") }
         }
@@ -105,7 +106,7 @@ subprojects {
         publications {
             create<MavenPublication>("maven") {
                 groupId = project.group as String?
-                artifactId = project.name
+                artifactId = project.ext.get("baseName") as String
                 version = project.version as String?
                 from(components["java"])
 
@@ -118,7 +119,7 @@ subprojects {
                     }
                 }
                 pom {
-                    name.set(project.name)
+                    name.set(project.ext.get("title") as String)
                     description.set(project.ext.get("description") as String)
                     url.set("https://github.com/zero88/qwe")
                     licenses {
@@ -183,8 +184,6 @@ task<JacocoReport>("jacocoRootReport") {
     }
 }
 
-project.tasks["sonarqube"].group = "analysis"
-project.tasks["sonarqube"].dependsOn("build", "jacocoRootReport")
 sonarqube {
     properties {
         property("jacocoHtml", "false")

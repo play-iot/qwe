@@ -46,9 +46,9 @@ class ProjectUtils {
 
     private static String computeProjectName(Project project, String sep, String firstSep = null) {
         if (project.parent == null) {
-            return extraProp(project, "baseName", project.name)
+            return extraProp(project, "baseName", project.projectDir.name)
         }
         final def s = project.parent.parent == null && firstSep ? firstSep : sep
-        return computeProjectName(project.parent, sep, firstSep) + s + project.name
+        return computeProjectName(project.parent, sep, firstSep) + s + project.projectDir.name
     }
 }
