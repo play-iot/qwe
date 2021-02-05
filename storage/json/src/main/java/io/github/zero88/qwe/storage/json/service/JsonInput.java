@@ -64,6 +64,10 @@ public final class JsonInput implements JsonData {
             return this.toRemove(keyToRemove);
         }
 
+        public JsonInputBuilder dataToInsert(JsonData dataToInsert) {
+            return this.toInsert(Optional.ofNullable(dataToInsert).map(JsonData::toJson).orElse(null));
+        }
+
         public JsonInputBuilder dataToInsert(JsonObject dataToInsert) {
             return this.toInsert(dataToInsert);
         }
