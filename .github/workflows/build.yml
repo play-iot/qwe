@@ -24,6 +24,7 @@ jobs:
       shouldBuild: ${{ steps.context.outputs.decision_build }}
       shouldPublish: ${{ steps.context.outputs.decision_publish }}
       isRelease: ${{ steps.context.outputs.isTag }}
+      afterRelease: ${{ steps.context.outputs.isAfterMergedReleasePR }}
       version: ${{ steps.context.outputs.version }}
       semanticVersion: ${{ steps.semantic.outputs.semanticVersion }}
 
@@ -52,12 +53,13 @@ jobs:
         id: semantic
         shell: bash
         run: |
-          echo ::set-output name=semanticVersion::$(grep semanticVersion gradle.properties | cut -d'=' -f2)
+          [[ "${{ steps.context.outputs.isTag }}" == "true" ]] && sv="" || sv=$(grep semanticVersion gradle.properties | cut -d'=' -f2)
+          echo ::set-output name=semanticVersion::$sv
 
   build:
     runs-on: ubuntu-latest
     needs: context
-    if: needs.context.outputs.shouldBuild == 'true'
+    if: needs.context.outputs.shouldBuild == 'true' && needs.context.outputs.afterRelease != 'true'
     steps:
       - uses: actions/checkout@v2
 
@@ -92,7 +94,9 @@ jobs:
       - name: Publish GitHub Package
         if: needs.context.outputs.isRelease == 'true'
         run: |
-          args=( -Psigning.gnupg.homeDir=/home/runner/.gnupg \
+          args=( -Pversion=${{ needs.context.outputs.version }} \
+                 -PsemanticVersion=${{needs.context.outputs.semanticVersion }} \
+                 -Psigning.gnupg.homeDir=/home/runner/.gnupg \
                  -Psigning.gnupg.keyName=${{ steps.import_gpg.outputs.keyid }} \
                  -Psigning.gnupg.passphrase=${{ secrets.CI_GPG_PASSPHARSE }} \
                  -Pnexus.username=${{ github.repository_owner }} \
@@ -104,18 +108,20 @@ jobs:
       - name: Publish Sonatype OSSRH
         if: needs.context.outputs.shouldPublish == 'true'
         run: |
-          args=( -Psigning.gnupg.homeDir=/home/runner/.gnupg \
-                           -Psigning.gnupg.keyName=${{ steps.import_gpg.outputs.keyid }} \
-                           -Psigning.gnupg.passphrase=${{ secrets.CI_GPG_PASSPHARSE }} \
-                           -Pnexus.username=${{ secrets.OSS_SONATYPE_USER }} \
-                           -Pnexus.password=${{ secrets.OSS_SONATYPE_PASSWORD }} )
+          args=( -Pversion=${{ needs.context.outputs.version }} \
+                 -PsemanticVersion=${{needs.context.outputs.semanticVersion }} \
+                 -Psigning.gnupg.homeDir=/home/runner/.gnupg \
+                 -Psigning.gnupg.keyName=${{ steps.import_gpg.outputs.keyid }} \
+                 -Psigning.gnupg.passphrase=${{ secrets.CI_GPG_PASSPHARSE }} \
+                 -Pnexus.username=${{ secrets.OSS_SONATYPE_USER }} \
+                 -Pnexus.password=${{ secrets.OSS_SONATYPE_PASSWORD }} )
           [[ "${{ needs.context.outputs.isRelease }}" == 'true' ]] && args+=( -Prelease )
           ./gradlew publish "${args[@]}"
 
   analysis:
     runs-on: ubuntu-latest
     needs: context
-    if: needs.context.outputs.shouldBuild == 'true'
+    if: needs.context.outputs.shouldBuild == 'true' && needs.context.outputs.afterRelease != 'true'
     steps:
       - uses: actions/checkout@v2
         with:
