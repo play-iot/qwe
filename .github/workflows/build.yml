@@ -26,7 +26,7 @@ jobs:
       shouldPublish: ${{ steps.context.outputs.decision_publish }}
       isRelease: ${{ steps.context.outputs.isTag }}
       afterRelease: ${{ steps.context.outputs.isAfterMergedReleasePR }}
-      version: ${{ steps.context.outputs.ver_current }}
+      version: ${{ steps.context.outputs.version }}
       semanticVersion: ${{ steps.semantic.outputs.semanticVersion }}
 
     steps:
@@ -60,7 +60,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: context
-    if: needs.context.outputs.shouldBuild == 'true' && needs.context.outputs.afterRelease != 'true'
+    if: needs.context.outputs.shouldBuild == 'true'
     steps:
       - uses: actions/checkout@v2
 

@@ -69,9 +69,9 @@ public class HttpClientDelegateTest {
     @Test
     public void test_connection_timeout(TestContext context) {
         Async async = context.async();
-        config.getOptions().setConnectTimeout(2000).setIdleTimeout(1);
+        config.getOptions().setConnectTimeout(3000).setIdleTimeout(1);
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
-        client.request("/delay/5", HttpMethod.GET, null)
+        client.request("/delay/10", HttpMethod.GET, null)
               .doFinally(() -> TestHelper.testComplete(async))
               .subscribe((responseData, throwable) -> context.assertTrue(throwable instanceof TimeoutException));
     }

@@ -49,7 +49,8 @@ public interface JsonData {
                                        .copy()
                                        .registerModule(new JavaTimeModule())
                                        .registerModule(JsonModule.BASIC)
-                                       .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                                       .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+                                                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
     ObjectMapper LENIENT_MAPPER = MAPPER.copy().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     String SUCCESS_KEY = "data";
     String ERROR_KEY = "error";
@@ -269,7 +270,7 @@ public interface JsonData {
                 } catch (DecodeException ex) {
                     if (isJson) {
                         throw new CarlException(ErrorCode.INVALID_ARGUMENT,
-                                                     "Cannot parse json data. Received data: " + buffer.toString(), ex);
+                                                "Cannot parse json data. Received data: " + buffer.toString(), ex);
                     }
                     logger.trace("Failed to parse json array. Use text", ex);
                     //TODO check length, check encode
