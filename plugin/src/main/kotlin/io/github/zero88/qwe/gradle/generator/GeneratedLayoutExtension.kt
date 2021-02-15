@@ -3,6 +3,7 @@ package io.github.zero88.qwe.gradle.generator
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 
+@Suppress("UnstableApiUsage")
 open class GeneratedLayoutExtension(objects: ObjectFactory, layout: ProjectLayout) {
 
     val generatedDir = objects.directoryProperty().convention(layout.buildDirectory.dir("generated"))

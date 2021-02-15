@@ -2,8 +2,9 @@ package io.github.zero88.qwe.gradle.helper
 
 import org.gradle.api.Project
 
-fun prop(project: Project, key: String): String? {
-    return prop(project, key, "")
+fun prop(project: Project, key: String, forceNull: Boolean = false): String? {
+    val prop = prop(project, key, "")
+    return if (prop == "" && forceNull) null else prop
 }
 
 fun prop(project: Project, key: String, fallback: String?): String {

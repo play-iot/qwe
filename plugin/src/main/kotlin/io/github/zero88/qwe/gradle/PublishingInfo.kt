@@ -12,7 +12,7 @@ import org.gradle.kotlin.dsl.property
 
 @Suppress("UnstableApiUsage") class PublishingInfo(objects: ObjectFactory) {
 
-    val enabled = objects.property<Boolean>()
+    val enabled = objects.property<Boolean>().convention(false)
     val projectName = objects.property<String>()
     val homepage = objects.property<String>()
     val license: MavenPomLicense = DefaultMavenPomLicense(objects)

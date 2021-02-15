@@ -34,19 +34,19 @@ abstract class QWEPlugin : Plugin<Project> {
         qwe.baseName.convention(computeBaseName(project))
         qwe.title.convention(prop(project, "title", qwe.baseName.get()))
         qwe.description.convention(prop(project, "description"))
-        qwe.publishingInfo.enabled.convention(false)
+        qwe.application.convention(prop(project, "executable", "false").toBoolean())
         qwe.publishingInfo.projectName.convention(qwe.baseName.get())
         project.extra.set("baseName", qwe.baseName.get())
 
-        applyPlugins(project)
+        applyExternalPlugins(project)
         evaluateProject(project, qwe)
-        configTask(project, qwe)
-        doApply(project, "qwe")
+        configExternalTasks(project, qwe)
+        doApply(project, qwe)
     }
 
-    abstract fun doApply(project: Project, rootExtName: String)
+    abstract fun doApply(project: Project, extension: QWEExtension)
 
-    protected open fun applyPlugins(project: Project) {
+    protected open fun applyExternalPlugins(project: Project) {
         project.pluginManager.apply(JavaLibraryDistributionPlugin::class.java)
         project.pluginManager.apply(MavenPublishPlugin::class.java)
         project.pluginManager.apply(SigningPlugin::class.java)
@@ -60,11 +60,11 @@ abstract class QWEPlugin : Plugin<Project> {
             println("- Project Version:  ${project.version}")
             println("- Gradle Version:   ${GradleVersion.current()}")
             println("- Java Version:     ${Jvm.current()}")
-            configExtensions(project, qwe)
+            configureExtension(project, qwe)
         }
     }
 
-    protected open fun configExtensions(project: Project, qwe: QWEExtension) {
+    protected open fun configureExtension(project: Project, qwe: QWEExtension) {
         project.extensions.configure<JavaPluginExtension> {
             withJavadocJar()
             withSourcesJar()
@@ -143,12 +143,12 @@ abstract class QWEPlugin : Plugin<Project> {
         }
     }
 
-    protected open fun configTask(project: Project, qwe: QWEExtension) {
+    protected open fun configExternalTasks(project: Project, qwe: QWEExtension) {
         project.tasks {
             withType<Jar>().configureEach {
                 archiveBaseName.set(prop(project, "baseName"))
                 manifest {
-                    attributes(createManifest(project, this@configureEach))
+                    attributes(createJarManifest(project, qwe, this@configureEach))
                 }
             }
             withType<Sign>().configureEach {
@@ -170,9 +170,9 @@ abstract class QWEPlugin : Plugin<Project> {
         }
     }
 
-    protected open fun createManifest(project: Project, task: Jar): Map<String, Any?> {
+    protected open fun createJarManifest(project: Project, qwe: QWEExtension, task: Jar): Map<String, Any?> {
         var manifestMap: Map<String, String> = emptyMap()
-        if ("true" == prop(project, "executable")) {
+        if (qwe.application.get()) {
             val mainClass = project.extra.get("mainClass").toString()
             val mainVerticle = project.extra.get("mainVerticle").toString()
             if (mainClass.trim() == "" || mainVerticle.trim() == "") {
@@ -197,4 +197,5 @@ abstract class QWEPlugin : Plugin<Project> {
             "Build-Date" to Instant.now()
         ) + manifestMap
     }
+
 }
