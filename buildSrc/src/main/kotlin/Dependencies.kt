@@ -20,10 +20,15 @@ object PluginLibs {
 
         const val sonarQube = "3.0"
         const val nexusStaging = "0.22.0"
+        const val docker = "6.7.0"
     }
 
     const val sonarQube = "org.sonarqube"
     const val nexusStaging = "io.codearte.nexus-staging"
+
+    object Depends {
+        const val docker = "com.bmuschko:gradle-docker-plugin:${Version.docker}"
+    }
 }
 
 object JacksonLibs {
