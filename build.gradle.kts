@@ -79,6 +79,12 @@ subprojects {
         withType<Sign>().configureEach {
             onlyIf { project.hasProperty("release") }
         }
+        withType<PublishToMavenRepository>().configureEach {
+            onlyIf { project.name != "plugin" }
+        }
+        withType<GenerateMavenPom>().configureEach {
+            onlyIf { project.name != "plugin" }
+        }
         jar {
             manifest {
                 attributes(
@@ -105,9 +111,6 @@ subprojects {
         }
         test {
             useJUnitPlatform()
-        }
-        publish {
-            onlyIf { project.name != "plugin" }
         }
     }
 

@@ -160,7 +160,11 @@ jobs:
         run: ./gradlew jacocoRootReport -PjacocoHtml=false
 
       - name: SonarQube
-        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.OSS_SONARQUBE_TOKEN }} -Dsonar.branch.name=${{ needs.context.outputs.branch }}
+        run: ./gradlew sonarqube -x test \
+                  -Pversion=${{ needs.context.outputs.version }} \
+                  -PsemanticVersion=${{ needs.context.outputs.semanticVersion }} \
+                  -Dsonar.login=${{ secrets.OSS_SONARQUBE_TOKEN }} \
+                  -Dsonar.branch.name=${{ needs.context.outputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
