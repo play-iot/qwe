@@ -29,8 +29,11 @@ import org.gradle.kotlin.dsl.register
         val qweDockerExt = configureExtension(project, qweExtension, dockerExtension)
         val dockerFileProvider = registerCreateDockerfileTask(project, qweExtension.baseName, qweDockerExt)
         registerPrintDockerfileTask(project, qweDockerExt, dockerFileProvider)
-        registerDockerBuildTask(project, qweExtension.baseName, qweDockerExt, dockerFileProvider)
-        registerDockerPushTask(project, qweDockerExt)
+        registerDockerPushTask(
+            project,
+            qweDockerExt,
+            registerDockerBuildTask(project, qweExtension.baseName, qweDockerExt, dockerFileProvider)
+        )
     }
 
     private fun configureExtension(
@@ -108,8 +111,8 @@ import org.gradle.kotlin.dsl.register
         baseName: Property<String>,
         qweDockerExt: QWEDockerExtension,
         dockerFileProvider: TaskProvider<Dockerfile>
-    ) {
-        project.tasks.register<DockerBuildImage>("buildDocker") {
+    ): TaskProvider<DockerBuildImage> {
+        return project.tasks.register<DockerBuildImage>("buildDocker") {
             group = "QWE Docker"
             description = "Build Docker image"
 
@@ -122,12 +125,17 @@ import org.gradle.kotlin.dsl.register
         }
     }
 
-    private fun registerDockerPushTask(project: Project, qweDockerExt: QWEDockerExtension) {
+    private fun registerDockerPushTask(
+        project: Project,
+        qweDockerExt: QWEDockerExtension,
+        dockerBuildProvider: TaskProvider<DockerBuildImage>
+    ) {
         project.tasks.register<DockerPushImage>("pushDocker") {
             group = "QWE Docker"
-            description = "Push Docker image to registries"
+            description = "Push Docker images to remote registry"
 
             onlyIf { qweDockerExt.enabled.get() }
+            dependsOn(dockerBuildProvider)
             images.set(qweDockerExt.dockerImage.toImages())
         }
     }
