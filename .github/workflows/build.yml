@@ -49,6 +49,7 @@ jobs:
         uses: zero88/gh-project-context@v1
         with:
           dry: false
+          mustSign: true
 
       - name: Find semantic version
         id: semantic
@@ -118,6 +119,13 @@ jobs:
                  -Pnexus.password=${{ secrets.OSS_SONATYPE_PASSWORD }} )
           [[ "${{ needs.context.outputs.isRelease }}" == 'true' ]] && args+=( -Prelease )
           ./gradlew publish "${args[@]}"
+
+      - name: Publish Gradle plugin
+        if: needs.context.outputs.shouldPublish == 'true'
+        run: |
+          ./gradlew publishPlugins \
+                  -Pgradle.publish.key=${{ secrets.OSS_GRADLE_KEY }} \
+                  -Pgradle.publish.secret=${{ secrets.OSS_GRADLE_SECRET }}
 
   analysis:
     runs-on: ubuntu-latest

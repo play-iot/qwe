@@ -107,7 +107,7 @@ subprojects {
             useJUnitPlatform()
         }
         publish {
-            onlyIf { project.name == "plugin" }
+            onlyIf { project.name != "plugin" }
         }
     }
 
