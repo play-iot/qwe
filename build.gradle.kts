@@ -30,9 +30,9 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "java-library")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
+    apply(plugin = "java-library")
     apply(plugin = "jacoco")
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
@@ -73,6 +73,12 @@ subprojects {
     }
 
     tasks {
+        withType<Jar>().configureEach {
+            archiveBaseName.set(project.ext.get("baseName") as String)
+        }
+        withType<Sign>().configureEach {
+            onlyIf { project.hasProperty("release") }
+        }
         jar {
             manifest {
                 attributes(
@@ -100,11 +106,8 @@ subprojects {
         test {
             useJUnitPlatform()
         }
-        withType<Jar>().configureEach {
-            archiveBaseName.set(project.ext.get("baseName") as String)
-        }
-        withType<Sign>().configureEach {
-            onlyIf { project.hasProperty("release") }
+        publish {
+            onlyIf { project.name == "plugin" }
         }
     }
 
@@ -198,17 +201,8 @@ sonarqube {
     }
 }
 
-task<Sign>("sign") {
-    dependsOn(subprojects.map { it.tasks.withType<Sign>() })
-}
-
 nexusStaging {
     packageGroup = "io.github.zero88"
     username = project.property("nexus.username") as String?
     password = project.property("nexus.password") as String?
-}
-
-tasks.test {
-    // Use junit platform for unit tests.
-    useJUnitPlatform()
 }

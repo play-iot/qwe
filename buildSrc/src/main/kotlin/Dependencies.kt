@@ -21,10 +21,12 @@ object PluginLibs {
         const val sonarQube = "3.1.1"
         const val nexusStaging = "0.22.0"
         const val docker = "6.7.0"
+        const val gradlePluginPublish = "0.12.0"
     }
 
     const val sonarQube = "org.sonarqube"
     const val nexusStaging = "io.codearte.nexus-staging"
+    const val gradlePluginPublish = "com.gradle.plugin-publish"
 
     object Depends {
 
