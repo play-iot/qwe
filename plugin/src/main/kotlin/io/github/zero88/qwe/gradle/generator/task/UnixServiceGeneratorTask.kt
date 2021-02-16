@@ -6,6 +6,5 @@ open class UnixServiceGeneratorTask : QWEGeneratorTask("Generates Systemd Linux 
 
     @TaskAction
     override fun generate() {
-        println("TBC")
     }
 }

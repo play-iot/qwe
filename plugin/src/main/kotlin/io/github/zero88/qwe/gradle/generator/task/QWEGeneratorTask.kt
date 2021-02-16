@@ -14,7 +14,7 @@ abstract class QWEGeneratorTask(_description: String) : DefaultTask() {
     abstract fun generate()
 
     init {
-        group = "QWE generator"
+        group = "QWE Generator"
         description = _description
     }
 }

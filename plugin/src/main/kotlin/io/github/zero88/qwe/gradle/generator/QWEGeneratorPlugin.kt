@@ -37,13 +37,13 @@ class QWEGeneratorPlugin : QWEPlugin() {
 
             named<AbstractArchiveTask>("distZip") {
                 onlyIf { extension.application.get() }
-                into("${prop(project, "baseName")}-${project.version}/conf") {
+                into("${extension.baseName.get()}-${project.version}/conf") {
                     from(generator.layout.generatedConfigDir.get())
                 }
             }
             named<AbstractArchiveTask>("distTar") {
                 onlyIf { extension.application.get() }
-                into("${prop(project, "baseName")}-${project.version}/conf") {
+                into("${extension.baseName.get()}-${project.version}/conf") {
                     from(generator.layout.generatedConfigDir.get())
                 }
             }

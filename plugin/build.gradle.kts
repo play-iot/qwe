@@ -13,6 +13,10 @@ gradlePlugin {
             id = "zero88.qwe.gradle.generator"
             implementationClass = "io.github.zero88.qwe.gradle.generator.QWEGeneratorPlugin"
         }
+        create("Root project plugin") {
+            id = "zero88.qwe.gradle.root"
+            implementationClass = "io.github.zero88.qwe.gradle.QWERootProjectPlugin"
+        }
     }
 }
 

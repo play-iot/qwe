@@ -13,6 +13,7 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.TaskExecutionException
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
@@ -23,6 +24,7 @@ import org.gradle.plugins.signing.SigningExtension
 import org.gradle.plugins.signing.SigningPlugin
 import org.gradle.util.GradleVersion
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.util.jar.Attributes
 
@@ -138,15 +140,18 @@ abstract class QWEPlugin : Plugin<Project> {
             }
             project.extensions.configure<SigningExtension> {
                 useGpgCmd()
-                sign(project.extensions.findByType(PublishingExtension::class.java)?.publications?.get("maven"))
+                sign(project.extensions.findByType<PublishingExtension>()?.publications?.get("maven"))
             }
         }
     }
 
     protected open fun configExternalTasks(project: Project, qwe: QWEExtension) {
         project.tasks {
+            withType<JavaCompile>().configureEach {
+                options.encoding = StandardCharsets.UTF_8.name()
+            }
             withType<Jar>().configureEach {
-                archiveBaseName.set(prop(project, "baseName"))
+                archiveBaseName.set(qwe.baseName)
                 manifest {
                     attributes(createJarManifest(project, qwe, this@configureEach))
                 }
@@ -157,6 +162,7 @@ abstract class QWEPlugin : Plugin<Project> {
             withType<Javadoc> {
                 title = "${qwe.title.get()} ${project.version} API"
                 options {
+                    encoding = StandardCharsets.UTF_8.name()
                     this as StandardJavadocDocletOptions
                     tags = mutableListOf(
                         "apiNote:a:API Note:", "implSpec:a:Implementation Requirements:",
@@ -166,6 +172,7 @@ abstract class QWEPlugin : Plugin<Project> {
             }
             withType<Test> {
                 useJUnitPlatform()
+                systemProperty("file.encoding", StandardCharsets.UTF_8.name())
             }
         }
     }
@@ -173,8 +180,8 @@ abstract class QWEPlugin : Plugin<Project> {
     protected open fun createJarManifest(project: Project, qwe: QWEExtension, task: Jar): Map<String, Any?> {
         var manifestMap: Map<String, String> = emptyMap()
         if (qwe.application.get()) {
-            val mainClass = project.extra.get("mainClass").toString()
-            val mainVerticle = project.extra.get("mainVerticle").toString()
+            val mainClass = prop(project, "mainClass", "")
+            val mainVerticle = prop(project, "mainVerticle", "")
             if (mainClass.trim() == "" || mainVerticle.trim() == "") {
                 throw TaskExecutionException(task, RuntimeException("Missing mainClass or mainVerticle"))
             }
@@ -188,7 +195,7 @@ abstract class QWEPlugin : Plugin<Project> {
         }
         return mapOf(
             Attributes.Name.MANIFEST_VERSION.toString() to "1.0",
-            Attributes.Name.IMPLEMENTATION_TITLE.toString() to prop(project, "baseName"),
+            Attributes.Name.IMPLEMENTATION_TITLE.toString() to qwe.baseName.get(),
             Attributes.Name.IMPLEMENTATION_VERSION.toString() to project.version,
             "Created-By" to GradleVersion.current(),
             "Build-Jdk" to Jvm.current(),

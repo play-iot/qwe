@@ -96,7 +96,7 @@ import org.gradle.kotlin.dsl.register
             onlyIf { docker.enabled.get() }
             doLast {
                 val instructions = provider.get().instructions.get()
-                println(instructions.map { it.text }.joinToString(System.lineSeparator()))
+                println(instructions.joinToString(System.lineSeparator()) { it.text })
             }
         }
     }
