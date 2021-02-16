@@ -3,6 +3,7 @@ package io.github.zero88.qwe.gradle.docker
 import com.bmuschko.gradle.docker.DockerExtension
 import com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import io.github.zero88.qwe.gradle.QWEExtension
 import io.github.zero88.qwe.gradle.generator.QWEGeneratorPlugin
@@ -29,6 +30,7 @@ import org.gradle.kotlin.dsl.register
         val dockerFileProvider = registerCreateDockerfileTask(project, qweExtension.baseName, qweDockerExt)
         registerPrintDockerfileTask(project, qweDockerExt, dockerFileProvider)
         registerDockerBuildTask(project, qweExtension.baseName, qweDockerExt, dockerFileProvider)
+        registerDockerPushTask(project, qweDockerExt)
     }
 
     private fun configureExtension(
@@ -86,14 +88,14 @@ import org.gradle.kotlin.dsl.register
 
     private fun registerPrintDockerfileTask(
         project: Project,
-        docker: QWEDockerExtension,
+        qweDockerExt: QWEDockerExtension,
         provider: TaskProvider<Dockerfile>
     ) {
         project.tasks.register<DefaultTask>("printDockerfile") {
             group = "QWE Docker"
             description = "Show Dockerfile"
 
-            onlyIf { docker.enabled.get() }
+            onlyIf { qweDockerExt.enabled.get() }
             doLast {
                 val instructions = provider.get().instructions.get()
                 println(instructions.joinToString(System.lineSeparator()) { it.text })
@@ -109,7 +111,7 @@ import org.gradle.kotlin.dsl.register
     ) {
         project.tasks.register<DockerBuildImage>("buildDocker") {
             group = "QWE Docker"
-            description = "Build Docker image from createDockerfile task output"
+            description = "Build Docker image"
 
             onlyIf { qweDockerExt.enabled.get() }
             dependsOn(project.tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME), dockerFileProvider.get())
@@ -117,6 +119,16 @@ import org.gradle.kotlin.dsl.register
             inputDir.set(project.layout.buildDirectory)
             dockerFile.set(project.layout.buildDirectory.file("docker/${baseName.get()}"))
             images.value(qweDockerExt.dockerImage.toImages())
+        }
+    }
+
+    private fun registerDockerPushTask(project: Project, qweDockerExt: QWEDockerExtension) {
+        project.tasks.register<DockerPushImage>("pushDocker") {
+            group = "QWE Docker"
+            description = "Push Docker image to registries"
+
+            onlyIf { qweDockerExt.enabled.get() }
+            images.set(qweDockerExt.dockerImage.toImages())
         }
     }
 
