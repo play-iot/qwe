@@ -22,6 +22,7 @@ import org.gradle.kotlin.dsl.*
 import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
 import org.gradle.plugins.signing.SigningPlugin
+import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.util.GradleVersion
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -29,7 +30,7 @@ import java.time.Instant
 import java.util.jar.Attributes
 
 @Suppress("UnstableApiUsage")
-abstract class QWEPlugin : Plugin<Project> {
+abstract class QWEProjectPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val qwe = project.extensions.create<QWEExtension>("qwe")
@@ -42,7 +43,9 @@ abstract class QWEPlugin : Plugin<Project> {
 
         applyExternalPlugins(project)
         evaluateProject(project, qwe)
-        configExternalTasks(project, qwe)
+        project.tasks {
+            configExternalTasks(project, qwe)
+        }
         doApply(project, qwe)
     }
 
@@ -50,6 +53,7 @@ abstract class QWEPlugin : Plugin<Project> {
 
     protected open fun applyExternalPlugins(project: Project) {
         project.pluginManager.apply(JavaLibraryDistributionPlugin::class.java)
+        project.pluginManager.apply(JacocoPlugin::class.java)
         project.pluginManager.apply(MavenPublishPlugin::class.java)
         project.pluginManager.apply(SigningPlugin::class.java)
     }
@@ -145,35 +149,33 @@ abstract class QWEPlugin : Plugin<Project> {
         }
     }
 
-    protected open fun configExternalTasks(project: Project, qwe: QWEExtension) {
-        project.tasks {
-            withType<JavaCompile>().configureEach {
-                options.encoding = StandardCharsets.UTF_8.name()
+    private fun TaskContainerScope.configExternalTasks(project: Project, qwe: QWEExtension) {
+        withType<JavaCompile>().configureEach {
+            options.encoding = StandardCharsets.UTF_8.name()
+        }
+        withType<Jar>().configureEach {
+            archiveBaseName.set(qwe.baseName)
+            manifest {
+                attributes(createJarManifest(project, qwe, this@configureEach))
             }
-            withType<Jar>().configureEach {
-                archiveBaseName.set(qwe.baseName)
-                manifest {
-                    attributes(createJarManifest(project, qwe, this@configureEach))
-                }
+        }
+        withType<Sign>().configureEach {
+            onlyIf { project.hasProperty("release") }
+        }
+        withType<Javadoc> {
+            title = "${qwe.title.get()} ${project.version} API"
+            options {
+                encoding = StandardCharsets.UTF_8.name()
+                this as StandardJavadocDocletOptions
+                tags = mutableListOf(
+                    "apiNote:a:API Note:", "implSpec:a:Implementation Requirements:",
+                    "implNote:a:Implementation Note:"
+                )
             }
-            withType<Sign>().configureEach {
-                onlyIf { project.hasProperty("release") }
-            }
-            withType<Javadoc> {
-                title = "${qwe.title.get()} ${project.version} API"
-                options {
-                    encoding = StandardCharsets.UTF_8.name()
-                    this as StandardJavadocDocletOptions
-                    tags = mutableListOf(
-                        "apiNote:a:API Note:", "implSpec:a:Implementation Requirements:",
-                        "implNote:a:Implementation Note:"
-                    )
-                }
-            }
-            withType<Test> {
-                useJUnitPlatform()
-                systemProperty("file.encoding", StandardCharsets.UTF_8.name())
-            }
+        }
+        withType<Test> {
+            useJUnitPlatform()
+            systemProperty("file.encoding", StandardCharsets.UTF_8.name())
         }
     }
 

@@ -1,7 +1,7 @@
 package io.github.zero88.qwe.gradle.generator
 
 import io.github.zero88.qwe.gradle.QWEExtension
-import io.github.zero88.qwe.gradle.QWEPlugin
+import io.github.zero88.qwe.gradle.QWEProjectPlugin
 import io.github.zero88.qwe.gradle.generator.task.ConfigGeneratorTask
 import io.github.zero88.qwe.gradle.generator.task.LoggingGeneratorTask
 import io.github.zero88.qwe.gradle.generator.task.SystemdServiceGeneratorTask
@@ -14,7 +14,7 @@ import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
 
 @Suppress("UnstableApiUsage")
-class QWEGeneratorPlugin : QWEPlugin() {
+class QWEGeneratorPlugin : QWEProjectPlugin() {
 
     override fun doApply(project: Project, extension: QWEExtension) {
         val generator = (extension as ExtensionAware).extensions.create<QWEGeneratorExtension>("generator")

@@ -22,4 +22,5 @@ gradlePlugin {
 
 dependencies {
     api(PluginLibs.Depends.docker)
+    api(PluginLibs.Depends.sonarQube)
 }

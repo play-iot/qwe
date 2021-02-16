@@ -18,7 +18,7 @@ object PluginLibs {
 
     object Version {
 
-        const val sonarQube = "3.0"
+        const val sonarQube = "3.1.1"
         const val nexusStaging = "0.22.0"
         const val docker = "6.7.0"
     }
@@ -27,7 +27,9 @@ object PluginLibs {
     const val nexusStaging = "io.codearte.nexus-staging"
 
     object Depends {
+
         const val docker = "com.bmuschko:gradle-docker-plugin:${Version.docker}"
+        const val sonarQube = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${Version.sonarQube}"
     }
 }
 

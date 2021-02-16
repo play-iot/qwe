@@ -16,18 +16,47 @@ import org.gradle.api.tasks.testing.TestResult
 import org.gradle.kotlin.dsl.*
 import org.gradle.testing.base.plugins.TestingBasePlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.sonarqube.gradle.SonarQubeExtension
+import org.sonarqube.gradle.SonarQubePlugin
 import java.io.File
+import java.nio.charset.StandardCharsets
 
 class QWERootProjectPlugin : Plugin<Project> {
+
+    companion object{
+        const val JACOCO_ROOT_TASK = "jacocoRootReport"
+    }
 
     override fun apply(project: Project) {
         if (project != project.rootProject) {
             return
         }
+        applyExternalPlugins(project)
+        configureExtension(project)
         project.tasks {
             assembleTask(project)
             verificationTask(project)
+            named(SonarQubeExtension.SONARQUBE_TASK_NAME) {
+                dependsOn(JACOCO_ROOT_TASK)
+            }
         }
+    }
+
+    private fun configureExtension(project: Project) {
+        project.afterEvaluate {
+            project.extensions.configure<SonarQubeExtension> {
+                properties {
+                    property("jacocoHtml", "false")
+                    property("sonar.sourceEncoding", StandardCharsets.UTF_8)
+                    property("sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/coverage.xml")
+                }
+            }
+        }
+
+    }
+
+    private fun applyExternalPlugins(project: Project) {
+        project.pluginManager.apply(SonarQubePlugin::class.java)
     }
 
     private fun TaskContainerScope.assembleTask(project: Project) {
@@ -98,7 +127,7 @@ class QWERootProjectPlugin : Plugin<Project> {
                 }
             }
         }
-        register<JacocoReport>("jacocoRootReport") {
+        register<JacocoReport>(JACOCO_ROOT_TASK) {
             group = "verification"
             description = "Aggregates Jacoco test result"
             dependsOn(project.subprojects.map { it.tasks.withType<Test>() },
