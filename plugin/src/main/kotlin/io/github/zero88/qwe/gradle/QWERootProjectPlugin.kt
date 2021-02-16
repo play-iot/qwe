@@ -39,6 +39,7 @@ class QWERootProjectPlugin : Plugin<Project> {
         }
         register<Copy>("copySubProjectsArtifacts") {
             group = "distribution"
+            description = "Gathers sub projects artifacts"
             dependsOn(project.subprojects.mapNotNull { it.tasks.findByName("assemble") })
             val zips = project.subprojects.fold(
                 listOf<File>(),
@@ -55,6 +56,7 @@ class QWERootProjectPlugin : Plugin<Project> {
         val testFailures = mutableListOf<String>()
         register<Copy>("copySubProjectsTestResults") {
             group = "verification"
+            description = "Gathers sub projects test result"
             dependsOn(project.subprojects.mapNotNull { it.tasks.findByName("test") })
             val zips = project.subprojects.fold(
                 listOf<File>(),
@@ -64,6 +66,7 @@ class QWERootProjectPlugin : Plugin<Project> {
         }
         register<TestReport>("testRootReport") {
             group = "verification"
+            description = "Aggregates sub projects test result"
             dependsOn("copySubProjectsTestResults")
             destinationDir = project.buildDir.resolve(TestingBasePlugin.TESTS_DIR_NAME)
             reportOn(project.subprojects.map { it.tasks.withType<Test>() })
@@ -97,8 +100,9 @@ class QWERootProjectPlugin : Plugin<Project> {
         }
         register<JacocoReport>("jacocoRootReport") {
             group = "verification"
-            dependsOn(project.subprojects.map { it.tasks.withType<Test>() })
-            dependsOn(project.subprojects.map { it.tasks.withType<JacocoReport>() })
+            description = "Aggregates Jacoco test result"
+            dependsOn(project.subprojects.map { it.tasks.withType<Test>() },
+                      project.subprojects.map { it.tasks.withType<JacocoReport>() })
             additionalSourceDirs.setFrom(project.subprojects.map {
                 it.convention.getPlugin<JavaPluginConvention>().sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME).allSource.srcDirs
             })
