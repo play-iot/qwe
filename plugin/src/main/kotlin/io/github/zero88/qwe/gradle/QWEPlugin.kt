@@ -180,7 +180,7 @@ abstract class QWEPlugin : Plugin<Project> {
     protected open fun createJarManifest(project: Project, qwe: QWEExtension, task: Jar): Map<String, Any?> {
         var manifestMap: Map<String, String> = emptyMap()
         if (qwe.application.get()) {
-            val mainClass = prop(project, "mainClass", "")
+            val mainClass = prop(project, "mainClass", MAIN_CLASS)
             val mainVerticle = prop(project, "mainVerticle", "")
             if (mainClass.trim() == "" || mainVerticle.trim() == "") {
                 throw TaskExecutionException(task, RuntimeException("Missing mainClass or mainVerticle"))
@@ -203,6 +203,11 @@ abstract class QWEPlugin : Plugin<Project> {
             "Build-Hash" to project.property("buildHash"),
             "Build-Date" to Instant.now()
         ) + manifestMap
+    }
+
+    companion object {
+
+        const val MAIN_CLASS = "io.github.zero88.qwe.CarlLauncher"
     }
 
 }

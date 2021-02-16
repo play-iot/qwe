@@ -8,6 +8,7 @@ open class GeneratedLayoutExtension(objects: ObjectFactory, layout: ProjectLayou
 
     val generatedDir = objects.directoryProperty().convention(layout.buildDirectory.dir("generated"))
     val generatedConfigDir = objects.directoryProperty().convention(generatedDir.dir("conf"))
+    val generatedServiceDir = objects.directoryProperty().convention(generatedDir.dir("service"))
     val generatedSrcDir = objects.directoryProperty().convention(generatedDir.dir("main"))
     val generatedJavaSrcDir = objects.directoryProperty().convention(generatedSrcDir.dir("java"))
     val generatedKotlinSrcDir = objects.directoryProperty().convention(generatedSrcDir.dir("kotlin"))

@@ -1,0 +1,14 @@
+[Unit]
+Description={{description}}
+After=network.target network-online.target
+
+[Service]
+Type=simple
+KillMode=process
+TimeoutStartSec=0
+WorkingDirectory={{working_dir}}
+ExecStartPre=/bin/sleep 1
+ExecStart={{java_path}} {{jvm}} {{system}} -jar {{jar_file}}.jar {{params}}
+
+[Install]
+WantedBy=default.target

@@ -4,8 +4,7 @@ import io.github.zero88.qwe.gradle.QWEExtension
 import io.github.zero88.qwe.gradle.QWEPlugin
 import io.github.zero88.qwe.gradle.generator.task.ConfigGeneratorTask
 import io.github.zero88.qwe.gradle.generator.task.LoggingGeneratorTask
-import io.github.zero88.qwe.gradle.generator.task.UnixServiceGeneratorTask
-import io.github.zero88.qwe.gradle.helper.prop
+import io.github.zero88.qwe.gradle.generator.task.SystemdServiceGeneratorTask
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.JavaPluginConvention
@@ -23,17 +22,20 @@ class QWEGeneratorPlugin : QWEPlugin() {
             outputDir.set(generator.layout.generatedConfigDir)
         }
         val loggingProvider = project.tasks.register<LoggingGeneratorTask>("generateLogging") {
+            onlyIf { extension.application.get() }
             loggers.set(generator.logging.specified)
             outputDir.set(generator.layout.generatedConfigDir)
-            onlyIf { extension.application.get() }
         }
-        val unixProvider = project.tasks.register<UnixServiceGeneratorTask>("generateUnixService") {
-            outputDir.set(generator.layout.generatedConfigDir)
-            onlyIf { extension.application.get() }
+        val systemdProvider = project.tasks.register<SystemdServiceGeneratorTask>("generateSystemdService") {
+            onlyIf { extension.application.get() && generator.systemd.enabled.get() }
+            baseName.set(extension.baseName)
+            projectDes.set(extension.description.convention(extension.title))
+            systemdProp.set(generator.systemd)
+            outputDir.set(generator.layout.generatedServiceDir)
         }
         project.tasks {
             withType<ProcessResources>()
-                .configureEach { dependsOn(configProvider, loggingProvider, unixProvider) }
+                .configureEach { dependsOn(configProvider, loggingProvider, systemdProvider) }
 
             named<AbstractArchiveTask>("distZip") {
                 onlyIf { extension.application.get() }
