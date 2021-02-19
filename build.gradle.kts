@@ -79,9 +79,9 @@ subprojects {
         withType<Sign>().configureEach {
             onlyIf { project.hasProperty("release") }
         }
-        withType<PublishToMavenRepository>().configureEach {
-            onlyIf { project.name != "plugin" }
-        }
+//        withType<PublishToMavenRepository>().configureEach {
+//            onlyIf { project.name != "plugin" }
+//        }
         jar {
             manifest {
                 attributes(
