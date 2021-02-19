@@ -6,12 +6,13 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.qwe.IConfig;
 import io.vertx.core.AbstractVerticle;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ComponentVerticle<C extends IConfig, T extends ComponentContext> extends AbstractVerticle
     implements Component<C, T>, DeployHook<T> {
 

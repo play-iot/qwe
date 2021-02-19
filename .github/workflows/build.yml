@@ -16,6 +16,7 @@ on:
 env:
   ENABLE_TEST: true
   ENABLE_GH_MAVEN: false
+  ENABLE_SONAR: false
 
 jobs:
   context:
@@ -163,7 +164,7 @@ jobs:
         run: ./gradlew jacocoRootReport -PjacocoHtml=false
 
       - name: SonarQube
-        if: needs.context.outputs.shouldPublish == 'true'
+        if: needs.context.outputs.shouldPublish == 'true' && env.ENABLE_SONAR == 'true'
         run: ./gradlew sonarqube -x test -Dsonar.login=${{ secrets.OSS_SONARQUBE_TOKEN }} -Dsonar.branch.name=${{ needs.context.outputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
