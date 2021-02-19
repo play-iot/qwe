@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.gradle.generator
+package io.github.zero88.qwe.gradle.app
 
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory

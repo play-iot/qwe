@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.gradle.generator.task
+package io.github.zero88.qwe.gradle.app.task
 
 import io.github.zero88.qwe.gradle.helper.getPluginResource
 import io.github.zero88.qwe.gradle.helper.prop

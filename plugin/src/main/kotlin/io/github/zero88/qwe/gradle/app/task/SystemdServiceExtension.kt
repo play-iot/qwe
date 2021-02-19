@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.gradle.generator.task
+package io.github.zero88.qwe.gradle.app.task
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input

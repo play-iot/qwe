@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.gradle.generator.task
+package io.github.zero88.qwe.gradle.app.task
 
 import io.github.zero88.qwe.gradle.helper.getPluginResource
 import io.github.zero88.qwe.gradle.helper.readResourceProperties
@@ -25,7 +25,6 @@ open class SystemdServiceGeneratorTask : QWEGeneratorTask("Generates Systemd Lin
         val resource = getPluginResource(project, "service")
         val input = systemdProp.get()
         val props = readResourceProperties("service/java.${input.arch.orNull?.name?.toLowerCase()}.properties")
-        println(input.jvmProps.isPresent)
         val jvmProps = if (input.jvmProps.isPresent && input.jvmProps.get().isNotEmpty()) {
             input.jvmProps.map { it.joinToString { " " } }.get()
         } else props?.getProperty("jvm") ?: ""

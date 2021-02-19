@@ -14,6 +14,7 @@ import org.gradle.api.tasks.testing.TestDescriptor
 import org.gradle.api.tasks.testing.TestReport
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.kotlin.dsl.*
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testing.base.plugins.TestingBasePlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.sonarqube.gradle.SonarQubeExtension
@@ -23,8 +24,12 @@ import java.nio.charset.StandardCharsets
 
 class QWERootProjectPlugin : Plugin<Project> {
 
-    companion object{
-        const val JACOCO_ROOT_TASK = "jacocoRootReport"
+    companion object {
+
+        const val COPY_SUB_PROJECT_ARTIFACTS_TASK_NAME = "copySubProjectsArtifacts"
+        const val COPY_SUB_PROJECT_TEST_RESULTS_TASK_NAME = "copySubProjectsTestResults"
+        const val ROOT_TEST_REPORT_TASK_NAME = "testRootReport"
+        const val ROOT_JACOCO_TASK_NAME = "jacocoRootReport"
     }
 
     override fun apply(project: Project) {
@@ -37,7 +42,7 @@ class QWERootProjectPlugin : Plugin<Project> {
             assembleTask(project)
             verificationTask(project)
             named(SonarQubeExtension.SONARQUBE_TASK_NAME) {
-                dependsOn(JACOCO_ROOT_TASK)
+                dependsOn(ROOT_JACOCO_TASK_NAME)
             }
         }
     }
@@ -66,25 +71,25 @@ class QWERootProjectPlugin : Plugin<Project> {
         withType<AbstractArchiveTask>().configureEach {
             onlyIf { project != project.rootProject }
         }
-        register<Copy>("copySubProjectsArtifacts") {
+        register<Copy>(COPY_SUB_PROJECT_ARTIFACTS_TASK_NAME) {
             group = "distribution"
             description = "Gathers sub projects artifacts"
-            dependsOn(project.subprojects.mapNotNull { it.tasks.findByName("assemble") })
+            dependsOn(project.subprojects.mapNotNull { it.tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME) })
             val zips = project.subprojects.fold(
                 listOf<File>(),
                 { r, p -> r.plus(p.buildDir.resolve("distributions")) })
             from(zips)
             into(project.buildDir.resolve("distributions"))
         }
-        named("assemble") {
-            finalizedBy("copySubProjectsArtifacts")
+        named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME) {
+            finalizedBy(COPY_SUB_PROJECT_ARTIFACTS_TASK_NAME)
         }
     }
 
     private fun TaskContainerScope.verificationTask(project: Project) {
         val testFailures = mutableListOf<String>()
-        register<Copy>("copySubProjectsTestResults") {
-            group = "verification"
+        register<Copy>(COPY_SUB_PROJECT_TEST_RESULTS_TASK_NAME) {
+            group = LifecycleBasePlugin.VERIFICATION_GROUP
             description = "Gathers sub projects test result"
             dependsOn(project.subprojects.mapNotNull { it.tasks.findByName("test") })
             val zips = project.subprojects.fold(
@@ -93,10 +98,10 @@ class QWERootProjectPlugin : Plugin<Project> {
             from(zips)
             into(project.buildDir.resolve(TestingBasePlugin.TEST_RESULTS_DIR_NAME))
         }
-        register<TestReport>("testRootReport") {
-            group = "verification"
+        register<TestReport>(ROOT_TEST_REPORT_TASK_NAME) {
+            group = LifecycleBasePlugin.VERIFICATION_GROUP
             description = "Aggregates sub projects test result"
-            dependsOn("copySubProjectsTestResults")
+            dependsOn(COPY_SUB_PROJECT_TEST_RESULTS_TASK_NAME)
             destinationDir = project.buildDir.resolve(TestingBasePlugin.TESTS_DIR_NAME)
             reportOn(project.subprojects.map { it.tasks.withType<Test>() })
             doLast {
@@ -111,7 +116,7 @@ class QWERootProjectPlugin : Plugin<Project> {
             }
         }
         named<Test>("test") {
-            finalizedBy("testRootReport")
+            finalizedBy(ROOT_TEST_REPORT_TASK_NAME)
             ignoreFailures = true
             val handler =
                 KotlinClosure2<TestDescriptor, TestResult, Any>(
@@ -127,8 +132,8 @@ class QWERootProjectPlugin : Plugin<Project> {
                 }
             }
         }
-        register<JacocoReport>(JACOCO_ROOT_TASK) {
-            group = "verification"
+        register<JacocoReport>(ROOT_JACOCO_TASK_NAME) {
+            group = LifecycleBasePlugin.VERIFICATION_GROUP
             description = "Aggregates Jacoco test result"
             dependsOn(project.subprojects.map { it.tasks.withType<Test>() },
                       project.subprojects.map { it.tasks.withType<JacocoReport>() })

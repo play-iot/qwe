@@ -8,6 +8,7 @@ import org.gradle.kotlin.dsl.property
 @Suppress("UnstableApiUsage") open class QWEDockerExtension(objects: ObjectFactory, layout: ProjectLayout) {
 
     val enabled = objects.property<Boolean>().convention(true)
+    val maintainer = objects.property<String>()
     val dockerfile = DockerfileExtension(objects)
     val dockerImage = DockerImageExtension(objects)
     val outputDirectory = objects.directoryProperty().convention(layout.buildDirectory.dir("docker"))
@@ -18,6 +19,11 @@ import org.gradle.kotlin.dsl.property
 
     fun dockerImage(configuration: Action<DockerImageExtension>) {
         configuration.execute(dockerImage)
+    }
+
+    companion object {
+
+        const val NAME = "qweApplication"
     }
 
 }
