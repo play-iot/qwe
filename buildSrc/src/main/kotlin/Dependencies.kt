@@ -18,7 +18,7 @@ object PluginLibs {
 
     object Version {
 
-        const val sonarQube = "3.1.1"
+        const val sonarQube = "3.0"
         const val nexusStaging = "0.22.0"
         const val docker = "6.7.0"
         const val gradlePluginPublish = "0.12.0"

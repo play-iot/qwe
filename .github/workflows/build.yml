@@ -148,8 +148,8 @@ jobs:
         uses: actions/cache@v2.1.4
         with:
           path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          key: ${{ runner.os }}-sonar-qwe
+          restore-keys: ${{ runner.os }}-sonar-qwe
 
       - name: Cache Gradle packages
         uses: actions/cache@v2.1.4
