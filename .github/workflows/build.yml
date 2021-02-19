@@ -25,9 +25,10 @@ jobs:
       shouldBuild: ${{ steps.context.outputs.decision_build }}
       shouldPublish: ${{ steps.context.outputs.decision_publish }}
       isRelease: ${{ steps.context.outputs.isTag }}
-      afterRelease: ${{ steps.context.outputs.isAfterMergedReleasePR }}
       version: ${{ steps.context.outputs.version }}
-      semanticVersion: ${{ steps.semantic.outputs.semanticVersion }}
+      commitId: ${{ steps.context.outputs.shortCommitId }}
+      semanticVersion: ${{ steps.dynamic_prop.outputs.semanticVersion }}
+      disablePlugin: ${{ steps.dynamic_prop.outputs.disablePlugin }}
 
     steps:
       - uses: actions/checkout@v2
@@ -51,12 +52,14 @@ jobs:
           dry: false
           mustSign: true
 
-      - name: Find semantic version
-        id: semantic
+      - name: Query dynamic properties
+        id: dynamic_prop
         shell: bash
         run: |
           [[ "${{ steps.context.outputs.isTag }}" == "true" ]] && sv="" || sv=$(grep semanticVersion gradle.properties | cut -d'=' -f2)
+          disablePlugin=$(grep "gradle.plugin.publish" gradle.properties | cut -d'=' -f2)
           echo ::set-output name=semanticVersion::$sv
+          echo ::set-output name=disablePlugin::$disablePlugin
 
   build:
     runs-on: ubuntu-latest
@@ -90,8 +93,8 @@ jobs:
         run: |
           ./gradlew clean build -x test \
                           -Pversion=${{ needs.context.outputs.version }} \
-                          -PsemanticVersion=${{needs.context.outputs.semanticVersion }} \
-                          -PbuildBy="GitHub Action" -PbuildHash=${{ github.sha }}
+                          -PsemanticVersion=${{ needs.context.outputs.semanticVersion }} \
+                          -PbuildBy="GitHub Action" -PbuildHash=${{ needs.context.outputs.commitId }}
 
       - name: Publish GitHub Package
         if: needs.context.outputs.isRelease == 'true' && env.ENABLE_GH_MAVEN == 'true'
@@ -121,7 +124,7 @@ jobs:
           ./gradlew publish "${args[@]}"
 
       - name: Publish Gradle plugin
-        if: needs.context.outputs.shouldPublish == 'true'
+        if: needs.context.outputs.shouldPublish == 'true' && needs.context.outputs.disablePlugin == 'true'
         run: |
           ./gradlew publishPlugins \
                   -Pgradle.publish.key=${{ secrets.OSS_GRADLE_KEY }} \
@@ -130,7 +133,7 @@ jobs:
   analysis:
     runs-on: ubuntu-latest
     needs: context
-    if: needs.context.outputs.shouldBuild == 'true' && needs.context.outputs.afterRelease != 'true'
+    if: needs.context.outputs.shouldBuild == 'true'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -160,11 +163,10 @@ jobs:
         run: ./gradlew jacocoRootReport -PjacocoHtml=false
 
       - name: SonarQube
+        if: needs.context.outputs.shouldPublish == 'true'
         run: ./gradlew sonarqube -x test \
-                  -Pversion=${{ needs.context.outputs.version }} \
-                  -PsemanticVersion=${{ needs.context.outputs.semanticVersion }} \
-                  -Dsonar.login=${{ secrets.OSS_SONARQUBE_TOKEN }} \
-                  -Dsonar.branch.name=${{ needs.context.outputs.branch }}
+                    -Dsonar.login=${{ secrets.OSS_SONARQUBE_TOKEN }} \
+                    -Dsonar.branch.name=${{ needs.context.outputs.branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

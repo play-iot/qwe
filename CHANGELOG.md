@@ -1,6 +1,6 @@
 # Changelog
 
-## [v0.6.0](https://github.com/zero88/qwe/tree/v0.5.3) (2021-02-05)
+## [v0.6.0](https://github.com/zero88/qwe/tree/v0.6.0) (2021-02-05)
 
 [Full Changelog](https://github.com/zero88/qwe/compare/v0.5.3...v0.6.0)
 
