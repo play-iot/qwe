@@ -35,7 +35,7 @@ import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
             ext.maintainer.set("${QWEExtension.DEV_ID} <${QWEExtension.DEV_EMAIL}>")
         }
         val registryParams = prop(project, "dockerRegistries", true)?.split(",")?.map { "${it}/${name}" }
-        val tagParams = prop(project, "dockerTags")?.split(",")
+        val tagParams = prop(project, "dockerTags")?.split(",")?.filter { s -> s.isNotEmpty() }
         val labelParams = prop(project, "dockerLabels", true)?.split(",")?.filter { s -> s.isNotEmpty() }
         val dl = listOf("version=${project.version}", "maintainer=${ext.maintainer}")
         val labels = dl + (labelParams ?: listOf())
