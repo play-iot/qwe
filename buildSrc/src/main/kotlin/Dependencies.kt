@@ -49,6 +49,17 @@ object JacksonLibs {
     const val datetime = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Version.jackson}"
 }
 
+object SwaggerLibs {
+
+    object Version {
+
+        const val swagger = "2.1.6"
+    }
+
+    const val swaggerCore = "io.swagger.core.v3:swagger-core:${Version.swagger}"
+    const val swaggerParser = "io.swagger.parser.v3:swagger-parser:${Version.swagger}"
+}
+
 object TestLibs {
 
     object Version {

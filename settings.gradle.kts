@@ -11,6 +11,7 @@ rootProject.name = "qwe"
 include("cache")
 include("http:client")
 include("http:server")
+include("http:oas")
 include("micro:rpc")
 include("micro")
 include("scheduler")
