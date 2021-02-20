@@ -1,21 +1,25 @@
 package io.github.zero88.qwe.gradle.app.task
 
 import io.github.zero88.qwe.gradle.helper.getPluginResource
-import io.github.zero88.qwe.gradle.helper.prop
 import org.gradle.api.file.RelativePath
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.mapProperty
+import org.gradle.kotlin.dsl.property
 
+@Suppress("UnstableApiUsage")
 open class LoggingGeneratorTask : QWEGeneratorTask("Generates logging configuration") {
 
     @Input
-    var loggers = project.objects.mapProperty<String, String>()
+    val projectName = project.objects.property<String>().convention(project.name)
+
+    @Nested
+    val ext = project.objects.property<LoggingExtension>().convention(LoggingExtension(project.objects))
 
     @TaskAction
     override fun generate() {
-        val pName = prop(project, "baseName", project.name)
-        val loggers = loggers.get().map { "<logger name=\"${it.key}\" level=\"${it.value}\"/>" }.joinToString("\r\n")
+        val loggers = ext.get().otherLoggers.get()
+            .map { "<logger name=\"${it.key}\" level=\"${it.value}\"/>" }.joinToString("\r\n")
         val resource = getPluginResource(project, "logger")
         project.copy {
             into(outputDir.get())
@@ -27,7 +31,10 @@ open class LoggingGeneratorTask : QWEGeneratorTask("Generates logging configurat
                 includeEmptyDirs = false
                 rename("((?!console))+(\\.console)?\\.xml\\.template", "$1.xml")
                 filter {
-                    it.replace("{{project}}", pName).replace("{{more_logger}}", loggers)
+                    it.replace("{{project}}", projectName.get())
+                        .replace("{{root_level}}", ext.get().rootLogLevel.get())
+                        .replace("{{zero_lib_level}}", ext.get().zeroLibLevel.get())
+                        .replace("{{other_logger}}", loggers)
                 }
             }
         }

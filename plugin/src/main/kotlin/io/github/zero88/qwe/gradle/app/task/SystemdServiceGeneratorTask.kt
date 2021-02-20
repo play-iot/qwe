@@ -25,12 +25,10 @@ open class SystemdServiceGeneratorTask : QWEGeneratorTask("Generates Systemd Lin
         val resource = getPluginResource(project, "service")
         val input = systemdProp.get()
         val props = readResourceProperties("service/java.${input.arch.orNull?.name?.toLowerCase()}.properties")
-        val jvmProps = if (input.jvmProps.isPresent && input.jvmProps.get().isNotEmpty()) {
-            input.jvmProps.map { it.joinToString { " " } }.get()
-        } else props?.getProperty("jvm") ?: ""
-        val systemProps = if (input.systemProps.isPresent && input.systemProps.get().isNotEmpty()) {
-            input.systemProps.map { it.joinToString(" ", "-D") }.get()
-        } else props?.getProperty("system") ?: ""
+        val jvmProps = if (input.jvmProps.get().isNotEmpty())
+            input.jvmProps.map { it.joinToString { " " } }.get() else props?.getProperty("jvm") ?: ""
+        val systemProps = if (input.systemProps.get().isNotEmpty())
+            input.systemProps.map { it.joinToString(" ", "-D") }.get() else props?.getProperty("system") ?: ""
         val configParam = input.configFile.map { "-conf $it" }.getOrElse("")
         val params = input.params.map { it.entries.map { kv -> "-${kv.key} ${kv.value}" }.joinToString { " " } }
             .getOrElse("")

@@ -15,9 +15,9 @@ import org.gradle.kotlin.dsl.property
     @Input
     val arch = objects.property<Arch>()
     @Input
-    val jvmProps = objects.listProperty<String>()
+    val jvmProps = objects.listProperty<String>().empty()
     @Input
-    val systemProps = objects.listProperty<String>()
+    val systemProps = objects.listProperty<String>().empty()
     @Input
     val serviceName = objects.property<String>()
     @Input
@@ -25,7 +25,7 @@ import org.gradle.kotlin.dsl.property
     @Input
     val configFile = objects.property<String>()
     @Input
-    val params = objects.mapProperty<String, String>()
+    val params = objects.mapProperty<String, String>().empty()
 
     enum class Arch {
         X86_64, ARM_V6, ARM_V7, ARM_V8

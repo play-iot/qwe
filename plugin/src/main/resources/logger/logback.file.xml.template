@@ -19,13 +19,13 @@
         </encoder>
     </appender>
 
-    <root level="info">
-        <appender-ref ref="STDOUT" level="info"/>
-        <appender-ref ref="FILE" level="info"/>
+    <root level="{{root_level}}">
+        <appender-ref ref="STDOUT" level="{{root_level}}"/>
+        <appender-ref ref="FILE" level="{{root_level}}"/>
     </root>
 
-    <logger name="io.github.zero88" level="info"/>
-    {{more_logger}}
+    <logger name="io.github.zero88" level="{{zero_lib_level}}"/>
+    {{other_logger}}
 
 </configuration>
 

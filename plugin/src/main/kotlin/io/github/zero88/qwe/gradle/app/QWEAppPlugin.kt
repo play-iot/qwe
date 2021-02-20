@@ -54,7 +54,8 @@ class QWEAppPlugin : QWEDecoratorPlugin<QWEAppExtension> {
         }
         val loggingProvider = project.tasks.register<LoggingGeneratorTask>("generateLogging") {
             onlyIf { qweExt.application.get() }
-            loggers.set(decoratorExt.logging.specified)
+            projectName.set(qweExt.baseName)
+            ext.set(decoratorExt.logging)
             outputDir.set(decoratorExt.layout.generatedConfigDir)
         }
         val systemdProvider = project.tasks.register<SystemdServiceGeneratorTask>("generateSystemdService") {
