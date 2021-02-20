@@ -8,6 +8,14 @@
  */
 
 rootProject.name = "qwe"
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
+    }
+}
+
 include("cache")
 include("http:client")
 include("http:server")

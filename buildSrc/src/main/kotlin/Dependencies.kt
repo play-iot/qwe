@@ -99,8 +99,15 @@ object ZeroLibs {
 
         const val utils = "1.0.1"
         const val jpaExt = "0.9.0"
+        const val plugin = "1.0.0-SNAPSHOT"
     }
 
     const val utils = "io.github.zero88:java-utils:${Version.utils}"
     const val jpaExt = "io.github.zero88:jpa-ext:${Version.jpaExt}"
+
+    object Plugins {
+
+        const val oss = "io.github.zero88.qwe.gradle.oss"
+        const val root = "io.github.zero88.qwe.gradle.root"
+    }
 }
