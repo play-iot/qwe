@@ -16,7 +16,7 @@ on:
 env:
   ENABLE_TEST: true
   ENABLE_GH_MAVEN: false
-  ENABLE_SONAR: false
+  ENABLE_SONAR: true
 
 jobs:
   context:

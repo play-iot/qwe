@@ -62,9 +62,3 @@ nexusStaging {
     username = project.property("nexus.username") as String?
     password = project.property("nexus.password") as String?
 }
-
-nexusStaging {
-    packageGroup = "io.github.zero88"
-    username = project.property("nexus.username") as String?
-    password = project.property("nexus.password") as String?
-}
