@@ -8,7 +8,7 @@ import org.gradle.kotlin.dsl.property
 @Suppress("UnstableApiUsage") open class QWEDockerExtension(objects: ObjectFactory, layout: ProjectLayout) {
 
     val enabled = objects.property<Boolean>().convention(true)
-    val maintainer = objects.property<String>()
+    val maintainer = objects.property<String>().convention("")
     val dockerfile = DockerfileExtension(objects)
     val dockerImage = DockerImageExtension(objects)
     val outputDirectory = objects.directoryProperty().convention(layout.buildDirectory.dir("docker"))

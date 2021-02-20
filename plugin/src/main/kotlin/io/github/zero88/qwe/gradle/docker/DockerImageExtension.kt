@@ -7,11 +7,11 @@ import org.gradle.kotlin.dsl.setProperty
 @Suppress("UnstableApiUsage")
 open class DockerImageExtension(objects: ObjectFactory) {
 
-    val registries = objects.setProperty<String>().convention(setOf("docker.io"))
-    val tags = objects.setProperty<String>().convention(emptySet())
-    val labels = objects.mapProperty<String, String>().convention(emptyMap())
+    val imageRegistries = objects.setProperty<String>()
+    val tags = objects.setProperty<String>().empty()
+    val labels = objects.mapProperty<String, String>().empty()
 
-    fun toImages(): List<String> {
-        return registries.get().flatMap { r -> tags.get().map { v -> "${r}:${v}" } }
+    fun toFQNImages(): List<String> {
+        return imageRegistries.get().flatMap { r -> tags.get().map { v -> "${r}:${v}" } }
     }
 }

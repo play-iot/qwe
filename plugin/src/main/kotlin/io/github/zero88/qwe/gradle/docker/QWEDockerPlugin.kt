@@ -18,7 +18,6 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
 
 @Suppress("UnstableApiUsage") class QWEDockerPlugin : QWEDecoratorPlugin<QWEDockerExtension> {
 
@@ -30,19 +29,21 @@ import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
     override fun configureExtension(project: Project, qweExt: QWEExtension): QWEDockerExtension {
         val dockerExt = project.extensions.getByType<DockerExtension>()
         val ext = (dockerExt as ExtensionAware).extensions.create<QWEDockerExtension>(QWEDockerExtension.NAME)
-        val name = qweExt.baseName.get()
-        if (qweExt.zero88.get()) {
-            ext.maintainer.set("${QWEExtension.DEV_ID} <${QWEExtension.DEV_EMAIL}>")
+        project.afterEvaluate {
+            val name = qweExt.baseName.get()
+            if (qweExt.zero88.get()) {
+                ext.maintainer.set("${QWEExtension.DEV_ID} <${QWEExtension.DEV_EMAIL}>")
+            }
+            val registryParams = prop(project, "dockerRegistries", true)?.split(",")?.map { "${it}/${name}" }
+            val tagParams = prop(project, "dockerTags")?.split(",")?.filter { s -> s.isNotEmpty() }
+            val labelParams = prop(project, "dockerLabels", true)?.split(",")?.filter { s -> s.isNotEmpty() }
+            val dl = listOf("version=${project.version}", "maintainer=${ext.maintainer.get()}")
+            val labels = dl + (labelParams ?: listOf())
+            ext.enabled.set(qweExt.application.get() && ext.enabled.get())
+            ext.dockerImage.imageRegistries.addAll(registryParams ?: listOf(name))
+            ext.dockerImage.tags.addAll(tagParams ?: listOf(project.version.toString()))
+            ext.dockerImage.labels.putAll(labels.map { s -> s.split("=") }.map { it[0] to it[1] }.toMap())
         }
-        val registryParams = prop(project, "dockerRegistries", true)?.split(",")?.map { "${it}/${name}" }
-        val tagParams = prop(project, "dockerTags")?.split(",")?.filter { s -> s.isNotEmpty() }
-        val labelParams = prop(project, "dockerLabels", true)?.split(",")?.filter { s -> s.isNotEmpty() }
-        val dl = listOf("version=${project.version}", "maintainer=${ext.maintainer}")
-        val labels = dl + (labelParams ?: listOf())
-        ext.enabled.set(qweExt.application.get() && ext.enabled.get())
-        ext.dockerImage.registries.addAll(registryParams ?: listOf(name))
-        ext.dockerImage.tags.addAll(tagParams ?: listOf(project.version.toString()))
-        ext.dockerImage.labels.putAll(labels.map { s -> s.split("=") }.map { it[0] to it[1] }.toMap())
         return ext
     }
 
@@ -74,13 +75,12 @@ import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
             workingDir(df.appDir)
             addFile("distributions/${fqn}.tar", "./")
             runCommand("cp -rf $fqn/* ./ && rm -rf $fqn && mkdir -p ${df.dataDir.get()}")
-            runCommand(
-                "useradd -u ${df.userId.get()} -G ${df.group.get()} ${df.user.get()} " +
-                    "&& chown -R ${df.user.get()}:${df.group.get()} ${df.dataDir.get()} " +
-                    "&& chmod -R 755 ${df.dataDir.get()}"
-            )
+            runCommand(df.userGroupCmd.orElse(df.generateUserGroupCmd()))
+            if (df.otherCmd.isPresent) {
+                runCommand(df.otherCmd)
+            }
             volume(df.dataDir.get())
-            user(df.user.get())
+            user(df.user)
             entryPoint("java")
             defaultCommand("-jar", "${fqn}.jar", "-conf", "conf/${df.configFile.get()}")
             label(qweDockerExt.dockerImage.labels)
@@ -120,7 +120,7 @@ import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
 
             inputDir.set(project.layout.buildDirectory)
             dockerFile.set(qweDockerExt.outputDirectory.file(baseName))
-            images.value(qweDockerExt.dockerImage.toImages())
+            images.value(qweDockerExt.dockerImage.toFQNImages())
         }
     }
 
@@ -135,7 +135,7 @@ import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
 
             onlyIf { qweDockerExt.enabled.get() }
             dependsOn(dockerBuildProvider)
-            images.set(qweDockerExt.dockerImage.toImages())
+            images.set(qweDockerExt.dockerImage.toFQNImages())
         }
     }
 
