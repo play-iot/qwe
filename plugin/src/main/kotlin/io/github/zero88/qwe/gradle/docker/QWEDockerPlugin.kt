@@ -3,11 +3,11 @@ package io.github.zero88.qwe.gradle.docker
 import com.bmuschko.gradle.docker.DockerExtension
 import com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import io.github.zero88.qwe.gradle.QWEDecoratorPlugin
 import io.github.zero88.qwe.gradle.QWEExtension
 import io.github.zero88.qwe.gradle.app.QWEAppPlugin
+import io.github.zero88.qwe.gradle.docker.task.DockerMultipleRegistriesPushTask
 import io.github.zero88.qwe.gradle.helper.prop
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -129,9 +129,9 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
         qweDockerExt: QWEDockerExtension,
         dockerBuildProvider: TaskProvider<DockerBuildImage>
     ) {
-        project.tasks.register<DockerPushImage>("pushDocker") {
+        project.tasks.register<DockerMultipleRegistriesPushTask>("pushDocker") {
             group = "QWE Docker"
-            description = "Push Docker images to remote registry"
+            description = "Push Docker images to multiple remote registries"
 
             onlyIf { qweDockerExt.enabled.get() }
             dependsOn(dockerBuildProvider)
