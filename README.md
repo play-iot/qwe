@@ -26,6 +26,7 @@ based on [Vertx](https://vertx.io/)
 - [QWE SQL](https://github.com/zero88/qwe-sql) `SQL` ability in event-driven architecture.
 - [QWE IoT Gateway](https://github.com/zero88/qwe-iot-gateway) `IoT Gateway` ability.
 - [QWE IoT OTA](https://github.com/zero88/qwe-iot-ota) `Software Provision` ability for `IoT device`.
+- [QWE Gradle plugin](https://github.com/topmo12/qwe-gradle-plugin) Gradle plugin for some common build step.
 
 ## Overview
 

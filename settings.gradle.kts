@@ -16,7 +16,6 @@ include("micro")
 include("scheduler")
 include("protocol")
 include("storage:json")
-include("plugin")
 
 include(":qwe-base", ":http:http-metadata", ":micro:micro-metadata", ":scheduler:scheduler-metadata")
 project(":qwe-base").projectDir = file("base")
