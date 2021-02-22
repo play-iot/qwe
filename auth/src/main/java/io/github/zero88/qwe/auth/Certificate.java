@@ -40,23 +40,31 @@ public interface Certificate {
     final class CertificateType extends AbstractEnumType {
 
         /**
+         * JKS
+         *
          * @see <a href="https://docs.oracle.com/javase/7/docs/api/java/security/KeyStore.html">Javadoc KeyStore</a>
-         * @see <a href=https://en.wikipedia.org/wiki/Java_KeyStore">JKS</a>
+         * @see <a href="https://en.wikipedia.org/wiki/Java_KeyStore">JKS</a>
          * @see JksOptions
          */
         public static final CertificateType JKS = new CertificateType("JKS");
         /**
+         * PKCS #1
+         *
          * @see <a href="https://en.wikipedia.org/wiki/PKCS_1">PKCS #1</a>
          * @see PemKeyCertOptions
          */
         public static final CertificateType PKCS1 = new CertificateType("PKCS#1");
         /**
+         * PKCS #8
+         *
          * @see <a href="https://en.wikipedia.org/wiki/PKCS_8">PKCS #8</a>
          * @see PemKeyCertOptions
          */
         public static final CertificateType PKCS8 = new CertificateType("PKCS#8");
         /**
-         * @see <a href="https://en.wikipedia.org/wiki/PKCS_12>PKCS #12</a>
+         * PKCS #12
+         *
+         * @see <a href="https://en.wikipedia.org/wiki/PKCS_12">PKCS #12</a>
          * @see PfxOptions
          */
         public static final CertificateType PKCS12 = new CertificateType("PKCS#12");
