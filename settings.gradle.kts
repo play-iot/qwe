@@ -16,6 +16,7 @@ pluginManagement {
     }
 }
 
+include("auth")
 include("cache")
 include("http:client")
 include("http:server")
