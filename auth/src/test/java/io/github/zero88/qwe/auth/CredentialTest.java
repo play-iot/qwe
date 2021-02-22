@@ -11,7 +11,7 @@ class CredentialTest {
     @Test
     void test_basic_serialize() {
         final BasicCredential cred = BasicCredential.builder().user("abc").password("xxy").build();
-        Assertions.assertEquals(CredentialType.BASIC, cred.getType());
+        Assertions.assertEquals(Credential.CredentialType.BASIC, cred.getType());
         Assertions.assertEquals("abc", cred.getUser());
         Assertions.assertEquals("xxy", cred.getPassword());
         Assertions.assertEquals("User: abc::Type: BASIC::Password:*****", cred.toString());
@@ -23,7 +23,7 @@ class CredentialTest {
     void test_basic_deserialize() {
         final JsonObject object = new JsonObject("{\"user\":\"hello\",\"password\":\"world\",\"type\":\"BASIC\"}");
         final BasicCredential cred = JsonData.from(object, BasicCredential.class);
-        Assertions.assertEquals(CredentialType.BASIC, cred.getType());
+        Assertions.assertEquals(Credential.CredentialType.BASIC, cred.getType());
         Assertions.assertEquals("Basic", cred.getHeaderAuthType());
         Assertions.assertEquals("hello", cred.getUser());
         Assertions.assertEquals("world", cred.getPassword());
@@ -33,7 +33,7 @@ class CredentialTest {
     @Test
     void test_token_serialize() {
         final TokenCredential cred = TokenCredential.builder().user("abc").token("xxy").build();
-        Assertions.assertEquals(CredentialType.TOKEN, cred.getType());
+        Assertions.assertEquals(Credential.CredentialType.TOKEN, cred.getType());
         Assertions.assertEquals("abc", cred.getUser());
         Assertions.assertEquals("xxy", cred.getToken());
         Assertions.assertEquals("User: abc::Type: TOKEN::Token: ******************************", cred.toString());
@@ -46,7 +46,7 @@ class CredentialTest {
         final JsonObject object = new JsonObject(
             "{\"user\":\"hello\",\"token\":\"world\",\"type\":\"TOKEN\",\"headerAuthType\":\"Custom\"}");
         final TokenCredential cred = JsonData.from(object, TokenCredential.class);
-        Assertions.assertEquals(CredentialType.TOKEN, cred.getType());
+        Assertions.assertEquals(Credential.CredentialType.TOKEN, cred.getType());
         Assertions.assertEquals("Custom", cred.getHeaderAuthType());
         Assertions.assertEquals("hello", cred.getUser());
         Assertions.assertEquals("world", cred.getToken());
