@@ -17,7 +17,15 @@ public interface ConnectionAware {
      *
      * @return protocol
      */
-    @NonNull Protocol type();
+    @NonNull Protocol protocol();
+
+    /**
+     * Connect strategy
+     *
+     * @return strategy
+     * @see ConnectStrategy
+     */
+    @NonNull ConnectStrategy strategy();
 
     /**
      * Target address
