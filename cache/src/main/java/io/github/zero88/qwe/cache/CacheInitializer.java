@@ -6,9 +6,9 @@ import io.github.zero88.qwe.component.SharedDataLocalProxy;
 
 import lombok.NonNull;
 
-public interface CacheInitializer<R extends CacheInitializer> {
+public interface CacheInitializer {
 
-    @NonNull R init(SharedDataLocalProxy context);
+    void init(@NonNull SharedDataLocalProxy context);
 
     default <T> void addBlockingCache(@NonNull SharedDataLocalProxy context, @NonNull String cacheKey,
                                       @NonNull Supplier<T> blockingCacheProvider) {
