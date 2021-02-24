@@ -3,7 +3,7 @@ package io.github.zero88.qwe.auth.resolver;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import io.github.zero88.qwe.auth.BasicCredential;
+import io.github.zero88.qwe.auth.credential.BasicCredential;
 
 import lombok.NonNull;
 

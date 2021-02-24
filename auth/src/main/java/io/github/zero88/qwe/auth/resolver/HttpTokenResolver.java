@@ -2,7 +2,7 @@ package io.github.zero88.qwe.auth.resolver;
 
 import java.util.Objects;
 
-import io.github.zero88.qwe.auth.TokenCredential;
+import io.github.zero88.qwe.auth.credential.TokenCredential;
 
 import lombok.NonNull;
 

@@ -1,7 +1,9 @@
-package io.github.zero88.qwe.auth;
+package io.github.zero88.qwe.auth.credential;
 
 import java.util.Collection;
 import java.util.Collections;
+
+import io.github.zero88.qwe.auth.Credential.AbstractCredential;
 
 import lombok.AccessLevel;
 import lombok.Builder.Default;
@@ -14,7 +16,7 @@ import lombok.extern.jackson.Jacksonized;
 @SuperBuilder
 @Jacksonized
 @FieldNameConstants(level = AccessLevel.PRIVATE)
-public final class TokenCredential extends Credential.AbstractCredential {
+public final class TokenCredential extends AbstractCredential {
 
     private final String token;
     @Default
@@ -23,6 +25,11 @@ public final class TokenCredential extends Credential.AbstractCredential {
     @Override
     public CredentialType getType() {
         return CredentialType.TOKEN;
+    }
+
+    @Override
+    public String secretValue() {
+        return getToken();
     }
 
     @Override

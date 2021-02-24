@@ -4,9 +4,11 @@ import io.github.zero88.qwe.dto.EnumType;
 import io.github.zero88.qwe.dto.EnumType.AbstractEnumType;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.JksOptions;
+import io.vertx.core.net.KeyCertOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.net.PfxOptions;
+import io.vertx.core.net.TrustOptions;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
@@ -35,7 +37,36 @@ public interface Certificate {
      *
      * @return cert value
      */
-    @NonNull Buffer cert();
+    @NonNull Buffer certValue();
+
+    @NonNull KeyCertOptions toKeyCert();
+
+    @NonNull TrustOptions toTrustCert();
+
+    interface TrustedCertificate extends Certificate {
+
+        @Override
+        default Buffer privateKey() {
+            return null;
+        }
+
+        @Override
+        default @NonNull KeyCertOptions toKeyCert() {
+            throw new UnsupportedOperationException("Unsupported generate key cert option from TrustedCert");
+        }
+
+    }
+
+
+    interface KeyPairCertificate extends Certificate {
+
+        @Override
+        default @NonNull TrustOptions toTrustCert() {
+            throw new UnsupportedOperationException("Use toKeyCert instead of toTrustCert");
+        }
+
+    }
+
 
     final class CertificateType extends AbstractEnumType {
 

@@ -26,6 +26,8 @@ public interface Credential extends JsonData {
 
     String getHeaderAuthType();
 
+    String secretValue();
+
     final class CredentialType extends AbstractEnumType {
 
         public static final CredentialType BASIC = new CredentialType("BASIC");

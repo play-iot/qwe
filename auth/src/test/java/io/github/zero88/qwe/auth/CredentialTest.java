@@ -3,6 +3,8 @@ package io.github.zero88.qwe.auth;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import io.github.zero88.qwe.auth.credential.BasicCredential;
+import io.github.zero88.qwe.auth.credential.TokenCredential;
 import io.github.zero88.qwe.dto.JsonData;
 import io.vertx.core.json.JsonObject;
 
