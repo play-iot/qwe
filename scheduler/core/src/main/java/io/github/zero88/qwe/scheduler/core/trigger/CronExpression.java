@@ -1,4 +1,5 @@
-package io.github.zero88.qwe.scheduler.solution;
+package io.github.zero88.qwe.scheduler.core.trigger;
+
 /*
  * All content copyright Terracotta, Inc., unless otherwise indicated. All rights reserved.
  *
@@ -185,8 +186,8 @@ public final class CronExpression implements Serializable, Cloneable {
     protected static final Integer ALL_SPEC = ALL_SPEC_INT;
     protected static final Integer NO_SPEC = NO_SPEC_INT;
 
-    protected static final Map<String, Integer> monthMap = new HashMap<String, Integer>(20);
-    protected static final Map<String, Integer> dayMap = new HashMap<String, Integer>(60);
+    protected static final Map<String, Integer> monthMap = new HashMap<>(20);
+    protected static final Map<String, Integer> dayMap = new HashMap<>(60);
     private static final long serialVersionUID = 12423409423L;
 
     static {
@@ -362,6 +363,8 @@ public final class CronExpression implements Serializable, Cloneable {
 
     /**
      * Returns the time zone for which this <code>CronExpression</code> will be resolved.
+     *
+     * @return timezone
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
@@ -373,6 +376,8 @@ public final class CronExpression implements Serializable, Cloneable {
 
     /**
      * Sets the time zone for which  this <code>CronExpression</code> will be resolved.
+     *
+     * @param timeZone timeZone
      */
     public void setTimeZone(TimeZone timeZone) {
         this.timeZone = timeZone;
@@ -384,25 +389,25 @@ public final class CronExpression implements Serializable, Cloneable {
         try {
 
             if (seconds == null) {
-                seconds = new TreeSet<Integer>();
+                seconds = new TreeSet<>();
             }
             if (minutes == null) {
-                minutes = new TreeSet<Integer>();
+                minutes = new TreeSet<>();
             }
             if (hours == null) {
-                hours = new TreeSet<Integer>();
+                hours = new TreeSet<>();
             }
             if (daysOfMonth == null) {
-                daysOfMonth = new TreeSet<Integer>();
+                daysOfMonth = new TreeSet<>();
             }
             if (months == null) {
-                months = new TreeSet<Integer>();
+                months = new TreeSet<>();
             }
             if (daysOfWeek == null) {
-                daysOfWeek = new TreeSet<Integer>();
+                daysOfWeek = new TreeSet<>();
             }
             if (years == null) {
-                years = new TreeSet<Integer>();
+                years = new TreeSet<>();
             }
 
             int exprOn = SECOND;
@@ -991,8 +996,6 @@ public final class CronExpression implements Serializable, Cloneable {
         if (stopAt < startAt) {
             switch (type) {
                 case SECOND:
-                    max = 60;
-                    break;
                 case MINUTE:
                     max = 60;
                     break;
@@ -1518,22 +1521,22 @@ public final class CronExpression implements Serializable, Cloneable {
         }
     }
 
-    /**
-     * NOT YET IMPLEMENTED: Returns the time before the given time that the <code>CronExpression</code> matches.
-     */
-    public Date getTimeBefore(Date endTime) {
-        // FUTURE_TODO: implement QUARTZ-423
-        return null;
-    }
-
-    /**
-     * NOT YET IMPLEMENTED: Returns the final time that the
-     * <code>CronExpression</code> will match.
-     */
-    public Date getFinalFireTime() {
-        // FUTURE_TODO: implement QUARTZ-423
-        return null;
-    }
+    //    /**
+    //     * NOT YET IMPLEMENTED: Returns the time before the given time that the <code>CronExpression</code> matches.
+    //     */
+    //    public Date getTimeBefore(Date endTime) {
+    //        // FUTURE_TODO: implement QUARTZ-423
+    //        return null;
+    //    }
+    //
+    //    /**
+    //     * NOT YET IMPLEMENTED: Returns the final time that the
+    //     * <code>CronExpression</code> will match.
+    //     */
+    //    public Date getFinalFireTime() {
+    //        // FUTURE_TODO: implement QUARTZ-423
+    //        return null;
+    //    }
 
     protected boolean isLeapYear(int year) {
         return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0));
@@ -1543,29 +1546,20 @@ public final class CronExpression implements Serializable, Cloneable {
 
         switch (monthNum) {
             case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
                 return 31;
             case 2:
                 return (isLeapYear(year)) ? 29 : 28;
-            case 3:
-                return 31;
             case 4:
-                return 30;
-            case 5:
-                return 31;
             case 6:
-                return 30;
-            case 7:
-                return 31;
-            case 8:
-                return 31;
             case 9:
-                return 30;
-            case 10:
-                return 31;
             case 11:
                 return 30;
-            case 12:
-                return 31;
             default:
                 throw new IllegalArgumentException("Illegal month number: " + monthNum);
         }
