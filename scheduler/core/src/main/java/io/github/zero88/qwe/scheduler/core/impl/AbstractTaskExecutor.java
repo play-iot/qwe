@@ -55,10 +55,14 @@ public abstract class AbstractTaskExecutor<T extends Trigger>
     @Override
     public void start(WorkerExecutor workerExecutor) {
         this.addTimer(Promise.promise(), workerExecutor)
-            .map(timerId -> TaskResultImpl.builder().availableAt(state.timerId(timerId).availableAt()).build())
-            .onSuccess(result -> monitor().onSchedule(result))
-            .onFailure(
-                t -> monitor().unableSchedule(TaskResultImpl.builder().error(t).availableAt(Instant.now()).build()));
+            .onSuccess(this::onReceiveTimer)
+            .onFailure(t -> monitor().unableSchedule(TaskResultImpl.builder()
+                                                                   .tick(state().tick())
+                                                                   .round(state().round())
+                                                                   .availableAt(state().availableAt())
+                                                                   .unscheduledAt(Instant.now())
+                                                                   .error(t)
+                                                                   .build()));
     }
 
     @Override
@@ -93,6 +97,21 @@ public abstract class AbstractTaskExecutor<T extends Trigger>
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("TaskExecutor[{}][{}][{}]::{}", tick, round, at, event);
         }
+    }
+
+    protected void onReceiveTimer(long timerId) {
+        TaskResultImpl result;
+        if (state().pending()) {
+            result = TaskResultImpl.builder().availableAt(state.timerId(timerId).markAvailable().availableAt()).build();
+        } else {
+            result = TaskResultImpl.builder()
+                                   .tick(state.timerId(timerId).tick())
+                                   .round(state().round())
+                                   .availableAt(state().availableAt())
+                                   .rescheduledAt(Instant.now())
+                                   .build();
+        }
+        monitor().onSchedule(result);
     }
 
     protected void run(WorkerExecutor workerExecutor) {

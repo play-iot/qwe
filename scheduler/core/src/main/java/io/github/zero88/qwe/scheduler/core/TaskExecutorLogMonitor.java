@@ -17,7 +17,11 @@ public interface TaskExecutorLogMonitor extends TaskExecutorMonitor {
 
     @Override
     default void onSchedule(@NonNull TaskResult result) {
-        LOGGER.debug("TaskExecutor is scheduled at [{}]", result.availableAt());
+        if (result.isReschedule()) {
+            LOGGER.debug("TaskExecutor is rescheduled at [{}] round [{}]", result.rescheduledAt(), result.round());
+        } else {
+            LOGGER.debug("TaskExecutor is available at [{}]", result.availableAt());
+        }
     }
 
     @Override

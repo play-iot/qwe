@@ -18,7 +18,7 @@ public interface TaskExecutorMonitor {
     void unableSchedule(@NonNull TaskResult result);
 
     /**
-     * Invoke when executor is available
+     * Invoke when executor is scheduled or rescheduled
      *
      * @param result task result
      */

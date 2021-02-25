@@ -1,5 +1,7 @@
 package io.github.zero88.qwe.scheduler.core.impl;
 
+import java.time.Instant;
+
 import io.github.zero88.qwe.scheduler.core.trigger.CronTrigger;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -12,8 +14,16 @@ import lombok.experimental.SuperBuilder;
 public final class CronTaskExecutor extends AbstractTaskExecutor<CronTrigger> {
 
     @Override
-    protected @NonNull Future<Long> addTimer(Promise<Long> promise, WorkerExecutor workerExecutor) {
-        promise.complete(0L);
+    protected @NonNull Future<Long> addTimer(@NonNull Promise<Long> promise, WorkerExecutor workerExecutor) {
+        try {
+            final long nextTriggerAfter = trigger().nextTriggerAfter(Instant.now());
+            promise.complete(vertx().setTimer(nextTriggerAfter, timerId -> {
+                run(workerExecutor);
+                start(workerExecutor);
+            }));
+        } catch (Exception ex) {
+            promise.fail(ex);
+        }
         return promise.future();
     }
 

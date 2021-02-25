@@ -81,7 +81,7 @@ public final class TaskExecutorStateImpl implements TaskExecutorStateInternal {
     @Override
     public @NonNull TaskExecutorStateInternal timerId(long timerId) {
         this.timerId = timerId;
-        return this.markAvailable();
+        return this;
     }
 
     @Override

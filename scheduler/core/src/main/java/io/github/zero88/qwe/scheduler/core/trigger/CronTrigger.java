@@ -1,5 +1,11 @@
 package io.github.zero88.qwe.scheduler.core.trigger;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import io.github.zero88.qwe.scheduler.core.Task;
@@ -23,12 +29,30 @@ public final class CronTrigger implements Trigger {
      * @see CronExpression
      */
     @NonNull
-    private final CronExpression expression;
+    private final String expression;
 
     /**
      * Returns the time zone for which the {@code cronExpression} of this {@code CronTrigger} will be resolved.
      */
     @Default
-    private final TimeZone timeZone = TimeZone.getDefault();
+    private final TimeZone timeZone = TimeZone.getTimeZone(ZoneOffset.UTC.getId());
+
+    private CronExpression cronExpression;
+
+    public CronExpression getCronExpression() {
+        if (Objects.nonNull(cronExpression)) {
+            return cronExpression;
+        }
+        try {
+            return this.cronExpression = new CronExpression(expression).setTimeZone(timeZone);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Cannot parse cron expression", e);
+        }
+    }
+
+    public long nextTriggerAfter(@NonNull Instant current) {
+        final Instant next = getCronExpression().getNextValidTimeAfter(Date.from(current)).toInstant();
+        return Math.max(1, ChronoUnit.MILLIS.between(current, next));
+    }
 
 }

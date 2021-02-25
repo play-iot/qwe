@@ -1,4 +1,4 @@
-package io.github.zero88.qwe.scheduler.core;
+package io.github.zero88.qwe.scheduler.core.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import io.github.zero88.qwe.TestHelper;
 import io.github.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.qwe.scheduler.core.impl.IntervalTaskExecutor;
+import io.github.zero88.qwe.scheduler.core.Task;
+import io.github.zero88.qwe.scheduler.core.TaskExecutorLogMonitor;
+import io.github.zero88.qwe.scheduler.core.TaskExecutorMonitor;
+import io.github.zero88.qwe.scheduler.core.TaskResult;
 import io.github.zero88.qwe.scheduler.core.trigger.IntervalTrigger;
 import io.vertx.core.Vertx;
 import io.vertx.core.WorkerExecutor;
@@ -19,40 +22,26 @@ import lombok.NonNull;
 @ExtendWith(VertxExtension.class)
 class IntervalTaskExecutorTest {
 
-    private TaskExecutorMonitor unableScheduleAsserter(VertxTestContext testContext, Checkpoint checkpoint) {
-        return new TaskExecutorLogMonitor() {
-            @Override
-            public void unableSchedule(@NonNull TaskResult result) {
-                testContext.verify(() -> {
-                    checkpoint.flag();
-                    Assertions.assertNotNull(result.availableAt());
-                    Assertions.assertTrue(result.error() instanceof IllegalArgumentException);
-                    testContext.completeNow();
-                });
-            }
-        };
-    }
-
     @Test
     void test_run_task_unable_schedule_due_to_interval(Vertx vertx, VertxTestContext testContext) {
-        final Checkpoint checkpoint = testContext.checkpoint(1);
+        final Checkpoint checkpoint = testContext.checkpoint(2);
         IntervalTaskExecutor.builder()
                             .vertx(vertx)
                             .trigger(IntervalTrigger.builder().interval(-1).build())
                             .task((jobData, ctx) -> {})
-                            .monitor(unableScheduleAsserter(testContext, checkpoint))
+                            .monitor(TaskExecutorTestHelper.unableScheduleAsserter(testContext, checkpoint))
                             .build()
                             .start();
     }
 
     @Test
     void test_run_task_unable_schedule_due_to_initial(Vertx vertx, VertxTestContext testContext) {
-        final Checkpoint checkpoint = testContext.checkpoint(1);
+        final Checkpoint checkpoint = testContext.checkpoint(2);
         IntervalTaskExecutor.builder()
                             .vertx(vertx)
                             .trigger(IntervalTrigger.builder().initialDelay(-1).build())
                             .task((jobData, ctx) -> {})
-                            .monitor(unableScheduleAsserter(testContext, checkpoint))
+                            .monitor(TaskExecutorTestHelper.unableScheduleAsserter(testContext, checkpoint))
                             .build()
                             .start();
     }

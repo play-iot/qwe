@@ -13,6 +13,8 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class TaskResultImpl implements TaskResult {
 
+    private final Instant unscheduledAt;
+    private final Instant rescheduledAt;
     private final Instant availableAt;
     private final Instant triggeredAt;
     private final Instant executedAt;

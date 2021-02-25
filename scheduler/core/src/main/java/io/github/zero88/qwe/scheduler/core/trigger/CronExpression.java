@@ -379,8 +379,9 @@ public final class CronExpression implements Serializable, Cloneable {
      *
      * @param timeZone timeZone
      */
-    public void setTimeZone(TimeZone timeZone) {
+    public CronExpression setTimeZone(TimeZone timeZone) {
         this.timeZone = timeZone;
+        return this;
     }
 
     protected void buildExpression(String expression) throws ParseException {
