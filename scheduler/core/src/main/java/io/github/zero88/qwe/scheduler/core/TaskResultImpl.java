@@ -1,4 +1,4 @@
-package io.github.zero88.scheduler.core;
+package io.github.zero88.qwe.scheduler.core;
 
 import lombok.Builder;
 import lombok.Getter;

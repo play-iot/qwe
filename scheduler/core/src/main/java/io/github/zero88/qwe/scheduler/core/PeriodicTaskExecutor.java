@@ -1,4 +1,4 @@
-package io.github.zero88.scheduler.core;
+package io.github.zero88.qwe.scheduler.core;
 
 import java.time.Instant;
 import java.util.AbstractMap.SimpleEntry;
@@ -43,11 +43,11 @@ public final class PeriodicTaskExecutor implements TaskExecutor {
     private final AtomicBoolean executing = new AtomicBoolean(false);
     private final AtomicReference<Entry<Long, Object>> data = new AtomicReference<>(new SimpleEntry<>(0L, null));
     private final AtomicReference<Entry<Long, Throwable>> error = new AtomicReference<>(new SimpleEntry<>(0L, null));
-    private long periodicId;
+    private long timerId;
 
     @Override
     public void start(WorkerExecutor workerExecutor) {
-        this.periodicId = vertx.setPeriodic(TimeUnit.MILLISECONDS.convert(interval, timeUnit), timerId -> {
+        this.timerId = vertx.setPeriodic(TimeUnit.MILLISECONDS.convert(interval, timeUnit), timerId -> {
             long tick = this.tick.incrementAndGet();
             if (isExecuting()) {
                 LOGGER.debug("Task is still executing. Skip tick [{}]", tick);
@@ -69,7 +69,7 @@ public final class PeriodicTaskExecutor implements TaskExecutor {
     public void cancel() {
         if (!isCompleted()) {
             LOGGER.debug("TaskExecutor is canceled at round [{}]", currentRound());
-            vertx.cancelTimer(periodicId);
+            vertx.cancelTimer(timerId);
             onCompleted();
         }
     }
