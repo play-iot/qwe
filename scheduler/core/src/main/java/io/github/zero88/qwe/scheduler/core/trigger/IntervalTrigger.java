@@ -17,19 +17,19 @@ public final class IntervalTrigger implements Trigger {
     public static final long REPEAT_INDEFINITELY = -1;
 
     /**
-     * Get the initial delay time (in {@link #getInitialDelayTimeUnit()}) before firing trigger in first time.
-     *
-     * @apiNote Default is {@code 0}
-     */
-    @Default
-    private final long initialDelay = 0;
-    /**
      * Delay time unit
      *
      * @apiNote Default is {@code SECONDS}
      */
     @Default
     private final TimeUnit initialDelayTimeUnit = TimeUnit.SECONDS;
+    /**
+     * Get the initial delay time (in {@link #getInitialDelayTimeUnit()}) before firing trigger in first time.
+     *
+     * @apiNote Default is {@code 0}
+     */
+    @Default
+    private final long initialDelay = 0;
     /**
      * Get the number of times the {@code IntervalTrigger} should repeat, after which it will be automatically deleted.
      *
@@ -38,15 +38,16 @@ public final class IntervalTrigger implements Trigger {
     @Default
     private final long repeat = REPEAT_INDEFINITELY;
     /**
-     * Get the time interval (in {@link #getIntervalTimeUnit()}) at which the {@code IntervalTrigger} should repeat.
-     */
-    private final long interval;
-    /**
      * Interval time unit
      *
      * @apiNote Default is {@code SECONDS}
      */
+    @Default
     private final TimeUnit intervalTimeUnit = TimeUnit.SECONDS;
+    /**
+     * Get the time interval (in {@link #getIntervalTimeUnit()}) at which the {@code IntervalTrigger} should repeat.
+     */
+    private final long interval;
 
     public long intervalInMilliseconds() {
         if (interval < 0) {
