@@ -1,5 +1,20 @@
 # Changelog
 
+## [v0.6.1](https://github.com/zero88/qwe/tree/v0.6.1) (2021-02-26)
+
+[Full Changelog](https://github.com/zero88/qwe/compare/v0.6.0...HEAD)
+
+**Closed issues:**
+
+- Gradle plugin [\#25](https://github.com/zero88/qwe/issues/25)
+- Exclude `quartz`, and just use `quartz cron parser` [\#9](https://github.com/zero88/qwe/issues/9)
+- Add `auth` core module for `Credential` and `Certificate`
+
+**Merged pull requests:**
+
+- Feature/scheduler core [\#28](https://github.com/zero88/qwe/pull/28) ([zero88](https://github.com/zero88))
+- Feature/gradle plugin [\#26](https://github.com/zero88/qwe/pull/26) ([zero88](https://github.com/zero88))
+
 ## [v0.6.0](https://github.com/zero88/qwe/tree/v0.6.0) (2021-02-05)
 
 [Full Changelog](https://github.com/zero88/qwe/compare/v0.5.3...v0.6.0)
