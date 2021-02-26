@@ -117,7 +117,8 @@ public abstract class AbstractTaskExecutor<T extends Trigger>
     protected void run(WorkerExecutor workerExecutor) {
         final Instant triggerAt = Instant.now();
         if (shouldRun(triggerAt)) {
-            final TaskExecutionContextImpl context = new TaskExecutionContextImpl(state.increaseRound(), triggerAt);
+            final TaskExecutionContextImpl context = new TaskExecutionContextImpl(vertx(), state.increaseRound(),
+                                                                                  triggerAt);
             debug(state().tick(), context.round(), triggerAt, "Trigger executing task");
             if (workerExecutor != null) {
                 workerExecutor.executeBlocking(promise -> executeTask(setupContext(promise, context)), this::onResult);

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -15,6 +16,7 @@ import lombok.experimental.Accessors;
 @RequiredArgsConstructor
 public final class TaskExecutionContextImpl implements TaskExecutionContextInternal {
 
+    private final Vertx vertx;
     private final long round;
     private final Instant triggeredAt;
     private Instant executedAt;

@@ -3,11 +3,14 @@ package io.github.zero88.qwe.scheduler.core;
 import java.time.Instant;
 
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 
 import lombok.NonNull;
 
 /**
  * Represents for a context per each execution round
+ *
+ * @since 1.0.0
  */
 public interface TaskExecutionContext {
 
@@ -22,6 +25,13 @@ public interface TaskExecutionContext {
      * @see Promise
      */
     @NonNull TaskExecutionContext setup(@NonNull Promise<Object> promise, @NonNull Instant executedAt);
+
+    /**
+     * Current vertx
+     *
+     * @return vertx
+     */
+    @NonNull Vertx vertx();
 
     /**
      * Current execution round
