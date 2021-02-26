@@ -23,7 +23,7 @@ public class DERCert implements TrustedCertificate {
 
     @Override
     public @NonNull TrustOptions toTrustCert() {
-        return null;
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
 }
