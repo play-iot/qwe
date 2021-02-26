@@ -1,5 +1,8 @@
 package io.github.zero88.qwe.scheduler.core.impl;
 
+import java.time.Instant;
+import java.util.function.Supplier;
+
 import io.github.zero88.qwe.scheduler.core.trigger.IntervalTrigger;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -13,12 +16,14 @@ public final class IntervalTaskExecutor extends AbstractTaskExecutor<IntervalTri
 
     protected @NonNull Future<Long> addTimer(@NonNull Promise<Long> promise, WorkerExecutor workerExecutor) {
         try {
-            final long i = trigger().intervalInMilliseconds();
-            if (trigger().getInitialDelay() == 0) {
-                promise.complete(vertx().setPeriodic(i, timerId -> run(workerExecutor)));
+            Supplier<Long> supplier = () -> vertx().setPeriodic(trigger().intervalInMilliseconds(),
+                                                                timerId -> run(workerExecutor));
+            if (trigger().noDelay()) {
+                promise.complete(supplier.get());
             } else {
-                vertx().setTimer(trigger().delayInMilliseconds(),
-                                 ignore -> promise.complete(vertx().setPeriodic(i, timerId -> run(workerExecutor))));
+                final long delay = trigger().delayInMilliseconds();
+                debug(-1, -1, Instant.now(), "delay [" + delay + "ms] then register task in schedule");
+                vertx().setTimer(delay, ignore -> promise.complete(supplier.get()));
             }
         } catch (Exception e) {
             promise.fail(e);
@@ -28,7 +33,7 @@ public final class IntervalTaskExecutor extends AbstractTaskExecutor<IntervalTri
 
     @Override
     protected boolean shouldCancel(long round) {
-        return trigger().getRepeat() != IntervalTrigger.REPEAT_INDEFINITELY && round >= trigger().getRepeat();
+        return trigger().noRepeatIndefinitely() && round >= trigger().getRepeat();
     }
 
 }
