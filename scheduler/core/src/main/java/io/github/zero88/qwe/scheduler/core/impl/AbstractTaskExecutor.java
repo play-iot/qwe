@@ -56,13 +56,13 @@ public abstract class AbstractTaskExecutor<T extends Trigger>
     public void start(WorkerExecutor workerExecutor) {
         this.addTimer(Promise.promise(), workerExecutor)
             .onSuccess(this::onReceiveTimer)
-            .onFailure(t -> monitor().unableSchedule(TaskResultImpl.builder()
-                                                                   .tick(state().tick())
-                                                                   .round(state().round())
-                                                                   .availableAt(state().availableAt())
-                                                                   .unscheduledAt(Instant.now())
-                                                                   .error(t)
-                                                                   .build()));
+            .onFailure(t -> monitor().onUnableSchedule(TaskResultImpl.builder()
+                                                                     .tick(state().tick())
+                                                                     .round(state().round())
+                                                                     .availableAt(state().availableAt())
+                                                                     .unscheduledAt(Instant.now())
+                                                                     .error(t)
+                                                                     .build()));
     }
 
     @Override
@@ -135,11 +135,11 @@ public abstract class AbstractTaskExecutor<T extends Trigger>
         }
         if (state().executing()) {
             debug(tick, state().round(), triggerAt, "Skip execution due to task is still running");
-            monitor().misfire(TaskResultImpl.builder()
-                                            .availableAt(state().availableAt())
-                                            .tick(state().tick())
-                                            .triggeredAt(triggerAt)
-                                            .build());
+            monitor().onMisfire(TaskResultImpl.builder()
+                                              .availableAt(state().availableAt())
+                                              .tick(state().tick())
+                                              .triggeredAt(triggerAt)
+                                              .build());
         }
         return state().idle();
     }

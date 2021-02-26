@@ -1,7 +1,15 @@
 package io.github.zero88.qwe.scheduler.core;
 
+import io.github.zero88.qwe.scheduler.core.trigger.Trigger;
+
 import lombok.NonNull;
 
+/**
+ * Represents for Task to run on each trigger time
+ *
+ * @see Trigger
+ * @since 1.0.0
+ */
 public interface Task {
 
     /**

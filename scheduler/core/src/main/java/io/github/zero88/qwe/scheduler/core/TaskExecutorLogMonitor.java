@@ -5,14 +5,19 @@ import org.slf4j.LoggerFactory;
 
 import lombok.NonNull;
 
+/**
+ * Represents for log monitor
+ *
+ * @since 1.0.0
+ */
 public interface TaskExecutorLogMonitor extends TaskExecutorMonitor {
 
     Logger LOGGER = LoggerFactory.getLogger(TaskExecutorLogMonitor.class);
     TaskExecutorMonitor LOG_MONITOR = new TaskExecutorLogMonitor() {};
 
     @Override
-    default void unableSchedule(@NonNull TaskResult result) {
-        LOGGER.error("Unable schedule task at [{}] due to error", result.availableAt(), result.error());
+    default void onUnableSchedule(@NonNull TaskResult result) {
+        LOGGER.error("Unable schedule task at [{}] due to error", result.unscheduledAt(), result.error());
     }
 
     @Override
@@ -25,7 +30,7 @@ public interface TaskExecutorLogMonitor extends TaskExecutorMonitor {
     }
 
     @Override
-    default void misfire(@NonNull TaskResult result) {
+    default void onMisfire(@NonNull TaskResult result) {
         LOGGER.debug("Misfire tick [{}] at [{}]", result.tick(), result.triggeredAt());
     }
 

@@ -5,8 +5,20 @@ import io.vertx.core.WorkerExecutor;
 
 import lombok.NonNull;
 
+/**
+ * Represents for an executor run {@code task} in conditional loop
+ *
+ * @param <C> Type of TaskExecutionContext
+ * @see TriggerTaskExecutor
+ * @since 1.0.0
+ */
 public interface TaskExecutor<C extends TaskExecutionContext> {
 
+    /**
+     * Vertx
+     *
+     * @return vertx
+     */
     @NonNull Vertx vertx();
 
     /**

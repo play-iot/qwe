@@ -4,15 +4,37 @@ import java.time.Instant;
 
 /**
  * Represents for current Task executor state
+ *
+ * @since 1.0.0
  */
 public interface TaskExecutorState {
 
+    /**
+     * Timer id
+     *
+     * @return timer id
+     */
     long timerId();
 
+    /**
+     * Identifies an executor is on scheduler at time
+     *
+     * @return available at time
+     */
     Instant availableAt();
 
+    /**
+     * Current number of times that trigger is fired
+     *
+     * @return tick
+     */
     long tick();
 
+    /**
+     * Current number of times that trigger is executed
+     *
+     * @return round
+     */
     long round();
 
     /**
@@ -46,8 +68,18 @@ public interface TaskExecutorState {
      */
     boolean completed();
 
+    /**
+     * Latest data of previous round
+     *
+     * @return latest data
+     */
     Object lastData();
 
+    /**
+     * Latest error of previous round
+     *
+     * @return latest error
+     */
     Throwable lastError();
 
 }

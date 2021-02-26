@@ -6,6 +6,7 @@ import lombok.NonNull;
  * Represents for monitor that watches lifecycle event in executor
  *
  * @see TaskResult
+ * @since 1.0.0
  */
 public interface TaskExecutorMonitor {
 
@@ -15,24 +16,24 @@ public interface TaskExecutorMonitor {
      * @param result task result
      * @see TaskResult
      */
-    void unableSchedule(@NonNull TaskResult result);
+    void onUnableSchedule(@NonNull TaskResult result);
 
     /**
-     * Invoke when executor is scheduled or rescheduled
+     * Invoke after executor is scheduled or rescheduled
      *
      * @param result task result
      */
     void onSchedule(@NonNull TaskResult result);
 
     /**
-     * Invoke when misfire
+     * Invoke when misfire the execution, one reason is due to task is still running when trigger a new round execution
      *
      * @param result task result
      */
-    void misfire(@NonNull TaskResult result);
+    void onMisfire(@NonNull TaskResult result);
 
     /**
-     * Invoke after each round is finished
+     * Invoke after each round is finished regardless a round execution is success or fail
      *
      * @param result task result
      */

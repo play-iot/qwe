@@ -1,15 +1,15 @@
 package io.github.zero88.qwe.scheduler.core;
 
+/**
+ * Represents for input task data
+ *
+ * @since 1.0.0
+ */
 @FunctionalInterface
 public interface JobData {
 
-    <T> T get();
+    Object get();
 
-    JobData EMPTY = new JobData() {
-        @Override
-        public <T> T get() {
-            return null;
-        }
-    };
+    JobData EMPTY = () -> null;
 
 }
