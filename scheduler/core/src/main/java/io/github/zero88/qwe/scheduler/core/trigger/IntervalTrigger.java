@@ -2,12 +2,23 @@ package io.github.zero88.qwe.scheduler.core.trigger;
 
 import java.util.concurrent.TimeUnit;
 
+import io.github.zero88.qwe.scheduler.core.Task;
+
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
+import lombok.NonNull;
+import lombok.extern.jackson.Jacksonized;
 
+/**
+ * Represents for inspecting settings specific to an interval trigger, which is used to fire a <code>{@link Task}</code>
+ * in periodic with repeat time.
+ *
+ * @since 1.0.0
+ */
 @Data
 @Builder
+@Jacksonized
 public final class IntervalTrigger implements Trigger {
 
     /**
@@ -22,6 +33,7 @@ public final class IntervalTrigger implements Trigger {
      * @apiNote Default is {@code SECONDS}
      */
     @Default
+    @NonNull
     private final TimeUnit initialDelayTimeUnit = TimeUnit.SECONDS;
     /**
      * Get the initial delay time (in {@link #getInitialDelayTimeUnit()}) before firing trigger in first time.
@@ -43,21 +55,46 @@ public final class IntervalTrigger implements Trigger {
      * @apiNote Default is {@code SECONDS}
      */
     @Default
+    @NonNull
     private final TimeUnit intervalTimeUnit = TimeUnit.SECONDS;
     /**
      * Get the time interval (in {@link #getIntervalTimeUnit()}) at which the {@code IntervalTrigger} should repeat.
      */
     private final long interval;
 
-    public long intervalInMilliseconds() {
-        if (interval < 0) {
-            throw new IllegalArgumentException("Interval must be greater than 0");
+    static long validate(long number, boolean allowZero, boolean allowIndefinitely, String msg) {
+        if (number > 0 || (allowZero && number == 0) || (allowIndefinitely && number == REPEAT_INDEFINITELY)) {
+            return number;
         }
+        throw new IllegalArgumentException("Invalid " + msg + " value");
+    }
+
+    public long getRepeat() {
+        return validate(repeat, false, true, "repeat");
+    }
+
+    public long getInitialDelay() {
+        return validate(initialDelay, true, false, "initial delay");
+    }
+
+    public long getInterval() {
+        return validate(interval, false, false, "interval");
+    }
+
+    public long intervalInMilliseconds() {
         return TimeUnit.MILLISECONDS.convert(getInterval(), getIntervalTimeUnit());
     }
 
     public long delayInMilliseconds() {
         return TimeUnit.MILLISECONDS.convert(getInitialDelay(), getInitialDelayTimeUnit());
+    }
+
+    public boolean noDelay() {
+        return getInitialDelay() == 0;
+    }
+
+    public boolean noRepeatIndefinitely() {
+        return getRepeat() != REPEAT_INDEFINITELY;
     }
 
 }

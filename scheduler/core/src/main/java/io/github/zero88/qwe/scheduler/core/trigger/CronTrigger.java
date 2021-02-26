@@ -10,17 +10,23 @@ import java.util.TimeZone;
 
 import io.github.zero88.qwe.scheduler.core.Task;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Builder;
 import lombok.Builder.Default;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NonNull;
+import lombok.extern.jackson.Jacksonized;
 
 /**
- * The public interface for inspecting settings specific to a CronTrigger, which is used to fire a <code>{@link
- * Task}</code> at given moments in time, defined with Unix 'cron-like' schedule definitions.
+ * Represents for inspecting settings specific to a CronTrigger, which is used to fire a <code>{@link Task}</code> at
+ * given moments in time, defined with Unix 'cron-like' schedule definitions.
+ *
+ * @since 1.0.0
  */
-@Getter
+@Data
 @Builder
+@Jacksonized
 public final class CronTrigger implements Trigger {
 
     /**
@@ -37,8 +43,10 @@ public final class CronTrigger implements Trigger {
     @Default
     private final TimeZone timeZone = TimeZone.getTimeZone(ZoneOffset.UTC.getId());
 
+    @JsonIgnore
     private CronExpression cronExpression;
 
+    @JsonIgnore
     public CronExpression getCronExpression() {
         if (Objects.nonNull(cronExpression)) {
             return cronExpression;

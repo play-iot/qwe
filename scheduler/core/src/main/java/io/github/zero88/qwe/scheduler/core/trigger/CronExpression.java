@@ -378,6 +378,7 @@ public final class CronExpression implements Serializable, Cloneable {
      * Sets the time zone for which  this <code>CronExpression</code> will be resolved.
      *
      * @param timeZone timeZone
+     * @return a reference to this for fluent API
      */
     public CronExpression setTimeZone(TimeZone timeZone) {
         this.timeZone = timeZone;
