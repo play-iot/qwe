@@ -59,7 +59,7 @@ public final class ReplyEventHandler implements Handler<AsyncResult<Message<Obje
 
     private void handleReplySuccess(EventMessage eventMessage) {
         if (logger.isTraceEnabled()) {
-            logger.trace("{}::Backend eventbus response | {}", eventMessage.toJson());
+            logger.trace("{}::Backend eventbus response | {}", system, eventMessage.toJson());
         }
         if (eventMessage.isError() && Objects.nonNull(error)) {
             error.accept(eventMessage.getError());
@@ -74,7 +74,7 @@ public final class ReplyEventHandler implements Handler<AsyncResult<Message<Obje
         } else if (Objects.nonNull(error)) {
             error.accept(ErrorMessage.parse(throwable));
         } else {
-            logger.error("{}::Backend eventbus response error", throwable, system);
+            logger.error("{}::Backend eventbus response error", system, throwable);
             success.accept(EventMessage.error(EventAction.RETURN, throwable));
         }
     }

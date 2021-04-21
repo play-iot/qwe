@@ -14,25 +14,26 @@ object UtilLibs {
     const val quartz = "org.quartz-scheduler:quartz:${Version.quartz}"
 }
 
+object WebLibs {
+
+    object Version {
+
+        const val jaxrs = "2.1.1"
+        const val jbossJaxrs = "2.0.1.Final"
+    }
+
+    const val jaxrs = "javax.ws.rs:javax.ws.rs-api:${Version.jaxrs}"
+    const val jbossJaxrs = "org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec:${Version.jbossJaxrs}"
+}
+
 object PluginLibs {
 
     object Version {
 
-        const val sonarQube = "3.0"
         const val nexusStaging = "0.22.0"
-        const val docker = "6.7.0"
-        const val gradlePluginPublish = "0.12.0"
     }
 
-    const val sonarQube = "org.sonarqube"
     const val nexusStaging = "io.codearte.nexus-staging"
-    const val gradlePluginPublish = "com.gradle.plugin-publish"
-
-    object Depends {
-
-        const val docker = "com.bmuschko:gradle-docker-plugin:${Version.docker}"
-        const val sonarQube = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${Version.sonarQube}"
-    }
 }
 
 object JacksonLibs {
