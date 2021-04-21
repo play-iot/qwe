@@ -1,4 +1,4 @@
 dependencies {
-    api(project(":qwe-base"))
+    api(project(":qwe-core"))
     implementation(VertxLibs.serviceDiscovery)
 }

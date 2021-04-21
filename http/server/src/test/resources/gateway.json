@@ -4,7 +4,7 @@
       "__gateway__": {
         "enabled": true,
         "indexAddress": "test.qwe.service.gateway.index",
-        "localAnnounceMonitorClass": "io.github.zero88.qwe.http.server.gateway.RouterAnnounceListener"
+        "localAnnounceMonitorClass": "io.zero88.qwe.http.server.gateway.RouterAnnounceListener"
       },
       "__serviceDiscovery__": {
         "enabled": false

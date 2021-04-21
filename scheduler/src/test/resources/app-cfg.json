@@ -2,7 +2,7 @@
   "__app__": {
     "__scheduler__": {
       "schedulerName": "qwe",
-      "registerServiceClass": "io.github.zero88.qwe.scheduler.service.SchedulerRegisterService",
+      "registerServiceClass": "io.zero88.qwe.scheduler.service.SchedulerRegisterService",
       "registerAddress": "qwe.scheduler.register",
       "monitorAddress": "qwe.scheduler.monitor",
       "__schedule_worker__": {

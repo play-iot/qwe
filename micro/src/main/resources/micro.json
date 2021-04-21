@@ -4,10 +4,10 @@
       "__gateway__": {
         "enabled": false,
         "indexAddress": "qwe.service.gateway.index",
-        "clusterAnnounceMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
-        "clusterUsageMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor",
-        "localAnnounceMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
-        "localUsageMonitorClass": "io.github.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor"
+        "clusterAnnounceMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
+        "clusterUsageMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor",
+        "localAnnounceMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
+        "localUsageMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor"
       },
       "__serviceDiscovery__": {
         "announceAddress": "qwe.service.discovery.announce",

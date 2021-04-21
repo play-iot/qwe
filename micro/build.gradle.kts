@@ -6,5 +6,5 @@ dependencies {
     api(VertxLibs.circuitBreaker)
 
     testImplementation(VertxLibs.junit)
-    testImplementation(testFixtures(project(":qwe-base")))
+    testImplementation(testFixtures(project(":qwe-core")))
 }

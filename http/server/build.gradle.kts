@@ -7,7 +7,7 @@ dependencies {
     compileOnly(VertxLibs.serviceDiscovery)
 
     testImplementation(VertxLibs.junit)
-    testImplementation(testFixtures(project(":qwe-base")))
+    testImplementation(testFixtures(project(":qwe-core")))
     testImplementation(project(":micro"))
     testImplementation(project(":http:client"))
 }

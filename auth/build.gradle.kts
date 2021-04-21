@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":qwe-base"))
+    api(project(":qwe-core"))
 
-    testImplementation(testFixtures(project(":qwe-base")))
+    testImplementation(testFixtures(project(":qwe-core")))
 }

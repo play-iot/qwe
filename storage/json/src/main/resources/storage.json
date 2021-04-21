@@ -2,7 +2,7 @@
   "subDir": "storage",
   "maxSizeInMB": 10,
   "serviceAddress": "qwe.storage.json",
-  "serviceHandlerClass": "io.github.zero88.qwe.storage.json.service.JsonStorageService",
+  "serviceHandlerClass": "io.zero88.qwe.storage.json.service.JsonStorageService",
   "chunk": false,
   "option": {
     "autoCreate": true,
