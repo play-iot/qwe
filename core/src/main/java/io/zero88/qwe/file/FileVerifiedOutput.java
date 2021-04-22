@@ -26,11 +26,6 @@ public class FileVerifiedOutput {
         return FileVerifiedOutput.builder().props(props).path(path).build();
     }
 
-    public static FileVerifiedOutput existed(@NonNull Path path,
-                                             @NonNull io.vertx.reactivex.core.file.FileProps props) {
-        return existed(path, props.getDelegate());
-    }
-
     public FileVerifiedOutput validate(@NonNull FileValidator validator) {
         validator.validate(this.path, this.props);
         return this;

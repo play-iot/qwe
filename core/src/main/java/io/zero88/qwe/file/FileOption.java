@@ -17,6 +17,8 @@ public class FileOption implements JsonData {
     @Default
     private final boolean overwrite = true;
     @Default
+    private final boolean strict = true;
+    @Default
     private final String owner = System.getProperty("user.name");
     @Default
     private final String filePerms = "rw-r--r--";

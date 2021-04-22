@@ -13,6 +13,12 @@ public interface FileValidator {
 
     void validate(@NonNull Path path, @NonNull FileProps props) throws FileException;
 
+    FileValidator MUST_BE_SYMLINK = (path, props) -> {
+        if (!props.isSymbolicLink()) {
+            throw new FileException("Given path '" + path + "' is not a symlink");
+        }
+    };
+
     FileValidator MUST_BE_FILE = (path, props) -> {
         if (!props.isRegularFile()) {
             throw new FileException("Given path '" + path + "' is not a file");
