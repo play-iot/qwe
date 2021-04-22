@@ -53,10 +53,6 @@ public final class ConfigProcessor {
         initConfig("env", PREFIX_ENV);
     }
 
-    public ConfigProcessor(io.vertx.reactivex.core.Vertx vertx) {
-        this(vertx.getDelegate());
-    }
-
     private static JsonObject toJson(Object configValue) {
         return configValue instanceof JsonObject
                ? (JsonObject) configValue
