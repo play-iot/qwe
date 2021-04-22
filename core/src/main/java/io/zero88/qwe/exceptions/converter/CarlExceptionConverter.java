@@ -10,17 +10,17 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.exceptions.ErrorCodeException;
 import io.github.zero88.exceptions.HiddenException;
+import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.utils.Strings;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.exceptions.CarlException;
-import io.github.zero88.utils.Strings;
-import io.reactivex.exceptions.CompositeException;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
 /**
- * Convert any {@code throwable} to friendly {@code carlException}. The converter result will be showed directly to
- * end user, any technical information will be log.
+ * Convert any {@code throwable} to friendly {@code carlException}. The converter result will be showed directly to end
+ * user, any technical information will be log.
  *
  * @see ErrorMessage
  * @see CarlException
@@ -66,8 +66,9 @@ public class CarlExceptionConverter implements Function<Throwable, CarlException
     @Override
     public CarlException apply(@NonNull Throwable throwable) {
         Throwable t = throwable;
-        if (t instanceof CompositeException) {
-            List<Throwable> exceptions = ((CompositeException) throwable).getExceptions();
+        final Class<Object> rxCompositeEx = ReflectionClass.findClass("io.reactivex.exceptions.CompositeException");
+        if (Objects.nonNull(rxCompositeEx) && ReflectionClass.assertDataType(t.getClass(), rxCompositeEx)) {
+            List<Throwable> exceptions = ((io.reactivex.exceptions.CompositeException) throwable).getExceptions();
             t = exceptions.get(exceptions.size() - 1);
         }
         final Throwable cause = t.getCause();
