@@ -14,7 +14,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
-public interface EventbusHelper {
+public interface EventBusHelper {
 
     static Handler<AsyncResult<Message<Object>>> replyAsserter(TestContext context, Async async,
                                                                JsonObject expected) {

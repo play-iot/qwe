@@ -1,4 +1,4 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import io.zero88.qwe.CarlConfig.AppConfig;
 import io.zero88.qwe.IConfig;

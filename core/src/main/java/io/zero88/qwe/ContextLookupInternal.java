@@ -1,4 +1,4 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import java.util.Collection;
 

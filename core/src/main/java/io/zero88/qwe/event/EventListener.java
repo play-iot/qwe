@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.eventbus.Message;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
 

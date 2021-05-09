@@ -1,12 +1,11 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import lombok.Setter;
 
+@Setter
 public final class MockApplication extends ApplicationVerticle {
 
-    @Setter
     private boolean error;
-    @Setter
     private boolean errorInHandler;
 
     @Override

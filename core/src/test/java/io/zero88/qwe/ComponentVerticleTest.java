@@ -1,4 +1,4 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -9,9 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.VertxHelper;
-import io.zero88.qwe.component.MockProvider.MockComponent;
+import io.zero88.qwe.MockProvider.MockComponent;
 import io.zero88.qwe.exceptions.CarlException;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;

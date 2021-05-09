@@ -1,4 +1,4 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import io.zero88.qwe.event.EventBusClient;
 import io.vertx.core.Vertx;

@@ -1,10 +1,8 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.VertxHelper;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;

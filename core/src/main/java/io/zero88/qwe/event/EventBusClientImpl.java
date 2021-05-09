@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 
 import lombok.Getter;
 import lombok.NonNull;

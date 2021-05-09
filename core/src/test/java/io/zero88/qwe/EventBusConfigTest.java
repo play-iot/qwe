@@ -66,9 +66,9 @@ public class EventBusConfigTest {
     @Test
     public void test_parse_delivery_option_from_eventbus() {
         EventBusConfig eventBusConfig = IConfig.from(
-            "{\"clientAuth\":\"REQUIRED\",\"ssl\":true,\"keyStoreOptions\":{\"path" + "\":\"ebks.jks\"," +
-            "\"password\":\"io.github.zero88EventBus\"},\"trustStoreOptions\":{\"path" + "\":\"ebks.jks\"," +
-            "\"password\":\"io.github.zero88EventBus\"}," + "\"__delivery__\":{\"codecName\":\"abc\"," +
+            "{\"clientAuth\":\"REQUIRED\",\"ssl\":true,\"keyStoreOptions\":{\"path\":\"ebks.jks\"," +
+            "\"password\":\"io.github.zero88EventBus\"},\"trustStoreOptions\":{\"path\":\"ebks.jks\"," +
+            "\"password\":\"io.github.zero88EventBus\"},\"__delivery__\":{\"codecName\":\"abc\"," +
             "\"timeout\": 300000, \"headers\":{\"Content-type\":\"application/json\", \"Method\":\"GET\"}}}",
             EventBusConfig.class);
         DeliveryOptions deliveryOptions = eventBusConfig.getDeliveryOptions();

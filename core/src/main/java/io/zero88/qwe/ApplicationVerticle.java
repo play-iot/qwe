@@ -1,4 +1,4 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,9 +13,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.CarlConfig;
-import io.zero88.qwe.ConfigProcessor;
-import io.zero88.qwe.IConfig;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventBusDeliveryOption;
 import io.zero88.qwe.exceptions.CarlException;
@@ -123,8 +120,12 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
     private void succeed(Promise<Void> promise, CompositeFuture r) {
         logger.info("Deployed {}/{} component verticle(s)...", r.size(), this.providers.size());
         this.providers.clear();
-        this.onInstallCompleted(this.contexts);
-        promise.tryComplete();
+        try {
+            this.onInstallCompleted(this.contexts);
+            promise.tryComplete();
+        } catch (Exception e) {
+            promise.fail(e);
+        }
     }
 
     private void fail(Promise<Void> promise, Throwable throwable) {

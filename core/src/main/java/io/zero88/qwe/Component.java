@@ -1,6 +1,5 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
-import io.zero88.qwe.IConfig;
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 

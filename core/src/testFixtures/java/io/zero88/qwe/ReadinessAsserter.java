@@ -1,13 +1,12 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
-import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.component.ApplicationProbeHandler.ApplicationReadinessHandler;
-import io.zero88.qwe.dto.ErrorData;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EventContractor;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.zero88.qwe.ApplicationProbeHandler.ApplicationReadinessHandler;
+import io.zero88.qwe.dto.ErrorData;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EventContractor;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

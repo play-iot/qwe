@@ -10,7 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.mock.MockEventListener.MockReceiveSendOrPublish;
 import io.zero88.qwe.event.mock.MockEventListener.MockWithVariousParams;
 

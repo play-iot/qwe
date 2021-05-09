@@ -5,7 +5,7 @@ import io.github.zero88.utils.Reflections.ReflectionMethod;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData.SerializerFunction;
 import io.zero88.qwe.exceptions.DesiredException;
 import io.zero88.qwe.exceptions.ImplementationError;

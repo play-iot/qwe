@@ -1,8 +1,7 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
-import io.zero88.qwe.CarlConfig;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListener;
 

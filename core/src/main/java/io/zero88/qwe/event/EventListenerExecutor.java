@@ -2,7 +2,7 @@ package io.zero88.qwe.event;
 
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
-import io.zero88.qwe.component.HasSharedData;
+import io.zero88.qwe.HasSharedData;
 
 public interface EventListenerExecutor extends HasSharedData {
 

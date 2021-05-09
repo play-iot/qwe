@@ -1,6 +1,6 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
-import io.zero88.qwe.component.DummyProvider.DummyComponentVerticle;
+import io.zero88.qwe.DummyProvider.DummyComponentVerticle;
 
 import lombok.NonNull;
 

@@ -9,8 +9,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.zero88.qwe.component.HasSharedData;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.HasSharedData;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.transport.Transporter;
 
 import lombok.NonNull;

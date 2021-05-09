@@ -1,8 +1,7 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.utils.Configs;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.utils.Configs;
 
 import lombok.NonNull;
 

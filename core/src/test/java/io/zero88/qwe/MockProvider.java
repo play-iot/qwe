@@ -1,6 +1,6 @@
-package io.zero88.qwe.component;
+package io.zero88.qwe;
 
-import io.zero88.qwe.component.MockProvider.MockComponent;
+import io.zero88.qwe.MockProvider.MockComponent;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -48,7 +48,7 @@ public class MockProvider implements ComponentProvider<MockComponent> {
             logger.info("Starting Mock Unit Verticle...");
             super.start();
             if (error) {
-                throw new RuntimeException("Error when starting Unit Verticle");
+                throw new RuntimeException("Error when starting Component Verticle");
             }
         }
 
