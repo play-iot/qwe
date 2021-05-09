@@ -88,7 +88,7 @@ public final class EventMessage implements Serializable, JsonData {
         return new EventMessage(Status.FAILED, action, ErrorMessage.parse(throwable));
     }
 
-    public static EventMessage error(@NonNull EventAction action, @NonNull ErrorCode code, @NonNull String message) {
+    public static EventMessage error(@NonNull EventAction action, @NonNull ErrorCode code, String message) {
         return new EventMessage(Status.FAILED, action, ErrorMessage.parse(code, message));
     }
 

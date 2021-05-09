@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,10 +40,7 @@ public interface EventListener {
     default String fallback() { return "data"; }
 
     default @NonNull void handle(SharedDataLocalProxy sharedData, Message<Object> msg) {
-        new EventListenerExecutorImpl(this, sharedData).execute(msg)
-                                                       .otherwise(t -> EventMessage.error(EventAction.UNKNOWN,
-                                                                                          ErrorMessage.parse(t)))
-                                                       .onSuccess(r -> msg.reply(r.toJson()));
+        new EventListenerExecutorImpl(this, sharedData).execute(msg).onSuccess(r -> msg.reply(r.toJson()));
     }
 
 }

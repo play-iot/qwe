@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.zero88.qwe.dto.ErrorMessage;
@@ -41,22 +42,10 @@ public class MockEventListener implements EventListener {
     }
 
 
-    public static class MockKeepEventMessageListener extends MockEventListener {
-
-        @EventContractor(action = "MONITOR")
-        public int monitor(@Param("data") JsonObject json, @Param("error") ErrorMessage err) {
-            return Objects.isNull(err) ? 1 : 0;
-        }
+    public static class MockWithVariousParams extends MockEventListener {
 
         @EventContractor(action = "NOTIFY")
-        public int swap(@Param("error") ErrorMessage error, @Param("data") JsonObject data) {
-            return Objects.isNull(error) ? 1 : 0;
-        }
-
-    }
-
-
-    public static class MockWithVariousParams extends MockEventListener {
+        public void noReturn(JsonObject data) { }
 
         @EventContractor(action = "GET_LIST")
         public String noParam() { return "hello"; }
@@ -78,35 +67,47 @@ public class MockEventListener implements EventListener {
         }
 
         @EventContractor(action = "REMOVE")
-        public JsonObject mixParams(@Param("id") int id, @Param("data") RequestData data) {
-            return new JsonObject().put("id", id).put("request", data.toJson());
-        }
-
-        @EventContractor(action = "HALT")
         public JsonObject collectionParam(@Param("list") Collection<String> data) {
             JsonObject result = new JsonObject();
             data.forEach(item -> result.put(item, item));
             return result;
         }
 
-        @EventContractor(action = "INIT")
-        public MockParent annotatedExtendsReturnType() {
-            return new MockParent();
+    }
+
+
+    public static class MockDuplicateEvent implements EventListener {
+
+        @EventContractor(action = "DUP")
+        public Map<String, String> dup1(RequestData data) {
+            return Collections.singletonMap("key", "duplicate 1");
         }
 
-        @EventContractor(action = "MIGRATE")
-        public MockChild returnTypeExtendsAnnotated() {
-            return new MockChild();
+        @EventContractor(action = "DUP")
+        public Map<String, String> dup2(RequestData data) {
+            return Collections.singletonMap("key", "duplicate 2");
         }
 
-        @EventContractor(action = "UNKNOWN")
-        public JsonObject refParam(@Param("metadata") JsonObject data) { return data; }
+    }
+
+
+    public static class MockKeepEventMessageListener implements EventListener {
+
+        @EventContractor(action = "MONITOR")
+        public int monitor(@Param("data") JsonObject json, @Param("error") ErrorMessage err) {
+            return Objects.isNull(err) ? 1 : 0;
+        }
+
+        @EventContractor(action = "NOTIFY")
+        public int swap(@Param("error") ErrorMessage error, @Param("data") JsonObject data) {
+            return Objects.isNull(error) ? 1 : 0;
+        }
 
     }
 
 
     @RequiredArgsConstructor
-    public static class MockReceiveSendOrPublish extends MockEventListener {
+    public static class MockReceiveSendOrPublish implements EventListener {
 
         private final String identifier;
         private final Checkpoint cp;
@@ -118,6 +119,28 @@ public class MockEventListener implements EventListener {
             return new JsonObject().put("id", id).put("identifier", identifier);
         }
 
+    }
+
+
+    @RequiredArgsConstructor
+    public static class MockFuture implements EventListener {
+
+        private final String identifier;
+        private final Checkpoint cp;
+
+        @EventContractor(action = "GET_ONE")
+        public Future<JsonObject> receive(@Param("id") int id) {
+            cp.flag();
+            System.out.println("[" + identifier + "] receive event");
+            return Future.succeededFuture(new JsonObject().put("id", id).put("identifier", identifier));
+        }
+
+        @EventContractor(action = "CREATE")
+        public Future<Void> voidFuture(@Param("id") int id) {
+            cp.flag();
+            System.out.println("[" + identifier + "] receive event");
+            return Future.succeededFuture();
+        }
     }
 
 

@@ -15,9 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.HiddenException;
-import io.zero88.qwe.dto.jackson.JsonModule;
-import io.zero88.qwe.exceptions.CarlException;
-import io.zero88.qwe.exceptions.ErrorCode;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
@@ -25,6 +22,9 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
+import io.zero88.qwe.dto.jackson.JsonModule;
+import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.ErrorCode;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -310,6 +310,9 @@ public interface JsonData {
         @SuppressWarnings("unchecked")
         @Override
         public JsonObject apply(Object obj) {
+            if (Objects.isNull(obj)) {
+                return null;
+            }
             if (obj instanceof String) {
                 try {
                     return new JsonObject(mapper.readValue((String) obj, Map.class));
@@ -328,7 +331,7 @@ public interface JsonData {
                 return decode(obj, "Failed to decode from JsonArray");
             }
             if (obj instanceof Collection) {
-                return decode(new ArrayList((Collection) obj), "Failed to decode from Collection");
+                return decode(obj, "Failed to decode from Collection");
             }
             try {
                 return new JsonObject((Map<String, Object>) mapper.convertValue(obj, Map.class));

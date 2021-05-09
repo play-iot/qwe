@@ -21,6 +21,8 @@ import lombok.extern.jackson.Jacksonized;
  * @see EventAction
  * @see EventPattern
  */
+//TODO Should re-innovate
+@Deprecated
 @Getter
 @Jacksonized
 @Builder(builderClassName = "Builder")

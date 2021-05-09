@@ -43,7 +43,7 @@ public final class ErrorMessage implements Serializable, JsonData {
         this.message = message;
     }
 
-    private ErrorMessage(@NonNull ErrorCode code, @NonNull String message) {
+    private ErrorMessage(@NonNull ErrorCode code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -56,13 +56,13 @@ public final class ErrorMessage implements Serializable, JsonData {
         return new ErrorMessage(c.apply(throwable));
     }
 
-    public static ErrorMessage parse(@NonNull io.github.zero88.exceptions.ErrorCode code, @NonNull String message) {
+    public static ErrorMessage parse(@NonNull io.github.zero88.exceptions.ErrorCode code, String message) {
         return new ErrorMessage(code, message);
     }
 
     @JsonCreator
     public static ErrorMessage parse(@NonNull @JsonProperty("code") String code,
-                                     @NonNull @JsonProperty("message") String message) {
+                                     @JsonProperty("message") String message) {
         return new ErrorMessage(ErrorCode.parse(code), message);
     }
 
