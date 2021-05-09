@@ -1,13 +1,9 @@
 package io.zero88.qwe.event.refl;
 
-import java.lang.reflect.Method;
-
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 public interface EventAnnotationProcessor {
 
@@ -25,33 +21,5 @@ public interface EventAnnotationProcessor {
     }
 
     MethodMeta scan(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action);
-
-    interface MethodMeta {
-
-        /**
-         * @return the declaring class
-         */
-        String declaringClass();
-
-        boolean outputIsVoid();
-
-        boolean outputIsVertxFuture();
-
-        MethodParam[] params();
-
-        Method toMethod();
-
-    }
-
-
-    @Getter
-    @RequiredArgsConstructor
-    class MethodParam {
-
-        private final String paramName;
-        private final Class<?> paramClass;
-        private final boolean isContext;
-
-    }
 
 }

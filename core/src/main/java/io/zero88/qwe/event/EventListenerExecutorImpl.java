@@ -5,7 +5,7 @@ import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData.SerializerFunction;
-import io.zero88.qwe.event.refl.EventAnnotationProcessor.MethodMeta;
+import io.zero88.qwe.event.refl.MethodMeta;
 import io.zero88.qwe.exceptions.DesiredException;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;

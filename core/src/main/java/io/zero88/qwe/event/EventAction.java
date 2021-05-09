@@ -14,7 +14,7 @@ import lombok.Getter;
  * Defines {@code action} for {@code Eventbus}
  */
 @Getter
-public class EventAction extends AbstractEnumType implements EnumType, Serializable {
+public final class EventAction extends AbstractEnumType implements EnumType, Serializable {
 
     private EventAction(String type) {
         super(type);

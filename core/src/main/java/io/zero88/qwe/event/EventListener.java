@@ -14,7 +14,7 @@ import lombok.NonNull;
 /**
  * Represents for a listener that receives and processes an {@code EventBus} message then response back to a caller
  *
- * @see EventContractor
+ * @see EBContract
  * @see EventMessage
  * @see EventAction
  * @see EventPattern#REQUEST_RESPONSE

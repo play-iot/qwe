@@ -17,8 +17,6 @@ import io.zero88.qwe.event.mock.MockEventListener.MockFuture;
 import io.zero88.qwe.event.mock.MockEventListener.MockKeepEventMessageListener;
 import io.zero88.qwe.event.mock.MockEventListener.MockParam;
 import io.zero88.qwe.event.mock.MockEventListener.MockWithVariousParams;
-import io.zero88.qwe.event.refl.EventAnnotationProcessor.MethodMeta;
-import io.zero88.qwe.event.refl.EventAnnotationProcessor.MethodParam;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.UnsupportedException;
 
@@ -84,6 +82,7 @@ class EventAnnotationProcessorTest {
         Assertions.assertNotNull(methodMeta);
         Assertions.assertFalse(methodMeta.outputIsVoid());
         Assertions.assertFalse(methodMeta.outputIsVertxFuture());
+        Assertions.assertEquals(MockEventListener.class.getName(), methodMeta.declaringClass());
         Assertions.assertEquals(1, methodMeta.params().length);
         final MethodParam param = methodMeta.params()[0];
         Assertions.assertNotNull(param.getParamName());
@@ -97,6 +96,7 @@ class EventAnnotationProcessorTest {
         Assertions.assertNotNull(methodMeta);
         Assertions.assertFalse(methodMeta.outputIsVoid());
         Assertions.assertFalse(methodMeta.outputIsVertxFuture());
+        Assertions.assertEquals(MockChildListener.class.getName(), methodMeta.declaringClass());
         Assertions.assertEquals(1, methodMeta.params().length);
         final MethodParam param = methodMeta.params()[0];
         Assertions.assertNotNull(param.getParamName());
@@ -110,6 +110,7 @@ class EventAnnotationProcessorTest {
         Assertions.assertNotNull(methodMeta);
         Assertions.assertFalse(methodMeta.outputIsVoid());
         Assertions.assertFalse(methodMeta.outputIsVertxFuture());
+        Assertions.assertEquals(MockWithVariousParams.class.getName(), methodMeta.declaringClass());
         Assertions.assertEquals(2, methodMeta.params().length);
         MethodParam param1 = methodMeta.params()[0];
         Assertions.assertEquals("mock", param1.getParamName());

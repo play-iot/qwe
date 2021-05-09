@@ -8,13 +8,16 @@ import java.util.stream.Collectors;
 
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.ErrorMessage;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.refl.EventAnnotationProcessor.MethodParam;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.ImplementationError;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EventParameterParserImpl implements EventParameterParser {
 
-    private final SharedDataLocalProxy sharedData;
+    private final SharedDataLocalProxy localDataProxy;
     private final ObjectMapper mapper;
 
     @Override
@@ -40,16 +43,37 @@ public class EventParameterParserImpl implements EventParameterParser {
             }
         }
         boolean isOne = params.length == 1;
-        return Arrays.stream(params).map(param -> parseParamValue(parseMessage(message), param, isOne)).toArray();
+        return Arrays.stream(params)
+                     .map(param -> param.isContext()
+                                   ? parseEBContext(message.getAction(), param)
+                                   : parseEBParam(message, param, isOne))
+                     .toArray();
     }
 
-    protected JsonObject parseMessage(EventMessage message) {
-        return message.isError()
-               ? Optional.ofNullable(message.getError()).map(ErrorMessage::toJson).orElse(null)
-               : message.getData();
+    protected Object parseEBContext(EventAction action, MethodParam param) {
+        if (param.getParamClass() == EventAction.class) {
+            return action;
+        }
+        if (param.getParamClass() == Vertx.class) {
+            return localDataProxy.getVertx();
+        }
+        if (ReflectionClass.assertDataType(param.getParamClass(), SharedDataLocalProxy.class)) {
+            return localDataProxy;
+        }
+        if (ReflectionClass.assertDataType(param.getParamClass(), EventBusClient.class)) {
+            return EventBusClient.create(localDataProxy);
+        }
+        throw new ImplementationError(ErrorCode.INVALID_ARGUMENT,
+                                      "Unsupported EventBus context [" + param.getParamClass() + "]");
     }
 
-    protected Object parseParamValue(JsonObject data, MethodParam param, boolean oneParam) {
+    protected Object parseEBParam(EventMessage message, MethodParam param, boolean oneParam) {
+        JsonObject data = message.isError() ? Optional.ofNullable(message.getError())
+                                                      .map(ErrorMessage::toJson)
+                                                      .orElse(null) : message.getData();
+        if (Objects.isNull(data)) {
+            return null;
+        }
         Object d = data.getValue(param.getParamName());
         if (Objects.isNull(d)) {
             return oneParam ? tryDeserialize(data.getMap(), param.getParamClass()) : null;
@@ -63,7 +87,7 @@ public class EventParameterParserImpl implements EventParameterParser {
                 return ReflectionClass.assertDataType(d.getClass(), paramClass) ? d : paramClass.cast(d);
             }
         } catch (ClassCastException e) {
-            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Event message format is invalid",
                                     new HiddenException("Unable cast data type [" + paramClass.getName() + "]", e));
         }
         return tryDeserialize(d, paramClass);
@@ -73,7 +97,7 @@ public class EventParameterParserImpl implements EventParameterParser {
         try {
             return mapper.convertValue(data, paramClass);
         } catch (IllegalArgumentException e) {
-            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Message format is invalid",
+            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Event message format is invalid",
                                     new HiddenException("Jackson parser error", e));
         }
     }

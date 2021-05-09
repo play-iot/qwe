@@ -14,7 +14,6 @@ import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListenerTest;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.mock.MockEventListener.MockWithVariousParams;
-import io.zero88.qwe.event.refl.EventAnnotationProcessor.MethodMeta;
 
 @ExtendWith(VertxExtension.class)
 class EventParameterParserTest {

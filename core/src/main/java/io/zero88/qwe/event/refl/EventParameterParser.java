@@ -2,7 +2,6 @@ package io.zero88.qwe.event.refl;
 
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.refl.EventAnnotationProcessor.MethodParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

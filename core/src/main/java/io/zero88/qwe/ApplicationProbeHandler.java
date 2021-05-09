@@ -2,7 +2,7 @@ package io.zero88.qwe;
 
 import io.zero88.qwe.dto.ErrorData;
 import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EventContractor;
+import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventPattern;
 
@@ -15,10 +15,10 @@ import lombok.NonNull;
  */
 public interface ApplicationProbeHandler extends EventListener {
 
-    @EventContractor(action = "NOTIFY", returnType = boolean.class)
+    @EBContract(action = "NOTIFY")
     boolean success(@NonNull RequestData requestData);
 
-    @EventContractor(action = "NOTIFY_ERROR", returnType = boolean.class)
+    @EBContract(action = "NOTIFY_ERROR")
     boolean error(@NonNull ErrorData error);
 
     /**

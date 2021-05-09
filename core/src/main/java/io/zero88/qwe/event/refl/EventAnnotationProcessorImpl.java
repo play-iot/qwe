@@ -1,6 +1,6 @@
 package io.zero88.qwe.event.refl;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,19 +17,18 @@ import io.github.classgraph.TypeParameter;
 import io.github.classgraph.TypeSignature;
 import io.github.classgraph.TypeVariableSignature;
 import io.vertx.core.Future;
+import io.zero88.qwe.event.EBContext;
+import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
-import io.zero88.qwe.event.EventContractor.Param;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.exceptions.ConflictException;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.UnsupportedException;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class EventAnnotationProcessorImpl implements EventAnnotationProcessor {
@@ -61,11 +60,11 @@ public class EventAnnotationProcessorImpl implements EventAnnotationProcessor {
     }
 
     protected boolean filterMethodByAction(MethodInfo methodInfo, EventAction action) {
-        final AnnotationInfo annotationInfo = methodInfo.getAnnotationInfo(EventContractor.class.getName());
+        final AnnotationInfo annotationInfo = methodInfo.getAnnotationInfo(EBContract.class.getName());
         if (annotationInfo == null) {
             return false;
         }
-        EventContractor contractor = (EventContractor) annotationInfo.loadClassAndInstantiate();
+        EBContract contractor = (EBContract) annotationInfo.loadClassAndInstantiate();
         return Arrays.stream(contractor.action()).anyMatch(a -> a.equals(action.action()));
     }
 
@@ -81,16 +80,16 @@ public class EventAnnotationProcessorImpl implements EventAnnotationProcessor {
         }
         return Arrays.stream(params)
                      .map(param -> new MethodParam(lookupParamName(param),
-                                                   loadClass(param.getTypeSignatureOrTypeDescriptor()), false))
+                                                   loadClass(param.getTypeSignatureOrTypeDescriptor()),
+                                                   Objects.nonNull(getAnnotation(param, EBContext.class))))
                      .toArray(MethodParam[]::new);
     }
 
     protected String lookupParamName(MethodParameterInfo param) {
-        final AnnotationInfo annotationInfo = param.getAnnotationInfo(Param.class.getName());
-        if (Objects.isNull(annotationInfo)) {
-            return Optional.ofNullable(param.getName()).orElse("");
-        }
-        return (String) annotationInfo.getParameterValues().getValue("value");
+        final AnnotationInfo annotationInfo = getAnnotation(param, EBParam.class);
+        return Objects.isNull(annotationInfo)
+               ? Optional.ofNullable(param.getName()).orElse("")
+               : (String) annotationInfo.getParameterValues().getValue("value");
     }
 
     protected Class<?> loadClass(TypeSignature signature) {
@@ -128,22 +127,8 @@ public class EventAnnotationProcessorImpl implements EventAnnotationProcessor {
                refSign.getTypeArguments().stream().findFirst().map(s -> isVoid(s.getTypeSignature())).orElse(false)*/;
     }
 
-    @Getter
-    @Accessors(fluent = true)
-    @RequiredArgsConstructor
-    public static class MethodMetaImpl implements MethodMeta {
-
-        private final String declaringClass;
-        private final Method method;
-        private final boolean outputIsVoid;
-        private final boolean outputIsVertxFuture;
-        private final MethodParam[] params;
-
-        @Override
-        public Method toMethod() {
-            return method;
-        }
-
+    private AnnotationInfo getAnnotation(MethodParameterInfo param, Class<? extends Annotation> annotationClass) {
+        return param.getAnnotationInfo(annotationClass.getName());
     }
 
 }
