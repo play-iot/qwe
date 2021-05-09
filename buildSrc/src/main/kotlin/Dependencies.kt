@@ -3,7 +3,7 @@ object UtilLibs {
     object Version {
 
         const val lombok = "1.18.16"
-        const val classgraph = "4.8.98"
+        const val classgraph = "4.8.105"
         const val ip = "5.3.3"
         const val quartz = "2.3.2"
     }

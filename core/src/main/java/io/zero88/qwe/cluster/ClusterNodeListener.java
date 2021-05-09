@@ -3,10 +3,10 @@ package io.zero88.qwe.cluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventbusClient;
 import io.vertx.core.spi.cluster.NodeListener;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +15,7 @@ public final class ClusterNodeListener implements NodeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(ClusterNodeListener.class);
     private final IClusterDelegate clusterDelegate;
-    private final EventbusClient controller;
+    private final EventBusClient controller;
     private final String listenerAddress;
 
     @Override

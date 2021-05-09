@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import io.github.zero88.exceptions.ErrorCode;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.exceptions.CarlException;
-import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,7 +38,6 @@ public final class EventMessage implements Serializable, JsonData {
     private final EventAction action;
     @Getter
     private final EventAction prevAction;
-    //TODO should replace to DataTransferObject
     private final Map<String, Object> data;
     @JsonIgnore
     private final Class<? extends JsonData> dataClass;
@@ -101,6 +101,10 @@ public final class EventMessage implements Serializable, JsonData {
         return new EventMessage(Status.FAILED, action, prevAction, message);
     }
 
+    public static EventMessage replyError(EventAction action, @NonNull Throwable throwable) {
+        return new EventMessage(Status.FAILED, EventAction.REPLY, action, ErrorMessage.parse(throwable));
+    }
+
     public static EventMessage initial(EventAction action) {
         return new EventMessage(Status.INITIAL, action);
     }
@@ -123,6 +127,10 @@ public final class EventMessage implements Serializable, JsonData {
 
     public static EventMessage success(EventAction action, EventAction prevAction, JsonObject data) {
         return from(Status.SUCCESS, action, prevAction, data);
+    }
+
+    public static EventMessage replySuccess(EventAction action, JsonObject data) {
+        return from(Status.SUCCESS, EventAction.REPLY, action, data);
     }
 
     public static EventMessage success(EventAction action, JsonData data) {
@@ -173,6 +181,13 @@ public final class EventMessage implements Serializable, JsonData {
             }
             throw e;
         }
+    }
+
+    public static EventMessage convert(Message<Object> message) {
+        if (Objects.isNull(message)) {
+            return EventMessage.initial(EventAction.UNKNOWN);
+        }
+        return tryParse(message.body());
     }
 
     @JsonInclude(Include.NON_EMPTY)

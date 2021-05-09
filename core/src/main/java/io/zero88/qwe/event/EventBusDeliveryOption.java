@@ -8,13 +8,13 @@ import io.vertx.core.shareddata.Shareable;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class EventbusDeliveryOption implements Shareable, Supplier<DeliveryOptions> {
+public final class EventBusDeliveryOption implements Shareable, Supplier<DeliveryOptions> {
 
     private final DeliveryOptions options;
 
     @Override
     public Shareable copy() {
-        return new EventbusDeliveryOption(new DeliveryOptions(this.options));
+        return new EventBusDeliveryOption(new DeliveryOptions(this.options));
     }
 
     @Override

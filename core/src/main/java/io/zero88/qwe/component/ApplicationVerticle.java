@@ -16,8 +16,8 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.CarlConfig;
 import io.zero88.qwe.ConfigProcessor;
 import io.zero88.qwe.IConfig;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.event.EventbusDeliveryOption;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventBusDeliveryOption;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;
 
@@ -35,18 +35,17 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
     @Getter
     protected CarlConfig config;
     @Getter
-    private EventbusClient eventbus;
+    private EventBusClient eventBus;
 
     @Override
     public void start() {
         final CarlConfig fileConfig = computeConfig(config());
         this.config = new ConfigProcessor(vertx).override(fileConfig.toJson(), true, false).orElse(fileConfig);
-        final EventbusDeliveryOption option = new EventbusDeliveryOption(
-            this.config.getSystemConfig().getEventBusConfig().getDeliveryOptions());
-        this.eventbus = EventbusClient.create(this.vertx, option.get());
-        this.registerEventbus(eventbus);
-        this.addData(SharedDataLocalProxy.EVENTBUS_OPTION, option);
+        this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION, new EventBusDeliveryOption(
+            this.config.getSystemConfig().getEventBusConfig().getDeliveryOptions()));
         this.addData(SharedDataLocalProxy.APP_DATADIR, this.config.getDataDir().toAbsolutePath().toString());
+        this.eventBus = EventBusClient.create(sharedData());
+        this.registerEventBus(eventBus);
     }
 
     @Override
@@ -61,7 +60,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
     }
 
     @Override
-    public void registerEventbus(EventbusClient eventClient) { }
+    public void registerEventBus(EventBusClient eventBus) { }
 
     @Override
     public final <T extends Component> Application addProvider(ComponentProvider<T> provider) {

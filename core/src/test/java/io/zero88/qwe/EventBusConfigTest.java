@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.CarlConfig.SystemConfig.EventBusConfig;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.http.ClientAuth;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
-import io.zero88.qwe.IConfig;
+import io.zero88.qwe.CarlConfig.SystemConfig.EventBusConfig;
 
-public class EventbusConfigTest {
+public class EventBusConfigTest {
 
     @Test
     public void test_default() throws JSONException {
@@ -37,8 +36,8 @@ public class EventbusConfigTest {
         System.out.println("DEFAULT: " + config.toJson().encode());
         System.out.println("====================");
         EventBusConfig from = IConfig.from(
-            "{\"clientAuth\":\"REQUIRED\"," + "\"ssl\":true,\"keyStoreOptions\":{\"path" + "\":\"ebks.jks\"," +
-            "\"password\":\"io.github.zero88EventBus\"}," + "\"trustStoreOptions\":{\"path" + "\":\"ebks.jks\"," +
+            "{\"clientAuth\":\"REQUIRED\",\"ssl\":true,\"keyStoreOptions\":{\"path\":\"ebks.jks\"," +
+            "\"password\":\"io.github.zero88EventBus\"},\"trustStoreOptions\":{\"path\":\"ebks.jks\"," +
             "\"password\":\"io.github.zero88EventBus\"}}", EventBusConfig.class);
         System.out.println("FROM: " + from.toJson().encode());
         JSONAssert.assertEquals(from.toJson().encode(), config.toJson().encode(), JSONCompareMode.STRICT);

@@ -1,6 +1,6 @@
 package io.zero88.qwe.component;
 
-import io.zero88.qwe.event.EventbusClient;
+import io.zero88.qwe.event.EventBusClient;
 import io.vertx.core.Vertx;
 import io.vertx.core.shareddata.LocalMap;
 
@@ -10,9 +10,9 @@ public interface SharedDataLocalProxy extends HasSharedKey {
     /**
      * Data key for EventBus delivery option
      *
-     * @see EventbusClient
+     * @see EventBusClient
      */
-    String EVENTBUS_OPTION = "EVENTBUS_OPTION";
+    String EVENTBUS_DELIVERY_OPTION = "EVENTBUS_OPTION";
     String APP_DATADIR = "APP_DATADIR";
 
     Vertx getVertx();

@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Builder(builderClassName = "Builder")
 @JsonDeserialize(builder = ErrorData.Builder.class)
-public class ErrorData implements JsonData {
+public final class ErrorData implements JsonData {
 
     @NonNull
     private final ErrorMessage error;
@@ -31,7 +31,7 @@ public class ErrorData implements JsonData {
         private Throwable throwable;
 
         public ErrorData build() {
-            final ErrorMessage err = Objects.nonNull(error) ? error : ErrorMessage.parse(throwable);
+            final ErrorMessage err = Objects.nonNull(throwable) ? ErrorMessage.parse(throwable) : error;
             return new ErrorData(err, extraInfo);
         }
 

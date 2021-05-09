@@ -3,20 +3,26 @@ package io.zero88.qwe.file.converter;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.CarlConverter;
 
 import lombok.NonNull;
 
-public interface BufferConverter<T> {
+public interface BufferConverter<D> extends CarlConverter<Buffer, D> {
 
-    @NonNull Class<T> dataClass();
+    D from(@NonNull Buffer buffer);
 
-    T from(@NonNull Buffer buffer);
+    Buffer to(@NonNull D data);
 
-    Buffer to(@NonNull T data);
+    @Override
+    default Class<Buffer> fromClass() {
+        return Buffer.class;
+    }
+
+    @NonNull Class<D> toClass();
 
     BufferConverter<Buffer> ITSELF = new BufferConverter<Buffer>() {
         @Override
-        public @NonNull Class<Buffer> dataClass() {
+        public @NonNull Class<Buffer> toClass() {
             return Buffer.class;
         }
 
@@ -33,7 +39,7 @@ public interface BufferConverter<T> {
 
     BufferConverter<JsonObject> JSON_OBJECT_CONVERTER = new BufferConverter<JsonObject>() {
         @Override
-        public @NonNull Class<JsonObject> dataClass() {
+        public @NonNull Class<JsonObject> toClass() {
             return JsonObject.class;
         }
 
@@ -50,7 +56,7 @@ public interface BufferConverter<T> {
 
     BufferConverter<JsonArray> JSON_ARRAY_CONVERTER = new BufferConverter<JsonArray>() {
         @Override
-        public @NonNull Class<JsonArray> dataClass() {
+        public @NonNull Class<JsonArray> toClass() {
             return JsonArray.class;
         }
 

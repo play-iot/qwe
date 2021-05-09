@@ -29,6 +29,8 @@ public class EventAction extends AbstractEnumType implements EnumType, Serializa
     public static final EventAction GET_ONE = new EventAction("GET_ONE");
     public static final EventAction GET_LIST = new EventAction("GET_LIST");
     public static final EventAction CREATE_OR_UPDATE = new EventAction("CREATE_OR_UPDATE");
+    public static final EventAction ACK = new EventAction("ACK");
+    public static final EventAction REPLY = new EventAction("REPLY");
     public static final EventAction RETURN = new EventAction("RETURN");
     public static final EventAction MIGRATE = new EventAction("MIGRATE");
     public static final EventAction UNKNOWN = new EventAction("UNKNOWN");

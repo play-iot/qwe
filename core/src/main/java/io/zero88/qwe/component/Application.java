@@ -1,11 +1,10 @@
 package io.zero88.qwe.component;
 
-import io.zero88.qwe.CarlConfig;
-import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.event.EventModel;
-import io.zero88.qwe.event.EventbusClient;
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
+import io.zero88.qwe.CarlConfig;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventListener;
 
 import lombok.NonNull;
 
@@ -35,12 +34,11 @@ public interface Application extends HasConfig<CarlConfig>, HasSharedKey, HasSha
     /**
      * Register eventbus consumer
      *
-     * @param eventClient EventController
-     * @see EventbusClient#register(EventModel, EventListener)
-     * @see EventbusClient#register(String, EventListener)
-     * @see EventbusClient#register(String, boolean, EventListener)
+     * @param eventBus event bus client
+     * @see EventBusClient#register(String, EventListener)
+     * @see EventBusClient#register(String, boolean, EventListener)
      */
-    void registerEventbus(EventbusClient eventClient);
+    void registerEventBus(EventBusClient eventBus);
 
     /**
      * Add component provider to startup

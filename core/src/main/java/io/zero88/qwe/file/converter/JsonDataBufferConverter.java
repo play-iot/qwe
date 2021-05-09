@@ -12,13 +12,13 @@ public class JsonDataBufferConverter<T extends JsonData> implements BufferConver
     private final Class<T> clazz;
 
     @Override
-    public @NonNull Class<T> dataClass() {
+    public @NonNull Class<T> toClass() {
         return this.clazz;
     }
 
     @Override
     public T from(@NonNull Buffer buffer) {
-        return JsonData.from(JSON_OBJECT_CONVERTER.from(buffer), dataClass());
+        return JsonData.from(JSON_OBJECT_CONVERTER.from(buffer), toClass());
     }
 
     @Override
