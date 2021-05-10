@@ -63,8 +63,8 @@ public class CarlExceptionConverterTest {
 
     @Test
     public void test_with_code_without_cause() {
-        CarlException t = converter.apply(new CarlException(ErrorCode.EVENT_ERROR, "1"));
-        Assertions.assertEquals(ErrorCode.EVENT_ERROR, t.errorCode());
+        CarlException t = converter.apply(new CarlException(ErrorCode.SERVICE_ERROR, "1"));
+        Assertions.assertEquals(ErrorCode.SERVICE_ERROR, t.errorCode());
         Assertions.assertEquals("1", t.getMessage());
         Assertions.assertNull(t.getCause());
     }
@@ -72,9 +72,8 @@ public class CarlExceptionConverterTest {
     @Test
     public void test_with_code_with_other_cause_no_message() {
         Assertions.assertThrows(RuntimeException.class, () -> {
-            CarlException t = converter.apply(
-                new CarlException(ErrorCode.EVENT_ERROR, "1", new RuntimeException()));
-            Assertions.assertEquals(ErrorCode.EVENT_ERROR, t.errorCode());
+            CarlException t = converter.apply(new CarlException(ErrorCode.SERVICE_ERROR, "1", new RuntimeException()));
+            Assertions.assertEquals(ErrorCode.SERVICE_ERROR, t.errorCode());
             Assertions.assertEquals("1", t.getMessage());
             throw t.getCause();
         });
@@ -84,8 +83,8 @@ public class CarlExceptionConverterTest {
     public void test_with_code_with_other_cause_has_message() {
         Assertions.assertThrows(RuntimeException.class, () -> {
             CarlException t = converter.apply(
-                new CarlException(ErrorCode.NOT_FOUND, "abc", new RuntimeException("xyz")));
-            Assertions.assertEquals(ErrorCode.NOT_FOUND, t.errorCode());
+                new CarlException(ErrorCode.DATA_NOT_FOUND, "abc", new RuntimeException("xyz")));
+            Assertions.assertEquals(ErrorCode.DATA_NOT_FOUND, t.errorCode());
             Assertions.assertEquals("abc | Cause: xyz", t.getMessage());
             throw t.getCause();
         });
@@ -95,7 +94,7 @@ public class CarlExceptionConverterTest {
     public void test_with_code_with_carl_cause() {
         Assertions.assertThrows(CarlException.class, () -> {
             CarlException t = converter.apply(new SecurityException("abc", new EngineException("xyz")));
-            Assertions.assertEquals(SecurityException.CODE, t.errorCode());
+            Assertions.assertEquals(ErrorCode.SECURITY_ERROR, t.errorCode());
             Assertions.assertEquals("abc | Cause: xyz - Error Code: ENGINE_ERROR", t.getMessage());
             throw t.getCause();
         });
@@ -105,11 +104,11 @@ public class CarlExceptionConverterTest {
     public void test_with_code_with_hidden_cause() {
         Assertions.assertThrows(HiddenException.class, () -> {
             CarlException t = converter.apply(
-                new ServiceException("abc", new HiddenException(ErrorCode.EVENT_ERROR, "xyz", null)));
+                new ServiceException("abc", new HiddenException(ErrorCode.SERVICE_ERROR, "xyz", null)));
             Assertions.assertEquals(ErrorCode.SERVICE_ERROR, t.errorCode());
             Assertions.assertEquals("abc", t.getMessage());
             HiddenException cause = (HiddenException) t.getCause();
-            Assertions.assertEquals(ErrorCode.EVENT_ERROR, cause.errorCode());
+            Assertions.assertEquals(ErrorCode.SERVICE_ERROR, cause.errorCode());
             Assertions.assertEquals("xyz", cause.getMessage());
             throw t.getCause();
         });
@@ -128,8 +127,7 @@ public class CarlExceptionConverterTest {
     @Test
     public void test_invalid_argument_exception_no_message() {
         Assertions.assertThrows(IllegalStateException.class, () -> {
-            CarlException t = converter.apply(
-                new IllegalArgumentException("xx", new IllegalStateException("abc")));
+            CarlException t = converter.apply(new IllegalArgumentException("xx", new IllegalStateException("abc")));
             Assertions.assertEquals(ErrorCode.INVALID_ARGUMENT, t.errorCode());
             Assertions.assertEquals("xx", t.getMessage());
             throw t.getCause();

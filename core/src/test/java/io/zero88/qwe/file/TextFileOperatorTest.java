@@ -21,7 +21,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.file.converter.BufferConverter;
 import io.zero88.qwe.utils.Configs;
 
@@ -82,7 +82,7 @@ class TextFileOperatorTest {
               .onSuccess(b -> testContext.failNow("Expect error in test"))
               .onFailure(err -> testContext.verify(() -> {
                   Assertions.assertTrue(err instanceof FileException);
-                  Assertions.assertTrue(err.getCause() instanceof NotFoundException);
+                  Assertions.assertTrue(err.getCause() instanceof DataNotFoundException);
                   Assertions.assertEquals("Not found file '" + path + "'", err.getCause().getMessage());
                   Assertions.assertEquals("Not found file '" + path + "'", err.getMessage());
                   testContext.completeNow();

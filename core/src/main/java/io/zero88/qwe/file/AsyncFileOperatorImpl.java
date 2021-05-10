@@ -12,10 +12,10 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.file.FileSystemException;
-import io.zero88.qwe.exceptions.AlreadyExistException;
+import io.zero88.qwe.exceptions.DataAlreadyExistException;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.exceptions.ConflictException;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.exceptions.SecurityException.InsufficientPermissionError;
 
 import lombok.Getter;
@@ -84,7 +84,7 @@ class AsyncFileOperatorImpl implements AsyncFileOperator {
                 return toFE(notFound(path, cause));
             }
             if (cause instanceof FileAlreadyExistsException) {
-                return toFE(new AlreadyExistException("Already existed file '" + path + "'", cause));
+                return toFE(new DataAlreadyExistException("Already existed file '" + path + "'", cause));
             }
             if (Optional.ofNullable(cause)
                         .flatMap(c -> Optional.ofNullable(c.getMessage()))
@@ -111,8 +111,8 @@ class AsyncFileOperatorImpl implements AsyncFileOperator {
         return Future.failedFuture(new FileException(error, t));
     }
 
-    protected static NotFoundException notFound(Path p, Throwable t) {
-        return new NotFoundException("Not found file '" + p + "'", t);
+    protected static DataNotFoundException notFound(Path p, Throwable t) {
+        return new DataNotFoundException("Not found file '" + p + "'", t);
     }
 
 }

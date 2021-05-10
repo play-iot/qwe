@@ -86,6 +86,7 @@ public interface EnumType extends JsonData, Serializable {
         final String t = Strings.optimizeMultipleSpace(type);
         final String st = uppercase ? t.toUpperCase(Locale.ENGLISH) : t;
         return ReflectionField.streamConstants(clazz)
+                              .filter(Objects::nonNull)
                               .filter(et -> et.type().equals(st) ||
                                             Objects.nonNull(et.alternatives()) && et.alternatives().contains(st))
                               .findAny()

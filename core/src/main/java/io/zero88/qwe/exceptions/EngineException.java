@@ -5,10 +5,8 @@ package io.zero88.qwe.exceptions;
  */
 public class EngineException extends CarlException {
 
-    public static final ErrorCode CODE = ErrorCode.parse("ENGINE_ERROR");
-
     public EngineException(String message, Throwable e) {
-        super(CODE, message, e);
+        super(ErrorCode.ENGINE_ERROR, message, e);
     }
 
     public EngineException(String message) { this(message, null); }

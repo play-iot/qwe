@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.dto.ErrorMessage;
 import io.reactivex.exceptions.CompositeException;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.dto.ErrorMessage;
 
 public class ErrorMessageTest {
 
@@ -28,7 +28,7 @@ public class ErrorMessageTest {
     @Test
     public void test_composite_exception_include_carl_exception_not_last() {
         final ErrorMessage message = ErrorMessage.parse(
-            new CompositeException(new NotFoundException("xxx"), new IllegalStateException("abc")));
+            new CompositeException(new DataNotFoundException("xxx"), new IllegalStateException("abc")));
         Assertions.assertEquals(io.github.zero88.exceptions.ErrorCode.UNKNOWN_ERROR, message.getCode());
         Assertions.assertEquals("UNKNOWN_ERROR | Cause: abc", message.getMessage());
     }
@@ -36,8 +36,8 @@ public class ErrorMessageTest {
     @Test
     public void test_composite_exception_include_carl_exception_at_last() {
         final ErrorMessage message = ErrorMessage.parse(
-            new CompositeException(new RuntimeException("1"), new NotFoundException("xxx")));
-        Assertions.assertEquals(NotFoundException.CODE, message.getCode());
+            new CompositeException(new RuntimeException("1"), new DataNotFoundException("xxx")));
+        Assertions.assertEquals(ErrorCode.DATA_NOT_FOUND, message.getCode());
         Assertions.assertEquals("xxx", message.getMessage());
     }
 

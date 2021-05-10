@@ -1,14 +1,9 @@
-package io.zero88.qwe.micro;
-
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.ServiceException;
+package io.zero88.qwe.exceptions;
 
 public final class ServiceNotFoundException extends ServiceException {
 
-    public static final ErrorCode CODE = ErrorCode.parse("SERVICE_NOT_FOUND");
-
     public ServiceNotFoundException(String message, Throwable e) {
-        super(CODE, message, e);
+        super(ErrorCode.SERVICE_NOT_FOUND, message, e);
     }
 
     public ServiceNotFoundException(String message) {
@@ -16,7 +11,7 @@ public final class ServiceNotFoundException extends ServiceException {
     }
 
     public ServiceNotFoundException(Throwable e) {
-        this(null, e);
+        this("Service not found", e);
     }
 
 }

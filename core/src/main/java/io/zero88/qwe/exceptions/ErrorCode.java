@@ -5,6 +5,7 @@ import java.util.Objects;
 import io.zero88.qwe.dto.EnumType;
 import io.zero88.qwe.dto.EnumType.AbstractEnumType;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Getter;
@@ -13,12 +14,30 @@ import lombok.NonNull;
 @Getter
 public final class ErrorCode extends AbstractEnumType implements io.github.zero88.exceptions.ErrorCode, EnumType {
 
-    public static final ErrorCode DESIRED_ERROR = new ErrorCode("DESIRED_ERROR");
-    public static final ErrorCode ALREADY_EXIST = new ErrorCode("ALREADY_EXIST");
-    public static final ErrorCode NOT_FOUND = new ErrorCode("NOT_FOUND");
-    public static final ErrorCode SERVICE_ERROR = new ErrorCode("SERVICE_ERROR");
-    public static final ErrorCode EVENT_ERROR = new ErrorCode("EVENT_ERROR");
+    public static final ErrorCode DESIRED_ERROR = parse("DESIRED_ERROR");
+    public static final ErrorCode CONFLICT_ERROR = parse("CONFLICT_ERROR");
 
+    public static final ErrorCode DATA_ALREADY_EXIST = parse("DATA_ALREADY_EXIST");
+    public static final ErrorCode DATA_BEING_USED = parse("DATA_BEING_USED");
+    public static final ErrorCode DATA_NOT_FOUND = parse("DATA_NOT_FOUND");
+
+    public static final ErrorCode ENGINE_ERROR = parse("ENGINE_ERROR");
+
+    public static final ErrorCode NETWORK_ERROR = parse("NETWORK_ERROR");
+
+    public static final ErrorCode INITIALIZER_ERROR = parse("INITIALIZER_ERROR");
+
+    public static final ErrorCode SERVICE_ERROR = parse("SERVICE_ERROR");
+    public static final ErrorCode SERVICE_UNAVAILABLE = parse("SERVICE_UNAVAILABLE");
+    public static final ErrorCode SERVICE_NOT_FOUND = parse("SERVICE_NOT_FOUND");
+
+    public static final ErrorCode SECURITY_ERROR = parse("SECURITY_ERROR");
+    public static final ErrorCode AUTHENTICATION_ERROR = parse("AUTHENTICATION_ERROR");
+    public static final ErrorCode INSUFFICIENT_PERMISSION_ERROR = parse("INSUFFICIENT_PERMISSION_ERROR");
+
+    public static final ErrorCode TIMEOUT_ERROR = parse("TIMEOUT_ERROR");
+
+    @JsonCreator
     private ErrorCode(String code) {
         super(code);
     }

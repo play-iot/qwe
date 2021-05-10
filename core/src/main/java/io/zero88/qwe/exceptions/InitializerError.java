@@ -2,10 +2,8 @@ package io.zero88.qwe.exceptions;
 
 public class InitializerError extends CarlException {
 
-    public static final ErrorCode CODE = ErrorCode.parse("INITIALIZER_ERROR");
-
     public InitializerError(String message, Throwable e) {
-        super(CODE, message, e);
+        super(ErrorCode.INITIALIZER_ERROR, message, e);
     }
 
     public InitializerError(String message) { this(message, null);}
