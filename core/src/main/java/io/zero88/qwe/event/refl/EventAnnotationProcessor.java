@@ -2,6 +2,8 @@ package io.zero88.qwe.event.refl;
 
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.exceptions.ImplementationError;
+import io.zero88.qwe.exceptions.UnsupportedException;
 
 import lombok.NonNull;
 
@@ -20,6 +22,16 @@ public interface EventAnnotationProcessor {
         return new EventAnnotationProcessorImpl(ignorePackages);
     }
 
-    MethodMeta scan(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action);
+    /**
+     * Lookup method in listener by given action
+     *
+     * @param listenerClass event listener class
+     * @param action        event action
+     * @return method metadata
+     * @throws UnsupportedException if not found action in listener
+     * @throws ImplementationError  if event action is bind more than one method
+     * @see MethodMeta
+     */
+    MethodMeta lookup(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action);
 
 }

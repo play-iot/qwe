@@ -3,8 +3,6 @@ package io.zero88.qwe.event;
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.eventbus.Message;
-import io.zero88.qwe.dto.ErrorMessage;
-import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,10 +36,8 @@ class EventReplyHandlerImpl implements EventReplyHandler {
     }
 
     public EventMessage otherwise(Throwable err) {
-        String msg = Strings.format("No reply from action [{0}] from [{1}]", action, address);
-        ServiceUnavailable ex = new ServiceUnavailable("Service unavailable",
-                                                       new HiddenException(ErrorCode.EVENT_ERROR, msg, err));
-        return EventMessage.error(EventAction.REPLY, action, ErrorMessage.parse(ex));
+        final String msg = Strings.format("No reply from action [{0}] from [{1}]", action, address);
+        return EventMessage.replyError(action, new ServiceUnavailable(new HiddenException(msg, err)));
     }
 
 }

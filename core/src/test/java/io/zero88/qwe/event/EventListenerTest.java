@@ -11,9 +11,12 @@ import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.mock.MockEventListener;
+import io.zero88.qwe.event.mock.MockEventListener.MockEventFailed;
 import io.zero88.qwe.event.mock.MockEventListener.MockFuture;
 import io.zero88.qwe.event.mock.MockEventListener.MockReceiveSendOrPublish;
 import io.zero88.qwe.event.mock.MockEventListener.MockWithVariousParams;
+import io.zero88.qwe.exceptions.ErrorCode;
 
 @ExtendWith(VertxExtension.class)
 public class EventListenerTest {
@@ -26,7 +29,21 @@ public class EventListenerTest {
     }
 
     @Test
-    void test_request(VertxTestContext testContext) {
+    void test_request_error(VertxTestContext testContext) {
+        final String address = "test.request";
+        final EventAction err = EventAction.parse("ERR");
+        eventBusClient.register(address, new MockEventFailed());
+        eventBusClient.request(address, EventMessage.initial(err)).onSuccess(msg -> testContext.verify(() -> {
+            Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+            Assertions.assertEquals(err, msg.getPrevAction());
+            Assertions.assertTrue(msg.isError());
+            Assertions.assertEquals(ErrorCode.INVALID_ARGUMENT, msg.getError().getCode());
+            testContext.completeNow();
+        }));
+    }
+
+    @Test
+    void test_request_success(VertxTestContext testContext) {
         final String address = "test.request";
         eventBusClient.register(address, new MockWithVariousParams());
         eventBusClient.request(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", "123")))
@@ -54,12 +71,11 @@ public class EventListenerTest {
     @Test
     void test_request_then_async_resp(VertxTestContext testContext) {
         final String address = "test.request";
-        Checkpoint cp = testContext.checkpoint();
-        eventBusClient.register(address, new MockFuture(address, cp));
-        eventBusClient.request(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", "123")))
+        eventBusClient.register(address, new MockFuture());
+        eventBusClient.request(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", 111)))
                       .onSuccess(msg -> testContext.verify(() -> {
                           Assertions.assertEquals(EventAction.REPLY, msg.getAction());
-                          Assertions.assertEquals(new JsonObject().put("data", 123), msg.getData());
+                          Assertions.assertEquals(new JsonObject().put("resp", 111), msg.getData());
                           testContext.completeNow();
                       }));
     }
@@ -67,11 +83,24 @@ public class EventListenerTest {
     @Test
     void test_request_then_async_void_resp(VertxTestContext testContext) {
         final String address = "test.request";
-        Checkpoint cp = testContext.checkpoint();
-        eventBusClient.register(address, new MockFuture(address, cp));
+        eventBusClient.register(address, new MockFuture());
         eventBusClient.request(address, EventMessage.initial(EventAction.CREATE, new JsonObject().put("id", 123)))
                       .onSuccess(msg -> testContext.verify(() -> {
                           Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+                          testContext.completeNow();
+                      }));
+    }
+
+    @Test
+    void test_request_then_failed_future(VertxTestContext testContext) {
+        final String address = "test.request";
+        eventBusClient.register(address, new MockFuture());
+        eventBusClient.request(address, EventMessage.initial(MockEventListener.ERROR_EVENT, new JsonObject().put("id", 1)))
+                      .onSuccess(msg -> testContext.verify(() -> {
+                          Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+                          Assertions.assertEquals(MockEventListener.ERROR_EVENT, msg.getPrevAction());
+                          Assertions.assertTrue(msg.isError());
+                          Assertions.assertEquals(ErrorCode.TIMEOUT_ERROR, msg.getError().getCode());
                           testContext.completeNow();
                       }));
     }

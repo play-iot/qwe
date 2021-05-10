@@ -13,6 +13,8 @@ import io.zero88.qwe.dto.JsonData;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
@@ -35,6 +37,7 @@ public final class RequestFilter extends JsonObject implements JsonData {
      * @param filter the filter
      * @since 1.0.0
      */
+    @JsonCreator
     public RequestFilter(JsonObject filter) {
         super(filter.copy().getMap());
     }

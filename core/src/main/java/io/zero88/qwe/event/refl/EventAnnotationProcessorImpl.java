@@ -22,7 +22,7 @@ import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.exceptions.ConflictException;
+import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.UnsupportedException;
 
@@ -36,7 +36,7 @@ public class EventAnnotationProcessorImpl implements EventAnnotationProcessor {
     private final String[] ignorePackages;
 
     @Override
-    public MethodMeta scan(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action) {
+    public MethodMeta lookup(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action) {
         try (ScanResult scanResult = new ClassGraph().enableClassInfo()
                                                      .enableAnnotationInfo()
                                                      .enableMethodInfo()
@@ -49,7 +49,7 @@ public class EventAnnotationProcessorImpl implements EventAnnotationProcessor {
                              .filter(m -> filterMethodByAction(m, action))
                              .reduce((m1, m2) -> {
                                  if (m1.getClassName().equals(m2.getClassName())) {
-                                     throw new ImplementationError(ConflictException.CODE,
+                                     throw new ImplementationError(ErrorCode.CONFLICT_ERROR,
                                                                    "More than one event [" + action + "]");
                                  }
                                  return m1;

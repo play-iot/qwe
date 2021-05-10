@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @RequiredArgsConstructor
-class EventBusClientImpl implements EventBusClient {
+final class EventBusClientImpl implements EventBusClient {
 
     static final Logger LOGGER = LoggerFactory.getLogger(EventBusClient.class);
 

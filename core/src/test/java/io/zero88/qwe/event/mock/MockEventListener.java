@@ -12,11 +12,14 @@ import io.vertx.junit5.Checkpoint;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.event.EBContext;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.exceptions.TimeoutException;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -25,6 +28,9 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 public class MockEventListener implements EventListener {
+
+    public static final EventAction ERROR_EVENT = EventAction.parse("ERR");
+    public static final EventAction PRIMITIVE_EVENT = EventAction.parse("PRIMITIVE");
 
     @EBContract(action = "CREATE")
     public Map<String, String> create(RequestData data) {
@@ -59,6 +65,11 @@ public class MockEventListener implements EventListener {
             return Integer.parseInt(id);
         }
 
+        @EBContract(action = "PRIMITIVE")
+        public long primitive(@EBParam("id") long id) {
+            return id;
+        }
+
         @EBContract(action = "CREATE")
         public RequestData refParam(RequestData data) { return data; }
 
@@ -80,7 +91,7 @@ public class MockEventListener implements EventListener {
     }
 
 
-    public static class MockDuplicateEvent implements EventListener {
+    public static class MockEventFailed implements EventListener {
 
         @EBContract(action = "DUP")
         public Map<String, String> dup1(RequestData data) {
@@ -90,6 +101,11 @@ public class MockEventListener implements EventListener {
         @EBContract(action = "DUP")
         public Map<String, String> dup2(RequestData data) {
             return Collections.singletonMap("key", "duplicate 2");
+        }
+
+        @EBContract(action = "ERR")
+        public void err() {
+            throw new IllegalArgumentException("Exception");
         }
 
     }
@@ -129,21 +145,19 @@ public class MockEventListener implements EventListener {
     @RequiredArgsConstructor
     public static class MockFuture implements EventListener {
 
-        private final String identifier;
-        private final Checkpoint cp;
-
         @EBContract(action = "GET_ONE")
         public Future<JsonObject> receive(@EBParam("id") int id) {
-            cp.flag();
-            System.out.println("[" + identifier + "] receive event");
-            return Future.succeededFuture(new JsonObject().put("id", id).put("identifier", identifier));
+            return Future.succeededFuture(new JsonObject().put("resp", id));
         }
 
         @EBContract(action = "CREATE")
         public Future<Void> voidFuture(@EBParam("id") int id) {
-            cp.flag();
-            System.out.println("[" + identifier + "] receive event");
             return Future.succeededFuture();
+        }
+
+        @EBContract(action = "ERR")
+        public Future<Void> failedFuture(@EBParam("id") int id) {
+            return Future.failedFuture(new TimeoutException("alo"));
         }
 
     }
@@ -152,28 +166,19 @@ public class MockEventListener implements EventListener {
     @RequiredArgsConstructor
     public static class MockWithContext implements EventListener {
 
-        private final String identifier;
-        private final Checkpoint cp;
-
         @EBContract(action = "GET_ONE")
-        public Future<JsonObject> receive(@EBContext Vertx vertx, @EBParam("id") int id) {
-            cp.flag();
-            System.out.println("[" + identifier + "] receive event");
-            return Future.succeededFuture(new JsonObject().put("id", id).put("identifier", identifier));
+        public void receive(@EBContext EventAction action, @EBContext Vertx vertx,
+                            @EBContext SharedDataLocalProxy dataLocalProxy, @EBContext EventBusClient eventBusClient,
+                            RequestData requestData) {
         }
 
-        @EBContract(action = "CREATE")
-        public Future<Void> voidFuture(@EBContext SharedDataLocalProxy sharedDataProxy, @EBParam("id") int id) {
-            cp.flag();
-            System.out.println("[" + identifier + "] receive event");
-            return Future.succeededFuture();
+        @EBContract(action = {"CREATE", "UPDATE"})
+        public void createOrUpdate(@EBContext EventAction action, @EBParam("id") int id) {
         }
 
-        @EBContract(action = "UPDATE")
-        public Future<Void> voidFuture(@EBContext EventAction action, @EBParam("id") int id) {
-            cp.flag();
-            System.out.println("[" + identifier + "] receive event");
-            return Future.succeededFuture();
+        @EBContract(action = "PATCH")
+        public void mix(@EBParam("filter") RequestFilter filter, @EBContext EventAction action,
+                        @EBContext EventBusClient eventBusClient, @EBParam("body") JsonObject body) {
         }
 
     }
