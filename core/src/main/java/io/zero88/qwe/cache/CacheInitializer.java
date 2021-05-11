@@ -2,7 +2,7 @@ package io.zero88.qwe.cache;
 
 import java.util.function.Supplier;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 
 import lombok.NonNull;
 
