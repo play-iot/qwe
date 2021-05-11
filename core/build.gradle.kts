@@ -16,6 +16,7 @@ dependencies {
 
     compileOnly(VertxLibs.codegen)
     compileOnly(VertxLibs.rx2)
+    compileOnly(UtilLibs.jetbrainsAnnotations)
     compileOnlyApi(JacksonLibs.annotations)
     annotationProcessor(VertxLibs.codegen)
 

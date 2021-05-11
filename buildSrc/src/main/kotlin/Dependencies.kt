@@ -6,10 +6,12 @@ object UtilLibs {
         const val classgraph = "4.8.105"
         const val ip = "5.3.3"
         const val quartz = "2.3.2"
+        const val jetbrainsAnnotations = "20.1.0"
     }
 
     const val lombok = "org.projectlombok:lombok:${Version.lombok}"
     const val classgraph = "io.github.classgraph:classgraph:${Version.classgraph}"
+    const val jetbrainsAnnotations = "org.jetbrains:annotations:${Version.jetbrainsAnnotations}"
     const val ip = "com.github.seancfoley:ipaddress:${Version.ip}"
     const val quartz = "org.quartz-scheduler:quartz:${Version.quartz}"
 }
