@@ -1,9 +1,9 @@
 package io.zero88.qwe.storage.json;
 
-import io.zero88.qwe.component.ComponentContext;
-import io.zero88.qwe.component.ComponentVerticle;
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventbusClient;
+import io.zero88.qwe.ComponentContext;
+import io.zero88.qwe.ComponentVerticle;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.storage.json.service.JsonStorageService;
 
 import lombok.NonNull;
@@ -28,9 +28,9 @@ public final class JsonStorageVerticle extends ComponentVerticle<StorageConfig, 
     public void start() {
         super.start();
         config.makeFullPath((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR));
-        EventbusClient.create(sharedData())
+        EventBusClient.create(sharedData())
                       .register(this.config.getServiceAddress(),
-                                JsonStorageService.create(sharedData(), config, config.serviceHandlerClass()));
+                                JsonStorageService.create(config, config.serviceHandlerClass()));
     }
 
 }

@@ -129,7 +129,8 @@ public interface AsyncFileOperator {
             if (isExist) {
                 return fs().props(path.toString()).map(props -> FileVerifiedOutput.existed(path, props)).map(validator);
             }
-            return Future.succeededFuture(FileVerifiedOutput.notExisted(path));
+            return fs().exists(path.getParent().toString())
+                       .map(parentExist -> FileVerifiedOutput.notExisted(parentExist, path));
         });
     }
 

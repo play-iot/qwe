@@ -4,12 +4,13 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
-import io.zero88.qwe.dto.JsonData;
 import io.github.zero88.utils.DateTimes;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.pointer.JsonPointer;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.file.FileOption;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -37,6 +38,7 @@ public final class JsonInput implements JsonData {
     private final Object keyToRemove;
     @Default
     private final boolean skipRemovedKeyInOutput = false;
+    private final FileOption fileOption;
 
     public @NonNull JsonPointer pointer() {
         return Strings.isBlank(pointer) ? JsonPointer.create() : JsonPointer.from(pointer);

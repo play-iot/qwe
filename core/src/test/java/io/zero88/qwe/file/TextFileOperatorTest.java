@@ -21,7 +21,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.file.converter.BufferConverter;
 import io.zero88.qwe.utils.Configs;
 
@@ -42,7 +41,7 @@ class TextFileOperatorTest {
         helper.touch(f, option)
               .onSuccess(b -> testContext.failNow("Expect error in test"))
               .onFailure(err -> testContext.verify(() -> {
-                  Assertions.assertTrue(err instanceof FileException);
+                  Assertions.assertTrue(err instanceof FileOptionException);
                   Assertions.assertEquals("Disallow creating file. Need to enable an auto-create option",
                                           err.getMessage());
                   testContext.completeNow();
@@ -59,7 +58,7 @@ class TextFileOperatorTest {
               .onSuccess(b -> testContext.failNow("Expect error in test"))
               .onFailure(err -> testContext.verify(() -> {
                   Assertions.assertTrue(err instanceof FileException);
-                  Assertions.assertEquals("One of item in path '" + d + "' is not a directory", err.getMessage());
+                  Assertions.assertEquals("One of item in path [" + d + "] is not a directory", err.getMessage());
                   testContext.completeNow();
               }));
     }
@@ -70,7 +69,7 @@ class TextFileOperatorTest {
               .onSuccess(b -> testContext.failNow("Expect error in test"))
               .onFailure(err -> testContext.verify(() -> {
                   Assertions.assertTrue(err instanceof FileException);
-                  Assertions.assertEquals("Given path '" + tempDir + "' is not a file", err.getMessage());
+                  Assertions.assertEquals("Given path [" + tempDir + "] is not a file", err.getMessage());
                   testContext.completeNow();
               }));
     }
@@ -81,10 +80,8 @@ class TextFileOperatorTest {
         helper.read(path, FileOption.create())
               .onSuccess(b -> testContext.failNow("Expect error in test"))
               .onFailure(err -> testContext.verify(() -> {
-                  Assertions.assertTrue(err instanceof FileException);
-                  Assertions.assertTrue(err.getCause() instanceof DataNotFoundException);
-                  Assertions.assertEquals("Not found file '" + path + "'", err.getCause().getMessage());
-                  Assertions.assertEquals("Not found file '" + path + "'", err.getMessage());
+                  Assertions.assertTrue(err instanceof FileNotFoundError);
+                  Assertions.assertEquals("Not found file [" + path + "]", err.getMessage());
                   testContext.completeNow();
               }));
     }
@@ -124,8 +121,8 @@ class TextFileOperatorTest {
               .flatMap(b -> helper.touch(a1, option))
               .onSuccess(b -> testContext.failNow("Expect error in test"))
               .onFailure(err -> testContext.verify(() -> {
-                  Assertions.assertTrue(err instanceof FileException);
-                  Assertions.assertEquals("Already existed file '" + a1 + "'", err.getMessage());
+                  Assertions.assertTrue(err instanceof FileAlreadyExistError);
+                  Assertions.assertEquals("Already existed file [" + a1 + "]", err.getMessage());
                   testContext.completeNow();
               }));
     }
@@ -139,7 +136,7 @@ class TextFileOperatorTest {
               .flatMap(b -> helper.write(a1, option, new JsonObject().put("1", "2"), converter))
               .onSuccess(b -> testContext.failNow("Expect error in test"))
               .onFailure(err -> testContext.verify(() -> {
-                  Assertions.assertTrue(err instanceof FileException);
+                  Assertions.assertTrue(err instanceof FileOptionException);
                   Assertions.assertEquals("Disallow overwriting file. Need to enable an overwrite option",
                                           err.getMessage());
                   testContext.completeNow();

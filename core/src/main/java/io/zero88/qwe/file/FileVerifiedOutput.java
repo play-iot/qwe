@@ -15,11 +15,13 @@ public class FileVerifiedOutput {
 
     private final Path path;
     @Default
+    private final boolean parentExisted = true;
+    @Default
     private final boolean existed = true;
     private final FileProps props;
 
-    public static FileVerifiedOutput notExisted(@NonNull Path path) {
-        return FileVerifiedOutput.builder().existed(false).path(path).build();
+    public static FileVerifiedOutput notExisted(boolean parentExist, @NonNull Path path) {
+        return FileVerifiedOutput.builder().parentExisted(parentExist).existed(false).path(path).build();
     }
 
     public static FileVerifiedOutput existed(@NonNull Path path, @NonNull FileProps props) {

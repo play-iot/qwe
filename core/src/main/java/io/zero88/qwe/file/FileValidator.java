@@ -15,19 +15,19 @@ public interface FileValidator {
 
     FileValidator MUST_BE_SYMLINK = (path, props) -> {
         if (!props.isSymbolicLink()) {
-            throw new FileException("Given path '" + path + "' is not a symlink");
+            throw new FileException("Given path [" + path + "] is not a symlink");
         }
     };
 
     FileValidator MUST_BE_FILE = (path, props) -> {
         if (!props.isRegularFile()) {
-            throw new FileException("Given path '" + path + "' is not a file");
+            throw new FileException("Given path [" + path + "] is not a file");
         }
     };
 
     FileValidator MUST_BE_FOLDER = (path, props) -> {
         if (!props.isDirectory()) {
-            throw new FileException("Given path '" + path + "' is not a folder");
+            throw new FileException("Given path [" + path + "] is not a folder");
         }
     };
 
@@ -36,7 +36,7 @@ public interface FileValidator {
             return;
         }
         if (size < (props.size() / 1024 / 1024)) {
-            throw new FileException("File: '" + path + "' exceeds " + size + "MB");
+            throw new FileException("File[" + path + "] exceeds " + size + "MB");
         }
     };
 

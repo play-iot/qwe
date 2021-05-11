@@ -12,10 +12,8 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.file.FileSystemException;
-import io.zero88.qwe.exceptions.DataAlreadyExistException;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.exceptions.ConflictException;
-import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.exceptions.SecurityException.InsufficientPermissionError;
 
 import lombok.Getter;
@@ -59,7 +57,7 @@ class AsyncFileOperatorImpl implements AsyncFileOperator {
     @Override
     public Future<Path> touch(@NonNull Path path, @NonNull FileOption option) {
         if (!option.isAutoCreate()) {
-            return toFE(FileOptionException.disallowCreation());
+            return Future.failedFuture(FileOptionException.disallowCreation());
         }
         return this.mkdirs(path.getParent(), option)
                    .flatMap(p -> fs.createFile(path.toString(), option.getFilePerms())
@@ -78,19 +76,19 @@ class AsyncFileOperatorImpl implements AsyncFileOperator {
         if (t instanceof FileSystemException) {
             Throwable cause = t.getCause();
             if (cause instanceof AccessDeniedException) {
-                return toFE(new InsufficientPermissionError("Unable access file '" + path + "'", cause));
+                return toFE(new InsufficientPermissionError("Unable access file [" + path + "]", cause));
             }
             if (cause instanceof NoSuchFileException) {
-                return toFE(notFound(path, cause));
+                return Future.failedFuture(new FileNotFoundError(path, t));
             }
             if (cause instanceof FileAlreadyExistsException) {
-                return toFE(new DataAlreadyExistException("Already existed file '" + path + "'", cause));
+                return Future.failedFuture(new FileAlreadyExistError(path, cause));
             }
             if (Optional.ofNullable(cause)
                         .flatMap(c -> Optional.ofNullable(c.getMessage()))
                         .map(s -> s.contains("Not a directory"))
                         .orElse(false)) {
-                return toFE(new ConflictException("One of item in path '" + path + "' is not a directory"));
+                return toFE(new ConflictException("One of item in path [" + path + "] is not a directory"));
             }
             if (Objects.nonNull(cause)) {
                 return toFE(Strings.fallback(cause.getMessage(), cause.toString()), cause);
@@ -109,10 +107,6 @@ class AsyncFileOperatorImpl implements AsyncFileOperator {
 
     protected final <T> Future<T> toFE(@NonNull String error, Throwable t) {
         return Future.failedFuture(new FileException(error, t));
-    }
-
-    protected static DataNotFoundException notFound(Path p, Throwable t) {
-        return new DataNotFoundException("Not found file '" + p + "'", t);
     }
 
 }

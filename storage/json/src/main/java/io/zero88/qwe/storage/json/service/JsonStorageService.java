@@ -1,30 +1,26 @@
 package io.zero88.qwe.storage.json.service;
 
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.zero88.qwe.component.HasSharedData;
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
-import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.file.ReadableFile;
-import io.zero88.qwe.file.converter.BufferConverter;
-import io.zero88.qwe.storage.json.StorageConfig;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.pointer.JsonPointer;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EBContext;
+import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.file.TextFileOperator;
+import io.zero88.qwe.file.TextFileOperatorImpl;
+import io.zero88.qwe.file.converter.BufferConverter;
+import io.zero88.qwe.storage.json.StorageConfig;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,100 +33,91 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class JsonStorageService implements EventListener, HasSharedData {
+public class JsonStorageService implements EventListener {
 
-    public static <T extends JsonStorageService> T create(@NonNull SharedDataLocalProxy sharedData,
-                                                          @NonNull StorageConfig config, @NonNull Class<T> clazz) {
-        final Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(SharedDataLocalProxy.class, sharedData);
-        inputs.put(StorageConfig.class, config);
-        return ReflectionClass.createObject(clazz, inputs);
+    public static <T extends JsonStorageService> T create(@NonNull StorageConfig config, @NonNull Class<T> clazz) {
+        return ReflectionClass.createObject(clazz, Collections.singletonMap(StorageConfig.class, config));
     }
 
-    private final SharedDataLocalProxy sharedData;
     private final StorageConfig config;
 
-    @Override
-    public @NonNull Collection<EventAction> getAvailableEvents() {
-        return Arrays.asList(EventAction.CREATE_OR_UPDATE, EventAction.REMOVE, EventAction.parse("QUERY"),
-                             EventAction.parse("HAS"));
-    }
-
-    @EventContractor(action = "CREATE_OR_UPDATE", returnType = Single.class)
-    public Single<JsonObject> createOrUpdate(RequestData requestData) {
+    @EBContract(action = "CREATE_OR_UPDATE")
+    public Future<JsonObject> createOrUpdate(@EBContext Vertx vertx, RequestData requestData) {
         final JsonInput ji = parse(requestData);
-        final JsonPointer pointer = ji.pointer();
-        return this.loadJson(ji)
-                   .map(json -> Objects.requireNonNull(pointer.writeJson(json, ji.getDataToInsert(), true),
-                                                       "Unable to write"))
-                   .flatMap(o -> writeJson(ji, o).map(ignore -> pointer.isRootPointer() ? o : pointer.queryJson(o)))
+        final JsonPointer p = ji.pointer();
+        return this.loadJson(vertx, ji)
+                   .map(j -> Objects.requireNonNull(p.writeJson(j, ji.getDataToInsert(), true), "Unable to write"))
+                   .flatMap(o -> writeJson(vertx, ji, o).map(ignore -> p.isRootPointer() ? o : p.queryJson(o)))
                    .map(o -> new JsonObject().put(ji.getOutputKey(), o));
     }
 
-    @EventContractor(action = "REMOVE", returnType = Single.class)
-    public Single<JsonObject> remove(RequestData requestData) {
+    @EBContract(action = "REMOVE")
+    public Future<JsonObject> remove(@EBContext Vertx vertx, RequestData requestData) {
         final JsonInput ji = parse(requestData);
         if (Objects.isNull(ji.getKeyToRemove())) {
             throw new IllegalArgumentException("Key to remove is mandatory");
         }
         final JsonPointer pointer = ji.pointer();
-        return this.loadJson(ji)
-                   .flatMapMaybe(json -> this.remove(pointer, ji, json)
-                                             .flatMapSingleElement(o -> this.writeJson(ji, json).map(ignore -> o)))
+        return this.loadJson(vertx, ji)
+                   .flatMap(json -> this.remove(pointer, ji, json)
+                                        .flatMap(o -> this.writeJson(vertx, ji, json).map(ignore -> o)))
                    .map(o -> new JsonObject().put(ji.getOutputKey(), o))
-                   .switchIfEmpty(Single.just(new JsonObject()));
+                   .otherwise(new JsonObject());
     }
 
-    @EventContractor(action = "QUERY", returnType = Single.class)
-    public Single<JsonObject> query(RequestData requestData) {
+    @EBContract(action = "QUERY")
+    public Future<JsonObject> query(@EBContext Vertx vertx, RequestData requestData) {
         final JsonInput ji = parse(requestData);
-        return loadJson(ji).map(json -> new JsonObject().put(ji.getOutputKey(), ji.pointer().queryJson(json)));
+        return loadJson(vertx, ji).map(json -> new JsonObject().put(ji.getOutputKey(), ji.pointer().queryJson(json)));
     }
 
-    @EventContractor(action = "HAS", returnType = Single.class)
-    public Single<JsonObject> has(RequestData requestData) {
+    @EBContract(action = "HAS")
+    public Future<JsonObject> has(@EBContext Vertx vertx, RequestData requestData) {
         final JsonInput ji = parse(requestData);
-        return this.loadJson(ji)
+        return this.loadJson(vertx, ji)
                    .map(json -> new JsonObject().put(ji.getOutputKey(), Objects.nonNull(ji.pointer().queryJson(json))));
     }
 
-    protected Maybe<?> remove(JsonPointer pointer, JsonInput ji, JsonObject json) {
+    protected Future<?> remove(JsonPointer pointer, JsonInput ji, JsonObject json) {
         final String keyToRemove = ji.getKeyToRemove().toString();
         final Object o = pointer.queryJson(json);
         if (o instanceof JsonObject) {
             return Optional.ofNullable(((JsonObject) o).remove(keyToRemove))
                            .map(v -> ji.isSkipRemovedKeyInOutput() ? v : new JsonObject().put(keyToRemove, v))
-                           .map(Maybe::just)
-                           .orElse(Maybe.empty());
+                           .map(Future::succeededFuture)
+                           .orElseGet(Future::succeededFuture);
         }
         if (o instanceof JsonArray) {
             return Functions.getIfThrow(() -> Integer.parseInt(keyToRemove))
                             .flatMap(idx -> Optional.ofNullable(((JsonArray) o).remove((int) idx)))
-                            .map(Maybe::just)
-                            .orElse(Maybe.empty());
+                            .map(Future::succeededFuture)
+                            .orElseGet(Future::succeededFuture);
         }
-        return Maybe.empty();
+        return Future.succeededFuture();
     }
 
     protected JsonInput parse(RequestData requestData) {
         return JsonData.from(requestData.body(), JsonInput.class);
     }
 
-    protected Single<JsonArray> loadArray(@NonNull JsonInput ji) {
-        return helper().loadArray(config.fullPath().resolve(ji.getFile()), config.getOption());
+    protected Future<JsonArray> loadArray(Vertx vertx, @NonNull JsonInput ji) {
+        return operator(vertx).loadArray(config.fullPath().resolve(ji.getFile()),
+                                         Optional.ofNullable(ji.getFileOption()).orElse(config.getOption()));
     }
 
-    protected Single<JsonObject> loadJson(@NonNull JsonInput ji) {
-        return helper().loadJson(config.fullPath().resolve(ji.getFile()), config.getOption());
+    protected Future<JsonObject> loadJson(Vertx vertx, @NonNull JsonInput ji) {
+        return operator(vertx).loadJson(config.fullPath().resolve(ji.getFile()),
+                                        Optional.ofNullable(ji.getFileOption()).orElse(config.getOption()));
     }
 
-    protected Single<Path> writeJson(@NonNull JsonInput ji, Object data) {
-        return helper().write(config.fullPath().resolve(ji.getFile()), config.getOption(),
-                              JsonData.tryParse(data).toJson(), BufferConverter.JSON_OBJECT_CONVERTER);
+    protected Future<Path> writeJson(Vertx vertx, @NonNull JsonInput ji, Object data) {
+        return operator(vertx).write(config.fullPath().resolve(ji.getFile()),
+                                     Optional.ofNullable(ji.getFileOption()).orElse(config.getOption()),
+                                     JsonData.tryParse(data).toJson(), BufferConverter.JSON_OBJECT_CONVERTER);
     }
 
-    private ReadableFile helper() {
-        return ReadableFile.builder().vertx(sharedData.getVertx()).maxSize(config.getMaxSizeInMB()).build();
+    private TextFileOperator operator(Vertx vertx) {
+        return TextFileOperatorImpl.builder().vertx(vertx).maxSize(config.getMaxSizeInMB()).build();
     }
 
 }

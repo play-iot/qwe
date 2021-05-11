@@ -1,9 +1,9 @@
 package io.zero88.qwe.file;
 
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import io.github.zero88.exceptions.FileException;
-import io.reactivex.functions.Function;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.zero88.qwe.file.converter.BufferConverter;
@@ -27,7 +27,7 @@ public final class TextFileOperatorImpl extends AsyncFileOperatorImpl implements
                 return fs.readFile(p.toString()).recover(t -> convertException(t, p));
             }
             if (option.isStrict()) {
-                return toFE(notFound(p, null));
+                return Future.failedFuture(new FileNotFoundError(verified.getPath(), verified.isParentExisted()));
             }
             return touch(p, option).map(f -> Buffer.buffer());
         }).map(buffer -> convert(converter::from, buffer));
@@ -39,7 +39,7 @@ public final class TextFileOperatorImpl extends AsyncFileOperatorImpl implements
         final Path path = filePath.toAbsolutePath();
         return verifyFile(path).flatMap(verified -> {
             if (verified.isExisted() && !option.isOverwrite()) {
-                return toFE(FileOptionException.disallowOverwrite());
+                return Future.failedFuture(FileOptionException.disallowOverwrite());
             }
             final Future<Path> future = verified.isExisted() ? deleteFile(path, option) : Future.succeededFuture(path);
             return future.flatMap(p -> touch(p, option))
