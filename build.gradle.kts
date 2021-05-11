@@ -38,6 +38,14 @@ subprojects {
         testCompileOnly(UtilLibs.lombok)
         testAnnotationProcessor(UtilLibs.lombok)
     }
+    tasks {
+        javadoc {
+            options {
+                this as StandardJavadocDocletOptions
+                this.addBooleanOption("Xdoclint:none", true)
+            }
+        }
+    }
 
     qwe {
         zero88.set(true)

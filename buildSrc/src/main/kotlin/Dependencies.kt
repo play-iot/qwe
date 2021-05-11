@@ -70,7 +70,7 @@ object VertxLibs {
 
     object Version {
 
-        const val vertx = "4.0.0"
+        const val vertx = "4.0.3"
     }
 
     const val core = "io.vertx:vertx-core:${Version.vertx}"
@@ -100,7 +100,7 @@ object LogLibs {
 object ZeroLibs {
     object Version {
 
-        const val utils = "1.0.1"
+        const val utils = "1.0.2-SNAPSHOT"
         const val jpaExt = "0.9.0"
         const val plugin = "1.0.0-SNAPSHOT"
     }
