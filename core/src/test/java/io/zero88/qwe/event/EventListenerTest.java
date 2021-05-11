@@ -15,6 +15,7 @@ import io.zero88.qwe.event.mock.MockEventListener;
 import io.zero88.qwe.event.mock.MockEventListener.MockEventFailed;
 import io.zero88.qwe.event.mock.MockEventListener.MockFuture;
 import io.zero88.qwe.event.mock.MockEventListener.MockReceiveSendOrPublish;
+import io.zero88.qwe.event.mock.MockEventListener.MockWithContext;
 import io.zero88.qwe.event.mock.MockEventListener.MockWithVariousParams;
 import io.zero88.qwe.exceptions.ErrorCode;
 
@@ -22,15 +23,16 @@ import io.zero88.qwe.exceptions.ErrorCode;
 public class EventListenerTest {
 
     EventBusClient eventBusClient;
+    private String address;
 
     @BeforeEach
     void setup(Vertx vertx) {
+        address = "test.request";
         eventBusClient = EventBusClient.create(SharedDataLocalProxy.create(vertx, EventListenerTest.class.getName()));
     }
 
     @Test
     void test_request_error(VertxTestContext testContext) {
-        final String address = "test.request";
         final EventAction err = EventAction.parse("ERR");
         eventBusClient.register(address, new MockEventFailed());
         eventBusClient.request(address, EventMessage.initial(err)).onSuccess(msg -> testContext.verify(() -> {
@@ -44,7 +46,6 @@ public class EventListenerTest {
 
     @Test
     void test_request_success(VertxTestContext testContext) {
-        final String address = "test.request";
         eventBusClient.register(address, new MockWithVariousParams());
         eventBusClient.request(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", "123")))
                       .onSuccess(msg -> testContext.verify(() -> {
@@ -57,7 +58,6 @@ public class EventListenerTest {
 
     @Test
     void test_request_then_void_resp(VertxTestContext testContext) {
-        final String address = "test.request";
         eventBusClient.register(address, new MockWithVariousParams());
         eventBusClient.request(address, EventMessage.initial(EventAction.NOTIFY, new JsonObject().put("id", "123")))
                       .onSuccess(msg -> testContext.verify(() -> {
@@ -70,7 +70,6 @@ public class EventListenerTest {
 
     @Test
     void test_request_then_async_resp(VertxTestContext testContext) {
-        final String address = "test.request";
         eventBusClient.register(address, new MockFuture());
         eventBusClient.request(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", 111)))
                       .onSuccess(msg -> testContext.verify(() -> {
@@ -82,25 +81,56 @@ public class EventListenerTest {
 
     @Test
     void test_request_then_async_void_resp(VertxTestContext testContext) {
-        final String address = "test.request";
         eventBusClient.register(address, new MockFuture());
         eventBusClient.request(address, EventMessage.initial(EventAction.CREATE, new JsonObject().put("id", 123)))
                       .onSuccess(msg -> testContext.verify(() -> {
                           Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+                          Assertions.assertTrue(msg.isSuccess());
+                          Assertions.assertNull(msg.getData());
                           testContext.completeNow();
                       }));
     }
 
     @Test
     void test_request_then_failed_future(VertxTestContext testContext) {
-        final String address = "test.request";
+        final EventAction errorEvent = MockEventListener.ERROR_EVENT;
         eventBusClient.register(address, new MockFuture());
-        eventBusClient.request(address, EventMessage.initial(MockEventListener.ERROR_EVENT, new JsonObject().put("id", 1)))
+        eventBusClient.request(address, EventMessage.initial(errorEvent, new JsonObject().put("id", 1)))
                       .onSuccess(msg -> testContext.verify(() -> {
                           Assertions.assertEquals(EventAction.REPLY, msg.getAction());
-                          Assertions.assertEquals(MockEventListener.ERROR_EVENT, msg.getPrevAction());
+                          Assertions.assertEquals(errorEvent, msg.getPrevAction());
                           Assertions.assertTrue(msg.isError());
                           Assertions.assertEquals(ErrorCode.TIMEOUT_ERROR, msg.getError().getCode());
+                          testContext.completeNow();
+                      }));
+    }
+
+    @Test
+    void test_request_unsupported_action(VertxTestContext testContext) {
+        final EventAction any = EventAction.parse("ANY");
+        eventBusClient.register(address, new MockFuture());
+        eventBusClient.request(address, EventMessage.initial(any, new JsonObject().put("id", 1)))
+                      .onSuccess(msg -> testContext.verify(() -> {
+                          Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+                          Assertions.assertEquals(any, msg.getPrevAction());
+                          Assertions.assertTrue(msg.isError());
+                          Assertions.assertEquals(ErrorCode.SERVICE_NOT_FOUND, msg.getError().getCode());
+                          Assertions.assertEquals(
+                              "Service not found | Cause: Unsupported event [ANY] - Error Code: UNSUPPORTED | Cause: " +
+                              "Unsupported event [ANY] - Error Code: UNSUPPORTED", msg.getError().getMessage());
+                          testContext.completeNow();
+                      }));
+    }
+
+    @Test
+    void test_request_with_context_then_async_resp(VertxTestContext testContext) {
+        final JsonObject req = new JsonObject().put("tik", 123);
+        eventBusClient.register(address, new MockWithContext());
+        eventBusClient.request(address, EventMessage.initial(EventAction.parse("EB"), req))
+                      .onSuccess(msg -> testContext.verify(() -> {
+                          Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+                          Assertions.assertTrue(msg.isSuccess());
+                          Assertions.assertEquals(new JsonObject().put("received", req), msg.getData());
                           testContext.completeNow();
                       }));
     }
@@ -115,10 +145,11 @@ public class EventListenerTest {
 
     @Test
     void test_publish(VertxTestContext testContext) {
-        final String address = "test.send";
-        final Checkpoint checkpoint = testContext.checkpoint();
+        final String address = "test.publish";
+        final Checkpoint checkpoint = testContext.checkpoint(2);
         eventBusClient.register(address, new MockReceiveSendOrPublish("id1", checkpoint));
-        eventBusClient.send(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", 111)));
+        eventBusClient.register(address, new MockReceiveSendOrPublish("id2", checkpoint));
+        eventBusClient.publish(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", 111)));
     }
 
 }

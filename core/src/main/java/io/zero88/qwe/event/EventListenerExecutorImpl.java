@@ -62,7 +62,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
             future = Future.failedFuture(e);
         }
         return future.otherwise(t -> {
-            debug("Error when handling", action, address);
+            debug("Error when handling", action, address, t);
             return EventMessage.replyError(action, CarlExceptionConverter.friendly(t));
         });
     }
@@ -83,9 +83,11 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     }
 
     private void debug(String lifecycleMsg, EventAction action, String address) {
-        listener.logger()
-                .debug("{} EventAction [{}] in address [{}] and listener[{}]", lifecycleMsg, action, address,
-                       listener.getClass().getName());
+        debug(lifecycleMsg, action, address, null);
+    }
+
+    private void debug(String lifecycleMsg, EventAction action, String address, Throwable t) {
+        listener.logger().debug("{} EventAction [{}] in address [{}]", lifecycleMsg, action, address, t);
     }
 
 }

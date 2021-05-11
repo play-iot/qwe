@@ -181,6 +181,11 @@ public class MockEventListener implements EventListener {
                         @EBContext EventBusClient eventBusClient, @EBParam("body") JsonObject body) {
         }
 
+        @EBContract(action = "EB")
+        public Future<JsonObject> mix(@EBContext Vertx vertx, @EBParam("body") JsonObject body) {
+            return Future.succeededFuture(new JsonObject().put("received", body));
+        }
+
     }
 
 
