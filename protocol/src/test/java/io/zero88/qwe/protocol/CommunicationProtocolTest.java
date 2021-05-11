@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.exceptions.CarlException;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 
 import io.zero88.qwe.protocol.network.Ipv4Network;
 import io.zero88.qwe.protocol.network.TcpProtocol;
@@ -13,7 +13,7 @@ import io.zero88.qwe.protocol.network.UdpProtocol;
 
 public class CommunicationProtocolTest {
 
-    @Test(expected = NotFoundException.class)
+    @Test(expected = DataNotFoundException.class)
     public void test_parse_not_found_ipv4() {
         CommunicationProtocol.parse("abc");
     }

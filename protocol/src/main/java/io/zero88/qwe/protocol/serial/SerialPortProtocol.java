@@ -3,7 +3,7 @@ package io.zero88.qwe.protocol.serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.zero88.qwe.exceptions.CommunicationProtocolException;
+import io.zero88.qwe.protocol.CommunicationProtocolException;
 import io.zero88.qwe.protocol.CommunicationProtocol;
 
 import lombok.NonNull;

@@ -3,8 +3,8 @@ package io.zero88.qwe.protocol.network;
 import java.util.Map;
 
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CommunicationProtocolException;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.protocol.CommunicationProtocolException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.utils.Networks;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Strings;
@@ -51,7 +51,7 @@ public abstract class TransportProtocol implements Ethernet {
      * @param identifier IP network identifier
      * @return IP network instance
      * @throws IllegalArgumentException if any invalid data
-     * @throws NotFoundException        if interface name is not found
+     * @throws DataNotFoundException        if interface name is not found
      */
     public static TransportProtocol parse(@NonNull String identifier) {
         final String[] splitter = identifier.split(SPLIT_CHAR, 2);

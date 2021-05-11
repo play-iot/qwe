@@ -1,4 +1,7 @@
-package io.zero88.qwe.exceptions;
+package io.zero88.qwe.protocol;
+
+import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.ErrorCode;
 
 public final class CommunicationProtocolException extends CarlException {
 

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import io.zero88.qwe.dto.EnumType;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CommunicationProtocolException;
 import io.github.zero88.utils.Strings;
 
 import com.fasterxml.jackson.annotation.JsonCreator;

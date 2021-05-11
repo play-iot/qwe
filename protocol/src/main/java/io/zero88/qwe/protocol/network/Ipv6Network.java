@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import io.zero88.qwe.exceptions.CommunicationProtocolException;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.protocol.CommunicationProtocolException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.github.zero88.utils.Functions;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -62,7 +62,7 @@ public final class Ipv6Network extends IpNetwork<Ipv6Network> implements Etherne
      *
      * @param interfaceName interface name
      * @return IPv6 network
-     * @throws NotFoundException if interface name is not found
+     * @throws DataNotFoundException if interface name is not found
      */
     public static Ipv6Network getActiveIpByName(String interfaceName) {
         return getActiveIpByName(interfaceName, IS_V6, Ipv6Network::from);

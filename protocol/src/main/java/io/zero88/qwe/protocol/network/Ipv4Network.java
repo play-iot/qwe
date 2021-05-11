@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.exceptions.CommunicationProtocolException;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.protocol.CommunicationProtocolException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.utils.Networks;
 import io.github.zero88.utils.Strings;
 
@@ -54,7 +54,7 @@ public final class Ipv4Network extends IpNetwork<Ipv4Network> implements Etherne
      *
      * @param interfaceName interface name
      * @return IPv4 network
-     * @throws NotFoundException if interface name is not found
+     * @throws DataNotFoundException if interface name is not found
      */
     public static Ipv4Network getActiveIpByName(String interfaceName) {
         return getActiveIpByName(interfaceName, Networks.IS_V4, Ipv4Network::from);

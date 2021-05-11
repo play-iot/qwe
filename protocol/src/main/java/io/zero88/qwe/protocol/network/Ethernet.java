@@ -1,6 +1,6 @@
 package io.zero88.qwe.protocol.network;
 
-import io.zero88.qwe.exceptions.CommunicationProtocolException;
+import io.zero88.qwe.protocol.CommunicationProtocolException;
 import io.zero88.qwe.protocol.CommunicationProtocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

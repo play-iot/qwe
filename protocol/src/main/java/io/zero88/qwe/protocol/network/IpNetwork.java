@@ -14,8 +14,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CommunicationProtocolException;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.protocol.CommunicationProtocolException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.protocol.CommunicationProtocol;
 import io.zero88.qwe.utils.Networks;
 import io.github.zero88.utils.Functions;
@@ -63,7 +63,7 @@ public abstract class IpNetwork<T extends IpNetwork> implements Ethernet {
      *
      * @param identifier IP network identifier
      * @return IP network instance
-     * @throws NotFoundException if interface name is not found
+     * @throws DataNotFoundException if interface name is not found
      */
     public static IpNetwork parse(@NonNull String identifier) {
         String[] splitter = identifier.split(CommunicationProtocol.SPLIT_CHAR, 2);
@@ -123,9 +123,9 @@ public abstract class IpNetwork<T extends IpNetwork> implements Ethernet {
         return Ipv4Network.cidr(interfaceAddress);
     }
 
-    private static Supplier<NotFoundException> notFound(String interfaceName) {
-        return () -> new NotFoundException("Not found active IP network interface" +
-                                           Optional.ofNullable(interfaceName).map(n -> " with name " + n).orElse(""));
+    private static Supplier<DataNotFoundException> notFound(String interfaceName) {
+        return () -> new DataNotFoundException("Not found active IP network interface" +
+                                               Optional.ofNullable(interfaceName).map(n -> " with name " + n).orElse(""));
     }
 
     private static String getInterfaceName(String interfaceName) {
