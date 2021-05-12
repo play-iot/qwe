@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.OSS_GITHUB_TOKEN }}
+          token: ${{ secrets.BEEIO_CI_TOKEN }}
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v3
