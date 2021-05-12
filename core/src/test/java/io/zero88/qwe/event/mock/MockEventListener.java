@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+import io.github.zero88.utils.UUID64;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -184,6 +185,15 @@ public class MockEventListener implements EventListener {
         @EBContract(action = "EB")
         public Future<JsonObject> mix(@EBContext Vertx vertx, @EBParam("body") JsonObject body) {
             return Future.succeededFuture(new JsonObject().put("received", body));
+        }
+
+        @EBContract(action = "INVOKE")
+        public Future<JsonObject> invoke(@EBContext Vertx vertx, @EBParam("body") JsonObject body) {
+            final String path = "/tmp/" + UUID64.random() + ".json";
+            System.out.println(path);
+            return vertx.fileSystem()
+                        .writeFile(path, body.toBuffer())
+                        .map(ignore -> new JsonObject().put("path", path));
         }
 
     }

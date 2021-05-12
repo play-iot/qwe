@@ -136,6 +136,20 @@ public class EventListenerTest {
     }
 
     @Test
+    void test_request_with_context_then_use_future_then_async_resp(VertxTestContext testContext) {
+        final JsonObject req = new JsonObject().put("tik", 123);
+        eventBusClient.register(address, new MockWithContext());
+        eventBusClient.request(address, EventMessage.initial(EventAction.parse("INVOKE"), req))
+                      .onSuccess(msg -> testContext.verify(() -> {
+                          System.out.println(msg.toJson());
+                          Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+                          Assertions.assertTrue(msg.isSuccess());
+                          Assertions.assertEquals(new JsonObject().put("received", req), msg.getData());
+                          testContext.completeNow();
+                      }));
+    }
+
+    @Test
     void test_send(VertxTestContext testContext) {
         final String address = "test.send";
         final Checkpoint checkpoint = testContext.checkpoint();
