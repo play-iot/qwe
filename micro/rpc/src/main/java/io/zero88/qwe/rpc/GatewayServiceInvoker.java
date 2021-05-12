@@ -13,7 +13,7 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.micro.filter.ByPredicate;
@@ -171,7 +171,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
                                        @NonNull RequestData reqData) {
         return this.invoke(address, action, reqData).map(out -> {
             if (out.isError() && throwIfResponseError()) {
-                throw new CarlException(out.getError().getCode(), out.getError().getMessage());
+                throw new QWEException(out.getError().getCode(), out.getError().getMessage());
             }
             return Optional.ofNullable(out.getError())
                            .map(ErrorMessage::toJson)
@@ -185,7 +185,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      * @return converter function
      * @since 1.0.0
      */
-    default Function<ErrorMessage, CarlException> notFound() {
+    default Function<ErrorMessage, QWEException> notFound() {
         return msg -> ErrorMessageConverter.override(msg, ErrorCode.SERVICE_NOT_FOUND,
                                                      RemoteServiceInvoker.notFoundMessage(serviceLabel()));
     }

@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public final class DesiredException extends CarlException {
+public final class DesiredException extends QWEException {
 
     public DesiredException(String message, Throwable e) {
         super(ErrorCode.DESIRED_ERROR, message, e);

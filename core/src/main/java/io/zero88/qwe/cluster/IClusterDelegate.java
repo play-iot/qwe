@@ -3,7 +3,7 @@ package io.zero88.qwe.cluster;
 import java.util.List;
 
 import io.zero88.qwe.exceptions.DataNotFoundException;
-import io.zero88.qwe.CarlConfig.SystemConfig.ClusterConfig;
+import io.zero88.qwe.QWEConfig.SystemConfig.ClusterConfig;
 import io.vertx.core.spi.cluster.ClusterManager;
 
 import lombok.NonNull;

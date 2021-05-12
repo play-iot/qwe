@@ -23,7 +23,7 @@ import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.DataAlreadyExistException;
 import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.exceptions.ErrorCode;
@@ -81,7 +81,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
                                      (r, json) -> r.getJsonArray(jobKey.toString(), new JsonArray()).add(json),
                                      JsonObject::mergeIn);
         } catch (SchedulerException e) {
-            throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot get trigger and job in scheduler", e);
+            throw new QWEException(ErrorCode.SERVICE_ERROR, "Cannot get trigger and job in scheduler", e);
         }
     }
 
@@ -107,7 +107,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
                             .orElseThrow(() -> new DataNotFoundException(
                                 "Not found trigger '" + triggerKey + "' that associated to job '" + jobKey + "'"));
         } catch (SchedulerException e) {
-            throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot get trigger and job in scheduler", e);
+            throw new QWEException(ErrorCode.SERVICE_ERROR, "Cannot get trigger and job in scheduler", e);
         }
     }
 
@@ -145,7 +145,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
                                         .firstFireTime(firstFire, tz)
                                         .build();
         } catch (SchedulerException e) {
-            throw new CarlException(
+            throw new QWEException(
                 e instanceof ObjectAlreadyExistsException ? ErrorCode.DATA_ALREADY_EXIST : ErrorCode.SERVICE_ERROR,
                 "Cannot add trigger and job in scheduler", e);
         }
@@ -158,7 +158,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
         try {
             return SchedulerRegisterResp.builder().removed(scheduler.deleteJob(key)).build();
         } catch (SchedulerException e) {
-            throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot remove job id '" + key.toString() + "'", e);
+            throw new QWEException(ErrorCode.SERVICE_ERROR, "Cannot remove job id '" + key.toString() + "'", e);
         }
     }
 

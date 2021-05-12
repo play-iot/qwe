@@ -8,12 +8,12 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.vertx.core.json.JsonObject;
 
 public class CronTriggerModelTest {
 
-    @Test(expected = CarlException.class)
+    @Test(expected = QWEException.class)
     public void test_unknown_expr() {
         CronTriggerModel.builder().name("test").expr("abc").build();
     }

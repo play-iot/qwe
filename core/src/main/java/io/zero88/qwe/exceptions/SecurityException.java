@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public class SecurityException extends CarlException {
+public class SecurityException extends QWEException {
 
     public SecurityException(String message, Throwable e) {
         this(ErrorCode.SECURITY_ERROR, message, e);

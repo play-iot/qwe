@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public final class UnsupportedException extends CarlException {
+public final class UnsupportedException extends QWEException {
 
     public UnsupportedException(String message, Throwable e) {
         super(ErrorCode.UNSUPPORTED, message, e);

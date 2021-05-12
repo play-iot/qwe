@@ -12,7 +12,7 @@ import io.vertx.core.Future;
 import io.vertx.core.VertxException;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.TimeoutException;
-import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;
+import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.client.HttpClientRegistry;
 
@@ -43,7 +43,7 @@ public abstract class HttpErrorHandler implements Function<Throwable, Future<Res
         if (error instanceof UnknownHostException || error instanceof DnsNameResolverException) {
             HttpClientRegistry.getInstance().remove(hostInfo, false);
         }
-        return Future.failedFuture(CarlExceptionConverter.friendly(error));
+        return Future.failedFuture(QWEExceptionConverter.friendly(error));
     }
 
 }

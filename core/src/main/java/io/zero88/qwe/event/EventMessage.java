@@ -9,7 +9,7 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -158,7 +158,7 @@ public final class EventMessage implements Serializable, JsonData {
      *
      * @param object any non null object
      * @return event message instance
-     * @throws CarlException if wrong format
+     * @throws QWEException if wrong format
      */
     public static EventMessage tryParse(@NonNull Object object) {
         return tryParse(object, false);
@@ -175,7 +175,7 @@ public final class EventMessage implements Serializable, JsonData {
     public static EventMessage tryParse(@NonNull Object object, boolean lenient) {
         try {
             return JsonData.from(object, EventMessage.class, "Invalid event message format");
-        } catch (CarlException e) {
+        } catch (QWEException e) {
             if (lenient) {
                 return EventMessage.initial(EventAction.UNKNOWN, JsonData.tryParse(object));
             }

@@ -13,7 +13,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.core.Vertx;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -80,7 +80,7 @@ public class ApplicationVerticleTest {
     public void test_component_throw_exception_cannot_start(TestContext context) {
         addDummyUnit();
         addMockUnitHavingException();
-        assertDeployError(context, new CarlException("UNKNOWN_ERROR | Cause: Error when starting Component Verticle"));
+        assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting Component Verticle"));
     }
 
     private void assertDeployError(TestContext context, Throwable error) {

@@ -9,7 +9,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.Status;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.BridgeEventType;
@@ -61,13 +61,13 @@ public class WebSocketEventMessageTest {
 
     @Test
     public void test_deserialize_socketMsg_missing_event_action() {
-        Assertions.assertThrows(CarlException.class, () -> WebSocketEventMessage.from(
+        Assertions.assertThrows(QWEException.class, () -> WebSocketEventMessage.from(
             "{\"address\":\"test\",\"type\":\"SEND\",\"body\":{\"data\":{\"hello\":\"world\"}}}"));
     }
 
     @Test
     public void test_deserialize_socketMsg_unknown_type() {
-        Assertions.assertThrows(CarlException.class,
+        Assertions.assertThrows(QWEException.class,
                                 () -> WebSocketEventMessage.from("{\"address\":\"test\",\"type\":\"xxx\"}"));
     }
 
@@ -96,7 +96,7 @@ public class WebSocketEventMessageTest {
 
     @Test
     public void test_deserialize_unknown_type() {
-        Assertions.assertThrows(CarlException.class, () -> WebSocketEventMessage.from(
+        Assertions.assertThrows(QWEException.class, () -> WebSocketEventMessage.from(
             "{\"address\":\"test\",\"type\":\"rec1\",\"body\":{" + "\"action\":\"CREATE\"}}"));
     }
 

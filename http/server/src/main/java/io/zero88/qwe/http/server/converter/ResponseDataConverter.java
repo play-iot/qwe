@@ -1,7 +1,7 @@
 package io.zero88.qwe.http.server.converter;
 
 import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.HttpException;
 import io.zero88.qwe.http.HttpStatusMapping;
 import io.zero88.qwe.http.server.handler.ResponseDataWriter;
@@ -17,8 +17,8 @@ public class ResponseDataConverter {
             return ResponseDataWriter.serializeResponseData(
                 new JsonObject().put("error", httpException.getMessage()).encode())
                                      .setStatus(httpException.getStatusCode().code());
-        } else if (e instanceof CarlException) {
-            CarlException ex = (CarlException) e;
+        } else if (e instanceof QWEException) {
+            QWEException ex = (QWEException) e;
             HttpResponseStatus responseStatus = HttpStatusMapping.error(httpMethod, ex.errorCode());
             return ResponseDataWriter.serializeResponseData(new JsonObject().put("error", ex.getMessage()).encode())
                                      .setStatus(responseStatus.code());

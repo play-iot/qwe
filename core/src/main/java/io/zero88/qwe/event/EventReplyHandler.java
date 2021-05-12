@@ -4,12 +4,12 @@ import java.util.Objects;
 
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.eventbus.Message;
-import io.zero88.qwe.CarlConverter;
+import io.zero88.qwe.QWEConverter;
 
 import lombok.NonNull;
 
 @SuppressWarnings("rawtypes")
-public interface EventReplyHandler extends CarlConverter<EventMessage, Message> {
+public interface EventReplyHandler extends QWEConverter<EventMessage, Message> {
 
     String DEFAULT_SYSTEM = "REPLY";
 

@@ -11,7 +11,7 @@ import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.DataTransferObject.Headers;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.micro.BaseMicroVerticleTest;
 import io.zero88.qwe.rpc.mock.MockServiceInvoker;
@@ -34,9 +34,9 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
             System.out.println(d);
             context.fail("Expected failed");
         }).onFailure(t -> {
-            context.assertTrue(t instanceof CarlException);
-            assert t instanceof CarlException;
-            CarlException e = (CarlException) t;
+            context.assertTrue(t instanceof QWEException);
+            assert t instanceof QWEException;
+            QWEException e = (QWEException) t;
             context.assertEquals(ErrorCode.SERVICE_NOT_FOUND, e.errorCode());
             context.assertEquals(
                 invoker.serviceLabel() + " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
@@ -54,9 +54,9 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
             System.out.println(d);
             context.fail("Expected failed");
         }).onFailure(t -> {
-            context.assertTrue(t instanceof CarlException);
-            assert t instanceof CarlException;
-            CarlException e = (CarlException) t;
+            context.assertTrue(t instanceof QWEException);
+            assert t instanceof QWEException;
+            QWEException e = (QWEException) t;
             context.assertEquals(ErrorCode.SERVICE_NOT_FOUND, e.errorCode());
             context.assertEquals(
                 invoker.serviceLabel() + " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",

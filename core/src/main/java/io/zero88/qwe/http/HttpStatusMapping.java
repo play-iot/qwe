@@ -10,7 +10,7 @@ import io.github.zero88.exceptions.HiddenException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.cluster.ClusterException;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 
 import lombok.AccessLevel;
@@ -73,7 +73,7 @@ public final class HttpStatusMapping {
         return HttpResponseStatus.OK;
     }
 
-    public static HttpResponseStatus error(HttpMethod method, CarlException exception) {
+    public static HttpResponseStatus error(HttpMethod method, QWEException exception) {
         final Throwable cause = exception.getCause();
         if (cause instanceof HiddenException) {
             return error(method, ((HiddenException) cause).errorCode());

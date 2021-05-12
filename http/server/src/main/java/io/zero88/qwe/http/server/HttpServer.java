@@ -10,9 +10,9 @@ import java.util.stream.Stream;
 import io.zero88.qwe.ComponentContext;
 import io.zero88.qwe.ComponentVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;
+import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpConfig.ApiGatewayConfig;
 import io.zero88.qwe.http.server.HttpConfig.CorsOptions;
@@ -89,7 +89,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
                 promise.complete();
                 return;
             }
-            promise.fail(CarlExceptionConverter.from(event.cause()));
+            promise.fail(QWEExceptionConverter.from(event.cause()));
         });
     }
 
@@ -164,7 +164,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
             new StaticWebRouterCreator().mount(root, config.getStaticWebConfig(), sharedData());
             root.route().last().handler(new NotFoundContextHandler());
             return root;
-        } catch (CarlException e) {
+        } catch (QWEException e) {
             throw new InitializerError("Error when initializing http server route", e);
         }
     }

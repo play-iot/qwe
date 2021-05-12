@@ -12,7 +12,7 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.file.FileSystemException;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ConflictException;
 import io.zero88.qwe.exceptions.SecurityException.InsufficientPermissionError;
 
@@ -98,7 +98,7 @@ class AsyncFileOperatorImpl implements AsyncFileOperator {
     }
 
     protected final <T> Future<T> toFE(@NonNull Throwable t) {
-        if (t instanceof CarlException) {
+        if (t instanceof QWEException) {
             //TODO Should check message
             return toFE(t.getMessage(), t);
         }

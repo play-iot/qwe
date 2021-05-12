@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.vertx.core.json.JsonObject;
 
 public class TriggerOptionTest {
@@ -44,7 +44,7 @@ public class TriggerOptionTest {
         Assert.assertEquals(5, ((PeriodicTriggerModel) from).getRepeat());
     }
 
-    @Test(expected = CarlException.class)
+    @Test(expected = QWEException.class)
     public void test_deserialize_unknown_then_build_failed() {
         JsonObject obj = new JsonObject("{\"type\":\"HEH\",\"intervalInSeconds\":10,\"repeat\":10}");
         final TriggerOption opt = JsonData.from(obj, TriggerOption.class);

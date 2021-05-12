@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public final class DataBeingUsedException extends CarlException {
+public final class DataBeingUsedException extends QWEException {
 
     public DataBeingUsedException(String message, Throwable e) {
         super(ErrorCode.DATA_BEING_USED, message, e);

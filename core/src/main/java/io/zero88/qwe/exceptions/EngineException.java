@@ -3,7 +3,7 @@ package io.zero88.qwe.exceptions;
 /**
  * Wrap Vertx exceptions
  */
-public class EngineException extends CarlException {
+public class EngineException extends QWEException {
 
     public EngineException(String message, Throwable e) {
         super(ErrorCode.ENGINE_ERROR, message, e);

@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public final class ConflictException extends CarlException {
+public final class ConflictException extends QWEException {
 
     public ConflictException(String message, Throwable e) {
         super(ErrorCode.CONFLICT_ERROR, message, e);

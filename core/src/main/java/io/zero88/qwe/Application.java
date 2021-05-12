@@ -14,11 +14,11 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ApplicationVerticle
  */
-public interface Application extends HasConfig<CarlConfig>, HasSharedKey, HasSharedData, Verticle {
+public interface Application extends HasConfig<QWEConfig>, HasSharedKey, HasSharedData, Verticle {
 
     @Override
-    default Class<CarlConfig> configClass() {
-        return CarlConfig.class;
+    default Class<QWEConfig> configClass() {
+        return QWEConfig.class;
     }
 
     @Override

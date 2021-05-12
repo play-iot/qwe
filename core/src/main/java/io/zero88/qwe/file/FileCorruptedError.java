@@ -1,10 +1,10 @@
 package io.zero88.qwe.file;
 
 import io.github.zero88.utils.Strings;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 
-public final class FileCorruptedError extends CarlException {
+public final class FileCorruptedError extends QWEException {
 
     public static final ErrorCode FILE_CORRUPTED = ErrorCode.parse("FILE_CORRUPTED");
 

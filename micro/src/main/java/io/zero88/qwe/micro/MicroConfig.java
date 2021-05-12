@@ -8,7 +8,7 @@ import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.ServiceDiscoveryOptions;
 import io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend;
-import io.zero88.qwe.CarlConfig.AppConfig;
+import io.zero88.qwe.QWEConfig.AppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;

@@ -1,13 +1,13 @@
 package io.zero88.qwe.http;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 
 import lombok.Getter;
 import lombok.NonNull;
 
-public final class HttpException extends CarlException {
+public final class HttpException extends QWEException {
 
     public static final ErrorCode HTTP_ERROR = ErrorCode.parse("HTTP_ERROR");
 

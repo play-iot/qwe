@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import io.zero88.qwe.cluster.ClusterType;
 import io.github.zero88.utils.FileUtils;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.cluster.ClusterType;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,12 +26,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public final class CarlConfig implements IConfig {
+public final class QWEConfig implements IConfig {
 
     public static final String DATA_DIR = "dataDir";
     public static final Path DEFAULT_DATADIR = FileUtils.defaultDatadir(".qwe");
 
-    @JsonProperty(value = CarlConfig.DATA_DIR)
+    @JsonProperty(value = QWEConfig.DATA_DIR)
     private Path dataDir;
     @JsonProperty(value = SystemConfig.NAME)
     private SystemConfig systemConfig;
@@ -41,36 +41,35 @@ public final class CarlConfig implements IConfig {
     private AppConfig appConfig = new AppConfig();
 
     /**
-     * Create {@link CarlConfig} with {@link AppConfig}, default {@link DeployConfig} and without {@link
-     * SystemConfig}
+     * Create {@link QWEConfig} with {@link AppConfig}, default {@link DeployConfig} and without {@link SystemConfig}
      *
      * @param appConfig Given app config
-     * @return CarlConfig instance
+     * @return QWEConfig instance
      */
-    public static CarlConfig blank(@NonNull JsonObject appConfig) {
+    public static QWEConfig blank(@NonNull JsonObject appConfig) {
         return blank(DEFAULT_DATADIR, appConfig);
     }
 
-    public static CarlConfig blank(@NonNull Path dataDir, @NonNull JsonObject appConfig) {
-        return new CarlConfig(dataDir, null, new DeployConfig(), IConfig.from(appConfig, AppConfig.class));
+    public static QWEConfig blank(@NonNull Path dataDir, @NonNull JsonObject appConfig) {
+        return new QWEConfig(dataDir, null, new DeployConfig(), IConfig.from(appConfig, AppConfig.class));
     }
 
-    public static CarlConfig blank(@NonNull Path dataDir) {
-        return new CarlConfig(dataDir, null, new DeployConfig(), null);
+    public static QWEConfig blank(@NonNull Path dataDir) {
+        return new QWEConfig(dataDir, null, new DeployConfig(), null);
     }
 
     /**
-     * Create {@link CarlConfig} with default {@link DeployConfig} and without {@link SystemConfig}
+     * Create {@link QWEConfig} with default {@link DeployConfig} and without {@link SystemConfig}
      *
-     * @return CarlConfig instance
+     * @return QWEConfig instance
      */
-    public static CarlConfig blank() {
-        return CarlConfig.blank(new JsonObject());
+    public static QWEConfig blank() {
+        return QWEConfig.blank(new JsonObject());
     }
 
-    public static CarlConfig create(CarlConfig carlConfig, AppConfig appConfig) {
-        return IConfig.from(carlConfig.toJson().mergeIn(new JsonObject().put(AppConfig.NAME, appConfig.toJson())),
-                            CarlConfig.class);
+    public static QWEConfig create(QWEConfig QWEConfig, AppConfig appConfig) {
+        return IConfig.from(QWEConfig.toJson().mergeIn(new JsonObject().put(AppConfig.NAME, appConfig.toJson())),
+                            QWEConfig.class);
     }
 
     @Override
@@ -102,7 +101,7 @@ public final class CarlConfig implements IConfig {
         public String key() { return NAME; }
 
         @Override
-        public Class<? extends IConfig> parent() { return CarlConfig.class; }
+        public Class<? extends IConfig> parent() { return QWEConfig.class; }
 
         @Getter
         @NoArgsConstructor
@@ -204,7 +203,7 @@ public final class CarlConfig implements IConfig {
         public String key() { return NAME; }
 
         @Override
-        public Class<? extends IConfig> parent() { return CarlConfig.class; }
+        public Class<? extends IConfig> parent() { return QWEConfig.class; }
 
     }
 
@@ -217,7 +216,7 @@ public final class CarlConfig implements IConfig {
         public String key() { return NAME; }
 
         @Override
-        public Class<? extends IConfig> parent() { return CarlConfig.class; }
+        public Class<? extends IConfig> parent() { return QWEConfig.class; }
 
     }
 

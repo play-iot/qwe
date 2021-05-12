@@ -21,7 +21,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.TimeoutException;
 import io.zero88.qwe.http.HostInfo;
@@ -92,8 +92,8 @@ public class HttpClientDelegateTest {
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
         client.request("/xxx", HttpMethod.GET, null, false).onFailure(t -> {
             context.assertNotNull(t);
-            assert t instanceof CarlException;
-            context.assertEquals(ErrorCode.DATA_NOT_FOUND, ((CarlException) t).errorCode());
+            assert t instanceof QWEException;
+            context.assertEquals(ErrorCode.DATA_NOT_FOUND, ((QWEException) t).errorCode());
         }).eventually(WebSocketClientDelegateTest.complete(async));
     }
 

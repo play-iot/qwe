@@ -3,11 +3,11 @@ package io.zero88.qwe.file.converter;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.CarlConverter;
+import io.zero88.qwe.QWEConverter;
 
 import lombok.NonNull;
 
-public interface BufferConverter<D> extends CarlConverter<Buffer, D> {
+public interface BufferConverter<D> extends QWEConverter<Buffer, D> {
 
     D from(@NonNull Buffer buffer);
 

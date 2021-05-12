@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public class InitializerError extends CarlException {
+public class InitializerError extends QWEException {
 
     public InitializerError(String message, Throwable e) {
         super(ErrorCode.INITIALIZER_ERROR, message, e);

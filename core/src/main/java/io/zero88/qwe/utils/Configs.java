@@ -13,7 +13,7 @@ import io.github.zero88.utils.Reflections;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 
 import lombok.AccessLevel;
@@ -38,7 +38,7 @@ public final class Configs {
         try (Scanner scanner = new Scanner(resourceAsStream).useDelimiter("\\A")) {
             return new JsonObject(scanner.next());
         } catch (DecodeException | NoSuchElementException e) {
-            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
+            throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
         }
     }
 
@@ -46,7 +46,7 @@ public final class Configs {
         try (Scanner scanner = new Scanner(resourceAsStream).useDelimiter("\\A")) {
             return new JsonArray(scanner.next());
         } catch (DecodeException | NoSuchElementException e) {
-            throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
+            throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
         }
     }
 

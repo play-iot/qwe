@@ -9,10 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.HiddenException;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CarlException;
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.utils.Configs;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Functions.Provider;
 import io.github.zero88.utils.Functions.Silencer;
@@ -22,6 +18,10 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.Shareable;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
+import io.zero88.qwe.utils.Configs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -68,7 +68,7 @@ public interface IConfig extends JsonData, Shareable {
                 hidden.addSuppressed(Objects.nonNull(cause.getCause()) ? cause.getCause() : cause);
             }
             String msg = Strings.isNotBlank(errorMsg) ? errorMsg : "Invalid config format";
-            throw new CarlException(ErrorCode.INVALID_ARGUMENT, msg, hidden);
+            throw new QWEException(ErrorCode.INVALID_ARGUMENT, msg, hidden);
         }
     }
 
@@ -111,7 +111,7 @@ public interface IConfig extends JsonData, Shareable {
     static <C extends IConfig> C parseConfig(JsonObject config, Class<C> clazz, Supplier<C> fallback) {
         try {
             return IConfig.from(config, clazz);
-        } catch (CarlException ex) {
+        } catch (QWEException ex) {
             return fallback.get();
         }
     }

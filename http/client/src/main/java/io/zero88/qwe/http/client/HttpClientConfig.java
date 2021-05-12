@@ -3,7 +3,7 @@ package io.zero88.qwe.http.client;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import io.zero88.qwe.CarlConfig.AppConfig;
+import io.zero88.qwe.QWEConfig.AppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.http.HostInfo;

@@ -5,7 +5,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.EngineException;
 
 public class MockEventBusErrorListener extends MockEventBusListener {
@@ -34,7 +34,7 @@ public class MockEventBusErrorListener extends MockEventBusListener {
 
     @EBContract(action = "UPDATE")
     public JsonObject update(RequestData data) {
-        throw new CarlException(ErrorCode.INVALID_ARGUMENT, "invalid");
+        throw new QWEException(ErrorCode.INVALID_ARGUMENT, "invalid");
     }
 
 }

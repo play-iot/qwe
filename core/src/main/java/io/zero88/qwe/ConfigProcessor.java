@@ -19,10 +19,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.CarlConfig.AppConfig;
-import io.zero88.qwe.CarlConfig.DeployConfig;
-import io.zero88.qwe.CarlConfig.SystemConfig;
-import io.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Strings;
 import io.vertx.config.ConfigRetriever;
@@ -31,6 +27,10 @@ import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.QWEConfig.AppConfig;
+import io.zero88.qwe.QWEConfig.DeployConfig;
+import io.zero88.qwe.QWEConfig.SystemConfig;
+import io.zero88.qwe.exceptions.QWEException;
 
 import lombok.NonNull;
 
@@ -77,8 +77,8 @@ public final class ConfigProcessor {
         return object instanceof JsonArray || object instanceof Collection;
     }
 
-    public Optional<CarlConfig> override(JsonObject fileConfig, boolean overrideAppConfig,
-                                         boolean overrideOtherConfigs) {
+    public Optional<QWEConfig> override(JsonObject fileConfig, boolean overrideAppConfig,
+                                        boolean overrideOtherConfigs) {
         logger.info("Starting to override config");
         if (Objects.isNull(fileConfig) || !overrideAppConfig && !overrideOtherConfigs) {
             return Optional.empty();
@@ -86,8 +86,8 @@ public final class ConfigProcessor {
         return overrideConfig(mergeEnvVarAndSystemVar(), fileConfig, overrideAppConfig, overrideOtherConfigs);
     }
 
-    Optional<CarlConfig> override(JsonObject defaultConfig, JsonObject provideConfig, boolean overrideAppConfig,
-                                  boolean overrideOtherConfigs) {
+    Optional<QWEConfig> override(JsonObject defaultConfig, JsonObject provideConfig, boolean overrideAppConfig,
+                                 boolean overrideOtherConfigs) {
         if ((Objects.isNull(provideConfig) && Objects.isNull(defaultConfig))) {
             return Optional.empty();
         }
@@ -105,10 +105,10 @@ public final class ConfigProcessor {
 
     SortedMap<String, Object> mergeEnvVarAndSystemVar() {
         SortedMap<String, Object> result = new TreeMap<>();
-        mappingOptions.forEach((store, filterCarlVariables) -> {
+        mappingOptions.forEach((store, filterQWEVariables) -> {
             ConfigRetrieverOptions options = new ConfigRetrieverOptions().addStore(store);
             ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-            retriever.getConfig(json -> result.putAll(filterCarlVariables.apply(json.result())));
+            retriever.getConfig(json -> result.putAll(filterQWEVariables.apply(json.result())));
         });
         return result;
     }
@@ -134,14 +134,14 @@ public final class ConfigProcessor {
         }
         JsonObject input = defaultConfig.mergeIn(provideConfig, true);
         if (logger.isDebugEnabled()) {
-            logger.debug("Input CarlConfig: {}", input.encode());
+            logger.debug("Input QWEConfig: {}", input.encode());
         }
         return input;
     }
 
     private String toStandardKey(String key) {
-        if (key.equalsIgnoreCase(CarlConfig.DATA_DIR)) {
-            return CarlConfig.DATA_DIR;
+        if (key.equalsIgnoreCase(QWEConfig.DATA_DIR)) {
+            return QWEConfig.DATA_DIR;
         }
         if (key.startsWith("__") && key.endsWith("__")) {
             return key;
@@ -149,8 +149,8 @@ public final class ConfigProcessor {
         return "__" + key + "__";
     }
 
-    private Optional<CarlConfig> overrideConfig(Map<String, Object> envConfig, JsonObject fileConfig,
-                                                boolean overrideAppConfig, boolean overrideSystemConfig) {
+    private Optional<QWEConfig> overrideConfig(Map<String, Object> envConfig, JsonObject fileConfig,
+                                               boolean overrideAppConfig, boolean overrideSystemConfig) {
         JsonObject bluePrintConfig = new JsonObject();
         JsonObject inputAppConfig = fileConfig.getJsonObject(AppConfig.NAME, new JsonObject());
         JsonObject inputSystemConfig = fileConfig.getJsonObject(SystemConfig.NAME, new JsonObject());
@@ -158,7 +158,7 @@ public final class ConfigProcessor {
         JsonObject destAppConfig = new JsonObject();
         JsonObject destSystemConfig = new JsonObject();
         JsonObject destDeployConfig = new JsonObject();
-        Object inputDataDir = fileConfig.getValue(CarlConfig.DATA_DIR);
+        Object inputDataDir = fileConfig.getValue(QWEConfig.DATA_DIR);
 
         for (Entry<String, Object> entry : envConfig.entrySet()) {
             String[] envKeyParts = entry.getKey().split("\\.");
@@ -167,10 +167,10 @@ public final class ConfigProcessor {
             }
             Object envValue = entry.getValue();
             String standardKey = toStandardKey(envKeyParts[1]);
-            if (standardKey.equals(CarlConfig.DATA_DIR) && overrideSystemConfig) {
+            if (standardKey.equals(QWEConfig.DATA_DIR) && overrideSystemConfig) {
                 try {
-                    bluePrintConfig.put(CarlConfig.DATA_DIR, FileUtils.toPath((String) envValue).toString());
-                } catch (CarlException ex) {
+                    bluePrintConfig.put(QWEConfig.DATA_DIR, FileUtils.toPath((String) envValue).toString());
+                } catch (QWEException ex) {
                     logger.warn("DataDir is not valid. ", ex);
                 }
             }
@@ -191,14 +191,14 @@ public final class ConfigProcessor {
         bluePrintConfig.put(DeployConfig.NAME,
                             new JsonObject(inputDeployConfig.toString()).mergeIn(destDeployConfig, true));
 
-        if (!bluePrintConfig.containsKey(CarlConfig.DATA_DIR)) {
-            bluePrintConfig.put(CarlConfig.DATA_DIR, inputDataDir);
+        if (!bluePrintConfig.containsKey(QWEConfig.DATA_DIR)) {
+            bluePrintConfig.put(QWEConfig.DATA_DIR, inputDataDir);
         }
         try {
             return Optional.of(
-                IConfig.MAPPER_IGNORE_UNKNOWN_PROPERTY.readValue(bluePrintConfig.encode(), CarlConfig.class));
+                IConfig.MAPPER_IGNORE_UNKNOWN_PROPERTY.readValue(bluePrintConfig.encode(), QWEConfig.class));
         } catch (IOException ex) {
-            throw new CarlException("Converting to object failed", ex);
+            throw new QWEException("Converting to object failed", ex);
         }
     }
 

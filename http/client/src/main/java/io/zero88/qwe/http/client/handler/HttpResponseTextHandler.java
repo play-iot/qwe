@@ -18,7 +18,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.HttpStatusMapping;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
@@ -55,7 +55,7 @@ public abstract class HttpResponseTextHandler implements Function<HttpClientResp
             final int status = response.statusCode();
             if (!swallowError && status >= 400) {
                 ErrorCode code = HttpStatusMapping.error(response.request().getMethod(), status);
-                return Future.failedFuture(new CarlException(code, body.encode()));
+                return Future.failedFuture(new QWEException(code, body.encode()));
             }
             return Future.succeededFuture(
                 new ResponseData().setStatus(status).setHeaders(overrideHeader(response)).setBody(body));

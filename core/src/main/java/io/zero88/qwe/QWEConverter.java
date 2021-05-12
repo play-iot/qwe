@@ -1,6 +1,6 @@
 package io.zero88.qwe;
 
-public interface CarlConverter<T, V> {
+public interface QWEConverter<T, V> {
 
     V from(T t);
 

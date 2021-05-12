@@ -1,9 +1,9 @@
 package io.zero88.qwe.file;
 
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 
-public class FileOptionException extends CarlException {
+public class FileOptionException extends QWEException {
 
     public static final ErrorCode CODE = ErrorCode.parse("FILE_OPTION_ERROR");
 

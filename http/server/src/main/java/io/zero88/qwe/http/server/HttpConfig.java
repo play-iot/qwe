@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.CarlConfig.AppConfig;
+import io.zero88.qwe.QWEConfig.AppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.download.DownloadFileHandler;

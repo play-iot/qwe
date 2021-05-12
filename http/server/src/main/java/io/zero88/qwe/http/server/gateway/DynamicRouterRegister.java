@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.server.HttpLogSystem.GatewayLogSystem;
 import io.zero88.qwe.http.server.HttpServer;
 import io.zero88.qwe.http.server.RouterCreator;
@@ -56,7 +56,7 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLog
                 });
             }
             return true;
-        } catch (CarlException e) {
+        } catch (QWEException e) {
             log().warn(decor("Cannot register Dynamic service"), e);
             return false;
         }

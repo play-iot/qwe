@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public class ServiceException extends CarlException {
+public class ServiceException extends QWEException {
 
     protected ServiceException(ErrorCode code, String message, Throwable e) { super(code, message, e); }
 

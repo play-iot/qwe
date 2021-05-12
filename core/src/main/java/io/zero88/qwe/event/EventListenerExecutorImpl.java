@@ -11,7 +11,7 @@ import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
 import io.zero88.qwe.exceptions.UnsupportedException;
-import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;
+import io.zero88.qwe.exceptions.QWEExceptionConverter;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -63,7 +63,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
         }
         return future.otherwise(t -> {
             debug("Error when handling", action, address, t);
-            return EventMessage.replyError(action, CarlExceptionConverter.friendly(t));
+            return EventMessage.replyError(action, QWEExceptionConverter.friendly(t));
         });
     }
 

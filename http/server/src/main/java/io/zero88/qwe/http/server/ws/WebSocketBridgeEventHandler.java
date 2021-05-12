@@ -10,7 +10,7 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.event.EventModel;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -78,7 +78,7 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent>, WebSoc
         try {
             log.info(decor("Redirect message from address: {}"), address);
             executor.execute(WebSocketEventMessage.from(event.getRawMessage()), metadata, handleMessage(socket));
-        } catch (CarlException e) {
+        } catch (QWEException e) {
             handleMessage(socket).accept(EventMessage.error(EventAction.RETURN, e));
         }
     }

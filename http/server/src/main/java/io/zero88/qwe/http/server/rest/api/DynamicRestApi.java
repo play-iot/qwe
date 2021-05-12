@@ -7,7 +7,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.micro.servicetype.EventMessageService;
@@ -29,7 +29,7 @@ public interface DynamicRestApi {
         if (EventMessageService.TYPE.equals(record.getType())) {
             return (T) DynamicEventRestApi.create(record);
         }
-        throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Dynamic Rest API unsupported type " + record.getType());
+        throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Dynamic Rest API unsupported type " + record.getType());
     }
 
     /**

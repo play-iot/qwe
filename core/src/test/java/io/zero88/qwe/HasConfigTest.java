@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.vertx.core.json.JsonObject;
 
 import lombok.NonNull;
@@ -26,7 +26,7 @@ public class HasConfigTest {
 
     @Test
     public void test_invalid_config_should_throw_exception() {
-        Assertions.assertThrows(CarlException.class,
+        Assertions.assertThrows(QWEException.class,
                                 () -> hasConfig.computeConfig(new JsonObject().put("aaa", "yyy")));
     }
 

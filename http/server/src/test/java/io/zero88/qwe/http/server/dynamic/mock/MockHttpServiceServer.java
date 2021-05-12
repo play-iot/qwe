@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.ContextLookup;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpServerContext;
 import io.zero88.qwe.http.server.HttpServerProvider;
@@ -53,7 +53,7 @@ public class MockHttpServiceServer extends ApplicationVerticle {
         @Path("/error")
         @Produces(HttpUtils.JSON_UTF8_CONTENT_TYPE)
         public JsonObject error() {
-            throw new CarlException("error");
+            throw new QWEException("error");
         }
 
     }

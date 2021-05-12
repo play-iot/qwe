@@ -1,7 +1,6 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.CarlConfig.AppConfig;
-import io.zero88.qwe.IConfig;
+import io.zero88.qwe.QWEConfig.AppConfig;
 
 import lombok.Getter;
 import lombok.Setter;

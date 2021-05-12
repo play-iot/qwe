@@ -5,7 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.rest.api.AbstractRestEventApi;
 import io.zero88.qwe.http.server.rest.api.RestApi;
@@ -28,7 +28,7 @@ public class MockApiDefinition {
         @Path("/error")
         @Produces(HttpUtils.JSON_UTF8_CONTENT_TYPE)
         public JsonObject error() {
-            throw new CarlException("error");
+            throw new QWEException("error");
         }
 
     }

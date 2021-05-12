@@ -13,7 +13,7 @@ import org.quartz.TriggerKey;
 
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.exceptions.HiddenException;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.scheduler.model.trigger.QWETriggerModel.AbstractTriggerModel;
 import io.github.zero88.utils.Strings;
 
@@ -79,8 +79,8 @@ public final class CronTriggerModel extends AbstractTriggerModel {
             try {
                 return new CronExpression(expression);
             } catch (IllegalArgumentException | ParseException e) {
-                throw new CarlException(ErrorCode.INVALID_ARGUMENT, "Cannot parse cron expression",
-                                        new HiddenException(e));
+                throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Cannot parse cron expression",
+                                       new HiddenException(e));
             }
         }
 

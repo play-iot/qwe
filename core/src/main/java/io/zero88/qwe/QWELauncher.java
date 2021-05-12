@@ -10,10 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.CarlConfig.AppConfig;
-import io.zero88.qwe.CarlConfig.DeployConfig;
-import io.zero88.qwe.utils.Configs;
-import io.zero88.qwe.utils.Networks;
 import io.github.zero88.utils.Functions;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Launcher;
@@ -21,24 +17,28 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.QWEConfig.AppConfig;
+import io.zero88.qwe.QWEConfig.DeployConfig;
+import io.zero88.qwe.utils.Configs;
+import io.zero88.qwe.utils.Networks;
 
 import lombok.NonNull;
 
-public class CarlLauncher extends Launcher {
+public class QWELauncher extends Launcher {
 
     private static final Logger logger;
 
     static {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
-        logger = LoggerFactory.getLogger(CarlLauncher.class);
+        logger = LoggerFactory.getLogger(QWELauncher.class);
     }
 
-    private CarlConfig config;
+    private QWEConfig config;
     private VertxOptions options;
     //    private IClusterDelegate clusterDelegate;
 
     public static void main(String[] args) {
-        new CarlLauncher().dispatch(args);
+        new QWELauncher().dispatch(args);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class CarlLauncher extends Launcher {
         if (logger.isDebugEnabled()) {
             logger.debug("CONFIG::INPUT: {}", config.encode());
         }
-        this.config = IConfig.merge(Configs.loadJsonConfig("system.json"), config, CarlConfig.class);
+        this.config = IConfig.merge(Configs.loadJsonConfig("system.json"), config, QWEConfig.class);
         //        Vertx dummy = Vertx.vertx();
         //        this.config = new ConfigProcessor(dummy).override(fileConfig.toJson(), false, true).orElse
         //        (fileConfig);
@@ -75,8 +75,35 @@ public class CarlLauncher extends Launcher {
             //                clusterManager.nodeListener(new ClusterNodeListener(clusterDelegate,
             //                                                                    SharedDataDelegate
             //                                                                    .getEventController(vertx,
-            //                                                                                                          this.getClass()
-            //                                                                                                              .getName()),
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //                                                                                                   this
+            //
+            //
+            //
+            //                                                                                               .getClass()
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //                                                                                               .getName
+            //                                                                                              ()),
             //                                                                    addr));
             //            }
         }
@@ -112,7 +139,7 @@ public class CarlLauncher extends Launcher {
             logger.debug("CONFIG::INPUT DEPLOYMENT CFG: {}", input.encode());
             logger.debug("CONFIG::CURRENT DEPLOYMENT CFG: {}", config.getDeployConfig().toJson().encode());
         }
-        return IConfig.merge(config.getDeployConfig(), input, CarlConfig.DeployConfig.class);
+        return IConfig.merge(config.getDeployConfig(), input, QWEConfig.DeployConfig.class);
     }
 
     private AppConfig mergeAppConfig(DeploymentOptions deploymentOptions) {
@@ -121,7 +148,7 @@ public class CarlLauncher extends Launcher {
             logger.debug("CONFIG::INPUT APP CFG: {}", input.encode());
             logger.debug("CONFIG::CURRENT APP CFG: {}", config.getAppConfig().toJson().encode());
         }
-        return IConfig.merge(config.getAppConfig(), input, CarlConfig.AppConfig.class);
+        return IConfig.merge(config.getAppConfig(), input, QWEConfig.AppConfig.class);
     }
 
     private VertxOptions reloadVertxOptions(VertxOptions vertxOptions) {

@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 
 import io.zero88.qwe.MockProvider.MockComponent;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -54,7 +54,7 @@ public class ComponentVerticleTest {
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, component, t -> {
             TestHelper.testComplete(async);
-            Assert.assertTrue(t instanceof CarlException);
+            Assert.assertTrue(t instanceof QWEException);
             Assert.assertEquals("Invalid config format", t.getMessage());
         });
     }

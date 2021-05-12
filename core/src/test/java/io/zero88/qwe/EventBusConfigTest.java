@@ -10,7 +10,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.http.ClientAuth;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
-import io.zero88.qwe.CarlConfig.SystemConfig.EventBusConfig;
+import io.zero88.qwe.QWEConfig.SystemConfig.EventBusConfig;
 
 public class EventBusConfigTest {
 

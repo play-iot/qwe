@@ -12,7 +12,7 @@ import io.vertx.core.http.UpgradeRejectedException;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.TimeoutException;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.HttpException;
@@ -56,7 +56,7 @@ public abstract class WebSocketConnectErrorHandler implements Function<Throwable
         if (error instanceof UpgradeRejectedException) {
             final int status = ((UpgradeRejectedException) error).getStatus();
             return new HttpException(status, error.getMessage(),
-                                     new CarlException(HttpStatusMapping.error(HttpMethod.GET, status), error));
+                                     new QWEException(HttpStatusMapping.error(HttpMethod.GET, status), error));
         }
         return new HttpException("Failed when open WebSocket connection", error);
     }

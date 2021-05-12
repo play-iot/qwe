@@ -3,7 +3,7 @@ package io.zero88.qwe.scheduler;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import io.zero88.qwe.CarlConfig.AppConfig;
+import io.zero88.qwe.QWEConfig.AppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.scheduler.service.SchedulerMonitorService;
 import io.zero88.qwe.scheduler.service.SchedulerRegisterService;

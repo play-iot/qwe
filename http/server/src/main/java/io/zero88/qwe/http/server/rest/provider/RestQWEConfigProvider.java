@@ -1,14 +1,14 @@
 package io.zero88.qwe.http.server.rest.provider;
 
-import io.zero88.qwe.CarlConfig;
+import io.zero88.qwe.QWEConfig;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class RestCarlConfigProvider {
+public class RestQWEConfigProvider {
 
     @Getter
-    private final CarlConfig bpConfig;
+    private final QWEConfig bpConfig;
 
 }

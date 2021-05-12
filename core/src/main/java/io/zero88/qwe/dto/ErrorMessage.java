@@ -3,9 +3,9 @@ package io.zero88.qwe.dto;
 import java.io.Serializable;
 import java.util.function.Function;
 
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;
+import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 
@@ -28,11 +28,11 @@ import lombok.ToString;
 public final class ErrorMessage implements Serializable, JsonData {
 
     @JsonIgnore
-    private CarlException throwable;
+    private QWEException throwable;
     private io.github.zero88.exceptions.ErrorCode code;
     private String message;
 
-    private ErrorMessage(@NonNull CarlException throwable) {
+    private ErrorMessage(@NonNull QWEException throwable) {
         this.throwable = throwable;
         this.code = throwable.errorCode();
         this.message = throwable.getMessage();
@@ -49,10 +49,10 @@ public final class ErrorMessage implements Serializable, JsonData {
     }
 
     public static ErrorMessage parse(@NonNull Throwable throwable) {
-        return parse(throwable, CarlExceptionConverter::friendly);
+        return parse(throwable, QWEExceptionConverter::friendly);
     }
 
-    public static ErrorMessage parse(@NonNull Throwable throwable, @NonNull Function<Throwable, CarlException> c) {
+    public static ErrorMessage parse(@NonNull Throwable throwable, @NonNull Function<Throwable, QWEException> c) {
         return new ErrorMessage(c.apply(throwable));
     }
 

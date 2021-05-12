@@ -7,7 +7,7 @@ import org.quartz.JobKey;
 import io.github.zero88.exceptions.ErrorCode;
 import io.zero88.qwe.http.event.Waybill;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.github.zero88.utils.Strings;
 
 import lombok.Builder;
@@ -63,7 +63,7 @@ public final class EventbusJobModel extends AbstractQWEJobModel {
 
         public EventbusJobModel build() {
             if (Objects.nonNull(callback) && callback.getPattern() == EventPattern.REQUEST_RESPONSE) {
-                throw new CarlException(ErrorCode.INVALID_ARGUMENT,
+                throw new QWEException(ErrorCode.INVALID_ARGUMENT,
                                         "Callback Pattern doesn't support " + EventPattern.REQUEST_RESPONSE);
             }
             return new EventbusJobModel(key(), process, callback, isForwardIfFailure());

@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.DataNotFoundException;
 
 import io.zero88.qwe.protocol.network.Ipv4Network;
@@ -87,7 +87,7 @@ public class CommunicationProtocolTest {
         Assert.assertEquals("172.1.0.1/16", ipv4.getCidrAddress());
     }
 
-    @Test(expected = CarlException.class)
+    @Test(expected = QWEException.class)
     public void test_deserialize_invalid_ipv6() {
         JsonData.from("{\"type\":\"ipv6\",\"ifIndex\":1,\"ifName\":\"eth0\",\"cidrAddress\":\"172.1.0.1/16\"," +
                       "\"hostAddress\":\"172.1.0.2\"}", CommunicationProtocol.class);

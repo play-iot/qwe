@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public final class DataNotFoundException extends CarlException {
+public final class DataNotFoundException extends QWEException {
 
     public DataNotFoundException(String message, Throwable e) {
         super(ErrorCode.DATA_NOT_FOUND, message, e);

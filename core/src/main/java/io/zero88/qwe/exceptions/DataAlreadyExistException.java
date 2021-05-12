@@ -1,6 +1,6 @@
 package io.zero88.qwe.exceptions;
 
-public final class DataAlreadyExistException extends CarlException {
+public final class DataAlreadyExistException extends QWEException {
 
     public static final ErrorCode CODE = ErrorCode.DATA_ALREADY_EXIST;
 

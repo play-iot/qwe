@@ -43,7 +43,7 @@ public class ErrorMessageTest {
 
     @Test
     public void test_carl_exception() {
-        final ErrorMessage message = ErrorMessage.parse(new CarlException(ErrorCode.INVALID_ARGUMENT, "invalid"));
+        final ErrorMessage message = ErrorMessage.parse(new QWEException(ErrorCode.INVALID_ARGUMENT, "invalid"));
         Assertions.assertEquals(ErrorCode.INVALID_ARGUMENT, message.getCode());
         Assertions.assertEquals("invalid", message.getMessage());
     }
@@ -64,7 +64,7 @@ public class ErrorMessageTest {
 
     @Test
     public void test_serialize_to_json() throws JSONException {
-        ErrorMessage msg = ErrorMessage.parse(new CarlException(ErrorCode.INVALID_ARGUMENT, "invalid"));
+        ErrorMessage msg = ErrorMessage.parse(new QWEException(ErrorCode.INVALID_ARGUMENT, "invalid"));
         Assertions.assertNotNull(msg.getThrowable());
         JsonObject jsonMsg = msg.toJson();
         JSONAssert.assertEquals("{\"code\":\"INVALID_ARGUMENT\",\"message\":\"invalid\"}", jsonMsg.encode(),

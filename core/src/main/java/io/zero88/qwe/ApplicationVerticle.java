@@ -15,8 +15,8 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventBusDeliveryOption;
-import io.zero88.qwe.exceptions.CarlException;
-import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;
+import io.zero88.qwe.exceptions.QWEException;
+import io.zero88.qwe.exceptions.QWEExceptionConverter;
 
 import lombok.Getter;
 
@@ -30,13 +30,13 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
     private final Map<Class<? extends Component>, ComponentProvider<? extends Component>> providers = new HashMap<>();
     private final ContextLookupInternal contexts = new ContextLookupImpl();
     @Getter
-    protected CarlConfig config;
+    protected QWEConfig config;
     @Getter
     private EventBusClient eventBus;
 
     @Override
     public void start() {
-        final CarlConfig fileConfig = computeConfig(config());
+        final QWEConfig fileConfig = computeConfig(config());
         this.config = new ConfigProcessor(vertx).override(fileConfig.toJson(), true, false).orElse(fileConfig);
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION, new EventBusDeliveryOption(
             this.config.getSystemConfig().getEventBusConfig().getDeliveryOptions()));
@@ -129,7 +129,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
     }
 
     private void fail(Promise<Void> promise, Throwable throwable) {
-        CarlException t = CarlExceptionConverter.from(throwable);
+        QWEException t = QWEExceptionConverter.from(throwable);
         logger.error("Cannot start container verticle {}", this.getClass().getName(), t);
         promise.fail(t);
     }
