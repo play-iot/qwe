@@ -16,7 +16,7 @@ class CredentialTest {
         Assertions.assertEquals(Credential.CredentialType.BASIC, cred.getType());
         Assertions.assertEquals("abc", cred.getUser());
         Assertions.assertEquals("xxy", cred.getPassword());
-        Assertions.assertEquals("User: abc::Type: BASIC::Password:*****", cred.toString());
+        Assertions.assertEquals("Type[BASIC]::User[abc]::Password[******]", cred.toString());
         Assertions.assertEquals(new JsonObject("{\"user\":\"abc\",\"headerAuthType\":\"Basic\",\"type\":\"BASIC\"}"),
                                 cred.toJson());
     }
@@ -29,7 +29,7 @@ class CredentialTest {
         Assertions.assertEquals("Basic", cred.getHeaderAuthType());
         Assertions.assertEquals("hello", cred.getUser());
         Assertions.assertEquals("world", cred.getPassword());
-        Assertions.assertEquals("User: hello::Type: BASIC::Password:*****", cred.toString());
+        Assertions.assertEquals("Type[BASIC]::User[hello]::Password[******]", cred.toString());
     }
 
     @Test
@@ -38,7 +38,7 @@ class CredentialTest {
         Assertions.assertEquals(Credential.CredentialType.TOKEN, cred.getType());
         Assertions.assertEquals("abc", cred.getUser());
         Assertions.assertEquals("xxy", cred.getToken());
-        Assertions.assertEquals("User: abc::Type: TOKEN::Token: ******************************", cred.toString());
+        Assertions.assertEquals("Type[TOKEN]::User[abc]::Token[**********]", cred.toString());
         Assertions.assertEquals(new JsonObject("{\"user\":\"abc\",\"headerAuthType\":\"Bearer\",\"type\":\"TOKEN\"}"),
                                 cred.toJson());
     }
@@ -52,7 +52,7 @@ class CredentialTest {
         Assertions.assertEquals("Custom", cred.getHeaderAuthType());
         Assertions.assertEquals("hello", cred.getUser());
         Assertions.assertEquals("world", cred.getToken());
-        Assertions.assertEquals("User: hello::Type: TOKEN::Token: ******************************", cred.toString());
+        Assertions.assertEquals("Type[TOKEN]::User[hello]::Token[**********]", cred.toString());
     }
 
 }

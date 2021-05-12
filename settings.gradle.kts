@@ -16,7 +16,6 @@ pluginManagement {
     }
 }
 
-include("auth")
 include("http:client")
 include("http:server")
 include("micro:rpc")

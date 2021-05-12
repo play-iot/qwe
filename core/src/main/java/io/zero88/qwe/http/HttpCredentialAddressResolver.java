@@ -1,6 +1,7 @@
-package io.zero88.qwe.auth.resolver;
+package io.zero88.qwe.http;
 
 import io.zero88.qwe.auth.Credential;
+import io.zero88.qwe.auth.resolver.CredentialAddressResolver;
 
 import lombok.NonNull;
 

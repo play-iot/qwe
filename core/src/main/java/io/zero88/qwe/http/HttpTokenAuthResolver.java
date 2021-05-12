@@ -1,4 +1,4 @@
-package io.zero88.qwe.auth.resolver;
+package io.zero88.qwe.http;
 
 import java.util.Objects;
 
@@ -6,7 +6,7 @@ import io.zero88.qwe.auth.credential.TokenCredential;
 
 import lombok.NonNull;
 
-public class HttpTokenResolver extends HttpCredentialAddressResolver<TokenCredential> {
+public class HttpTokenAuthResolver extends HttpCredentialAddressResolver<TokenCredential> {
 
     @Override
     public @NonNull String resolveAddress(@NonNull String address, @NonNull TokenCredential credential) {

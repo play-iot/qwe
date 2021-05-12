@@ -3,10 +3,10 @@ package io.zero88.qwe.auth;
 import java.util.Collection;
 import java.util.HashSet;
 
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.EnumType;
 import io.zero88.qwe.dto.EnumType.AbstractEnumType;
 import io.zero88.qwe.dto.JsonData;
-import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -56,7 +56,7 @@ public interface Credential extends JsonData {
 
         @Override
         public String toString() {
-            return "User: " + user + "::Type: " + getType();
+            return "Type[" + getType() + "]::User[" + user + "]::" + maskSensitive();
         }
 
         @Override
@@ -69,6 +69,8 @@ public interface Credential extends JsonData {
             this.type = CredentialType.factory(type);
             return this;
         }
+
+        protected abstract String maskSensitive();
 
     }
 

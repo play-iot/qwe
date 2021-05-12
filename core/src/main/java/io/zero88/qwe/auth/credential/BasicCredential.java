@@ -6,7 +6,6 @@ import java.util.Collections;
 import io.zero88.qwe.auth.Credential.AbstractCredential;
 
 import lombok.AccessLevel;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
@@ -16,30 +15,34 @@ import lombok.extern.jackson.Jacksonized;
 @SuperBuilder
 @Jacksonized
 @FieldNameConstants(level = AccessLevel.PRIVATE)
-public final class TokenCredential extends AbstractCredential {
+public final class BasicCredential extends AbstractCredential {
 
-    private final String token;
-    @Default
-    private final String headerAuthType = "Bearer";
+    @Getter
+    private final String password;
 
     @Override
     public CredentialType getType() {
-        return CredentialType.TOKEN;
+        return CredentialType.BASIC;
+    }
+
+    @Override
+    public String getHeaderAuthType() {
+        return "Basic";
     }
 
     @Override
     public String secretValue() {
-        return getToken();
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + "::Token: ******************************";
+        return getPassword();
     }
 
     @Override
     protected Collection<String> sensitiveFields() {
-        return Collections.singleton(Fields.token);
+        return Collections.singleton(Fields.password);
+    }
+
+    @Override
+    protected String maskSensitive() {
+        return "Password[******]";
     }
 
 }

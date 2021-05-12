@@ -1,4 +1,4 @@
-package io.zero88.qwe.auth.resolver;
+package io.zero88.qwe.http;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -7,7 +7,7 @@ import io.zero88.qwe.auth.credential.BasicCredential;
 
 import lombok.NonNull;
 
-public class HttpBasicResolver extends HttpCredentialAddressResolver<BasicCredential> {
+public class HttpBasicAuthResolver extends HttpCredentialAddressResolver<BasicCredential> {
 
     @Override
     public @NonNull String resolveHeader(@NonNull BasicCredential credential) {
