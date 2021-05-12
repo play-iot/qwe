@@ -4,7 +4,7 @@ import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.MicroContext;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService {
 

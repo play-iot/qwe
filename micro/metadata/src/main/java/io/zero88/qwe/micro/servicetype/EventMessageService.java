@@ -2,7 +2,7 @@ package io.zero88.qwe.micro.servicetype;
 
 import java.util.Objects;
 
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;

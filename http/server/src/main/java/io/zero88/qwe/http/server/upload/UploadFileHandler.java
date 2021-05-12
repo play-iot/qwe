@@ -17,7 +17,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
 import io.zero88.qwe.http.server.rest.handler.RestEventRequestDispatcher;
 
@@ -36,18 +36,18 @@ public class UploadFileHandler implements RestEventRequestDispatcher {
     @NonNull
     @Accessors(fluent = true)
     private final EventBusClient eventbus;
-    private final EventModel eventModel;
+    private final String address;
     private final Path uploadDir;
     private final String publicUrl;
 
-    public static UploadFileHandler create(String handlerClass, @NonNull EventBusClient controller,
-                                           @NonNull EventModel eventModel, @NonNull Path uploadDir, String publicUrl) {
+    public static UploadFileHandler create(String handlerClass, @NonNull EventBusClient client, @NonNull String address,
+                                           @NonNull Path uploadDir, String publicUrl) {
         if (Strings.isBlank(handlerClass) || UploadFileHandler.class.getName().equals(handlerClass)) {
-            return new UploadFileHandler(controller, eventModel, uploadDir, publicUrl);
+            return new UploadFileHandler(client, address, uploadDir, publicUrl);
         }
         Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(EventBusClient.class, controller);
-        inputs.put(EventModel.class, eventModel);
+        inputs.put(EventBusClient.class, client);
+        inputs.put(String.class, address);
         inputs.put(Path.class, uploadDir);
         inputs.put(String.class, publicUrl);
         return ReflectionClass.createObject(handlerClass, inputs);
@@ -64,9 +64,8 @@ public class UploadFileHandler implements RestEventRequestDispatcher {
         JsonObject data = new JsonObject();
         context.fileUploads().forEach(fileUpload -> data.put(fileUpload.name(), extractFileInfo(link, fileUpload)));
         data.put("attributes", HttpHeaderUtils.serializeHeaders(context.request().formAttributes()));
-        EventMessage message = EventMessage.initial(
-            eventModel.getEvents().stream().findFirst().orElse(EventAction.CREATE), data);
-        dispatch(context, "UPLOAD", eventModel.getAddress(), eventModel.getPattern(), message);
+        EventMessage message = EventMessage.initial(EventAction.CREATE, data);
+        dispatch(context, "UPLOAD", address, EventPattern.REQUEST_RESPONSE, message);
     }
 
     private JsonObject extractFileInfo(String link, FileUpload fileUpload) {

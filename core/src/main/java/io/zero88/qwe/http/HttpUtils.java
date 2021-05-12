@@ -15,9 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.zero88.exceptions.InvalidUrlException;
-import io.zero88.qwe.dto.jpa.Pagination;
-import io.zero88.qwe.dto.jpa.Sort;
-import io.zero88.qwe.dto.msg.Filters;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.MultiMap;
@@ -28,6 +25,9 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.dto.jpa.Pagination;
+import io.zero88.qwe.dto.jpa.Sort;
+import io.zero88.qwe.dto.msg.Filters;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -143,8 +143,7 @@ public final class HttpUtils {
             final Map<String, Object> map = request.params()
                                                    .entries()
                                                    .stream()
-                                                   .collect(Collectors.toMap(Entry::getKey,
-                                                                             entry -> (Object) entry.getValue(),
+                                                   .collect(Collectors.toMap(Entry::getKey, Entry::getValue,
                                                                              (o, o2) -> {
                                                                                  if (o instanceof String) {
                                                                                      return new JsonArray().add(o)

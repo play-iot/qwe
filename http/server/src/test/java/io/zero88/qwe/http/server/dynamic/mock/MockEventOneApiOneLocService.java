@@ -7,7 +7,7 @@ import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.MicroContext;
 import io.zero88.qwe.micro.MicroVerticleProvider;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 public class MockEventOneApiOneLocService extends ApplicationVerticle {
 

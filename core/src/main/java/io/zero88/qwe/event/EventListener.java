@@ -45,7 +45,7 @@ public interface EventListener {
                 msg.reply(ar.result().toJson());
                 return;
             }
-            msg.reply(EventMessage.replyError(EventAction.UNKNOWN, ar.cause()));
+            msg.reply(EventMessage.replyError(EventAction.UNKNOWN, ar.cause()).toJson());
         });
     }
 

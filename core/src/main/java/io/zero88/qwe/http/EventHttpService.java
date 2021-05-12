@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro.http;
+package io.zero88.qwe.http;
 
 import java.util.Set;
 
@@ -20,7 +20,7 @@ public interface EventHttpService extends EventListener {
     String api();
 
     /**
-     * Declares Eventbus Address.
+     * Declares EventBus Address.
      *
      * @return service address. Default: {@code current class full-qualified name}
      * @since 1.0.0

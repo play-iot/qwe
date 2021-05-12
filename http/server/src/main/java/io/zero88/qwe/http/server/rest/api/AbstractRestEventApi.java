@@ -10,15 +10,14 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.http.ActionMethodMapping;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.event.RestEventApiMetadata;
 import io.zero88.qwe.http.server.HttpLogSystem.ApisLogSystem;
-import io.zero88.qwe.micro.http.ActionMethodMapping;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
-import io.vertx.core.http.HttpMethod;
 
 import lombok.NonNull;
 
@@ -38,29 +37,21 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisLogSyste
         return CRUD_MAP;
     }
 
-    protected void addRouter(@NonNull EventModel eventModel, String apiPath) {
-        addRouter(eventModel, EventMethodDefinition.create(apiPath, this));
+    protected void addRouter(String address, String apiPath, String paramPath) {
+        addRouter(address, EventMethodDefinition.create(apiPath, paramPath, this));
     }
 
-    protected void addRouter(@NonNull EventModel eventModel, String apiPath, String paramPath) {
-        addRouter(eventModel, EventMethodDefinition.create(apiPath, paramPath, this));
-    }
-
-    protected void addRouter(@NonNull EventModel eventModel, @NonNull EventMethodDefinition definition) {
-        addRouter(eventModel.getAddress(), eventModel.getPattern(), definition);
-    }
-
-    protected void addRouter(@NonNull String address, @NonNull EventPattern pattern,
-                             @NonNull EventMethodDefinition definition) {
+    protected void addRouter(@NonNull String address, @NonNull EventMethodDefinition definition) {
         if (restMetadata.containsKey(definition.getServicePath())) {
             logger.warn(decor("HTTP path '{}' is already registered, but might different Event address '{}'"),
                         definition.getServicePath(), restMetadata.get(definition.getServicePath()).getAddress());
         }
-        restMetadata.putIfAbsent(definition.getServicePath(), RestEventApiMetadata.builder()
-                                                                                  .address(address)
-                                                                                  .pattern(pattern)
-                                                                                  .definition(definition)
-                                                                                  .build());
+        RestEventApiMetadata metadata = RestEventApiMetadata.builder()
+                                                            .address(address)
+                                                            .pattern(EventPattern.REQUEST_RESPONSE)
+                                                            .definition(definition)
+                                                            .build();
+        restMetadata.putIfAbsent(definition.getServicePath(), metadata);
     }
 
     @Override

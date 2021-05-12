@@ -41,7 +41,7 @@ import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.http.client.HttpClientDelegate;
 import io.zero88.qwe.micro.MicroConfig.BackendConfig;
 import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;

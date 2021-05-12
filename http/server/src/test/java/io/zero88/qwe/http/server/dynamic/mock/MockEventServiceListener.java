@@ -15,7 +15,7 @@ import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.DataNotFoundException;
 

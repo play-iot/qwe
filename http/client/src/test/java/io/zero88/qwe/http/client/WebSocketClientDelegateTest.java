@@ -23,10 +23,10 @@ import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.event.Status;
 import io.zero88.qwe.http.HostInfo;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
 
 import lombok.RequiredArgsConstructor;

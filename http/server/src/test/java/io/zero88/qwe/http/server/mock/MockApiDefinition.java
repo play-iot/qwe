@@ -4,13 +4,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventModel;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.rest.api.AbstractRestEventApi;
 import io.zero88.qwe.http.server.rest.api.RestApi;
-import io.vertx.core.json.JsonObject;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,12 +38,7 @@ public class MockApiDefinition {
 
         @Override
         public MockRestEventApi initRouter() {
-            EventModel model = EventModel.builder()
-                                         .address("http.server.test")
-                                         .addEvents(EventAction.GET_LIST, EventAction.GET_ONE, EventAction.CREATE,
-                                                    EventAction.UPDATE, EventAction.PATCH)
-                                         .build();
-            this.addRouter(model, "/test/events", "/:event_id");
+            this.addRouter("http.server.test", "/test/events", "/:event_id");
             return this;
         }
 

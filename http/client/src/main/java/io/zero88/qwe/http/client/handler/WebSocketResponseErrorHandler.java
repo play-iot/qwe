@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.Handler;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 
 import lombok.Getter;
 import lombok.NonNull;

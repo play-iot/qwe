@@ -9,9 +9,8 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.event.EventReplyHandler;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
 

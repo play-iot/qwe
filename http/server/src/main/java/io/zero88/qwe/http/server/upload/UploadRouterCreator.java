@@ -1,16 +1,12 @@
 package io.zero88.qwe.http.server.upload;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 
 import io.github.zero88.utils.Strings;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.event.EventModel;
-import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpConfig.FileStorageConfig.UploadConfig;
 import io.zero88.qwe.http.server.HttpLogSystem.UploadLogSystem;
@@ -32,15 +28,8 @@ public class UploadRouterCreator implements RouterCreator<UploadConfig>, UploadL
         log().info(decor("Registering route: '{}' in storage '{}'..."), config.getPath(), storageDir);
         final EventBusClient eventbus = EventBusClient.create(sharedData);
         final String address = Strings.fallback(config.getListenerAddress(), sharedData.getSharedKey() + ".upload");
-        final EventModel listenerEvent = EventModel.builder()
-                                                   .address(address)
-                                                   .event(EventAction.CREATE)
-                                                   .pattern(EventPattern.REQUEST_RESPONSE)
-                                                   .local(true)
-                                                   .build();
-        final UploadListener listener = UploadListener.create(sharedData, config.getListenerClass(),
-                                                              new ArrayList<>(listenerEvent.getEvents()));
-        final UploadFileHandler handler = UploadFileHandler.create(config.getHandlerClass(), eventbus, listenerEvent,
+        final UploadListener listener = UploadListener.create(sharedData, config.getListenerClass());
+        final UploadFileHandler handler = UploadFileHandler.create(config.getHandlerClass(), eventbus, address,
                                                                    storageDir, publicUrl);
         eventbus.register(address, listener);
         final Router router = Router.router(sharedData.getVertx());

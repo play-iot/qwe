@@ -6,7 +6,7 @@ import org.quartz.JobExecutionContext;
 
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.Waybill;
+import io.zero88.qwe.http.event.Waybill;
 import io.zero88.qwe.scheduler.model.job.EventbusJobModel;
 
 import lombok.extern.slf4j.Slf4j;

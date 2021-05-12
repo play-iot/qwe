@@ -8,7 +8,7 @@ import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 import lombok.AccessLevel;
 import lombok.NonNull;

@@ -13,7 +13,7 @@ import io.vertx.core.buffer.Buffer;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 
 import lombok.NonNull;

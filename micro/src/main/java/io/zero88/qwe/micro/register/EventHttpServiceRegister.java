@@ -19,7 +19,7 @@ import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.http.EventHttpService;
+import io.zero88.qwe.http.EventHttpService;
 
 import lombok.Builder;
 import lombok.NonNull;

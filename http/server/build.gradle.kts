@@ -1,8 +1,7 @@
 dependencies {
-    api(project(":http:http-metadata"))
+    api(project(":qwe-core"))
     api(VertxLibs.web)
     api(WebLibs.jaxrs)
-    api(WebLibs.jbossJaxrs)
     compileOnly(project(":micro"))
     compileOnly(VertxLibs.serviceDiscovery)
 

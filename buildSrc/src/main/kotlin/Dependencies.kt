@@ -21,11 +21,9 @@ object WebLibs {
     object Version {
 
         const val jaxrs = "2.1.1"
-        const val jbossJaxrs = "2.0.1.Final"
     }
 
     const val jaxrs = "javax.ws.rs:javax.ws.rs-api:${Version.jaxrs}"
-    const val jbossJaxrs = "org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec:${Version.jbossJaxrs}"
 }
 
 object PluginLibs {

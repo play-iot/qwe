@@ -10,7 +10,7 @@ import io.vertx.servicediscovery.types.AbstractServiceReference;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 import lombok.NonNull;
 

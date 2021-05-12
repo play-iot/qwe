@@ -27,7 +27,7 @@ import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.micro.filter.ServiceLocatorParams;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.mock.MockEventbusService;
 import io.zero88.qwe.micro.servicetype.EventMessageService;
 import io.zero88.qwe.micro.type.ServiceScope;

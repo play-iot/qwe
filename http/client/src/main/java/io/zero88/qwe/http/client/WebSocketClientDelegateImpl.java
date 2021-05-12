@@ -10,7 +10,7 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.http.client.handler.WebSocketClientWriter;
 import io.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler;
 import io.zero88.qwe.http.client.handler.WebSocketResponseDispatcher;

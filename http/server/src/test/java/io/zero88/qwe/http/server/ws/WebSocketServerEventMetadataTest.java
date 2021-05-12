@@ -3,7 +3,7 @@ package io.zero88.qwe.http.server.ws;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;

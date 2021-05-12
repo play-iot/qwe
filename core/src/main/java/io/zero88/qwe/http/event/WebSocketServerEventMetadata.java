@@ -2,7 +2,6 @@ package io.zero88.qwe.http.event;
 
 import java.util.Objects;
 
-import io.zero88.qwe.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.github.zero88.utils.Urls;

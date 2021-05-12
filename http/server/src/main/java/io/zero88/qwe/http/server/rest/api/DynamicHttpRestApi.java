@@ -3,12 +3,12 @@ package io.zero88.qwe.http.server.rest.api;
 import java.util.Optional;
 import java.util.Set;
 
-import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.utils.Networks;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
+import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.utils.Networks;
 
 import lombok.NonNull;
 

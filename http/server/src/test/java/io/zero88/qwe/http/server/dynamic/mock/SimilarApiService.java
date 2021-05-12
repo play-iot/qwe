@@ -7,11 +7,11 @@ import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.micro.MicroContext;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 public class SimilarApiService extends MockEventOneApiOneLocService {
 

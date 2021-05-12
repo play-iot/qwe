@@ -15,7 +15,7 @@ import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.handler.DynamicContextDispatcher.AbstractDynamicContextDispatcher;
 import io.zero88.qwe.http.server.rest.api.DynamicEventRestApi;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.servicetype.EventMessageService;
 
 public final class DynamicEventApiDispatcher<T extends DynamicEventRestApi>

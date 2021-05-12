@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server.mock;
 
 import io.vertx.core.eventbus.EventBus;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 
 import lombok.RequiredArgsConstructor;
 

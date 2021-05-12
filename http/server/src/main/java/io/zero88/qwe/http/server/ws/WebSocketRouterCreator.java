@@ -10,7 +10,7 @@ import java.util.Objects;
 
 import io.github.zero88.exceptions.InvalidUrlException;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.zero88.qwe.http.server.BasePaths;

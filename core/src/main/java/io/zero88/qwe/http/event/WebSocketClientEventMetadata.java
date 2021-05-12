@@ -1,7 +1,6 @@
 package io.zero88.qwe.http.event;
 
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.github.zero88.utils.Strings;
 

@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.quartz.JobKey;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.zero88.qwe.event.Waybill;
+import io.zero88.qwe.http.event.Waybill;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.CarlException;
 import io.github.zero88.utils.Strings;

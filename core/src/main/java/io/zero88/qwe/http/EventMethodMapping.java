@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro.http;
+package io.zero88.qwe.http;
 
 import java.util.Objects;
 

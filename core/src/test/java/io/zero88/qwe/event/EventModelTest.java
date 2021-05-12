@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import io.zero88.qwe.http.event.EventModel;
+
 public class EventModelTest {
 
     @Test

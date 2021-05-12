@@ -39,15 +39,16 @@ public class CarlConfigTest {
         JSONAssert.assertEquals("{\"acceptBacklog\":-1,\"clientAuth\":\"NONE\",\"clusterPingInterval\":20000," +
                                 "\"clusterPingReplyInterval\":20000,\"clusterPublicPort\":-1," +
                                 "\"connectTimeout\":60000,\"crlPaths\":[],\"crlValues\":[]," +
-                                "\"enabledCipherSuites\":[],\"enabledSecureTransportProtocols\":[\"TLSv1\"," +
-                                "\"TLSv1.1\",\"TLSv1.2\"],\"host\":\"0.0.0.0\",\"idleTimeout\":0," +
+                                "\"enabledCipherSuites\":[],\"enabledSecureTransportProtocols\":[\"TLSv1\",\"TLSv1" +
+                                ".1\",\"TLSv1.2\"],\"host\":\"0.0.0.0\",\"idleTimeout\":0," +
                                 "\"idleTimeoutUnit\":\"SECONDS\",\"logActivity\":false,\"port\":5000," +
                                 "\"receiveBufferSize\":-1,\"reconnectAttempts\":0,\"reconnectInterval\":1000," +
                                 "\"reuseAddress\":true,\"reusePort\":false,\"sendBufferSize\":-1,\"soLinger\":-1," +
                                 "\"ssl\":false,\"sslHandshakeTimeout\":10,\"sslHandshakeTimeoutUnit\":\"SECONDS\"," +
                                 "\"tcpCork\":false,\"tcpFastOpen\":false,\"tcpKeepAlive\":false,\"tcpNoDelay\":true," +
                                 "\"tcpQuickAck\":false,\"trafficClass\":-1,\"trustAll\":true,\"useAlpn\":false," +
-                                "\"__delivery__\":{\"timeout\":30000,\"localOnly\":false}}",
+                                "\"__delivery__\":{\"timeout\":30000,\"localOnly\":false," +
+                                "\"tracingPolicy\":\"PROPAGATE\"}}",
                                 eventBusConfig.toJson().encode(), JSONCompareMode.STRICT);
         final DeployConfig deployConfig = from.getDeployConfig();
         Assertions.assertNotNull(deployConfig);

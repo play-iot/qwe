@@ -21,7 +21,7 @@ import io.zero88.qwe.IConfig;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseMicroVerticleTest {

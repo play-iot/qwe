@@ -6,7 +6,7 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 
 public class MockEventScheduler {

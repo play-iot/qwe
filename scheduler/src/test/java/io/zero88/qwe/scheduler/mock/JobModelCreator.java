@@ -1,8 +1,8 @@
 package io.zero88.qwe.scheduler.mock;
 
-import io.zero88.qwe.event.Waybill;
+import io.zero88.qwe.http.event.Waybill;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.scheduler.model.job.EventbusJobModel;
 
 import lombok.NonNull;
