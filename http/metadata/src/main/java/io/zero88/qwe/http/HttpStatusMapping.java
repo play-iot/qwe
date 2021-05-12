@@ -4,14 +4,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
+import java.util.Optional;
 
 import io.github.zero88.exceptions.HiddenException;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.cluster.ClusterException;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.exceptions.ErrorCode;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.vertx.core.http.HttpMethod;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -54,10 +54,10 @@ public final class HttpStatusMapping {
         map.put(ErrorCode.SECURITY_ERROR.code(), HttpResponseStatus.FORBIDDEN);
         map.put(ErrorCode.INSUFFICIENT_PERMISSION_ERROR.code(), HttpResponseStatus.FORBIDDEN);
 
-        map.put(ErrorCode.SERVICE_ERROR.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
+        map.put(ClusterException.CODE.code(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        map.put(ErrorCode.SERVICE_ERROR.code(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
         map.put(ErrorCode.SERVICE_NOT_FOUND.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
         map.put(ErrorCode.SERVICE_UNAVAILABLE.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
-        map.put(ClusterException.CODE.code(), HttpResponseStatus.SERVICE_UNAVAILABLE);
 
         map.put(ErrorCode.TIMEOUT_ERROR.code(), HttpResponseStatus.REQUEST_TIMEOUT);
         return Collections.unmodifiableMap(map);
@@ -82,12 +82,11 @@ public final class HttpStatusMapping {
     }
 
     public static HttpResponseStatus error(HttpMethod method, io.github.zero88.exceptions.ErrorCode errorCode) {
-        HttpResponseStatus status = STATUS_ERROR.get(errorCode.code());
-        if (Objects.nonNull(status)) {
-            return status;
-        }
-        return STATUS_METHOD_ERROR.getOrDefault(errorCode.code(), new HashMap<>())
-                                  .getOrDefault(method, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        final Map<HttpMethod, HttpResponseStatus> methodStatus = STATUS_METHOD_ERROR.get(errorCode.code());
+        return Optional.ofNullable(methodStatus)
+                       .map(m -> m.get(method))
+                       .orElseGet(() -> Optional.ofNullable(STATUS_ERROR.get(errorCode.code()))
+                                                .orElse(HttpResponseStatus.INTERNAL_SERVER_ERROR));
     }
 
     public static io.github.zero88.exceptions.ErrorCode error(HttpMethod method, int code) {

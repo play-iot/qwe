@@ -64,8 +64,8 @@ public class HttpStatusMappingTest {
     public void test_error_internal_server_error() {
         Assertions.assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                                 HttpStatusMapping.error(HttpMethod.DELETE, ErrorCode.UNKNOWN_ERROR));
-        Assertions.assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                                HttpStatusMapping.error(HttpMethod.GET, ErrorCode.SERVICE_ERROR));
+        Assertions.assertEquals(HttpResponseStatus.SERVICE_UNAVAILABLE,
+                                HttpStatusMapping.error(HttpMethod.GET, ErrorCode.SERVICE_NOT_FOUND));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class HttpStatusMappingTest {
             .parallel()
             .forEach(e -> e.getValue()
                            .parallelStream()
-                           .forEach(method -> Assertions.assertEquals(HttpResponseStatus.SERVICE_UNAVAILABLE,
+                           .forEach(method -> Assertions.assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                                                                       HttpStatusMapping.error(method, e.getKey()),
                                                                       Strings.format("Method: {0} | Code: {1}", method,
                                                                                      e.getKey()))));
@@ -93,7 +93,7 @@ public class HttpStatusMappingTest {
     @Test
     public void test_error_by_exception_with_hidden() {
         ServiceException t = new ServiceException("Hey", new HiddenException(ClusterException.CODE, "xx", null));
-        Assertions.assertEquals(HttpResponseStatus.SERVICE_UNAVAILABLE, HttpStatusMapping.error(HttpMethod.GET, t));
+        Assertions.assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, HttpStatusMapping.error(HttpMethod.GET, t));
     }
 
 }
