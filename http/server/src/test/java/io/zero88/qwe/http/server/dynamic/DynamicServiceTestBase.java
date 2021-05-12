@@ -8,14 +8,14 @@ import java.util.function.Supplier;
 import org.junit.Before;
 import org.skyscreamer.jsonassert.Customization;
 
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.VertxHelper;
-import io.zero88.qwe.component.ApplicationVerticle;
-import io.zero88.qwe.http.server.HttpServerTestBase;
-import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
+import io.zero88.qwe.ApplicationVerticle;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.VertxHelper;
+import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 
 public abstract class DynamicServiceTestBase extends HttpServerTestBase {
 
@@ -31,10 +31,10 @@ public abstract class DynamicServiceTestBase extends HttpServerTestBase {
                                           DeploymentOptions serviceOptions) {
         CountDownLatch latch = new CountDownLatch(2);
         DeploymentOptions config = new DeploymentOptions().setConfig(deployConfig(httpConfig.getPort()));
-        VertxHelper.deploy(vertx.getDelegate(), context, config, gateway().get(), id -> {
+        VertxHelper.deploy(vertx, context, config, gateway().get(), id -> {
             System.out.println("Gateway Deploy Id: " + id);
             latch.countDown();
-            VertxHelper.deploy(vertx.getDelegate(), context, serviceOptions, service, d -> {
+            VertxHelper.deploy(vertx, context, serviceOptions, service, d -> {
                 System.out.println("Service Deploy Id: " + d);
                 latch.countDown();
             });

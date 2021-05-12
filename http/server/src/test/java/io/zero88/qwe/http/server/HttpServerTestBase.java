@@ -16,20 +16,12 @@ import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.EventbusHelper;
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.component.ComponentTestHelper;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.HostInfo;
-import io.zero88.qwe.http.client.HttpClientDelegate;
-import io.zero88.qwe.http.server.ws.WebSocketEventMessage;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
-import io.reactivex.Single;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.RequestOptions;
@@ -41,8 +33,16 @@ import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.reactivex.core.Vertx;
-import io.vertx.reactivex.core.http.HttpClient;
+import io.zero88.qwe.ComponentTestHelper;
+import io.zero88.qwe.EventBusHelper;
+import io.zero88.qwe.IConfig;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.ResponseData;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.http.HostInfo;
+import io.zero88.qwe.http.client.HttpClientDelegate;
+import io.zero88.qwe.http.server.ws.WebSocketEventMessage;
 
 import lombok.NonNull;
 
@@ -117,28 +117,35 @@ public abstract class HttpServerTestBase {
     protected void assertRestByClient(TestContext context, HttpMethod method, String path, RequestData requestData,
                                       ExpectedResponse expected) {
         Async async = context.async(expected.hasAfter() ? 2 : 1);
-        HttpClientDelegate.create(vertx.getDelegate(), HostInfo.from(requestOptions))
+        HttpClientDelegate.create(vertx, HostInfo.from(requestOptions))
                           .request(path, method, requestData)
-                          .doFinally(() -> TestHelper.testComplete(async))
-                          .subscribe(resp -> expected._assert(context, async, resp), context::fail);
+                          .onSuccess(resp -> expected._assert(context, async, resp))
+                          .onFailure(context::fail)
+                          .eventually(v -> {
+                              TestHelper.testComplete(async);
+                              return Future.succeededFuture();
+                          });
     }
 
-    protected Single<ResponseData> restRequest(TestContext context, HttpMethod method, String path,
+    protected Future<ResponseData> restRequest(TestContext context, HttpMethod method, String path,
                                                RequestData requestData) {
         Async async = context.async();
-        return HttpClientDelegate.create(vertx.getDelegate(), HostInfo.from(requestOptions))
+        return HttpClientDelegate.create(vertx, HostInfo.from(requestOptions))
                                  .request(path, method, requestData)
-                                 .doFinally(() -> TestHelper.testComplete(async));
+                                 .eventually(v -> {
+                                     TestHelper.testComplete(async);
+                                     return Future.succeededFuture();
+                                 });
     }
 
     protected HttpServer startServer(TestContext context, HttpServerRouter httpRouter) {
-        return ComponentTestHelper.deploy(vertx.getDelegate(), context, httpConfig.toJson(),
-                                          new HttpServerProvider(httpRouter), folder.getRoot().toPath());
+        return ComponentTestHelper.deploy(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter),
+                                          folder.getRoot().toPath());
     }
 
     protected void startServer(TestContext context, HttpServerRouter httpRouter, Handler<Throwable> consumer) {
-        ComponentTestHelper.deployFailed(vertx.getDelegate(), context, httpConfig.toJson(),
-                                         new HttpServerProvider(httpRouter), consumer);
+        ComponentTestHelper.deployFailed(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter),
+                                         consumer);
     }
 
     protected JsonObject notFoundResponse(int port, String path) {
@@ -159,7 +166,7 @@ public abstract class HttpServerTestBase {
     }
 
     protected void assertJsonData(Async async, String address, Consumer<Object> asserter) {
-        EventbusHelper.assertReceivedData(vertx.getDelegate(), async, address, asserter, closeClient());
+        EventBusHelper.assertReceivedData(vertx, async, address, asserter, closeClient());
     }
 
     protected WebSocket setupSockJsClient(TestContext context, Async async, Consumer<Throwable> error)
@@ -174,11 +181,11 @@ public abstract class HttpServerTestBase {
         AtomicReference<WebSocket> wsReference = new AtomicReference<>();
         client.webSocket(wsOpt(requestOptions.setURI(Urls.combinePath(path, "websocket"))), ar -> {
             if (ar.succeeded()) {
-                final io.vertx.reactivex.core.http.WebSocket ws = ar.result();
+                final WebSocket ws = ar.result();
                 if (Objects.nonNull(writerBeforeHandler)) {
-                    writerBeforeHandler.accept(ws.getDelegate());
+                    writerBeforeHandler.accept(ws);
                 }
-                wsReference.set(ws.getDelegate());
+                wsReference.set(ws);
                 latch.countDown();
                 ws.endHandler(v -> testComplete(async, "CLIENT END"));
                 ws.exceptionHandler(error::accept);
@@ -207,7 +214,7 @@ public abstract class HttpServerTestBase {
     }
 
     protected WebSocketConnectOptions wsOpt(@NonNull RequestOptions opt) {
-//        HttpMethod method = opt.getMethod();
+        //        HttpMethod method = opt.getMethod();
         //        .put("method", method.name())
         return new WebSocketConnectOptions(opt.setMethod(null).toJson());
     }

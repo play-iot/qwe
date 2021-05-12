@@ -2,7 +2,7 @@ package io.zero88.qwe.scheduler.mock;
 
 import org.quartz.Scheduler;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.scheduler.service.SchedulerConverterHelper;
 import io.zero88.qwe.scheduler.service.SchedulerRegisterService;
 

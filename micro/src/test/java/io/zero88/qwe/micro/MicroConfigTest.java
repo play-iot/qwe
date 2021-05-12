@@ -24,7 +24,6 @@ public class MicroConfigTest {
         Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_ADDRESS,
                                 def.getDiscoveryConfig().getUsageAddress());
         Assertions.assertFalse(def.getDiscoveryConfig().isLocal());
-        Assertions.assertTrue(def.getDiscoveryConfig().isAutoRegistrationOfImporters());
 
         Assertions.assertFalse(def.getLocalDiscoveryConfig().isEnabled());
         Assertions.assertEquals(LocalServiceDiscoveryConfig.SERVICE_DISCOVERY_ANNOUNCE_LOCAL_ADDRESS,
@@ -32,7 +31,6 @@ public class MicroConfigTest {
         Assertions.assertEquals(LocalServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_LOCAL_ADDRESS,
                                 def.getLocalDiscoveryConfig().getUsageAddress());
         Assertions.assertTrue(def.getLocalDiscoveryConfig().isLocal());
-        Assertions.assertFalse(def.getLocalDiscoveryConfig().isAutoRegistrationOfImporters());
 
         Assertions.assertFalse(def.getCircuitConfig().isEnabled());
         System.out.println(def.toJson());

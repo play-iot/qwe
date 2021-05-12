@@ -11,6 +11,8 @@ import lombok.NonNull;
 @SuppressWarnings("rawtypes")
 public interface EventReplyHandler extends CarlConverter<EventMessage, Message> {
 
+    String DEFAULT_SYSTEM = "REPLY";
+
     static EventReplyHandler create() {
         return new EventReplyHandlerImpl();
     }
@@ -32,7 +34,7 @@ public interface EventReplyHandler extends CarlConverter<EventMessage, Message> 
     }
 
     default String replySystem() {
-        return "REPLY";
+        return DEFAULT_SYSTEM;
     }
 
     EventMessage otherwise(@NonNull Throwable err);

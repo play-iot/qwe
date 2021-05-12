@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server.rest.api;
 
 import java.util.Collection;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.http.event.RestEventApiMetadata;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
 import io.zero88.qwe.micro.http.ActionMethodMapping;

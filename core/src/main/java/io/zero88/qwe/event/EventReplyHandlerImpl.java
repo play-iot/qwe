@@ -11,8 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("rawtypes")
 class EventReplyHandlerImpl implements EventReplyHandler {
 
+    private final String system;
     private String address;
     private EventAction action;
+
+    EventReplyHandlerImpl(String system) {
+        this.system = system;
+    }
+
+    EventReplyHandlerImpl() {
+        this(EventReplyHandler.DEFAULT_SYSTEM);
+    }
 
     @Override
     public EventReplyHandler loadContext(String address, EventAction action) {
@@ -38,6 +47,10 @@ class EventReplyHandlerImpl implements EventReplyHandler {
     public EventMessage otherwise(Throwable err) {
         final String msg = Strings.format("No response on EventAction [{0}] from address [{1}]", action, address);
         return EventMessage.replyError(action, new TimeoutException(msg, new HiddenException(err)));
+    }
+
+    public String replySystem() {
+        return system;
     }
 
 }

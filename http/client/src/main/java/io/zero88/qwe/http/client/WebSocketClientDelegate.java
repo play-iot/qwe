@@ -1,12 +1,12 @@
 package io.zero88.qwe.http.client;
 
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.http.HostInfo;
-import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
-import io.reactivex.Single;
+import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.http.HostInfo;
+import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
 
 import lombok.NonNull;
 
@@ -74,9 +74,9 @@ public interface WebSocketClientDelegate extends IClientDelegate {
      * @param metadata Websocket metadata for {@code listener} and {@code publisher}
      * @return eventMessage for websocket status
      */
-    default Single<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata) {
+    default Future<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata) {
         return open(metadata, null);
-    };
+    }
 
     /**
      * Blocking open websocket connection
@@ -85,8 +85,8 @@ public interface WebSocketClientDelegate extends IClientDelegate {
      * @param headers  Websocket headers
      * @return eventMessage for websocket status
      */
-    Single<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata, MultiMap headers);
+    Future<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata, MultiMap headers);
 
-    EventbusClient getEventbus();
+    EventBusClient getEventbus();
 
 }

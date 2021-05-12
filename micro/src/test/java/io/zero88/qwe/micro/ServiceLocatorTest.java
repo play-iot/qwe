@@ -3,23 +3,24 @@ package io.zero88.qwe.micro;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.EventbusHelper;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.dto.msg.Filters;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.Status;
+import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.micro.filter.ServiceLocatorParams;
 import io.zero88.qwe.micro.transfomer.RecordTransformer.RecordView;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
 
 public class ServiceLocatorTest extends BaseMicroVerticleTest {
 
     @Test
     public void test_not_found(TestContext context) {
-        final JsonObject expected = new JsonObject().put("code", ServiceNotFoundException.CODE.code())
+        final JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_NOT_FOUND.code())
                                                     .put("message", "Not found service by given parameters: " +
                                                                     "{\"_by\":\"name\",\"identifier\":\"event.not" +
                                                                     ".found\"}");
@@ -81,7 +82,8 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
             "\"location\":\"event.address.2\",\"status\":\"UP\"}");
         testSuccess(context, RequestData.builder()
                                         .body(new JsonObject().put(ServiceLocatorParams.IDENTIFIER, "/xy"))
-                                        .filter(new JsonObject().put(ServiceLocatorParams.BY, "path").put(Filters.PRETTY, true))
+                                        .filter(new JsonObject().put(ServiceLocatorParams.BY, "path")
+                                                                .put(Filters.PRETTY, true))
                                         .build(), EventAction.GET_ONE, expected);
     }
 
@@ -114,11 +116,11 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                       Status status) {
         final Async async = context.async();
         final String dataKey = status == Status.FAILED ? "error" : "data";
-        final JsonObject response = new JsonObject().put("status", status)
-                                                    .put("action", action.action())
-                                                    .put(dataKey, expected);
-        eventbus.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData),
-                         EventbusHelper.replyAsserter(context, async, response, JSONCompareMode.LENIENT));
+        final JsonObject resp = new JsonObject().put("status", status)
+                                                .put("action", action.action())
+                                                .put(dataKey, expected);
+        eventbus.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData))
+                .onSuccess(msg -> JsonHelper.assertJson(context, async, resp, msg.toJson(), JSONCompareMode.LENIENT));
     }
 
 }

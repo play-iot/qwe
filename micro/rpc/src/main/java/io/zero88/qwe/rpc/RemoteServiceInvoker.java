@@ -1,14 +1,14 @@
 package io.zero88.qwe.rpc;
 
-import io.zero88.qwe.component.HasSharedData;
+import io.vertx.core.Future;
+import io.zero88.qwe.HasSharedData;
 import io.zero88.qwe.dto.msg.DataTransferObject.Headers;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventBusProxy;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.event.EventbusProxy;
-import io.zero88.qwe.micro.ServiceNotFoundException;
-import io.reactivex.Single;
+import io.zero88.qwe.exceptions.ServiceNotFoundException;
 
 import lombok.NonNull;
 
@@ -18,7 +18,7 @@ import lombok.NonNull;
  * @see <a href="https://en.wikipedia.org/wiki/Remote_procedure_call">Remote procedure call</a>
  * @since 1.0.0
  */
-public interface RemoteServiceInvoker extends EventbusProxy, HasSharedData {
+public interface RemoteServiceInvoker extends EventBusProxy, HasSharedData {
 
     /**
      * Request by string.
@@ -69,7 +69,7 @@ public interface RemoteServiceInvoker extends EventbusProxy, HasSharedData {
      * @return the single
      * @since 1.0.0
      */
-    default Single<EventMessage> invoke(@NonNull String address, @NonNull EventAction action,
+    default Future<EventMessage> invoke(@NonNull String address, @NonNull EventAction action,
                                         @NonNull RequestData reqData) {
         reqData.headers().put(Headers.X_REQUEST_BY, RemoteServiceInvoker.requestBy(requester()));
         return invoke(address, EventMessage.initial(action, reqData));
@@ -83,15 +83,15 @@ public interface RemoteServiceInvoker extends EventbusProxy, HasSharedData {
      * @return the single
      * @since 1.0.0
      */
-    default Single<EventMessage> invoke(@NonNull String address, @NonNull EventMessage message) {
-        return transporter().request(address, message).onErrorReturn(t -> {
+    default Future<EventMessage> invoke(@NonNull String address, @NonNull EventMessage message) {
+        return transporter().request(address, message).otherwise(t -> {
             throw new ServiceNotFoundException(notFoundMessage(serviceLabel()), t);
         });
     }
 
     @Override
-    default EventbusClient transporter() {
-        return EventbusClient.create(sharedData());
+    default EventBusClient transporter() {
+        return EventBusClient.create(sharedData());
     }
 
 }

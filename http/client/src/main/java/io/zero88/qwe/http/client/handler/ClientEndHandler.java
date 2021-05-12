@@ -1,15 +1,14 @@
 package io.zero88.qwe.http.client.handler;
 
+import io.vertx.core.Handler;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.client.HttpClientRegistry;
-import io.reactivex.functions.Action;
-import io.vertx.core.Handler;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class ClientEndHandler implements Handler<Void>, Action {
+public final class ClientEndHandler implements Handler<Void>, Runnable {
 
     @NonNull
     private final HostInfo options;

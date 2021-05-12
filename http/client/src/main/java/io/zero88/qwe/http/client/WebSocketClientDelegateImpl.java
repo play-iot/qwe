@@ -1,49 +1,49 @@
 package io.zero88.qwe.http.client;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.http.client.handler.WebSocketClientWriter;
-import io.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler;
-import io.zero88.qwe.http.client.handler.WebSocketResponseDispatcher;
-import io.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler;
-import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
-import io.reactivex.Single;
+import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.client.handler.WebSocketClientWriter;
+import io.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler;
+import io.zero88.qwe.http.client.handler.WebSocketResponseDispatcher;
+import io.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler;
+import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
 
 final class WebSocketClientDelegateImpl extends ClientDelegate implements WebSocketClientDelegate {
 
-    private final EventbusClient eventbus;
+    private final EventBusClient eventbus;
 
     WebSocketClientDelegateImpl(Vertx vertx, HttpClientConfig config) {
         super(vertx, config);
-        this.eventbus = EventbusClient.create(vertx);
+        //FIXME create client
+        this.eventbus = EventBusClient.create(SharedDataLocalProxy.create(vertx, "wtf"));
     }
 
     @Override
-    public Single<EventMessage> open(WebSocketClientEventMetadata metadata, MultiMap headers) {
+    public Future<EventMessage> open(WebSocketClientEventMetadata metadata, MultiMap headers) {
         final WebSocketConnectOptions options = new WebSocketConnectOptions().setHeaders(headers)
                                                                              .setURI(metadata.getPath());
-        return getRx().rxWebSocket(options)
-                      .map(webSocket -> onSuccess(webSocket, metadata))
-                      .onErrorReturn(WebSocketConnectErrorHandler.create(getHostInfo(), eventbus,
-                                                                         getHandlerConfig().getWebSocketConnectErrorHandlerCls()));
+        return get().webSocket(options)
+                    .map(webSocket -> onSuccess(webSocket, metadata))
+                    .otherwise(WebSocketConnectErrorHandler.create(getHostInfo(), eventbus,
+                                                                   getHandlerConfig().getWebSocketConnectErrorHandlerCls()));
     }
 
-    private EventMessage onSuccess(io.vertx.reactivex.core.http.WebSocket webSocket,
-                                   WebSocketClientEventMetadata metadata) {
+    private EventMessage onSuccess(WebSocket webSocket, WebSocketClientEventMetadata metadata) {
         logger.info("Websocket to {} is connected", getHostInfo().toJson());
-        WebSocket ws = webSocket.getDelegate();
-        eventbus.register(metadata.getPublisher(), new WebSocketClientWriter(ws, metadata.getPublisher()));
+        eventbus.register(metadata.getPublisher().getAddress(), new WebSocketClientWriter(webSocket));
         EventModel listener = metadata.getListener();
-        ws.handler(WebSocketResponseDispatcher.create(eventbus, listener,
-                                                      getHandlerConfig().getWebSocketResponseDispatcherCls()));
-        ws.exceptionHandler(
+        webSocket.handler(WebSocketResponseDispatcher.create(eventbus, listener,
+                                                             getHandlerConfig().getWebSocketResponseDispatcherCls()));
+        webSocket.exceptionHandler(
             WebSocketResponseErrorHandler.create(eventbus, listener, getHandlerConfig().getWebSocketErrorHandlerCls()));
         return EventMessage.success(EventAction.parse("OPEN"),
                                     new JsonObject().put("binaryHandlerID", webSocket.binaryHandlerID())
@@ -51,7 +51,7 @@ final class WebSocketClientDelegateImpl extends ClientDelegate implements WebSoc
     }
 
     @Override
-    public EventbusClient getEventbus() {
+    public EventBusClient getEventbus() {
         return eventbus;
     }
 

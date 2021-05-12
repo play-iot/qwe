@@ -6,15 +6,15 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.http.server.converter.RequestDataConverter;
-import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.ext.web.RoutingContext;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.http.server.converter.RequestDataConverter;
+import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -34,7 +34,7 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher {
     @Getter
     @NonNull
     @Accessors(fluent = true)
-    private final EventbusClient eventbus;
+    private final EventBusClient eventbus;
     @NonNull
     private final String address;
     @NonNull
@@ -45,13 +45,13 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher {
 
     @SuppressWarnings("unchecked")
     public static <T extends RestEventApiDispatcher> RestEventApiDispatcher create(Class<T> handler,
-                                                                                   EventbusClient eventbus,
+                                                                                   EventBusClient eventbus,
                                                                                    String address, EventAction action,
                                                                                    EventPattern pattern,
                                                                                    boolean useRequestData) {
         Class<T> handlerClass = Objects.isNull(handler) ? (Class<T>) RestEventApiDispatcher.class : handler;
         LinkedHashMap<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(EventbusClient.class, eventbus);
+        inputs.put(EventBusClient.class, eventbus);
         inputs.put(String.class, Strings.requireNotBlank(address));
         inputs.put(EventAction.class, action);
         inputs.put(EventPattern.class, pattern);

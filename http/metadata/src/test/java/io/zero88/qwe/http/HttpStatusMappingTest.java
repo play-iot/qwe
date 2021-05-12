@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import io.github.zero88.exceptions.HiddenException;
 import io.zero88.qwe.cluster.ClusterException;
 import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.HttpException;
 import io.zero88.qwe.exceptions.ServiceException;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -51,14 +50,14 @@ public class HttpStatusMappingTest {
                   .parallelStream()
                   .filter(method -> HttpMethod.GET != method)
                   .forEach(method -> Assertions.assertEquals(HttpResponseStatus.GONE,
-                                                             HttpStatusMapping.error(method, ErrorCode.NOT_FOUND),
+                                                             HttpStatusMapping.error(method, ErrorCode.DATA_NOT_FOUND),
                                                              "HTTP Method: " + method));
     }
 
     @Test
     public void test_error_not_found() {
         Assertions.assertEquals(HttpResponseStatus.NOT_FOUND,
-                                HttpStatusMapping.error(HttpMethod.GET, ErrorCode.NOT_FOUND));
+                                HttpStatusMapping.error(HttpMethod.GET, ErrorCode.DATA_NOT_FOUND));
     }
 
     @Test
@@ -72,7 +71,7 @@ public class HttpStatusMappingTest {
     @Test
     public void test_error_service_unavailable() {
         Map<ErrorCode, List<HttpMethod>> test = new HashMap<>();
-        test.put(ErrorCode.EVENT_ERROR, HttpMethod.values());
+        test.put(ErrorCode.SERVICE_ERROR, HttpMethod.values());
         test.put(ClusterException.CODE, HttpMethod.values());
         test.entrySet()
             .stream()

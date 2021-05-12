@@ -1,6 +1,6 @@
 package io.zero88.qwe.micro;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.micro.MicroConfig.LocalServiceDiscoveryConfig;
 import io.zero88.qwe.micro.type.ServiceKind;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;

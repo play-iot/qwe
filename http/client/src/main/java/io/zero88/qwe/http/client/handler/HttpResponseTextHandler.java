@@ -2,26 +2,26 @@ package io.zero88.qwe.http.client.handler;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.ErrorCode;
+import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.utils.Strings;
+import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.http.HttpStatusMapping;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
-import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.github.zero88.utils.Strings;
-import io.reactivex.Single;
-import io.reactivex.functions.Function;
-import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.core.buffer.Buffer;
-import io.vertx.reactivex.core.http.HttpClientResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages#body_2">HTTP Response body</a>
  */
 @RequiredArgsConstructor
-public abstract class HttpResponseTextHandler implements Function<HttpClientResponse, Single<ResponseData>> {
+public abstract class HttpResponseTextHandler implements Function<HttpClientResponse, Future<ResponseData>> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final boolean swallowError;
@@ -49,20 +49,21 @@ public abstract class HttpResponseTextHandler implements Function<HttpClientResp
     }
 
     @Override
-    public Single<ResponseData> apply(HttpClientResponse response) throws Exception {
-        return response.rxBody().flatMap(buffer -> {
+    public Future<ResponseData> apply(HttpClientResponse response) {
+        return response.body().flatMap(buffer -> {
             final JsonObject body = tryParse(response, buffer);
             final int status = response.statusCode();
             if (!swallowError && status >= 400) {
                 ErrorCode code = HttpStatusMapping.error(response.request().getMethod(), status);
-                return Single.error(new CarlException(code, body.encode()));
+                return Future.failedFuture(new CarlException(code, body.encode()));
             }
-            return Single.just(new ResponseData().setStatus(status).setHeaders(overrideHeader(response)).setBody(body));
+            return Future.succeededFuture(
+                new ResponseData().setStatus(status).setHeaders(overrideHeader(response)).setBody(body));
         });
     }
 
     private JsonObject overrideHeader(HttpClientResponse response) {
-        return HttpHeaderUtils.serializeHeaders(response.headers().getDelegate())
+        return HttpHeaderUtils.serializeHeaders(response.headers())
                               .put(HttpHeaders.CONTENT_TYPE.toString(), HttpUtils.JSON_UTF8_CONTENT_TYPE);
     }
 
@@ -73,10 +74,10 @@ public abstract class HttpResponseTextHandler implements Function<HttpClientResp
         final boolean isError = response.statusCode() >= 400;
         if (Strings.isNotBlank(contentType) && contentType.contains("json")) {
             logger.info("Try parsing Json data from {}::{}", method, uri);
-            return JsonData.tryParse(buffer.getDelegate(), true, isError).toJson();
+            return JsonData.tryParse(buffer, true, isError).toJson();
         }
         logger.warn("Try parsing Json in ambiguous case from {}::{}", method, uri);
-        return JsonData.tryParse(buffer.getDelegate(), false, isError).toJson();
+        return JsonData.tryParse(buffer, false, isError).toJson();
     }
 
 }

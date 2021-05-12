@@ -4,12 +4,12 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 
-import io.zero88.qwe.component.HasSharedData;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.HasSharedData;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventbusClient;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.Status;
 import io.zero88.qwe.scheduler.model.JobResult;
 import io.zero88.qwe.scheduler.model.job.QWEJobModel;
@@ -56,7 +56,7 @@ public interface QWEJob<J extends QWEJobModel> extends Job, HasSharedData {
                                            .fireId(context.getFireInstanceId())
                                            .fireTime(context.getFireTime())
                                            .build();
-        EventbusClient.create(sharedData())
+        EventBusClient.create(sharedData())
                       .publish(sharedData().getData(MONITOR_ADDRESS_KEY),
                                EventMessage.success(EventAction.MONITOR, new JsonObject().put("result", monitor)));
     }

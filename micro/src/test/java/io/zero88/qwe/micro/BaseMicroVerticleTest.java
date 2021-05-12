@@ -7,11 +7,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
-import io.reactivex.Single;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -20,6 +17,11 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpLocation;
+import io.zero88.qwe.IConfig;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.micro.http.EventMethodDefinition;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseMicroVerticleTest {
@@ -30,7 +32,7 @@ public abstract class BaseMicroVerticleTest {
     public static final String EVENT_ADDRESS_2 = "event.address.2";
     public static final String HTTP_RECORD = "http.test";
     protected MicroConfig config;
-    protected EventbusClient eventbus;
+    protected EventBusClient eventbus;
     private Vertx vertx;
     private MicroContext micro;
 
@@ -45,19 +47,21 @@ public abstract class BaseMicroVerticleTest {
         config = IConfig.fromClasspath("local.json", MicroConfig.class);
         vertx = Vertx.vertx();
         micro = new MicroContext().setup(vertx, config);
-        eventbus = EventbusClient.create(vertx, micro.sharedKey());
+        eventbus = EventBusClient.create(SharedDataLocalProxy.create(vertx, micro.sharedKey()));
         final ServiceDiscoveryInvoker discovery = micro.getLocalInvoker();
-        final Single<Record> record1 = discovery.addHttpRecord(HTTP_RECORD, new HttpLocation().setHost("123.456.0.1")
+        final Future<Record> record1 = discovery.addHttpRecord(HTTP_RECORD, new HttpLocation().setHost("123.456.0.1")
                                                                                               .setPort(1234)
                                                                                               .setRoot("/api"),
                                                                new JsonObject().put("meta", "test"));
-        final Single<Record> record2 = discovery.addEventMessageRecord(EVENT_RECORD_1, EVENT_ADDRESS_1,
+        final Future<Record> record2 = discovery.addEventMessageRecord(EVENT_RECORD_1, EVENT_ADDRESS_1,
                                                                        EventMethodDefinition.createDefault("/path",
                                                                                                            "/:param"));
-        final Single<Record> record3 = discovery.addEventMessageRecord(EVENT_RECORD_2, EVENT_ADDRESS_2,
+        final Future<Record> record3 = discovery.addEventMessageRecord(EVENT_RECORD_2, EVENT_ADDRESS_2,
                                                                        EventMethodDefinition.createDefault("/xy",
                                                                                                            "/:z"));
-        Single.concat(record1, record2, record3).subscribe(record -> TestHelper.testComplete(async), context::fail);
+        CompositeFuture.all(record1, record2, record3)
+                       .onSuccess(record -> TestHelper.testComplete(async))
+                       .onFailure(context::fail);
     }
 
     @After

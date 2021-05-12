@@ -1,7 +1,7 @@
 package io.zero88.qwe.scheduler;
 
-import io.zero88.qwe.component.ComponentProvider;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.ComponentProvider;
+import io.zero88.qwe.SharedDataLocalProxy;
 
 public final class SchedulerProvider implements ComponentProvider<SchedulerVerticle> {
 

@@ -33,7 +33,7 @@ public interface EventBusClient extends Transporter, HasSharedData {
 
     @GenIgnore
     static EventBusClient create(@NonNull SharedDataLocalProxy localDataProxy,
-                                   Class<EventReplyHandler> replyHandlerClass) {
+                                 Class<EventReplyHandler> replyHandlerClass) {
         return new EventBusClientImpl(localDataProxy, replyHandlerClass);
     }
 
@@ -75,7 +75,7 @@ public interface EventBusClient extends Transporter, HasSharedData {
     @Fluent
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
     default EventBusClient request(@NonNull String address, @NonNull EventMessage message,
-                                     @NonNull Handler<AsyncResult<EventMessage>> handler) {
+                                   @NonNull Handler<AsyncResult<EventMessage>> handler) {
         request(address, message).onComplete(handler);
         return this;
     }
@@ -99,7 +99,7 @@ public interface EventBusClient extends Transporter, HasSharedData {
     @Fluent
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
     default EventBusClient request(@NonNull String address, @NonNull EventMessage message, DeliveryOptions options,
-                                     @NonNull Handler<AsyncResult<EventMessage>> handler) {
+                                   @NonNull Handler<AsyncResult<EventMessage>> handler) {
         request(address, message, options).onComplete(handler);
         return this;
     }
@@ -130,6 +130,24 @@ public interface EventBusClient extends Transporter, HasSharedData {
     @Fluent
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
     EventBusClient publish(@NonNull String address, @NonNull EventMessage message, DeliveryOptions options);
+
+
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    default Future<EventMessage> fire(@NonNull String address, @NonNull EventPattern pattern,
+                                      @NonNull EventMessage message) {
+        if (pattern == EventPattern.REQUEST_RESPONSE) {
+            return request(address, message);
+        }
+        if (pattern == EventPattern.POINT_2_POINT) {
+            send(address, message);
+            return Future.succeededFuture();
+        }
+        if (pattern == EventPattern.PUBLISH_SUBSCRIBE) {
+            publish(address, message);
+            return Future.succeededFuture();
+        }
+        throw new IllegalArgumentException("Unknown EventBus pattern [" + pattern + "]");
+    }
 
     /**
      * Register event listener

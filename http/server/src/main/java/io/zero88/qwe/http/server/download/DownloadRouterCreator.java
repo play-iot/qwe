@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server.download;
 
 import java.nio.file.Path;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpConfig.FileStorageConfig.DownloadConfig;
 import io.zero88.qwe.http.server.HttpLogSystem.DownloadLogSystem;

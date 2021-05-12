@@ -1,18 +1,17 @@
 package io.zero88.qwe.http.server.upload;
 
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
-import io.zero88.qwe.event.EventListener;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
-import io.reactivex.Single;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventListener;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +36,7 @@ public class UploadListener implements EventListener {
         return ReflectionClass.createObject(listenerClass, inputs);
     }
 
-    @Override
-    public @NonNull Collection<EventAction> getAvailableEvents() { return actions; }
-
-    @EventContractor(action = "CREATE", returnType = Single.class)
-    public Single<JsonObject> create(JsonObject data) { return Single.just(data); }
+    @EBContract(action = "CREATE")
+    public Future<JsonObject> create(JsonObject data) { return Future.succeededFuture(data); }
 
 }

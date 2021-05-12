@@ -12,10 +12,6 @@ public interface EventListenerExecutor extends HasSharedData {
 
     @NonNull EventListener listener();
 
-    default EventReplyHandler converter() {
-        return EventReplyHandler.create();
-    }
-
     default EventAnnotationProcessor annotationProcessor() {
         return EventAnnotationProcessor.create();
     }

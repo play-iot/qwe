@@ -9,19 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.EventbusHelper;
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.Waybill;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.micro.filter.ServiceLocatorParams;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
-import io.zero88.qwe.micro.mock.MockEventbusService;
-import io.zero88.qwe.micro.servicetype.EventMessageService;
-import io.zero88.qwe.micro.type.ServiceScope;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -30,6 +17,20 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.servicediscovery.types.EventBusService;
 import io.vertx.servicediscovery.types.HttpLocation;
+import io.zero88.qwe.EventBusHelper;
+import io.zero88.qwe.IConfig;
+import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.micro.filter.ServiceLocatorParams;
+import io.zero88.qwe.micro.http.EventMethodDefinition;
+import io.zero88.qwe.micro.mock.MockEventbusService;
+import io.zero88.qwe.micro.servicetype.EventMessageService;
+import io.zero88.qwe.micro.type.ServiceScope;
 
 @RunWith(VertxUnitRunner.class)
 public class MicroContextTest {
@@ -87,15 +88,15 @@ public class MicroContextTest {
         final MicroConfig config = IConfig.fromClasspath("local.json", MicroConfig.class);
         micro = new MicroContext().setup(vertx, IConfig.fromClasspath("local.json", MicroConfig.class));
         JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"address1\"},\"metadata\":{\"service" +
-                                             ".interface\":\"io.zero88.qwe.micro.mock" +
-                                             ".MockEventbusService\"}," + "\"name\":\"test\",\"status\":\"UP\"," +
+                                             ".interface\":\"io.zero88.qwe.micro.mock" + ".MockEventbusService\"}," +
+                                             "\"name\":\"test\",\"status\":\"UP\"," +
                                              "\"type\":\"eventbus-service-proxy\"}");
-        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
+        EventBusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected));
-        EventbusClient controller = EventbusClient.create(vertx, MicroContext.class.getName());
+        EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, MicroContext.class.getName()));
         micro.getLocalInvoker()
              .addRecord(EventBusService.createRecord("test", "address1", MockEventbusService.class))
-             .subscribe(record -> {
+             .onSuccess(record -> {
                  final JsonObject indexExpected = new JsonObject(
                      "{\"status\":\"SUCCESS\",\"action\":\"GET_LIST\",\"data\":{\"apis\":[{\"name\":\"test\"," +
                      "\"type\":\"eventbus-service-proxy\",\"status\":\"UP\",\"location\":\"address1\"}]}}");
@@ -103,11 +104,10 @@ public class MicroContextTest {
                                                         .filter(new JsonObject().put(ServiceLocatorParams.SCOPE,
                                                                                      ServiceScope.INTERNAL))
                                                         .build();
-                 controller.fire(Waybill.builder()
-                                        .address(config.getGatewayConfig().getIndexAddress())
-                                        .payload(payload)
-                                        .action(EventAction.GET_LIST)
-                                        .build(), EventbusHelper.replyAsserter(context, async, indexExpected));
+                 client.request(config.getGatewayConfig().getIndexAddress(),
+                                EventMessage.initial(EventAction.GET_LIST, payload))
+                       .onSuccess(msg -> JsonHelper.assertJson(context, async, indexExpected, msg.toJson(),
+                                                               JSONCompareMode.LENIENT));
              });
     }
 
@@ -120,21 +120,19 @@ public class MicroContextTest {
                                              "\"host\":\"123.456.0.1\",\"port\":1234,\"root\":\"/api\"," +
                                              "\"ssl\":false},\"metadata\":{\"meta\":\"test\"},\"name\":\"http.test\"," +
                                              "\"status\":\"UP\",\"type\":\"http-endpoint\"}");
-        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
+        EventBusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected));
-        EventbusClient controller = EventbusClient.create(vertx, MicroContext.class.getName());
+        EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, MicroContext.class.getName()));
         micro.getLocalInvoker()
              .addHttpRecord("http.test", new HttpLocation().setHost("123.456.0.1").setPort(1234).setRoot("/api"),
                             new JsonObject().put("meta", "test"))
-             .subscribe(record -> {
+             .onSuccess(record -> {
                  final JsonObject indexExpected = new JsonObject(
                      "{\"status\":\"SUCCESS\",\"action\":\"GET_LIST\",\"data\":{\"apis\":[{\"name\":\"http.test\"," +
                      "\"status\":\"UP\",\"type\":\"http-endpoint\",\"location\":\"http://123.456.0.1:1234/api\"}]}}");
-                 controller.fire(Waybill.builder()
-                                        .address(config.getGatewayConfig().getIndexAddress())
-                                        .payload(RequestData.builder().build())
-                                        .action(EventAction.GET_LIST)
-                                        .build(), EventbusHelper.replyAsserter(context, async, indexExpected));
+                 client.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(EventAction.GET_LIST))
+                       .onSuccess(msg -> JsonHelper.assertJson(context, async, indexExpected, msg.toJson(),
+                                                               JSONCompareMode.LENIENT));
              });
     }
 
@@ -153,13 +151,13 @@ public class MicroContextTest {
             "\"regexPath\":\"/path/.+\"},{\"action\":\"REMOVE\",\"method\":\"DELETE\"," +
             "\"capturePath\":\"/path/:param\",\"regexPath\":\"/path/.+\"}],\"useRequestData\":true}}," +
             "\"name\":\"event-message\",\"status\":\"UP\",\"type\":\"eventbus-message-service\"}");
-        EventbusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
+        EventBusHelper.assertReceivedData(vertx, async, micro.getLocalInvoker().getConfig().getAnnounceAddress(),
                                           JsonHelper.asserter(context, async, expected, JSONCompareMode.LENIENT));
-        EventbusClient client = EventbusClient.create(vertx, MicroContext.class.getName());
+        EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, MicroContext.class.getName()));
         micro.getLocalInvoker()
              .addRecord(EventMessageService.createRecord("event-message", "address.1",
                                                          EventMethodDefinition.createDefault("/path", "/:param")))
-             .subscribe(record -> {
+             .onSuccess(record -> {
                  final JsonObject indexExpected = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"GET_LIST\"," +
                                                                  "\"data\":{\"apis\":[{\"name\":\"event-message\"," +
                                                                  "\"status\":\"UP\",\"location\":\"address.1\"," +
@@ -170,12 +168,9 @@ public class MicroContextTest {
                                                                  "\"path\":\"/path\"},{\"method\":\"DELETE\"," +
                                                                  "\"path\":\"/path/:param\"},{\"method\":\"GET\"," +
                                                                  "\"path\":\"/path/:param\"}]}]}}");
-                 client.fire(Waybill.builder()
-                                    .address(config.getGatewayConfig().getIndexAddress())
-                                    .payload(RequestData.builder().build())
-                                    .action(EventAction.GET_LIST)
-                                    .build(),
-                             EventbusHelper.replyAsserter(context, async, indexExpected, JSONCompareMode.LENIENT));
+                 client.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(EventAction.GET_LIST))
+                       .onSuccess(msg -> JsonHelper.assertJson(context, async, indexExpected, msg.toJson(),
+                                                               JSONCompareMode.LENIENT));
              });
     }
 

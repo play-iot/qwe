@@ -8,7 +8,7 @@ import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.micro.ServiceNotFoundException;
+import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.utils.Networks;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;

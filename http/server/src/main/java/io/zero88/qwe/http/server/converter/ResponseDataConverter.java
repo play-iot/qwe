@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server.converter;
 
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.CarlException;
-import io.zero88.qwe.exceptions.HttpException;
+import io.zero88.qwe.http.HttpException;
 import io.zero88.qwe.http.HttpStatusMapping;
 import io.zero88.qwe.http.server.handler.ResponseDataWriter;
 import io.netty.handler.codec.http.HttpResponseStatus;

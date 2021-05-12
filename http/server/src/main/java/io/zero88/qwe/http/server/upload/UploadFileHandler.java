@@ -5,12 +5,6 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
-import io.zero88.qwe.http.server.rest.handler.RestEventRequestDispatcher;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Reflections.ReflectionClass;
@@ -20,6 +14,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
+import io.zero88.qwe.http.server.rest.handler.RestEventRequestDispatcher;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,18 +35,18 @@ public class UploadFileHandler implements RestEventRequestDispatcher {
 
     @NonNull
     @Accessors(fluent = true)
-    private final EventbusClient eventbus;
+    private final EventBusClient eventbus;
     private final EventModel eventModel;
     private final Path uploadDir;
     private final String publicUrl;
 
-    public static UploadFileHandler create(String handlerClass, @NonNull EventbusClient controller,
+    public static UploadFileHandler create(String handlerClass, @NonNull EventBusClient controller,
                                            @NonNull EventModel eventModel, @NonNull Path uploadDir, String publicUrl) {
         if (Strings.isBlank(handlerClass) || UploadFileHandler.class.getName().equals(handlerClass)) {
             return new UploadFileHandler(controller, eventModel, uploadDir, publicUrl);
         }
         Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(EventbusClient.class, controller);
+        inputs.put(EventBusClient.class, controller);
         inputs.put(EventModel.class, eventModel);
         inputs.put(Path.class, uploadDir);
         inputs.put(String.class, publicUrl);

@@ -5,10 +5,12 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.DirectSchedulerFactory;
 import org.quartz.simpl.RAMJobStore;
 
-import io.zero88.qwe.component.ComponentContext;
-import io.zero88.qwe.component.ComponentContext.DefaultComponentContext;
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventbusClient;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
+import io.zero88.qwe.ComponentContext;
+import io.zero88.qwe.ComponentContext.DefaultComponentContext;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.scheduler.job.QWEJob;
 import io.zero88.qwe.scheduler.quartz.QWEJobFactory;
@@ -16,9 +18,6 @@ import io.zero88.qwe.scheduler.quartz.QWEThreadPool;
 import io.zero88.qwe.scheduler.service.SchedulerConverterHelper;
 import io.zero88.qwe.scheduler.service.SchedulerMonitorService;
 import io.zero88.qwe.scheduler.service.SchedulerRegisterService;
-import io.zero88.qwe.utils.ExecutorHelpers;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,7 +35,8 @@ public final class SchedulerContext extends DefaultComponentContext {
 
     SchedulerContext init(SharedDataLocalProxy sharedData, SchedulerConfig config) {
         final Vertx vertx = sharedData.getVertx();
-        ExecutorHelpers.blocking(vertx, () -> this.init(sharedData, config, vertx)).subscribe();
+        //FIXME
+        vertx.executeBlocking(p -> this.init(sharedData, config, vertx), ar -> {});
         return this;
     }
 
@@ -56,7 +56,7 @@ public final class SchedulerContext extends DefaultComponentContext {
     }
 
     private void registerSchedulerEvent(SharedDataLocalProxy sharedData, SchedulerConfig config) {
-        final EventbusClient eventbus = EventbusClient.create(sharedData);
+        final EventBusClient eventbus = EventBusClient.create(sharedData);
         sharedData.addData(QWEJob.MONITOR_ADDRESS_KEY, config.getMonitorAddress());
         eventbus.register(config.getRegisterAddress(),
                           SchedulerRegisterService.create(scheduler, sharedData, SchedulerConverterHelper.create(),
@@ -65,8 +65,8 @@ public final class SchedulerContext extends DefaultComponentContext {
                           SchedulerMonitorService.create(sharedData, config.monitorServiceClass()));
     }
 
-    void shutdown(Vertx vertx, Promise<Void> future) {
-        ExecutorHelpers.blocking(vertx, this::shutdown).subscribe(s -> future.complete(), future::fail);
+    void shutdown(Vertx vertx, Promise<Void> promise) {
+        vertx.executeBlocking(p -> this.shutdown()).onComplete(ar -> promise.handle(ar.mapEmpty()));
     }
 
     private SchedulerContext shutdown() {

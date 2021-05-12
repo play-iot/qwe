@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.zero88.qwe.component.ComponentContext;
-import io.zero88.qwe.component.ComponentVerticle;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.ComponentContext;
+import io.zero88.qwe.ComponentVerticle;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.exceptions.converter.CarlExceptionConverter;

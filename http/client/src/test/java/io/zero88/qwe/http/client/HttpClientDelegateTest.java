@@ -10,20 +10,21 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.TimeoutException;
 import io.zero88.qwe.http.HostInfo;
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
 public class HttpClientDelegateTest {
@@ -53,17 +54,15 @@ public class HttpClientDelegateTest {
     public void test_get_success(TestContext context) {
         Async async = context.async();
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
-        client.request("/get?foo1=bar1&foo2=bar2", HttpMethod.GET, null)
-              .doFinally(() -> TestHelper.testComplete(async))
-              .subscribe(resp -> {
-                  System.out.println(resp.body());
-                  System.out.println(resp.headers());
-                  JSONAssert.assertEquals("{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}",
-                                          resp.body().getJsonObject("args").encode(), JSONCompareMode.STRICT);
-                  //FIXME Cache?
-                  //                  context.assertNotNull(HttpClientRegistry.getInstance().getHttpRegistries().get
-                  //                  (hostInfo));
-              });
+        client.request("/get?foo1=bar1&foo2=bar2", HttpMethod.GET, null).onSuccess(resp -> {
+            System.out.println(resp.body());
+            System.out.println(resp.headers());
+            JsonHelper.assertJson(context, async, new JsonObject("{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}"),
+                                  resp.body().getJsonObject("args"), JSONCompareMode.STRICT);
+            //FIXME Cache?
+            //                  context.assertNotNull(HttpClientRegistry.getInstance().getHttpRegistries().get
+            //                  (hostInfo));
+        }).eventually(WebSocketClientDelegateTest.complete(async));
     }
 
     @Test
@@ -72,8 +71,8 @@ public class HttpClientDelegateTest {
         config.getOptions().setConnectTimeout(3000).setIdleTimeout(1);
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
         client.request("/delay/10", HttpMethod.GET, null)
-              .doFinally(() -> TestHelper.testComplete(async))
-              .subscribe((responseData, throwable) -> context.assertTrue(throwable instanceof TimeoutException));
+              .onFailure(t -> context.assertTrue(t instanceof TimeoutException))
+              .eventually(WebSocketClientDelegateTest.complete(async));
     }
 
     @Test
@@ -82,11 +81,8 @@ public class HttpClientDelegateTest {
         config.getOptions().setConnectTimeout(2000).setIdleTimeout(1);
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
         client.request("/xxx", HttpMethod.GET, null)
-              .doFinally(() -> TestHelper.testComplete(async))
-              .subscribe((responseData, throwable) -> {
-                  context.assertEquals(404, responseData.getStatus().code());
-                  context.assertNull(throwable);
-              });
+              .onSuccess(resp -> context.assertEquals(404, resp.getStatus().code()))
+              .eventually(WebSocketClientDelegateTest.complete(async));
     }
 
     @Test
@@ -94,14 +90,11 @@ public class HttpClientDelegateTest {
         Async async = context.async();
         config.getOptions().setConnectTimeout(2000).setIdleTimeout(1);
         HttpClientDelegate client = HttpClientDelegate.create(vertx, config, hostInfo);
-        client.request("/xxx", HttpMethod.GET, null, false)
-              .doFinally(() -> TestHelper.testComplete(async))
-              .subscribe((responseData, throwable) -> {
-                  context.assertNull(responseData);
-                  context.assertNotNull(throwable);
-                  assert throwable instanceof CarlException;
-                  context.assertEquals(ErrorCode.NOT_FOUND, ((CarlException) throwable).errorCode());
-              });
+        client.request("/xxx", HttpMethod.GET, null, false).onFailure(t -> {
+            context.assertNotNull(t);
+            assert t instanceof CarlException;
+            context.assertEquals(ErrorCode.DATA_NOT_FOUND, ((CarlException) t).errorCode());
+        }).eventually(WebSocketClientDelegateTest.complete(async));
     }
 
     @Test
@@ -127,13 +120,13 @@ public class HttpClientDelegateTest {
         context.assertEquals(1, HttpClientRegistry.getInstance().getHttpRegistries().get(host2).current());
 
         client1.request("/xxx", HttpMethod.GET, null)
-               .subscribe((r, t) -> countDown(async, latch, client1, r, t, "/xxx", false));
+               .onComplete(ar -> countDown(async, latch, client1, ar.result(), ar.cause(), "/xxx", false));
 
         client2.request("/yyy", HttpMethod.GET, null)
-               .subscribe((r, t) -> countDown(async, latch, client2, r, t, "/yyy", false));
+               .onComplete(ar -> countDown(async, latch, client2, ar.result(), ar.cause(), "/yyy", false));
 
         client3.request("/echo", HttpMethod.GET, null)
-               .subscribe((r, t) -> countDown(async, latch, client3, r, t, "/echo", true));
+               .onComplete(ar -> countDown(async, latch, client3, ar.result(), ar.cause(), "/echo", true));
         final boolean await = latch.await(TestHelper.TEST_TIMEOUT_SEC * 2, TimeUnit.SECONDS);
         if (await) {
             TestHelper.testComplete(async);
@@ -152,11 +145,12 @@ public class HttpClientDelegateTest {
         } else {
             System.out.println("RESPONSE " + path + ":" + r.toJson());
         }
-        client.close().subscribe(() -> {
+        client.close().onSuccess(v -> {
             latch.countDown();
             TestHelper.testComplete(async);
-        }, err -> {
+        }).onFailure(err -> {
             latch.countDown();
+            err.printStackTrace();
             TestHelper.testComplete(async);
         });
     }

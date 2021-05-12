@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.component.ApplicationVerticle;
+import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.dynamic.mock.MockHttpServiceServer;
 import io.vertx.core.DeploymentOptions;
@@ -55,7 +55,7 @@ public class DynamicHttpServerTest extends DynamicServiceTestBase {
     public void test_not_found(TestContext context) {
         JsonObject m = new JsonObject().put("message", "Resource not found");
         assertRestByClient(context, HttpMethod.GET, "/api/s/rest/xxx", 404,
-                           new JsonObject().put("code", ErrorCode.NOT_FOUND.code()).put("message", m),
+                           new JsonObject().put("code", ErrorCode.DATA_NOT_FOUND.code()).put("message", m),
                            JsonHelper.ignore("message.uri"));
     }
 

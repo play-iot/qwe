@@ -7,7 +7,6 @@
       },
       "__serviceDiscovery__": {
         "announceAddress": "qwe.service.discovery.announce",
-        "autoRegistrationOfImporters": true,
         "backendConfig": {
           "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
         },
@@ -16,7 +15,6 @@
       },
       "__localServiceDiscovery__": {
         "announceAddress": "qwe.service.local.discovery.announce",
-        "autoRegistrationOfImporters": false,
         "backendConfig": {
           "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
         },

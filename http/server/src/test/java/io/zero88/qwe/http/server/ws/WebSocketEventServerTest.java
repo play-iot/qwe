@@ -9,18 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.http.server.HttpServerRouter;
-import io.zero88.qwe.http.server.HttpServerTestBase;
-import io.zero88.qwe.http.server.mock.MockWebSocketEvent;
-import io.zero88.qwe.http.server.mock.MockWebSocketEvent.MockWebSocketEventServerListener;
 import io.github.zero88.utils.Urls;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.UpgradeRejectedException;
 import io.vertx.core.http.WebSocket;
@@ -30,8 +21,18 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.reactivex.core.http.HttpClientRequest;
-import io.vertx.reactivex.core.http.HttpClientResponse;
+import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.exceptions.InitializerError;
+import io.zero88.qwe.http.server.HttpServerRouter;
+import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.mock.MockWebSocketEvent;
+import io.zero88.qwe.http.server.mock.MockWebSocketEvent.MockWebSocketEventServerListener;
 
 @RunWith(VertxUnitRunner.class)
 public class WebSocketEventServerTest extends HttpServerTestBase {
@@ -105,8 +106,8 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
     public void test_client_listen_only_publisher(TestContext context) {
         EventMessage echo = EventMessage.success(EventAction.GET_ONE, new JsonObject().put("echo", 1));
         EventModel publisher = MockWebSocketEvent.ONLY_PUBLISHER.getPublisher();
-        EventbusClient controller = EventbusClient.create(vertx.getDelegate(), this.getClass().getName());
-        vertx.setPeriodic(1000, t -> controller.fire(publisher.getAddress(), publisher.getPattern(), echo));
+        EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, this.getClass().getName()));
+        vertx.setPeriodic(1000, t -> client.fire(publisher.getAddress(), publisher.getPattern(), echo));
         Async async = context.async(1);
         assertJsonData(async, publisher.getAddress(), JsonHelper.asserter(context, async, echo.toJson()));
     }
@@ -116,9 +117,9 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         EventModel publisher = MockWebSocketEvent.ONLY_PUBLISHER.getPublisher();
         EventMessage echo = EventMessage.success(EventAction.GET_ONE, new JsonObject().put("echo", 1));
         JsonObject expected = createWebsocketMsg(publisher.getAddress(), echo, BridgeEventType.RECEIVE);
-        EventbusClient controller = EventbusClient.create(vertx.getDelegate(), this.getClass().getName());
+        EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, this.getClass().getName()));
         startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ONLY_PUBLISHER));
-        vertx.setPeriodic(1000, t -> controller.fire(publisher.getAddress(), publisher.getPattern(), echo));
+        vertx.setPeriodic(1000, t -> client.fire(publisher.getAddress(), publisher.getPattern(), echo));
         Async async = context.async(1);
         WebSocket ws = setupSockJsClient(context, async,
                                          Urls.combinePath("/ws", MockWebSocketEvent.ONLY_PUBLISHER.getPath()),

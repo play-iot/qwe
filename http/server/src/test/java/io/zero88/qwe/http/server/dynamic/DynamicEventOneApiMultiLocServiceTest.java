@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.component.ApplicationVerticle;
+import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.http.server.dynamic.mock.MockEventOneApiMultiLocService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;

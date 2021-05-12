@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventModel;

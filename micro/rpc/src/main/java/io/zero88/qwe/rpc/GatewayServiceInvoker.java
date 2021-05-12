@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import io.github.zero88.utils.Strings;
-import io.reactivex.Single;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Status;
 import io.zero88.qwe.dto.ErrorMessage;
@@ -14,7 +14,8 @@ import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.CarlException;
-import io.zero88.qwe.micro.ServiceNotFoundException;
+import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.micro.filter.ByPredicate;
 import io.zero88.qwe.micro.filter.ServiceLocatorParams;
 import io.zero88.qwe.micro.transfomer.RecordOutput;
@@ -99,7 +100,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      * @return destination address
      * @since 1.0.0
      */
-    default Single<String> search(@NonNull EventAction action) {
+    default Future<String> search(@NonNull EventAction action) {
         final RequestData searchReq = RequestData.builder()
                                                  .body(new JsonObject().put(ServiceLocatorParams.IDENTIFIER,
                                                                             destination()))
@@ -112,14 +113,16 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
                                                                           RecordView.TECHNICAL)
                                                                      .put(ServiceLocatorParams.ACTION, action.action()))
                                                  .build();
-        final Single<EventMessage> invoker = invoke(gatewayAddress(), EventAction.GET_ONE, searchReq);
+        final Future<EventMessage> invoker = invoke(gatewayAddress(), EventAction.GET_ONE, searchReq);
         return invoker.flatMap(out -> out.isError()
-                                      ? Single.error(notFound().apply(out.getError()))
-                                      : Single.just(Optional.ofNullable(out.getData()).orElse(new JsonObject())))
+                                      ? Future.failedFuture(notFound().apply(out.getError()))
+                                      : Future.succeededFuture(
+                                          Optional.ofNullable(out.getData()).orElse(new JsonObject())))
                       .map(json -> json.getString(RecordOutput.Fields.location))
-                      .filter(Strings::isNotBlank)
-                      .switchIfEmpty(Single.error(new ServiceNotFoundException(
-                          "Not found destination address of service name '" + destination() + "'")));
+                      .flatMap(addr -> Strings.isBlank(addr)
+                                       ? Future.failedFuture(new ServiceNotFoundException(
+                          "Not found destination address of service name '" + destination() + "'"))
+                                       : Future.succeededFuture(addr));
     }
 
     /**
@@ -135,7 +138,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      * @see RequestData
      * @since 1.0.0
      */
-    default Single<JsonObject> execute(@NonNull EventAction action, JsonObject data) {
+    default Future<JsonObject> execute(@NonNull EventAction action, JsonObject data) {
         return execute(action, RequestData.builder().body(data).build());
     }
 
@@ -151,7 +154,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      * @see RequestData
      * @since 1.0.0
      */
-    default Single<JsonObject> execute(@NonNull EventAction action, @NonNull RequestData reqData) {
+    default Future<JsonObject> execute(@NonNull EventAction action, @NonNull RequestData reqData) {
         return search(action).flatMap(address -> execute(address, action, reqData));
     }
 
@@ -164,7 +167,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      * @return json result
      * @since 1.0.0
      */
-    default Single<JsonObject> execute(@NonNull String address, @NonNull EventAction action,
+    default Future<JsonObject> execute(@NonNull String address, @NonNull EventAction action,
                                        @NonNull RequestData reqData) {
         return this.invoke(address, action, reqData).map(out -> {
             if (out.isError() && throwIfResponseError()) {
@@ -183,7 +186,7 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      * @since 1.0.0
      */
     default Function<ErrorMessage, CarlException> notFound() {
-        return msg -> ErrorMessageConverter.override(msg, ServiceNotFoundException.CODE,
+        return msg -> ErrorMessageConverter.override(msg, ErrorCode.SERVICE_NOT_FOUND,
                                                      RemoteServiceInvoker.notFoundMessage(serviceLabel()));
     }
 

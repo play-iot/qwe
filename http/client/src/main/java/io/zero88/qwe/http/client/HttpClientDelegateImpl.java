@@ -2,6 +2,17 @@ package io.zero88.qwe.http.client;
 
 import java.util.Objects;
 
+import io.github.zero88.utils.Urls;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.file.AsyncFile;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.streams.ReadStream;
+import io.vertx.core.streams.WriteStream;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.HostInfo;
@@ -11,17 +22,6 @@ import io.zero88.qwe.http.client.HttpClientConfig.HandlerConfig;
 import io.zero88.qwe.http.client.handler.HttpErrorHandler;
 import io.zero88.qwe.http.client.handler.HttpRequestMessageComposer;
 import io.zero88.qwe.http.client.handler.HttpResponseTextHandler;
-import io.github.zero88.utils.Urls;
-import io.reactivex.Single;
-import io.vertx.core.Vertx;
-import io.vertx.core.file.AsyncFile;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.streams.ReadStream;
-import io.vertx.core.streams.WriteStream;
-import io.vertx.reactivex.core.http.HttpClientRequest;
 
 import lombok.NonNull;
 
@@ -36,35 +36,35 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
     }
 
     @Override
-    public Single<ResponseData> request(String path, HttpMethod method, RequestData requestData, boolean swallowError) {
+    public Future<ResponseData> request(String path, HttpMethod method, RequestData requestData, boolean swallowError) {
         final RequestData reqData = decorator(requestData);
         final HostInfo hostInfo = getHostInfo();
         final HandlerConfig cfg = getHandlerConfig();
-        return getRx().rxRequest(method, Urls.buildURL(path, HttpRequests.serializeQuery(reqData.filter())))
-                      .flatMap(req -> onConnectionSuccess(req, reqData, cfg, swallowError))
-                      .onErrorResumeNext(HttpErrorHandler.create(hostInfo, cfg.getHttpErrorHandlerCls()))
-                      //FIXME Cache?
-                      .doOnSuccess(res -> HttpClientRegistry.getInstance().remove(hostInfo, false))
-                      .doOnError(err -> HttpClientRegistry.getInstance().remove(hostInfo, false));
+        return get().request(method, Urls.buildURL(path, HttpRequests.serializeQuery(reqData.filter())))
+                    .flatMap(req -> onConnectionSuccess(req, reqData, cfg, swallowError))
+                    .recover(HttpErrorHandler.create(hostInfo, cfg.getHttpErrorHandlerCls()))
+                    //FIXME Cache?
+                    .onSuccess(res -> HttpClientRegistry.getInstance().remove(hostInfo, false))
+                    .onFailure(err -> HttpClientRegistry.getInstance().remove(hostInfo, false));
     }
 
     @Override
-    public Single<ResponseData> upload(String path, String uploadFile) {
+    public Future<ResponseData> upload(String path, String uploadFile) {
         return null;
     }
 
     @Override
-    public Single<ResponseData> push(String path, ReadStream readStream, HttpMethod method) {
+    public Future<ResponseData> push(String path, ReadStream readStream, HttpMethod method) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
-    public Single<AsyncFile> download(String path, AsyncFile saveFile) {
+    public Future<AsyncFile> download(String path, AsyncFile saveFile) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
-    public Single<WriteStream> pull(String path, WriteStream writeStream) {
+    public Future<WriteStream> pull(String path, WriteStream writeStream) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -82,7 +82,7 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
         return reqData;
     }
 
-    private Single<ResponseData> onConnectionSuccess(HttpClientRequest req, RequestData reqData,
+    private Future<ResponseData> onConnectionSuccess(HttpClientRequest req, RequestData reqData,
                                                      HandlerConfig handlerConfig, boolean swallowError) {
         if (logger.isDebugEnabled()) {
             logger.debug("Send HTTP request {}::{} | <{}>", req.getMethod(), req.absoluteURI(), reqData.toJson());
@@ -91,7 +91,7 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
         }
         return HttpRequestMessageComposer.create(handlerConfig.getReqComposerCls())
                                          .apply(req, reqData)
-                                         .rxSend()
+                                         .send()
                                          .flatMap(HttpResponseTextHandler.create(swallowError,
                                                                                  handlerConfig.getRespTextHandlerCls()));
     }

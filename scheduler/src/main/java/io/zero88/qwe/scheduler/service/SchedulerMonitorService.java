@@ -3,11 +3,11 @@ package io.zero88.qwe.scheduler.service;
 import java.util.Collection;
 import java.util.Collections;
 
-import io.zero88.qwe.component.HasSharedData;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.HasSharedData;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
-import io.zero88.qwe.event.EventContractor.Param;
+import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.Status;
 import io.zero88.qwe.scheduler.model.JobResult;
@@ -35,13 +35,8 @@ public class SchedulerMonitorService implements EventListener, HasSharedData {
     @NonNull
     private final SharedDataLocalProxy sharedData;
 
-    @Override
-    public @NonNull Collection<EventAction> getAvailableEvents() {
-        return Collections.singleton(EventAction.MONITOR);
-    }
-
-    @EventContractor(action = "MONITOR")
-    public JsonObject monitor(@Param("result") JobResult result) {
+    @EBContract(action = "MONITOR")
+    public JsonObject monitor(@EBParam("result") JobResult result) {
         if (result.getStatus() == Status.FAILED) {
             log.warn("Schedule Job::{}", result.toJson());
         } else {

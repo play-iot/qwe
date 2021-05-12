@@ -3,13 +3,13 @@ package io.zero88.qwe.http.server.mock;
 import java.util.Arrays;
 import java.util.List;
 
+import io.vertx.core.eventbus.EventBus;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
 import io.zero88.qwe.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.vertx.reactivex.core.eventbus.EventBus;
 
 public class MockWebSocketEvent {
 
@@ -41,12 +41,12 @@ public class MockWebSocketEvent {
             super(eventBus, SERVER_PROCESSOR);
         }
 
-        @EventContractor(action = "GET_LIST", returnType = List.class)
+        @EBContract(action = "GET_LIST")
         public List<String> list(RequestData data) {
             return Arrays.asList("1", "2", "3");
         }
 
-        @EventContractor(action = "GET_ONE", returnType = String.class)
+        @EBContract(action = "GET_ONE")
         public String one(RequestData data) {
             return "1";
         }

@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.dto.JsonData;
 import io.vertx.core.Handler;
 import io.vertx.ext.unit.Async;
 
@@ -27,10 +26,6 @@ public interface TestHelper {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
         ((Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.INFO);
         ((Logger) LoggerFactory.getLogger("io.github.zero88")).setLevel(Level.DEBUG);
-    }
-
-    static void testComplete(io.vertx.reactivex.ext.unit.Async async) {
-        testComplete(async.getDelegate());
     }
 
     static void testComplete(Async async) {

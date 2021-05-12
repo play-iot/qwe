@@ -3,15 +3,15 @@ package io.zero88.qwe.http.server.ws;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import io.zero88.qwe.component.HasSharedData;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.HasSharedData;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.event.ReplyEventHandler;
+import io.zero88.qwe.event.EventReplyHandler;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
 
@@ -33,24 +33,19 @@ public class WebSocketEventExecutor implements HasSharedData, WebSocketLogSystem
                         @NonNull Consumer<EventMessage> callback) {
         final EventMessage msg = EventMessage.success(socketMessage.getBody().getAction(),
                                                       RequestData.from(socketMessage.getBody()));
-        final EventbusClient eventbus = EventbusClient.create(sharedData);
+        final EventBusClient eventbus = EventBusClient.create(sharedData);
         log.info(decor("Handle action '{}' from client"), msg.getAction());
         EventModel processor = metadata.getProcessor();
         if (processor.getPattern() == EventPattern.REQUEST_RESPONSE) {
-            ReplyEventHandler handler = ReplyEventHandler.builder()
-                                                         .system(function())
-                                                         .address(processor.getAddress())
-                                                         .action(msg.getAction())
-                                                         .success(callback(eventbus, metadata.getPublisher(), callback))
-                                                         .build();
-            eventbus.fire(processor.getAddress(), processor.getPattern(), msg, handler);
+            eventbus.request(processor.getAddress(), msg)
+                    .onSuccess(eMsg -> callback(eventbus, metadata.getPublisher(), callback).accept(eMsg));
         } else {
             eventbus.fire(processor.getAddress(), processor.getPattern(), msg);
             callback.accept(EventMessage.success(EventAction.RETURN));
         }
     }
 
-    private Consumer<EventMessage> callback(EventbusClient eventbus, EventModel publisher,
+    private Consumer<EventMessage> callback(EventBusClient eventbus, EventModel publisher,
                                             Consumer<EventMessage> defCallback) {
         if (Objects.isNull(publisher)) {
             return defCallback;

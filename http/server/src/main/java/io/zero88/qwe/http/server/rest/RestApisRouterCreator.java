@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import io.github.zero88.exceptions.InvalidUrlException;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;

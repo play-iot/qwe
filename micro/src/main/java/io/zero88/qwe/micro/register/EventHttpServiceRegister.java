@@ -1,23 +1,25 @@
 package io.zero88.qwe.micro.register;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.http.EventHttpService;
-import io.zero88.qwe.utils.ExecutorHelpers;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.Record;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.http.EventHttpService;
 
 import lombok.Builder;
 import lombok.NonNull;
@@ -50,43 +52,30 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
      * @see Record
      * @since 1.0.0
      */
-    public Single<List<Record>> publish(@NonNull ServiceDiscoveryInvoker discovery) {
-        final EventbusClient client = EventbusClient.create(vertx, sharedKey);
-        return ExecutorHelpers.blocking(vertx, eventServices::get)
-                              .flattenAsObservable(s -> s)
-                              .doOnEach(s -> Optional.ofNullable(s.getValue())
-                                                     .ifPresent(service -> registerEventbusAddress(client, service)))
-                              .filter(s -> Objects.nonNull(s.definitions()))
-                              .flatMap(s -> registerEndpoint(discovery, s))
-                              .toList()
-                              .doOnSuccess(r -> LOGGER.info("Published {} Service API(s)", r.size()));
+    public Future<List<Record>> publish(@NonNull ServiceDiscoveryInvoker discovery) {
+        final EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, sharedKey));
+        return Future.succeededFuture(eventServices.get()
+                                                   .stream()
+                                                   .map(s -> register(client, discovery, s))
+                                                   .flatMap(cf -> cf.list()
+                                                                    .stream()
+                                                                    .filter(Objects::nonNull)
+                                                                    .map(Record.class::cast))
+                                                   .collect(Collectors.toList()))
+                     .onSuccess(recs -> LOGGER.info("Published {} Service API(s)", recs.size()));
     }
 
-    private void registerEventbusAddress(@NonNull EventbusClient client, @NonNull S service) {
-        client.register(service.address(), service);
-        Optional.ofNullable(afterRegisterEventbusAddress).ifPresent(func -> func.accept(service));
-    }
-
-    private Observable<Record> registerEndpoint(@NonNull ServiceDiscoveryInvoker discovery, @NonNull S service) {
+    private CompositeFuture register(@NonNull EventBusClient client, @NonNull ServiceDiscoveryInvoker discovery,
+                                     @NonNull S srv) {
+        client.register(srv.address(), srv);
+        Optional.ofNullable(afterRegisterEventbusAddress).ifPresent(func -> func.accept(srv));
         if (!discovery.isEnabled()) {
-            return Observable.empty();
+            return CompositeFuture.join(new ArrayList<>());
         }
-        return Observable.fromIterable(service.definitions())
-                         .flatMapSingle(e -> discovery.addEventMessageRecord(service.api(), service.address(), e));
-    }
-
-    public static class Builder<S extends EventHttpService> {
-
-        public Builder<S> vertx(@NonNull Vertx vertx) {
-            this.vertx = vertx;
-            return this;
-        }
-
-        public Builder<S> vertx(@NonNull io.vertx.reactivex.core.Vertx vertx) {
-            this.vertx = vertx.getDelegate();
-            return this;
-        }
-
+        return CompositeFuture.join(srv.definitions()
+                                       .stream()
+                                       .map(d -> discovery.addEventMessageRecord(srv.api(), srv.address(), d))
+                                       .collect(Collectors.toList()));
     }
 
 }

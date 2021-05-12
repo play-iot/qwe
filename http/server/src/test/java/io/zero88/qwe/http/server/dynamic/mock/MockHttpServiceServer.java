@@ -4,8 +4,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import io.zero88.qwe.component.ApplicationVerticle;
-import io.zero88.qwe.component.ContextLookup;
+import io.vertx.core.json.JsonObject;
+import io.vertx.servicediscovery.types.HttpLocation;
+import io.zero88.qwe.ApplicationVerticle;
+import io.zero88.qwe.ContextLookup;
 import io.zero88.qwe.exceptions.CarlException;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpServerContext;
@@ -15,8 +17,6 @@ import io.zero88.qwe.http.server.ServerInfo;
 import io.zero88.qwe.http.server.rest.api.RestApi;
 import io.zero88.qwe.micro.MicroContext;
 import io.zero88.qwe.micro.MicroVerticleProvider;
-import io.vertx.core.json.JsonObject;
-import io.vertx.servicediscovery.types.HttpLocation;
 
 public class MockHttpServiceServer extends ApplicationVerticle {
 
@@ -37,7 +37,7 @@ public class MockHttpServiceServer extends ApplicationVerticle {
         microContext.getLocalInvoker()
                     .addHttpRecord("httpService", new HttpLocation(info.toJson()).setRoot(info.getApiPath()),
                                    new JsonObject())
-                    .subscribe();
+                    .mapEmpty();
     }
 
     @Path("/test")

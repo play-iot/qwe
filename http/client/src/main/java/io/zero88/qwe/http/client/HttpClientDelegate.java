@@ -1,10 +1,6 @@
 package io.zero88.qwe.http.client;
 
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.http.HostInfo;
-import io.reactivex.Single;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.http.HttpClient;
@@ -12,6 +8,10 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
+import io.zero88.qwe.IConfig;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.ResponseData;
+import io.zero88.qwe.http.HostInfo;
 
 import lombok.NonNull;
 
@@ -89,7 +89,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @apiNote It is equivalent to call {@link #request(String, HttpMethod, RequestData, boolean)} with {@code
      *     swallowError} is {@code true}
      */
-    default Single<ResponseData> request(String path, HttpMethod method, RequestData requestData) {
+    default Future<ResponseData> request(String path, HttpMethod method, RequestData requestData) {
         return this.request(path, method, requestData, true);
     }
 
@@ -99,11 +99,11 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @param path         Request path
      * @param method       Http Method
      * @param requestData  Request data
-     * @param swallowError Swallow error in {@link ResponseData} instead raise {@link Single#error(Throwable)} if {@code
-     *                     HTTP Response status code >= 400}
+     * @param swallowError Swallow error in {@link ResponseData} instead raise exception if {@code HTTP Response status
+     *                     code >= 400}
      * @return single response data. Must be subscribe before using
      */
-    Single<ResponseData> request(String path, HttpMethod method, RequestData requestData, boolean swallowError);
+    Future<ResponseData> request(String path, HttpMethod method, RequestData requestData, boolean swallowError);
 
     /**
      * Upload file in {@code POST} method
@@ -113,7 +113,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @return single response data. Must be subscribe before using
      * @see #upload(String, AsyncFile)
      */
-    Single<ResponseData> upload(String path, String uploadFile);
+    Future<ResponseData> upload(String path, String uploadFile);
 
     /**
      * Upload file in {@code POST} method
@@ -122,7 +122,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @return single response data. Must be subscribe before using
      * @see #push(ReadStream, HttpMethod)
      */
-    default Single<ResponseData> upload(AsyncFile uploadFile) {
+    default Future<ResponseData> upload(AsyncFile uploadFile) {
         return this.upload(null, uploadFile);
     }
 
@@ -134,7 +134,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @return single response data. Must be subscribe before using
      * @see #push(String, ReadStream, HttpMethod)
      */
-    default Single<ResponseData> upload(String path, AsyncFile uploadFile) {
+    default Future<ResponseData> upload(String path, AsyncFile uploadFile) {
         return this.push(path, uploadFile, HttpMethod.POST);
     }
 
@@ -146,7 +146,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @return single response data. Must be subscribe before using
      * @see #push(String, ReadStream, HttpMethod)
      */
-    default Single<ResponseData> push(ReadStream readStream, HttpMethod method) {
+    default Future<ResponseData> push(ReadStream readStream, HttpMethod method) {
         return this.push(null, readStream, HttpMethod.POST);
     }
 
@@ -158,7 +158,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @param method     Http Method
      * @return single response data. Must be subscribe before using
      */
-    Single<ResponseData> push(String path, ReadStream readStream, HttpMethod method);
+    Future<ResponseData> push(String path, ReadStream readStream, HttpMethod method);
 
     /**
      * Download data from server and save it to local file
@@ -166,7 +166,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @param saveFile Save file
      * @return single async file a reference to {@code saveFile }parameter, so the API can be used fluently
      */
-    default Single<AsyncFile> download(AsyncFile saveFile) {
+    default Future<AsyncFile> download(AsyncFile saveFile) {
         return this.download(null, saveFile);
     }
 
@@ -177,7 +177,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @param saveFile Save file
      * @return single async file a reference to {@code saveFile }parameter, so the API can be used fluently
      */
-    Single<AsyncFile> download(String path, AsyncFile saveFile);
+    Future<AsyncFile> download(String path, AsyncFile saveFile);
 
     /**
      * Pull data from server then redirect it to destination stream
@@ -185,7 +185,7 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @param writeStream destination stream
      * @return single {@code WriteStream} a reference to {@code saveFile }parameter, so the API can be used fluently
      */
-    default Single<WriteStream> pull(WriteStream writeStream) {
+    default Future<WriteStream> pull(WriteStream writeStream) {
         return this.pull(null, writeStream);
     }
 
@@ -196,6 +196,6 @@ public interface HttpClientDelegate extends IClientDelegate {
      * @param writeStream destination stream
      * @return single {@code WriteStream} a reference to {@code saveFile }parameter, so the API can be used fluently
      */
-    Single<WriteStream> pull(String path, WriteStream writeStream);
+    Future<WriteStream> pull(String path, WriteStream writeStream);
 
 }

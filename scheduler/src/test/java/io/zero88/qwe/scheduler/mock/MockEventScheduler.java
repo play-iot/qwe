@@ -1,16 +1,13 @@
 package io.zero88.qwe.scheduler.mock;
 
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
-import io.vertx.core.json.JsonObject;
-
-import lombok.NonNull;
 
 public class MockEventScheduler {
 
@@ -32,12 +29,7 @@ public class MockEventScheduler {
 
         private AtomicInteger count = new AtomicInteger(0);
 
-        @Override
-        public @NonNull Collection<EventAction> getAvailableEvents() {
-            return PROCESS_EVENT.getEvents();
-        }
-
-        @EventContractor(action = "CREATE")
+        @EBContract(action = "CREATE")
         public JsonObject increaseNumber() {
             return new JsonObject().put("count", count.getAndIncrement());
         }
@@ -47,12 +39,7 @@ public class MockEventScheduler {
 
     public static class FailureProcessEventSchedulerListener implements EventListener {
 
-        @Override
-        public @NonNull Collection<EventAction> getAvailableEvents() {
-            return PROCESS_EVENT.getEvents();
-        }
-
-        @EventContractor(action = "CREATE")
+        @EBContract(action = "CREATE")
         public JsonObject increaseNumber() {
             throw new IllegalArgumentException("Failed");
         }

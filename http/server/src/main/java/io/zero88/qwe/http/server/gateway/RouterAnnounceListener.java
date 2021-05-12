@@ -1,10 +1,10 @@
 package io.zero88.qwe.http.server.gateway;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 
 import lombok.NonNull;
 
@@ -63,7 +63,7 @@ public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implem
     // TODO: find better way instead force rescan in every register call
     // TODO: for checking in cluster mode
     private void rescanService() {
-        getInvoker().getRecords().subscribe(records -> records.forEach(this::register));
+        getInvoker().getRecords().map(records -> records.stream().map(this::register));
     }
 
 }

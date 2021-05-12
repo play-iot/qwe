@@ -1,6 +1,6 @@
 package io.zero88.qwe.http.server.web;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpConfig.StaticWebConfig;
 import io.zero88.qwe.http.server.HttpLogSystem.WebLogSystem;

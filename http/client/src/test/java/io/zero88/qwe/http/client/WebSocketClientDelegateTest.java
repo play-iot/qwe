@@ -1,7 +1,6 @@
 package io.zero88.qwe.http.client;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.function.Function;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,10 +10,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.TestHelper;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.Timeout;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventModel;
@@ -22,14 +28,7 @@ import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.event.Status;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.Timeout;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RunWith(VertxUnitRunner.class)
@@ -70,17 +69,15 @@ public class WebSocketClientDelegateTest {
     public void test_not_found(TestContext context) {
         Async async = context.async();
         WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, hostInfo);
-        client.open(WebSocketClientEventMetadata.create("/xxx", LISTENER, PUBLISHER_ADDRESS))
-              .doFinally(() -> TestHelper.testComplete(async))
-              .subscribe(msg -> {
-                  String error
-                      = "WebSocket connection attempt returned HTTP status code 404 | Cause:  - Error Code: NOT_FOUND";
-                  JsonHelper.assertJson(new JsonObject().put("status", Status.FAILED)
+        client.open(WebSocketClientEventMetadata.create("/xxx", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
+            String error
+                = "WebSocket connection attempt returned HTTP status code 404 | Cause:  - Error Code: NOT_FOUND";
+            final JsonObject expected = new JsonObject().put("status", Status.FAILED)
                                                         .put("action", "OPEN")
                                                         .put("error", new JsonObject().put("code", "HTTP_ERROR")
-                                                                                      .put("message", error)),
-                                        msg.toJson());
-              });
+                                                                                      .put("message", error));
+            JsonHelper.assertJson(context, async, expected, msg.toJson());
+        }).eventually(complete(async));
     }
 
     @Test
@@ -88,18 +85,15 @@ public class WebSocketClientDelegateTest {
         Async async = context.async();
         HostInfo opt = HostInfo.builder().host("echo.websocket.test").port(443).ssl(true).build();
         WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, opt);
-        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS))
-              .doFinally(() -> TestHelper.testComplete(async))
-              .subscribe(msg -> {
-                  String error =
-                      "Failed when open WebSocket connection | Cause: failed to resolve 'echo.websocket.test'. " +
-                      "Exceeded max queries per resolve 4 ";
-                  JsonHelper.assertJson(new JsonObject().put("status", Status.FAILED)
+        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
+            String error = "Failed when open WebSocket connection | Cause: failed to resolve 'echo.websocket.test'. " +
+                           "Exceeded max queries per resolve 4 ";
+            final JsonObject expected = new JsonObject().put("status", Status.FAILED)
                                                         .put("action", "OPEN")
                                                         .put("error", new JsonObject().put("code", "HTTP_ERROR")
-                                                                                      .put("message", error)),
-                                        msg.toJson());
-              });
+                                                                                      .put("message", error));
+            JsonHelper.assertJson(context, async, expected, msg.toJson());
+        }).eventually(complete(async));
     }
 
     @Test
@@ -107,15 +101,12 @@ public class WebSocketClientDelegateTest {
         Async async = context.async(2);
         WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, hostInfo);
         client.getEventbus()
-              .register(LISTENER, new EventAsserter(LISTENER, context, async, new JsonObject().put("k", 1)));
-        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS))
-              .doFinally(() -> TestHelper.testComplete(async))
-              .subscribe(msg -> {
-                  System.out.println(msg.toJson());
-                  client.getEventbus()
-                        .publish(PUBLISHER_ADDRESS,
-                                 EventMessage.initial(EventAction.SEND, new JsonObject().put("k", 1)));
-              });
+              .register(LISTENER.getAddress(), new EventAsserter(context, async, new JsonObject().put("k", 1)));
+        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
+            System.out.println(msg.toJson());
+            client.getEventbus()
+                  .publish(PUBLISHER_ADDRESS, EventMessage.initial(EventAction.SEND, new JsonObject().put("k", 1)));
+        }).eventually(complete(async));
     }
 
     @Test
@@ -141,44 +132,46 @@ public class WebSocketClientDelegateTest {
         final WebSocketClientEventMetadata metadata = WebSocketClientEventMetadata.create("/echo", LISTENER,
                                                                                           PUBLISHER_ADDRESS);
         client1.open(metadata)
-               .doOnSuccess(msg -> {
+               .onSuccess(msg -> {
                    System.out.println(msg.toJson());
                    TestHelper.testComplete(async);
                })
                .flatMap(msg -> client2.open(metadata))
-               .doOnSuccess(msg -> {
+               .onSuccess(msg -> {
                    System.out.println(msg.toJson());
                    TestHelper.testComplete(async);
                })
                .flatMap(msg -> client3.open(metadata))
-               .doFinally(() -> TestHelper.testComplete(async))
+               .eventually(complete(async))
                .map(msg -> client1.close())
-               .mergeWith(r -> client2.close())
-               .subscribe(a -> {
+               .compose(r -> client2.close())
+               .onSuccess(a -> {
                    System.out.println(HttpClientRegistry.getInstance().getWsRegistries().size());
                    context.assertTrue(HttpClientRegistry.getInstance().getWsRegistries().isEmpty());
-               }, System.out::println);
+               })
+               .onFailure(context::fail);
     }
 
     @RequiredArgsConstructor
     static class EventAsserter implements EventListener {
 
-        private final EventModel eventModel;
         private final TestContext context;
         private final Async async;
         private final JsonObject expected;
 
-        @EventContractor(action = "UNKNOWN", returnType = int.class)
+        @EBContract(action = "UNKNOWN")
         public int send(JsonObject data) {
             JsonHelper.assertJson(context, async, expected, data);
             return 1;
         }
 
-        @Override
-        public @NonNull Collection<EventAction> getAvailableEvents() {
-            return new ArrayList<>(eventModel.getEvents());
-        }
+    }
 
+    static Function<Void, Future<Object>> complete(Async async) {
+        return v -> {
+            TestHelper.testComplete(async);
+            return Future.succeededFuture();
+        };
     }
 
 }

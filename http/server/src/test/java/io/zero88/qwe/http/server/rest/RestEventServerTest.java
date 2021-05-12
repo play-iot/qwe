@@ -6,7 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.exceptions.EngineException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.HttpServerRouter;
 import io.zero88.qwe.http.server.HttpServerTestBase;
@@ -48,7 +47,7 @@ public class RestEventServerTest extends HttpServerTestBase {
     public void test_api_eventbus_error_from_server(TestContext context) {
         MockEventBusErrorListener.create(this.vertx.eventBus()).start();
         String path = "/api/test/events";
-        JsonObject expected = new JsonObject().put("code", EngineException.CODE.code()).put("message", "Engine error");
+        JsonObject expected = new JsonObject().put("code", ErrorCode.ENGINE_ERROR.code()).put("message", "Engine error");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
         assertRestByClient(context, HttpMethod.POST, path, 500, expected);
     }

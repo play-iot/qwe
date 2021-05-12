@@ -7,8 +7,8 @@ import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 
-import io.zero88.qwe.component.HasSharedData;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.HasSharedData;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.scheduler.job.QWEJob;
 import io.vertx.core.shareddata.SharedData;
 

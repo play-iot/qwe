@@ -3,16 +3,16 @@ package io.zero88.qwe.micro;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.zero88.qwe.CarlConfig.AppConfig;
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
-import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 import io.github.zero88.utils.Strings;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.ServiceDiscoveryOptions;
 import io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend;
+import io.zero88.qwe.CarlConfig.AppConfig;
+import io.zero88.qwe.IConfig;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
+import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -92,7 +92,7 @@ public final class MicroConfig implements IConfig {
                                  : DEFAULT_USAGE_ADDRESS.equals(usageAddress)
                                    ? getServiceDiscoveryUsageAddress()
                                    : usageAddress);
-            this.setAutoRegistrationOfImporters(!isLocal()).setBackendConfiguration(backendConfig.toConfiguration());
+            this.setBackendConfiguration(backendConfig.toConfiguration());
         }
 
         void reloadProperty() {

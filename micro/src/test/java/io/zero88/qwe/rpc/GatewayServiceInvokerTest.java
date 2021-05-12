@@ -3,8 +3,11 @@ package io.zero88.qwe.rpc;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.zero88.qwe.TestHelper;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.DataTransferObject.Headers;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
@@ -13,10 +16,6 @@ import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.micro.BaseMicroVerticleTest;
 import io.zero88.qwe.rpc.mock.MockServiceInvoker;
 import io.zero88.qwe.rpc.mock.MockServiceListener;
-import io.zero88.qwe.micro.ServiceNotFoundException;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
 
 public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
 
@@ -31,17 +30,19 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
         Async async = context.async();
         MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), eventbus,
                                                             EVENT_RECORD_1 + "...");
-        invoker.execute(EventAction.CREATE, RequestData.builder().build())
-               .subscribe(d -> TestHelper.testComplete(async), t -> {
-                   context.assertTrue(t instanceof CarlException);
-                   assert t instanceof CarlException;
-                   CarlException e = (CarlException) t;
-                   context.assertEquals(ServiceNotFoundException.CODE, e.errorCode());
-                   context.assertEquals(invoker.serviceLabel() +
-                                        " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
-                                        e.getMessage());
-                   TestHelper.testComplete(async);
-               });
+        invoker.execute(EventAction.CREATE, RequestData.builder().build()).onSuccess(d -> {
+            System.out.println(d);
+            context.fail("Expected failed");
+        }).onFailure(t -> {
+            context.assertTrue(t instanceof CarlException);
+            assert t instanceof CarlException;
+            CarlException e = (CarlException) t;
+            context.assertEquals(ErrorCode.SERVICE_NOT_FOUND, e.errorCode());
+            context.assertEquals(
+                invoker.serviceLabel() + " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
+                e.getMessage());
+            TestHelper.testComplete(async);
+        });
     }
 
     @Test
@@ -49,17 +50,19 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
         Async async = context.async();
         MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), eventbus,
                                                             EVENT_RECORD_1);
-        invoker.execute(EventAction.UNKNOWN, RequestData.builder().build())
-               .subscribe(d -> TestHelper.testComplete(async), t -> {
-                   context.assertTrue(t instanceof CarlException);
-                   assert t instanceof CarlException;
-                   CarlException e = (CarlException) t;
-                   context.assertEquals(ServiceNotFoundException.CODE, e.errorCode());
-                   context.assertEquals(invoker.serviceLabel() +
-                                        " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
-                                        e.getMessage());
-                   TestHelper.testComplete(async);
-               });
+        invoker.execute(EventAction.UNKNOWN, RequestData.builder().build()).onSuccess(d -> {
+            System.out.println(d);
+            context.fail("Expected failed");
+        }).onFailure(t -> {
+            context.assertTrue(t instanceof CarlException);
+            assert t instanceof CarlException;
+            CarlException e = (CarlException) t;
+            context.assertEquals(ErrorCode.SERVICE_NOT_FOUND, e.errorCode());
+            context.assertEquals(
+                invoker.serviceLabel() + " is not found or out of service. Try again later | Error: SERVICE_NOT_FOUND",
+                e.getMessage());
+            TestHelper.testComplete(async);
+        });
     }
 
     @Test
@@ -68,9 +71,10 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
         MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), eventbus,
                                                             EVENT_RECORD_1);
         invoker.execute(EventAction.UPDATE, RequestData.builder().build())
-               .subscribe(d -> JsonHelper.assertJson(context, async,
+               .onSuccess(d -> JsonHelper.assertJson(context, async,
                                                      new JsonObject().put("code", ErrorCode.INVALID_ARGUMENT.code())
-                                                                     .put("message", "hey"), d), context::fail);
+                                                                     .put("message", "hey"), d))
+               .onFailure(context::fail);
     }
 
     @Test
@@ -81,7 +85,8 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
         final JsonObject expected = new JsonObject().put(Headers.X_REQUEST_BY, "service/" + invoker.requester())
                                                     .put("action", EventAction.CREATE.action());
         invoker.execute(EventAction.CREATE, RequestData.builder().build())
-               .subscribe(d -> JsonHelper.assertJson(context, async, expected, d), context::fail);
+               .onSuccess(d -> JsonHelper.assertJson(context, async, expected, d))
+               .onFailure(context::fail);
     }
 
 }

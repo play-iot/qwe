@@ -1,6 +1,6 @@
 package io.zero88.qwe.micro.monitor;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
 import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 import io.vertx.core.eventbus.Message;

@@ -11,9 +11,10 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.http.HostInfo;
-import io.reactivex.Observable;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.zero88.qwe.http.HostInfo;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -61,12 +62,13 @@ public final class HttpClientRegistry {
             return;
         }
         if (storage.shouldClose()) {
-            storage.get().close().subscribe(() -> {
+            storage.get().close().eventually(v -> {
                 if (isWebsocket) {
                     wsRegistries.remove(hostInfo);
                 } else {
                     httpRegistries.remove(hostInfo);
                 }
+                return Future.succeededFuture();
             });
         }
     }
@@ -78,17 +80,19 @@ public final class HttpClientRegistry {
      */
     public Promise<Void> clear() {
         Promise<Void> promise = Promise.promise();
-        Observable.fromIterable(Stream.concat(httpRegistries.values().stream(), wsRegistries.values().stream())
-                                      .collect(Collectors.toList()))
-                  .map(ClientStorage::get)
-                  .map(IClientDelegate::close)
-                  .count()
-                  .doOnSuccess(c -> log.debug("Closed {} HTTP client(s)", c))
-                  .ignoreElement()
-                  .subscribe(promise::complete, err -> {
-                      log.debug("Something error when closing http client", err);
-                      promise.complete();
-                  });
+        CompositeFuture.join(Stream.concat(httpRegistries.values().stream(), wsRegistries.values().stream())
+                                   .map(ClientStorage::get)
+                                   .map(IClientDelegate::close)
+                                   .collect(Collectors.toList()))
+                       .onSuccess(c -> log.debug("Closed {} HTTP client(s)", c))
+                       .onComplete(ar -> {
+                           if (ar.succeeded()) {
+                               promise.complete();
+                               return;
+                           }
+                           log.debug("Something error when closing http client", ar.cause());
+                           promise.complete();
+                       });
         return promise;
     }
 

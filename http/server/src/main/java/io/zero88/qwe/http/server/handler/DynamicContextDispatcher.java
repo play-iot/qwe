@@ -3,21 +3,21 @@ package io.zero88.qwe.http.server.handler;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import io.github.zero88.utils.Urls;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.exceptions.HttpException;
+import io.zero88.qwe.http.HttpException;
 import io.zero88.qwe.http.HttpStatusMapping;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.rest.api.DynamicEventRestApi;
 import io.zero88.qwe.http.server.rest.api.DynamicHttpRestApi;
 import io.zero88.qwe.http.server.rest.api.DynamicRestApi;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.github.zero88.utils.Urls;
-import io.reactivex.Single;
-import io.vertx.core.Handler;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.servicediscovery.Record;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,7 +58,8 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
         String path = context.request().path();
         String servicePath = Urls.normalize(path.replaceAll("^" + getGatewayPath(), ""));
         this.handle(httpMethod, servicePath, context)
-            .subscribe(r -> handleSuccess(context, r), t -> handleError(context, ErrorMessage.parse(t)));
+            .map(r -> handleSuccess(context, r))
+            .otherwise(t -> handleError(context, ErrorMessage.parse(t)));
     }
 
     /**
@@ -85,7 +86,7 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
      * @return single response data
      * @see ResponseData
      */
-    Single<ResponseData> handle(HttpMethod httpMethod, String path, RoutingContext context);
+    Future<ResponseData> handle(HttpMethod httpMethod, String path, RoutingContext context);
 
     /**
      * Filter {@code micro service owner} based on incoming request
@@ -103,11 +104,12 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
      *
      * @param context      Routing context
      * @param responseData Response data
+     * @return future
      */
-    default void handleSuccess(RoutingContext context, ResponseData responseData) {
-        context.response()
-               .setStatusCode(HttpStatusMapping.success(context.request().method()).code())
-               .end(HttpUtils.prettify(responseData.body(), context.request()));
+    default Future<Void> handleSuccess(RoutingContext context, ResponseData responseData) {
+        return context.response()
+                      .setStatusCode(HttpStatusMapping.success(context.request().method()).code())
+                      .end(HttpUtils.prettify(responseData.body(), context.request()));
     }
 
     /**
@@ -115,11 +117,12 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
      *
      * @param context      Routing context
      * @param errorMessage Response data
+     * @return future
      */
-    default void handleError(@NonNull RoutingContext context, ErrorMessage errorMessage) {
-        context.response()
-               .setStatusCode(HttpStatusMapping.error(context.request().method(), errorMessage.getCode()).code())
-               .end(HttpUtils.prettify(errorMessage.toJson(), context.request()));
+    default Future<Void> handleError(@NonNull RoutingContext context, ErrorMessage errorMessage) {
+        return context.response()
+                      .setStatusCode(HttpStatusMapping.error(context.request().method(), errorMessage.getCode()).code())
+                      .end(HttpUtils.prettify(errorMessage.toJson(), context.request()));
     }
 
     default HttpMethod validateMethod(HttpMethod method) {

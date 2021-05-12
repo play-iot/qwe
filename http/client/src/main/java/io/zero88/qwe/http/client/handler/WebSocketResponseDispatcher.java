@@ -7,14 +7,14 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventModel;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.event.EventModel;
+import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,19 +30,19 @@ public abstract class WebSocketResponseDispatcher implements Handler<Buffer> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @NonNull
-    private final EventbusClient eventbus;
+    private final EventBusClient eventbus;
     @NonNull
     private final EventModel listener;
 
     @SuppressWarnings("unchecked")
-    public static <T extends WebSocketResponseDispatcher> T create(@NonNull EventbusClient controller,
+    public static <T extends WebSocketResponseDispatcher> T create(@NonNull EventBusClient client,
                                                                    @NonNull EventModel listener,
-                                                                   @NonNull Class<T> bodyHandlerClass) {
+                                                                   Class<T> bodyHandlerClass) {
         if (Objects.isNull(bodyHandlerClass) || WebSocketResponseDispatcher.class.equals(bodyHandlerClass)) {
-            return (T) new WebSocketResponseDispatcher(controller, listener) {};
+            return (T) new WebSocketResponseDispatcher(client, listener) {};
         }
         Map<Class, Object> params = new LinkedHashMap<>();
-        params.put(EventbusClient.class, controller);
+        params.put(EventBusClient.class, client);
         params.put(EventModel.class, listener);
         return ReflectionClass.createObject(bodyHandlerClass, params);
     }

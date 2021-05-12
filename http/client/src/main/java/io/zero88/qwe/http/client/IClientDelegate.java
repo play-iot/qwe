@@ -2,11 +2,11 @@ package io.zero88.qwe.http.client;
 
 import java.util.function.Supplier;
 
+import io.vertx.core.Future;
+import io.vertx.core.http.HttpClient;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.client.HttpClientConfig.HandlerConfig;
 import io.zero88.qwe.transport.Transporter;
-import io.reactivex.Completable;
-import io.vertx.core.http.HttpClient;
 
 interface IClientDelegate extends Transporter, Supplier<HttpClient> {
 
@@ -30,8 +30,6 @@ interface IClientDelegate extends Transporter, Supplier<HttpClient> {
      *
      * @return completable
      */
-    Completable close();
-
-    io.vertx.reactivex.core.http.HttpClient getRx();
+    Future<Void> close();
 
 }

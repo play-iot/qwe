@@ -1,8 +1,8 @@
 package io.zero88.qwe.scheduler;
 
-import io.zero88.qwe.component.ComponentContext;
-import io.zero88.qwe.component.ComponentVerticle;
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.ComponentContext;
+import io.zero88.qwe.ComponentVerticle;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.vertx.core.Promise;
 
 import lombok.NonNull;

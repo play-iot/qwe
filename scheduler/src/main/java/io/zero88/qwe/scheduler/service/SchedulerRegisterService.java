@@ -1,7 +1,5 @@
 package io.zero88.qwe.scheduler.service;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,22 +14,21 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
-import io.zero88.qwe.component.HasSharedData;
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventContractor;
-import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.exceptions.AlreadyExistException;
-import io.zero88.qwe.exceptions.CarlException;
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.NotFoundException;
-import io.zero88.qwe.scheduler.model.job.QWEJobModel;
-import io.zero88.qwe.scheduler.model.trigger.QWETriggerModel;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.HasSharedData;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.exceptions.CarlException;
+import io.zero88.qwe.exceptions.DataAlreadyExistException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
+import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.scheduler.model.job.QWEJobModel;
+import io.zero88.qwe.scheduler.model.trigger.QWETriggerModel;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -64,12 +61,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
     @NonNull
     private final SchedulerConverterHelper converterHelper;
 
-    @Override
-    public @NonNull Collection<EventAction> getAvailableEvents() {
-        return Arrays.asList(EventAction.CREATE, EventAction.REMOVE, EventAction.GET_ONE, EventAction.GET_LIST);
-    }
-
-    @EventContractor(action = "GET_LIST")
+    @EBContract(action = "GET_LIST")
     public JsonObject list(@NonNull RequestData requestData) {
         final SchedulerRegisterArgs args = SchedulerRegisterArgs.parse(requestData);
         final JobKey jobKey = args.requiredJobKey();
@@ -93,7 +85,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
         }
     }
 
-    @EventContractor(action = "GET_ONE", returnType = SchedulerRegisterResp.class)
+    @EBContract(action = "GET_ONE")
     public SchedulerRegisterResp get(@NonNull RequestData requestData) {
         final SchedulerRegisterArgs args = SchedulerRegisterArgs.parse(requestData);
         final JobKey jobKey = args.requiredJobKey();
@@ -112,14 +104,14 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
                                                             .build();
                             })
                             .findFirst()
-                            .orElseThrow(() -> new NotFoundException(
+                            .orElseThrow(() -> new DataNotFoundException(
                                 "Not found trigger '" + triggerKey + "' that associated to job '" + jobKey + "'"));
         } catch (SchedulerException e) {
             throw new CarlException(ErrorCode.SERVICE_ERROR, "Cannot get trigger and job in scheduler", e);
         }
     }
 
-    @EventContractor(action = "CREATE", returnType = SchedulerRegisterResp.class)
+    @EBContract(action = "CREATE")
     public SchedulerRegisterResp create(@NonNull RequestData requestData) {
         final SchedulerRegisterArgs args = SchedulerRegisterArgs.parse(requestData);
         final QWEJobModel jobModel = args.requiredJob();
@@ -131,7 +123,7 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
             final TriggerKey triggerKey = trigger.getKey();
             if (scheduler.checkExists(triggerKey)) {
                 final JobKey jobKey = scheduler.getTrigger(triggerKey).getJobKey();
-                throw new AlreadyExistException(
+                throw new DataAlreadyExistException(
                     "Trigger '" + triggerKey + "' is already assigned to another job '" + jobKey + "'");
             }
             Date firstFire;
@@ -154,12 +146,12 @@ public class SchedulerRegisterService implements EventListener, HasSharedData {
                                         .build();
         } catch (SchedulerException e) {
             throw new CarlException(
-                e instanceof ObjectAlreadyExistsException ? ErrorCode.ALREADY_EXIST : ErrorCode.SERVICE_ERROR,
+                e instanceof ObjectAlreadyExistsException ? ErrorCode.DATA_ALREADY_EXIST : ErrorCode.SERVICE_ERROR,
                 "Cannot add trigger and job in scheduler", e);
         }
     }
 
-    @EventContractor(action = "REMOVE", returnType = SchedulerRegisterResp.class)
+    @EBContract(action = "REMOVE")
     public SchedulerRegisterResp remove(@NonNull RequestData requestData) {
         final SchedulerRegisterArgs args = SchedulerRegisterArgs.parse(requestData);
         final JobKey key = args.requiredJobKey();

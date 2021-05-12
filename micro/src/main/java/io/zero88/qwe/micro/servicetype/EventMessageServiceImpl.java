@@ -1,8 +1,5 @@
 package io.zero88.qwe.micro.servicetype;
 
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.event.EventbusClient;
-import io.zero88.qwe.micro.http.EventMethodDefinition;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.JsonObject;
@@ -10,6 +7,10 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.types.AbstractServiceReference;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.micro.http.EventMethodDefinition;
 
 import lombok.NonNull;
 
@@ -34,7 +35,7 @@ public class EventMessageServiceImpl implements EventMessageService {
 
         @Override
         protected EventMessagePusher retrieve() {
-            return new Pusher(EventbusClient.create(vertx, sharedKey),
+            return new Pusher(EventBusClient.create(SharedDataLocalProxy.create(vertx, sharedKey)),
                               JsonData.from(this.record().getMetadata().getJsonObject(EVENT_METHOD_CONFIG),
                                             EventMethodDefinition.class), config,
                               record().getLocation().getString(Record.ENDPOINT));

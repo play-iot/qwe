@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.exceptions.HttpException;
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.http.HttpException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.json.JsonObject;
 
@@ -28,7 +28,7 @@ public class ResponseDataConverterTest {
     public void testConvertNotFoundExceptionToResponseData() {
         String message = "Not found";
 
-        NotFoundException notFoundException = new NotFoundException(message);
+        DataNotFoundException notFoundException = new DataNotFoundException(message);
         ResponseData responseData = ResponseDataConverter.convert(notFoundException);
 
         Assertions.assertEquals(responseData.getStatus().code(), HttpResponseStatus.NOT_FOUND.code());

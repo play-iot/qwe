@@ -1,7 +1,7 @@
 package io.zero88.qwe.http.server;
 
-import io.zero88.qwe.component.ComponentContext;
-import io.zero88.qwe.component.ComponentContext.DefaultComponentContext;
+import io.zero88.qwe.ComponentContext;
+import io.zero88.qwe.ComponentContext.DefaultComponentContext;
 
 import lombok.Getter;
 

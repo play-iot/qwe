@@ -5,16 +5,16 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.http.HostInfo;
-import io.zero88.qwe.http.client.HttpClientConfig.HandlerConfig;
-import io.reactivex.Completable;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.impl.HttpClientImpl;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.IConfig;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.http.HostInfo;
+import io.zero88.qwe.http.client.HttpClientConfig.HandlerConfig;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -80,13 +80,8 @@ abstract class ClientDelegate implements IClientDelegate {
     }
 
     @Override
-    public Completable close() {
-        return getRx().rxClose();
-    }
-
-    @Override
-    public io.vertx.reactivex.core.http.HttpClient getRx() {
-        return io.vertx.reactivex.core.http.HttpClient.newInstance(get());
+    public Future<Void> close() {
+        return get().close();
     }
 
 }

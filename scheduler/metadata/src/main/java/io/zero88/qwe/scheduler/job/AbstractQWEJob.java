@@ -2,7 +2,7 @@ package io.zero88.qwe.scheduler.job;
 
 import org.quartz.Job;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.scheduler.model.job.QWEJobModel;
 
 import lombok.Getter;

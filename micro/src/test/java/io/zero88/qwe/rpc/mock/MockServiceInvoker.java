@@ -1,7 +1,7 @@
 package io.zero88.qwe.rpc.mock;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventbusClient;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.rpc.GatewayServiceInvoker;
 
 import lombok.NonNull;
@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 public final class MockServiceInvoker implements GatewayServiceInvoker {
 
     private final String gatewayAddress;
-    private final EventbusClient client;
+    private final EventBusClient client;
     private final String destination;
 
     @Override
@@ -35,7 +35,7 @@ public final class MockServiceInvoker implements GatewayServiceInvoker {
     }
 
     @Override
-    public EventbusClient transporter() {
+    public EventBusClient transporter() {
         return client;
     }
 

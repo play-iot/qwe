@@ -3,11 +3,11 @@ package io.zero88.qwe.http.server.mock;
 import java.util.Arrays;
 import java.util.List;
 
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EventContractor;
-import io.reactivex.Single;
+import io.vertx.core.Future;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.core.eventbus.EventBus;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EBContract;
 
 public class MockEventBusSuccessListener extends MockEventBusListener {
 
@@ -23,30 +23,31 @@ public class MockEventBusSuccessListener extends MockEventBusListener {
         return new MockEventBusSuccessListener(eventBus, "http.server.test");
     }
 
-    @EventContractor(action = "GET_LIST", returnType = List.class)
+    @EBContract(action = "GET_LIST")
     public List<String> list(RequestData data) {
         return Arrays.asList("1", "2", "3");
     }
 
-    @EventContractor(action = "GET_ONE", returnType = Integer.class)
+    @EBContract(action = "GET_ONE")
     public int get(RequestData data) {
-        return Integer.valueOf(data.body().getString("event_id"));
+        return Integer.parseInt(data.body().getString("event_id"));
     }
 
-    @EventContractor(action = "CREATE")
+    @EBContract(action = "CREATE")
     public JsonObject create(RequestData data) {
         return new JsonObject().put("create", "success");
     }
 
-    @EventContractor(action = "UPDATE", returnType = Single.class)
-    public Single<String> update(RequestData data) {
-        return Single.just("success");
+    @EBContract(action = "UPDATE")
+    public Future<String> update(RequestData data) {
+        return Future.succeededFuture("success");
     }
 
-    @EventContractor(action = "PATCH", returnType = Single.class)
-    public Single<JsonObject> patch(RequestData data) {
-        return Single.just(new JsonObject().put("patch", "success")
-                                           .put("event_id", Integer.valueOf(data.body().getString("event_id"))));
+    @EBContract(action = "PATCH")
+    public Future<JsonObject> patch(RequestData data) {
+        return Future.succeededFuture(new JsonObject().put("patch", "success")
+                                                      .put("event_id",
+                                                           Integer.valueOf(data.body().getString("event_id"))));
     }
 
 }

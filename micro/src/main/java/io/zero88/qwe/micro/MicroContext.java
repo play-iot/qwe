@@ -3,10 +3,10 @@ package io.zero88.qwe.micro;
 import java.util.Objects;
 import java.util.UUID;
 
-import io.zero88.qwe.component.ComponentContext;
-import io.zero88.qwe.component.ComponentContext.DefaultComponentContext;
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventbusClient;
+import io.zero88.qwe.ComponentContext;
+import io.zero88.qwe.ComponentContext.DefaultComponentContext;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.MicroConfig.GatewayConfig;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -59,7 +59,7 @@ public final class MicroContext extends DefaultComponentContext {
         }
         localDiscovery.subscribe(proxy.getVertx(), config.getLocalAnnounceMonitorClass(),
                                  config.getLocalUsageMonitorClass());
-        EventbusClient.create(proxy).register(config.getIndexAddress(), new ServiceLocator(this));
+        EventBusClient.create(proxy).register(config.getIndexAddress(), new ServiceLocator(this));
     }
 
     void unregister(Promise<Void> promise) {

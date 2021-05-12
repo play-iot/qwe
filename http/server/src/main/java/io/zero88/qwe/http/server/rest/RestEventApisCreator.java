@@ -6,8 +6,12 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import io.zero88.qwe.component.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventbusClient;
+import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.utils.Strings;
+import io.vertx.core.Vertx;
+import io.vertx.ext.web.Router;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.event.RestEventApiMetadata;
 import io.zero88.qwe.http.server.HttpServer;
@@ -16,10 +20,6 @@ import io.zero88.qwe.http.server.rest.api.RestEventApi;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
 import io.zero88.qwe.micro.http.EventMethodDefinition;
 import io.zero88.qwe.micro.http.EventMethodMapping;
-import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.github.zero88.utils.Strings;
-import io.vertx.core.Vertx;
-import io.vertx.ext.web.Router;
 
 import lombok.NonNull;
 
@@ -88,7 +88,7 @@ public final class RestEventApisCreator implements ApisCreator {
 
     private void createRouter(RestEventApiMetadata metadata, RestEventApi api) {
         final EventMethodDefinition definition = metadata.getDefinition();
-        final EventbusClient eventbus = EventbusClient.create(proxy);
+        final EventBusClient eventbus = EventBusClient.create(proxy);
         for (EventMethodMapping mapping : definition.getMapping()) {
             RestEventApiDispatcher restHandler = RestEventApiDispatcher.create(api.dispatcher(), eventbus,
                                                                                metadata.getAddress(),

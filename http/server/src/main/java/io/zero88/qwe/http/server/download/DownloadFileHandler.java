@@ -7,7 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.exceptions.NotFoundException;
+import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.http.server.HttpLogSystem.DownloadLogSystem;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
@@ -59,7 +59,7 @@ public abstract class DownloadFileHandler implements Handler<RoutingContext>, Do
                        }
                    });
         } else {
-            throw new NotFoundException(decor("Not found file: " + fileId + " in system"));
+            throw new DataNotFoundException(decor("Not found file: " + fileId + " in system"));
         }
     }
 

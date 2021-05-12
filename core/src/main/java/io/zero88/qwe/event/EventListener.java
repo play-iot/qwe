@@ -40,7 +40,13 @@ public interface EventListener {
     default String fallback() { return "data"; }
 
     default @NonNull void handle(SharedDataLocalProxy sharedData, Message<Object> msg) {
-        new EventListenerExecutorImpl(this, sharedData).execute(msg).onSuccess(r -> msg.reply(r.toJson()));
+        new EventListenerExecutorImpl(this, sharedData).execute(msg).onComplete(ar -> {
+            if (ar.succeeded()) {
+                msg.reply(ar.result().toJson());
+                return;
+            }
+            msg.reply(EventMessage.replyError(EventAction.UNKNOWN, ar.cause()));
+        });
     }
 
 }

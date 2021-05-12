@@ -1,6 +1,6 @@
 package io.zero88.qwe.http.server.dynamic.mock;
 
-import io.zero88.qwe.component.ApplicationVerticle;
+import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.http.server.HttpServerProvider;
 import io.zero88.qwe.http.server.HttpServerRouter;
 import io.zero88.qwe.micro.MicroVerticleProvider;
