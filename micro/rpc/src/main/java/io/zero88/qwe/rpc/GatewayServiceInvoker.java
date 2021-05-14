@@ -8,7 +8,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Status;
 import io.zero88.qwe.dto.ErrorMessage;
-import io.zero88.qwe.dto.converter.ErrorMessageConverter;
+import io.zero88.qwe.dto.ErrorMessageConverter;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;

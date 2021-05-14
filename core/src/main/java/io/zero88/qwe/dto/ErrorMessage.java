@@ -32,7 +32,7 @@ public final class ErrorMessage implements Serializable, JsonData {
     private io.github.zero88.exceptions.ErrorCode code;
     private String message;
 
-    private ErrorMessage(@NonNull QWEException throwable) {
+    ErrorMessage(@NonNull QWEException throwable) {
         this.throwable = throwable;
         this.code = throwable.errorCode();
         this.message = throwable.getMessage();
