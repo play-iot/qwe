@@ -16,15 +16,20 @@ pluginManagement {
     }
 }
 
+//include("manifest")
+
+include(":qwe-core")
+project(":qwe-core").projectDir = file("core")
+
 include("http:client")
 include("http:server")
-include("micro:rpc")
-include("micro")
-include("scheduler")
-include("protocol")
+
 include("storage:json")
 
-include(":qwe-core", ":micro:micro-metadata", ":scheduler:scheduler-metadata")
-project(":qwe-core").projectDir = file("core")
+include("micro:rpc", ":micro:micro-metadata", "micro")
 project(":micro:micro-metadata").projectDir = file("micro/metadata")
-project(":scheduler:scheduler-metadata").projectDir = file("scheduler/metadata")
+
+include("examples:shared")
+include("examples:systemd")
+include("examples:docker")
+include("examples:fatjar")

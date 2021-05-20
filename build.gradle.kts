@@ -1,7 +1,7 @@
 plugins {
-    id(ZeroLibs.Plugins.oss) version ZeroLibs.Version.plugin
-    id(ZeroLibs.Plugins.root) version ZeroLibs.Version.plugin apply false
-    id(PluginLibs.nexusStaging) version PluginLibs.Version.nexusStaging
+    id(PluginLibs.oss) version PluginLibs.Version.plugin
+    id(PluginLibs.root) version PluginLibs.Version.plugin apply false
+    id(PluginLibs.nexusPublish) version PluginLibs.Version.nexusPublish
 }
 
 allprojects {
@@ -10,18 +10,15 @@ allprojects {
     repositories {
         mavenLocal()
         maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
-        maven { url = uri("https://maven.pkg.github.com/zero88/java-utils") }
         mavenCentral()
         jcenter()
     }
 }
 
-apply(plugin = ZeroLibs.Plugins.root)
-
 subprojects {
     apply(plugin = "eclipse")
     apply(plugin = "idea")
-    apply(plugin = ZeroLibs.Plugins.oss)
+    apply(plugin = PluginLibs.oss)
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -38,19 +35,10 @@ subprojects {
         testCompileOnly(UtilLibs.lombok)
         testAnnotationProcessor(UtilLibs.lombok)
     }
-    tasks {
-        javadoc {
-            options {
-                this as StandardJavadocDocletOptions
-                this.addBooleanOption("Xdoclint:none", true)
-            }
-        }
-    }
 
-    qwe {
+    oss {
         zero88.set(true)
         publishingInfo {
-            enabled.set(true)
             homepage.set("https://github.com/zero88/qwe")
             license {
                 name.set("The Apache License, Version 2.0")
@@ -65,8 +53,14 @@ subprojects {
     }
 }
 
-nexusStaging {
-    packageGroup = "io.github.zero88"
-    username = project.property("nexus.username") as String?
-    password = project.property("nexus.password") as String?
+apply(plugin = PluginLibs.root)
+
+nexusPublishing {
+    packageGroup.set("io.github.zero88")
+    repositories {
+        sonatype {
+            username.set(project.property("nexus.username") as String?)
+            password.set(project.property("nexus.password") as String?)
+        }
+    }
 }
