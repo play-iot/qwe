@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.QWEConfig.AppConfig;
+import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.download.DownloadFileHandler;
@@ -70,7 +70,7 @@ public final class HttpConfig implements IConfig {
     public String key() { return NAME; }
 
     @Override
-    public Class<? extends IConfig> parent() { return AppConfig.class; }
+    public Class<? extends IConfig> parent() { return QWEAppConfig.class; }
 
     @JsonIgnore
     public String publicServerUrl() {

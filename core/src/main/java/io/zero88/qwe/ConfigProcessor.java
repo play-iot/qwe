@@ -27,9 +27,7 @@ import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.QWEConfig.AppConfig;
-import io.zero88.qwe.QWEConfig.DeployConfig;
-import io.zero88.qwe.QWEConfig.SystemConfig;
+import io.zero88.qwe.QWEConfig.QWEDeployConfig;
 import io.zero88.qwe.exceptions.QWEException;
 
 import lombok.NonNull;
@@ -152,9 +150,9 @@ public final class ConfigProcessor {
     private Optional<QWEConfig> overrideConfig(Map<String, Object> envConfig, JsonObject fileConfig,
                                                boolean overrideAppConfig, boolean overrideSystemConfig) {
         JsonObject bluePrintConfig = new JsonObject();
-        JsonObject inputAppConfig = fileConfig.getJsonObject(AppConfig.NAME, new JsonObject());
-        JsonObject inputSystemConfig = fileConfig.getJsonObject(SystemConfig.NAME, new JsonObject());
-        JsonObject inputDeployConfig = fileConfig.getJsonObject(DeployConfig.NAME, new JsonObject());
+        JsonObject inputAppConfig = fileConfig.getJsonObject(QWEAppConfig.NAME, new JsonObject());
+        JsonObject inputSystemConfig = fileConfig.getJsonObject(QWEBootConfig.NAME, new JsonObject());
+        JsonObject inputDeployConfig = fileConfig.getJsonObject(QWEDeployConfig.NAME, new JsonObject());
         JsonObject destAppConfig = new JsonObject();
         JsonObject destSystemConfig = new JsonObject();
         JsonObject destDeployConfig = new JsonObject();
@@ -174,21 +172,21 @@ public final class ConfigProcessor {
                     logger.warn("DataDir is not valid. ", ex);
                 }
             }
-            if (standardKey.equals(SystemConfig.NAME) && overrideSystemConfig) {
+            if (standardKey.equals(QWEBootConfig.NAME) && overrideSystemConfig) {
                 handleDomainConfig(destSystemConfig, inputSystemConfig, envValue, envKeyParts);
             }
-            if (standardKey.equals(DeployConfig.NAME) && overrideSystemConfig) {
+            if (standardKey.equals(QWEDeployConfig.NAME) && overrideSystemConfig) {
                 handleDomainConfig(destDeployConfig, inputDeployConfig, envValue, envKeyParts);
             }
-            if (standardKey.equals(AppConfig.NAME) && overrideAppConfig) {
+            if (standardKey.equals(QWEAppConfig.NAME) && overrideAppConfig) {
                 handleDomainConfig(destAppConfig, inputAppConfig, envValue, envKeyParts);
             }
         }
 
-        bluePrintConfig.put(AppConfig.NAME, new JsonObject(inputAppConfig.toString()).mergeIn(destAppConfig, true));
-        bluePrintConfig.put(SystemConfig.NAME,
+        bluePrintConfig.put(QWEAppConfig.NAME, new JsonObject(inputAppConfig.toString()).mergeIn(destAppConfig, true));
+        bluePrintConfig.put(QWEBootConfig.NAME,
                             new JsonObject(inputSystemConfig.toString()).mergeIn(destSystemConfig, true));
-        bluePrintConfig.put(DeployConfig.NAME,
+        bluePrintConfig.put(QWEDeployConfig.NAME,
                             new JsonObject(inputDeployConfig.toString()).mergeIn(destDeployConfig, true));
 
         if (!bluePrintConfig.containsKey(QWEConfig.DATA_DIR)) {

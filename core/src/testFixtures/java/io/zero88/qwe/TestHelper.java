@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Objects;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.Handler;
@@ -52,6 +54,16 @@ public interface TestHelper {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    static <T extends Throwable> void assertThrows(Executable ex, Class<T> throwable,
+                                                   Class<? extends Throwable> causeClass) {
+        assertThrows(Assertions.assertThrows(throwable, ex), causeClass);
+    }
+
+    static void assertThrows(Throwable ex, Class<? extends Throwable> causeClass) {
+        ex.printStackTrace(System.out);
+        Assertions.assertTrue(causeClass.isInstance(ex.getCause()));
     }
 
 }

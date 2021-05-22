@@ -113,7 +113,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle implements Ap
     private void deployComponentSuccess(Component component, String deployId) {
         final Class<? extends Component> clazz = component.getClass();
         logger.info("Deployed Verticle '{}' successful with ID '{}'", clazz.getName(), deployId);
-        final ComponentContext def = ComponentContext.create(clazz, config.getDataDir(), getSharedKey(), deployId);
+        final ComponentContext def = ComponentContext.create(clazz, config.dataDir(), getSharedKey(), deployId);
         contexts.add(component.setup(component.hook().onSuccess(def)));
     }
 

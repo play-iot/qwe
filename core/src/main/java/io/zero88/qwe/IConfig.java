@@ -19,7 +19,7 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.Shareable;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.ConfigException;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.utils.Configs;
 
@@ -44,7 +44,7 @@ public interface IConfig extends JsonData, Shareable {
     }
 
     static <T extends IConfig> T from(Object data, Class<T> clazz) {
-        return from(data, clazz, "Invalid config format");
+        return from(data, clazz, null, null);
     }
 
     static <T extends IConfig> T from(Object data, Class<T> clazz, String errorMsg) {
@@ -63,12 +63,11 @@ public interface IConfig extends JsonData, Shareable {
                                  : JsonObject.mapFrom(Objects.requireNonNull(data));
             return CreateConfig.create(clazz, entries, MAPPER);
         } catch (IllegalArgumentException | NullPointerException | DecodeException | HiddenException ex) {
-            HiddenException hidden = ex instanceof HiddenException ? (HiddenException) ex : new HiddenException(ex);
+            Throwable c = ex instanceof HiddenException ? ex.getCause() : ex;
             if (Objects.nonNull(cause)) {
-                hidden.addSuppressed(Objects.nonNull(cause.getCause()) ? cause.getCause() : cause);
+                c.addSuppressed(Objects.nonNull(cause.getCause()) ? cause.getCause() : cause);
             }
-            String msg = Strings.isNotBlank(errorMsg) ? errorMsg : "Invalid config format";
-            throw new QWEException(ErrorCode.INVALID_ARGUMENT, msg, hidden);
+            throw new ConfigException(errorMsg, c);
         }
     }
 
@@ -137,10 +136,10 @@ public interface IConfig extends JsonData, Shareable {
     }
 
     @Override
-    default JsonObject toJson() {
+    default JsonObject toJson(@NonNull ObjectMapper mapper) {
         List<? extends IConfig> fieldValues = ReflectionField.getFieldValuesByType(this, IConfig.class);
         JsonObject jsonObject = getMapper().convertValue(this, JsonObject.class);
-        fieldValues.forEach(val -> jsonObject.put(val.key(), val.toJson()));
+        fieldValues.forEach(val -> jsonObject.put(val.key(), val.toJson(mapper)));
         return jsonObject;
     }
 
@@ -199,8 +198,8 @@ public interface IConfig extends JsonData, Shareable {
                                     ? entries.getJsonObject(name)
                                     : entries;
                 return mapper.convertValue(values.getMap(), clazz);
-            } catch (IllegalArgumentException | ClassCastException e) {
-                throw new HiddenException(ErrorCode.INVALID_ARGUMENT, "Jackson cannot convert data", e);
+            } catch (ClassCastException e) {
+                throw new IllegalArgumentException("Entry [" + name + "] is not json format", e);
             }
         }
 

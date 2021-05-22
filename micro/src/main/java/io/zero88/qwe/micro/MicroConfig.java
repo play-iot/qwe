@@ -8,7 +8,7 @@ import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.ServiceDiscoveryOptions;
 import io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend;
-import io.zero88.qwe.QWEConfig.AppConfig;
+import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
@@ -44,7 +44,7 @@ public final class MicroConfig implements IConfig {
     public String key() { return KEY; }
 
     @Override
-    public Class<? extends IConfig> parent() { return AppConfig.class; }
+    public Class<? extends IConfig> parent() { return QWEAppConfig.class; }
 
     @Getter
     public static class ServiceDiscoveryConfig extends ServiceDiscoveryOptions implements IConfig {

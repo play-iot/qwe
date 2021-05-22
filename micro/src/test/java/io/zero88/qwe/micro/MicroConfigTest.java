@@ -7,7 +7,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.zero88.qwe.QWEConfig;
-import io.zero88.qwe.QWEConfig.AppConfig;
+import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.micro.MicroConfig.BackendConfig;
 import io.zero88.qwe.micro.MicroConfig.LocalServiceDiscoveryConfig;
@@ -54,7 +54,7 @@ public class MicroConfigTest {
 
     @Test
     public void test_parse_from_appConfig() throws JSONException {
-        MicroConfig fromApp = IConfig.from(IConfig.fromClasspath("micro.json", AppConfig.class), MicroConfig.class);
+        MicroConfig fromApp = IConfig.from(IConfig.fromClasspath("micro.json", QWEAppConfig.class), MicroConfig.class);
         MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
         System.out.println(fromApp.toJson());
         System.out.println(fromMicro.toJson());

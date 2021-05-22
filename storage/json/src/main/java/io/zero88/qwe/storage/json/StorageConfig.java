@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import io.zero88.qwe.QWEConfig.AppConfig;
+import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.file.FileOption;
 import io.zero88.qwe.storage.json.service.JsonStorageService;
@@ -58,7 +58,7 @@ public final class StorageConfig implements IConfig {
 
     @Override
     public Class<? extends IConfig> parent() {
-        return AppConfig.class;
+        return QWEAppConfig.class;
     }
 
     public StorageConfig makeFullPath(@NonNull String rootDir) {

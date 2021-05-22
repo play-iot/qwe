@@ -1,57 +1,5 @@
 {
-  "__system__": {
-    "__cluster__": {
-      "active": false,
-      "ha": false,
-      "name": "qwe-cluster",
-      "type": "HAZELCAST",
-      "listenerAddress": "",
-      "url": "",
-      "file": "",
-      "options": {}
-    },
-    "__eventBus__": {
-      "acceptBacklog": -1,
-      "clientAuth": "NONE",
-      "clusterPingInterval": 20000,
-      "clusterPingReplyInterval": 20000,
-      "clusterPublicPort": -1,
-      "clustered": true,
-      "connectTimeout": 60000,
-      "crlPaths": [],
-      "crlValues": [],
-      "enabledCipherSuites": [],
-      "enabledSecureTransportProtocols": [
-        "TLSv1",
-        "TLSv1.1",
-        "TLSv1.2"
-      ],
-      "host": "0.0.0.0",
-      "idleTimeout": 0,
-      "idleTimeoutUnit": "SECONDS",
-      "logActivity": false,
-      "port": 5000,
-      "receiveBufferSize": -1,
-      "reconnectAttempts": 0,
-      "reconnectInterval": 1000,
-      "reuseAddress": true,
-      "reusePort": false,
-      "sendBufferSize": -1,
-      "soLinger": -1,
-      "ssl": false,
-      "sslHandshakeTimeout": 10,
-      "sslHandshakeTimeoutUnit": "SECONDS",
-      "tcpCork": false,
-      "tcpFastOpen": false,
-      "tcpKeepAlive": false,
-      "tcpNoDelay": true,
-      "tcpQuickAck": false,
-      "trafficClass": -1,
-      "trustAll": true,
-      "useAlpn": false,
-      "usePooledBuffers": false
-    }
-  },
+  "dataDir": null,
   "__deploy__": {
     "ha": false,
     "instances": 1,
@@ -60,5 +8,11 @@
     "worker": false,
     "workerPoolSize": 20
   },
-  "__app__": {}
+  "__app__": {
+    "__delivery__": {
+      "timeout": 30000,
+      "localOnly": false,
+      "tracingPolicy": "PROPAGATE"
+    }
+  }
 }

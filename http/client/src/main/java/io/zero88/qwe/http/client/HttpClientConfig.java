@@ -3,7 +3,7 @@ package io.zero88.qwe.http.client;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import io.zero88.qwe.QWEConfig.AppConfig;
+import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.http.HostInfo;
@@ -76,7 +76,7 @@ public final class HttpClientConfig implements IConfig {
     public String key() { return "__httpClient__"; }
 
     @Override
-    public Class<? extends IConfig> parent() { return AppConfig.class; }
+    public Class<? extends IConfig> parent() { return QWEAppConfig.class; }
 
     public HostInfo getHostInfo() {
         if (Objects.nonNull(hostInfo)) {
@@ -118,13 +118,13 @@ public final class HttpClientConfig implements IConfig {
             = WebSocketResponseDispatcher.class;
 
         @JsonCreator
-        HandlerConfig(@JsonProperty(Fields.reqComposerCls) String reqComposerCls,
-                      @JsonProperty(Fields.respTextHandlerCls) String respTextHandlerCls,
-                      @JsonProperty(Fields.respBinaryHandlerCls) String respBinaryHandlerCls,
-                      @JsonProperty(Fields.httpErrorHandlerCls) String httpErrorHandlerCls,
-                      @JsonProperty(Fields.webSocketConnectErrorHandlerCls) String webSocketConnectErrorHandlerCls,
-                      @JsonProperty(Fields.webSocketErrorHandlerCls) String webSocketErrorHandlerCls,
-                      @JsonProperty(Fields.webSocketResponseDispatcherCls) String webSocketResponseDispatcherCls) {
+        HandlerConfig(@JsonProperty("reqComposerCls") String reqComposerCls,
+                      @JsonProperty("respTextHandlerCls") String respTextHandlerCls,
+                      @JsonProperty("respBinaryHandlerCls") String respBinaryHandlerCls,
+                      @JsonProperty("httpErrorHandlerCls") String httpErrorHandlerCls,
+                      @JsonProperty("webSocketConnectErrorHandlerCls") String webSocketConnectErrorHandlerCls,
+                      @JsonProperty("webSocketErrorHandlerCls") String webSocketErrorHandlerCls,
+                      @JsonProperty("webSocketResponseDispatcherCls") String webSocketResponseDispatcherCls) {
             this.reqComposerCls = Strings.isBlank(reqComposerCls)
                                   ? HttpRequestMessageComposer.class
                                   : ReflectionClass.findClass(reqComposerCls);

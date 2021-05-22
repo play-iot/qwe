@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.cluster.ClusterType;
 import io.zero88.qwe.exceptions.QWEException;
 import io.github.zero88.utils.OSHelper;
 import io.github.zero88.utils.SystemHelper;
@@ -31,7 +30,7 @@ import io.vertx.junit5.VertxTestContext;
 public class ConfigProcessorTest {
 
     private ConfigProcessor processor;
-    private QWEConfig QWEConfig;
+    private QWEConfig qweConfig;
 
     @BeforeAll
     public static void beforeSuite() {
@@ -50,7 +49,7 @@ public class ConfigProcessorTest {
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_2\", \"HTTP_1_1\" ]},\"api" +
                            ".name\":\"edge-connector\"}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
         testContext.completeNow();
     }
 
@@ -75,8 +74,8 @@ public class ConfigProcessorTest {
         System.setProperty("qwe.app.http1.abc.def", "123");
 
         overrideConfigThenAssert(finalResult -> {
-            Assertions.assertEquals("thanh", finalResult.getAppConfig().get("name"));
-            Assertions.assertEquals("{abc={def=123.0}}", finalResult.getAppConfig().get("http1").toString());
+            Assertions.assertEquals("thanh", finalResult.getAppConfig().lookup("name"));
+            Assertions.assertEquals("{abc={def=123.0}}", finalResult.getAppConfig().lookup("http1").toString());
         }, true, true);
     }
 
@@ -86,7 +85,7 @@ public class ConfigProcessorTest {
 
         overrideConfigThenAssert(finalResult -> Assertions.assertEquals(
             "{host=0.0.0.0, port=8086, enabled=true, rootApi=/api, alpnVersions=[HTTP_2, HTTP_1_1]}",
-            finalResult.getAppConfig().get("__http__").toString()), true, true);
+            finalResult.getAppConfig().lookup("__http__").toString()), true, true);
     }
 
     @Test
@@ -97,7 +96,7 @@ public class ConfigProcessorTest {
         System.setProperty("qwe.app.http.rootApi", "/test");
 
         overrideConfigThenAssert(finalResult -> {
-            String httpConfig = finalResult.getAppConfig().get("__http__").toString();
+            String httpConfig = finalResult.getAppConfig().lookup("__http__").toString();
             Assertions.assertEquals(
                 "{host=2.2.2.2, port=8088, enabled=false, rootApi=/test, alpnVersions=[" + "HTTP_2, HTTP_1_1]}",
                 httpConfig);
@@ -113,7 +112,7 @@ public class ConfigProcessorTest {
         System.setProperty("qwe.app.http.alpnVersions", "[HTTP_2,HTTP_1_2]");
 
         overrideConfigThenAssert(finalResult -> {
-            String httpConfig = finalResult.getAppConfig().get("__http__").toString();
+            String httpConfig = finalResult.getAppConfig().lookup("__http__").toString();
             Assertions.assertEquals(
                 "{host=2.2.2.2, port=8088, enabled=false, rootApi=/test, alpnVersions=[HTTP_2, HTTP_1_2]}", httpConfig);
         }, true, true);
@@ -127,11 +126,11 @@ public class ConfigProcessorTest {
         System.setProperty("qwe.system.eventBus.clustered", "true");
 
         overrideConfigThenAssert(finalResult -> {
-            Assertions.assertEquals(6000, finalResult.getSystemConfig().getEventBusConfig().getOptions().getPort());
+            Assertions.assertEquals(6000, finalResult.getBootConfig().getEventBusOptions().getPort());
             //            Assertions.assertTrue(finalResult.getSystemConfig().getEventBusConfig().getOptions()
             //            .isClustered());
-            Assertions.assertEquals(ClusterType.ZOOKEEPER, finalResult.getSystemConfig().getClusterConfig().getType());
-            Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
+//            Assertions.assertEquals(ClusterType.ZOOKEEPER, finalResult.getSystemConfig().getClusterManager());
+//            Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
         }, true, true);
     }
 
@@ -158,7 +157,7 @@ public class ConfigProcessorTest {
         System.setProperty("qwe.system.cluster.active", "invalid_type");
 
         overrideConfigThenAssert(
-            finalResult -> Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive()), true,
+            finalResult -> Assertions.assertTrue(finalResult.getBootConfig().isHAEnabled()), true,
             true);
     }
 
@@ -167,10 +166,10 @@ public class ConfigProcessorTest {
         System.setProperty("qwe.app.test.port", "8087");
         String jsonInput1 = "{\"__app__\":{\"test\":\"anyvalue\"}}";
 
-        QWEConfig = IConfig.from(jsonInput1, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(QWEConfig.toJson(), null, true, true);
+        qweConfig = IConfig.from(jsonInput1, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(qweConfig.toJson(), null, true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object testConfig = finalResult.get().getAppConfig().get("test");
+        Object testConfig = finalResult.get().getAppConfig().lookup("test");
         Assertions.assertNotNull(testConfig);
         Assertions.assertEquals("anyvalue", testConfig.toString());
     }
@@ -184,12 +183,12 @@ public class ConfigProcessorTest {
         String jsonInput2 = "{\"__app__\":{\"__http__\":{\"host\":\"1.1.1.1\",\"port\":8086," +
                             "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_3\", \"HTTP_1_1\" ]},\"api" +
                             ".name\":\"edge-connector\"}}";
-        QWEConfig = IConfig.from(jsonInput1, QWEConfig.class);
+        qweConfig = IConfig.from(jsonInput1, QWEConfig.class);
         QWEConfig bpConfig2 = IConfig.from(jsonInput2, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(QWEConfig.toJson(), bpConfig2.toJson(),
+        Optional<QWEConfig> finalResult = this.processor.override(qweConfig.toJson(), bpConfig2.toJson(),
                                                                   true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpConfig = finalResult.get().getAppConfig().get("__http__");
+        Object httpConfig = finalResult.get().getAppConfig().lookup("__http__");
         Assertions.assertNotNull(httpConfig);
         Assertions.assertEquals(
             "{host=1.1.1.1, port=8087, enabled=false, rootApi=/api, alpnVersions=[" + "HTTP_3, HTTP_1_1]}",
@@ -200,7 +199,7 @@ public class ConfigProcessorTest {
     public void test_data_dir() {
         System.setProperty("qwe.dataDir", OSHelper.getAbsolutePathByOs("test").toString());
         overrideConfigThenAssert(
-            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getDataDir()),
+            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.dataDir()),
             true, true);
     }
 
@@ -208,10 +207,10 @@ public class ConfigProcessorTest {
     public void test_double() {
         System.setProperty("qwe.app.http.port", "8087.0");
         String jsonInput = "{\"__app__\":{\"__http__\":{\"port\":8086.0}}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpConfig = finalResult.get().getAppConfig().get("__http__");
+        Object httpConfig = finalResult.get().getAppConfig().lookup("__http__");
         Assertions.assertNotNull(httpConfig);
         Assertions.assertEquals("{port=8087.0}", httpConfig.toString());
     }
@@ -220,11 +219,11 @@ public class ConfigProcessorTest {
     public void test_float() {
         System.setProperty("qwe.app.http.port", String.valueOf(3.4e+038));
         String jsonInput = "{\"__app__\":{\"__http__\":{\"port\":8080}}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        ((Map<String, Object>) QWEConfig.getAppConfig().get("__http__")).put("port", (float) 3.4e+028);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        ((Map<String, Object>) qweConfig.getAppConfig().lookup("__http__")).put("port", (float) 3.4e+028);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpConfig = finalResult.get().getAppConfig().get("__http__");
+        Object httpConfig = finalResult.get().getAppConfig().lookup("__http__");
         Assertions.assertNotNull(httpConfig);
         Assertions.assertEquals("{port=3.4E38}", httpConfig.toString());
     }
@@ -236,10 +235,10 @@ public class ConfigProcessorTest {
             "{\"__app__\":{\"__https__\": [{\"host\": \"2.2.2.2\", \"port\": 8088, \"enabled\": false, " +
             "\"rootApi\": \"/test\"},{\"host\": \"2.2.2.3\", \"port\": 8089, \"enabled\": true, " +
             "\"rootApi\": \"/test1\"}]}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpsConfig = finalResult.get().getAppConfig().get("__https__");
+        Object httpsConfig = finalResult.get().getAppConfig().lookup("__https__");
         Assertions.assertNotNull(httpsConfig);
         Assertions.assertEquals("[{host=2.2.2.2, port=8088, enabled=false, rootApi=/test}, {host=2.2.2.3, port=8089, " +
                                 "enabled=true, rootApi=/test1}]", httpsConfig.toString());
@@ -249,10 +248,10 @@ public class ConfigProcessorTest {
     public void test_json_array_of_primitive() {
         System.setProperty("qwe.app.https", "[abc1,def1]");
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpsConfig = finalResult.get().getAppConfig().get("__https__").toString();
+        Object httpsConfig = finalResult.get().getAppConfig().lookup("__https__").toString();
         Assertions.assertNotNull(httpsConfig);
         Assertions.assertEquals("[abc1, def1]", httpsConfig.toString());
     }
@@ -261,10 +260,10 @@ public class ConfigProcessorTest {
     public void test_json_array_of_primitive_not_update() {
         System.setProperty("qwe.app.https.name", "[abc1,def1]");
         String jsonInput = "{\"__app__\":{\"__https__\": [\"abc\", \"def\"]}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpsConfig = finalResult.get().getAppConfig().get("__https__");
+        Object httpsConfig = finalResult.get().getAppConfig().lookup("__https__");
         Assertions.assertNotNull(httpsConfig);
         Assertions.assertEquals("[abc, def]", httpsConfig.toString());
     }
@@ -274,10 +273,10 @@ public class ConfigProcessorTest {
         System.setProperty("qwe.app.http.host.name", "[abc.net,def.net]");
         String jsonInput = "{\"__app__\":{\"__http__\":{\"host\":[{\"name\":\"abc.com\"}, {\"name\":\"def.com\"}]}}}";
 
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpConfig = finalResult.get().getAppConfig().get("__http__");
+        Object httpConfig = finalResult.get().getAppConfig().lookup("__http__");
         Assertions.assertNotNull(httpConfig);
         Assertions.assertEquals("{host=[{name=abc.com}, {name=def.com}]}", httpConfig.toString());
     }
@@ -286,10 +285,10 @@ public class ConfigProcessorTest {
     public void test_json_array_of_primitive_1() {
         String jsonInput = "{\"__app__\":{\"__http__\":{\"host\":[\"abc.com\",\"def.com\"]}}}";
         System.setProperty("qwe.app.http.host.name", "[abc.net,def.net]");
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        Object httpConfig = finalResult.get().getAppConfig().get("__http__");
+        Object httpConfig = finalResult.get().getAppConfig().lookup("__http__");
         Assertions.assertNotNull(httpConfig);
         Assertions.assertEquals("{host=[abc.com, def.com]}", httpConfig.toString());
     }
@@ -308,8 +307,8 @@ public class ConfigProcessorTest {
             } catch (JSONException e) {
                 throw new QWEException(e);
             }
-            Assertions.assertTrue(finalResult.getSystemConfig().getClusterConfig().isActive());
-            Object httpConfig = finalResult.getAppConfig().get("__http__");
+            Assertions.assertTrue(finalResult.getBootConfig().isHAEnabled());
+            Object httpConfig = finalResult.getAppConfig().lookup("__http__");
             Assertions.assertNotNull(httpConfig);
             Assertions.assertEquals(
                 "{host=0.0.0.0, port=8088, enabled=true, rootApi=/api, alpnVersions=[" + "HTTP_2, HTTP_1_1]}",
@@ -331,8 +330,8 @@ public class ConfigProcessorTest {
             } catch (JSONException e) {
                 throw new QWEException(e);
             }
-            Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
-            Object httpConfig = finalResult.getAppConfig().get("__http__");
+            Assertions.assertFalse(finalResult.getBootConfig().isHAEnabled());
+            Object httpConfig = finalResult.getAppConfig().lookup("__http__");
             Assertions.assertNotNull(httpConfig);
             Assertions.assertEquals(
                 "{host=0.0.0.0, port=8086, enabled=true, rootApi=/api, alpnVersions=[" + "HTTP_2, HTTP_1_1]}",
@@ -353,8 +352,8 @@ public class ConfigProcessorTest {
                            "\"__app__\":{\"__http__\":{\"host\":\"0.0.0.0\",\"port\":8086,\"enabled\":true," +
                            "\"rootApi\":\"/api\", \"alpnVersions\": [ \"HTTP_2\", \"HTTP_1_1\" ]},\"api" +
                            ".name\":\"edge-connector\"}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(null, QWEConfig.toJson(), false, false);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(null, qweConfig.toJson(), false, false);
         Assertions.assertFalse(finalResult.isPresent());
     }
 
@@ -390,17 +389,17 @@ public class ConfigProcessorTest {
                            "\"__hikari__\":{\"jdbcUrl\":\"jdbc:h2:file:/data/db/bios-installer\"}}}}," +
                            "{\"metadata\":{\"group_id\":\"io.zero88.edge.module\",\"artifact_id\":\"gateway\"," +
                            "\"version\":\"1.0.0-SNAPSHOT\",\"service_name\":\"edge-gateway\"}}]}}}";
-        QWEConfig = IConfig.from(jsonInput, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(QWEConfig.toJson(), null, true, true);
+        qweConfig = IConfig.from(jsonInput, QWEConfig.class);
+        Optional<QWEConfig> finalResult = this.processor.override(qweConfig.toJson(), null, true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        MatcherAssert.assertThat(finalResult.get().getDataDir().toString(), CoreMatchers.containsString("data"));
+        MatcherAssert.assertThat(finalResult.get().dataDir().toString(), CoreMatchers.containsString("data"));
     }
 
     private void overrideConfigThenAssert(Consumer<QWEConfig> configConsumer, boolean overrideAppConfig,
                                           boolean overrideOtherConfigs) {
-        Optional<QWEConfig> result = processor.override(QWEConfig.toJson(), null, overrideAppConfig,
+        Optional<QWEConfig> result = processor.override(qweConfig.toJson(), null, overrideAppConfig,
                                                         overrideOtherConfigs);
-        configConsumer.accept(result.orElse(new QWEConfig()));
+        configConsumer.accept(result.orElseGet(QWEConfig::create));
     }
 
     @AfterEach

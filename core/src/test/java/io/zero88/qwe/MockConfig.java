@@ -1,7 +1,5 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.QWEConfig.AppConfig;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +16,7 @@ public class MockConfig implements IConfig {
 
     @Override
     public Class<? extends IConfig> parent() {
-        return AppConfig.class;
+        return QWEAppConfig.class;
     }
 
 }
