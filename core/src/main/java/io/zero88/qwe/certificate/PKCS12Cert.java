@@ -1,6 +1,6 @@
-package io.zero88.qwe.auth.certificate;
+package io.zero88.qwe.certificate;
 
-import io.zero88.qwe.auth.Certificate.KeyPairCertificate;
+import io.zero88.qwe.certificate.Certificate.KeyPairCertificate;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.KeyCertOptions;
 import io.vertx.core.net.PfxOptions;

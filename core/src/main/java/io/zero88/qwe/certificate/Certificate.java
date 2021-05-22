@@ -1,4 +1,4 @@
-package io.zero88.qwe.auth;
+package io.zero88.qwe.certificate;
 
 import io.zero88.qwe.dto.EnumType;
 import io.zero88.qwe.dto.EnumType.AbstractEnumType;

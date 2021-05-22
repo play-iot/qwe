@@ -1,6 +1,6 @@
-package io.zero88.qwe.auth.certificate;
+package io.zero88.qwe.certificate;
 
-import io.zero88.qwe.auth.Certificate.TrustedCertificate;
+import io.zero88.qwe.certificate.Certificate.TrustedCertificate;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.TrustOptions;
 
