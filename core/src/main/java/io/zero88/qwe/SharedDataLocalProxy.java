@@ -1,8 +1,9 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.event.EventBusClient;
 import io.vertx.core.Vertx;
 import io.vertx.core.shareddata.LocalMap;
+import io.vertx.core.shareddata.SharedData;
+import io.zero88.qwe.event.EventBusClient;
 
 @SuppressWarnings("unchecked")
 public interface SharedDataLocalProxy extends HasSharedKey {
@@ -22,18 +23,18 @@ public interface SharedDataLocalProxy extends HasSharedKey {
     }
 
     default <D> D getData(String dataKey, D fallback) {
-        return (D) unwrap().getOrDefault(dataKey, fallback);
+        return (D) localData().getOrDefault(dataKey, fallback);
     }
 
     default <D> D addData(String dataKey, D data) {
-        return (D) unwrap().put(dataKey, data);
+        return (D) localData().put(dataKey, data);
     }
 
     default <D> D removeData(String dataKey) {
-        return (D) unwrap().remove(dataKey);
+        return (D) localData().remove(dataKey);
     }
 
-    default LocalMap<Object, Object> unwrap() {
+    default LocalMap<Object, Object> localData() {
         return getVertx().sharedData().getLocalMap(getSharedKey());
     }
 
@@ -49,6 +50,10 @@ public interface SharedDataLocalProxy extends HasSharedKey {
                 return sharedKey;
             }
         };
+    }
+
+    default SharedData unwrap() {
+        return getVertx().sharedData();
     }
 
 }

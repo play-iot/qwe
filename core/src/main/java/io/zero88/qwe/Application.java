@@ -1,14 +1,14 @@
 package io.zero88.qwe;
 
-import io.vertx.core.Promise;
+import io.vertx.core.Future;
 import io.vertx.core.Verticle;
-import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.event.EventListener;
 
 import lombok.NonNull;
 
 /**
- * Represents a container consists a list of {@code Verticle component} to startup application
+ * Represents an {@code Application} contains a list of micro {@code Components} function.
+ * <p>
+ * It's mostly deployed as a standalone application by {@code java -jar Application.jar}
  *
  * @see Component
  * @see HasConfig
@@ -31,15 +31,6 @@ public interface Application extends HasConfig<QWEConfig>, HasSharedKey, HasShar
     }
 
     /**
-     * Register eventbus consumer
-     *
-     * @param eventBus event bus client
-     * @see EventBusClient#register(String, EventListener)
-     * @see EventBusClient#register(String, boolean, EventListener)
-     */
-    void registerEventBus(EventBusClient eventBus);
-
-    /**
      * Add component provider to startup
      *
      * @param <T>      Type of component
@@ -54,16 +45,16 @@ public interface Application extends HasConfig<QWEConfig>, HasSharedKey, HasShar
      * <p>
      * If any component verticle starts failed, future will catch and report it to {@code Vertx}
      *
-     * @param future a future which should be called when all component verticle start-up is complete.
+     * @return void future
      */
-    void installComponents(Promise<Void> future);
+    Future<Void> installComponents();
 
     /**
      * Uninstall a list of register components when application is stopped
      *
-     * @param future a future which should be called when all component verticle clean-up is complete.
+     * @return void future
      */
-    void uninstallComponents(Promise<Void> future);
+    Future<Void> uninstallComponents();
 
     /**
      * Raise event after installed all component completely

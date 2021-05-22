@@ -5,13 +5,12 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.micro.MicroContext;
 import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.http.EventMethodDefinition;
 
 public class SimilarApiService extends MockEventOneApiOneLocService {
 
@@ -24,9 +23,9 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
     static EventModel EVENT_2 = EventModel.clone(EVENT_1, "test.SimilarApiService.2");
 
     @Override
-    public void registerEventBus(EventBusClient eventBus) {
-        eventBus.register(EVENT_1.getAddress(), new MockSiteListener())
-                .register(EVENT_2.getAddress(), new MockProductListener());
+    public void onStart() {
+        getEventBus().register(EVENT_1.getAddress(), new MockSiteListener())
+                     .register(EVENT_2.getAddress(), new MockProductListener());
     }
 
     @Override

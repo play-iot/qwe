@@ -44,9 +44,8 @@ public class MockProvider implements ComponentProvider<MockComponent> {
         }
 
         @Override
-        public void start() {
+        public void onStart() {
             logger.info("Starting Mock Unit Verticle...");
-            super.start();
             if (error) {
                 throw new RuntimeException("Error when starting Component Verticle");
             }

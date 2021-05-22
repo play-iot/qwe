@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -51,7 +50,7 @@ public class MicroContextTest {
     @After
     public void tearDown() {
         if (Objects.nonNull(micro)) {
-            micro.unregister(Promise.promise());
+            micro.unregister();
         }
         vertx.close();
     }

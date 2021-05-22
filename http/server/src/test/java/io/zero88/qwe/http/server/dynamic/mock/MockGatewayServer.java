@@ -8,8 +8,7 @@ import io.zero88.qwe.micro.MicroVerticleProvider;
 public class MockGatewayServer extends ApplicationVerticle {
 
     @Override
-    public void start() {
-        super.start();
+    public void onStart() {
         this.addProvider(new HttpServerProvider(new HttpServerRouter())).addProvider(new MicroVerticleProvider());
     }
 

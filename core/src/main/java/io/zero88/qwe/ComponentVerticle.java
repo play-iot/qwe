@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Promise;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.experimental.Accessors;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ComponentVerticle<C extends IConfig, T extends ComponentContext> extends AbstractVerticle
-    implements Component<C, T>, DeployHook<T> {
+    implements Component<C, T>, DeployHook<T>, VerticleLifecycleHooks {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter
@@ -24,10 +25,26 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
     protected C config;
 
     @Override
-    public void start() {
+    public final void start() {
         logger.debug("Computing component configure from {} of {}", configFile(), configClass());
         this.config = computeConfig(config());
         logger.debug("Component Configuration: {}", config.toJson().encode());
+        this.onStart();
+    }
+
+    @Override
+    public final void start(Promise<Void> promise) throws Exception {
+        promise.handle(VerticleLifecycleHooks.run(vertx, this::start).flatMap(i -> this.onAsyncStart()));
+    }
+
+    @Override
+    public final void stop() {
+        this.onStop();
+    }
+
+    @Override
+    public final void stop(Promise<Void> promise) {
+        promise.handle(VerticleLifecycleHooks.run(vertx, this::stop).flatMap(i -> this.onAsyncStop()));
     }
 
     @Override

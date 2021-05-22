@@ -2,16 +2,26 @@ package io.zero88.qwe.http.server;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.github.zero88.utils.FileUtils;
+import io.github.zero88.utils.Strings;
+import io.vertx.core.Future;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.ext.web.Route;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.handler.ResponseContentTypeHandler;
+import io.vertx.ext.web.handler.ResponseTimeHandler;
 import io.zero88.qwe.ComponentContext;
 import io.zero88.qwe.ComponentVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.InitializerError;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpConfig.ApiGatewayConfig;
@@ -34,16 +44,6 @@ import io.zero88.qwe.http.server.rest.api.RestEventApi;
 import io.zero88.qwe.http.server.upload.UploadRouterCreator;
 import io.zero88.qwe.http.server.web.StaticWebRouterCreator;
 import io.zero88.qwe.http.server.ws.WebSocketRouterCreator;
-import io.github.zero88.utils.FileUtils;
-import io.github.zero88.utils.Strings;
-import io.vertx.core.Promise;
-import io.vertx.core.http.HttpServerOptions;
-import io.vertx.ext.web.Route;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.CorsHandler;
-import io.vertx.ext.web.handler.ResponseContentTypeHandler;
-import io.vertx.ext.web.handler.ResponseTimeHandler;
 
 import lombok.NonNull;
 
@@ -75,29 +75,21 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
     }
 
     @Override
-    public void start(Promise<Void> promise) {
+    public Future<Void> onAsyncStart() {
         logger.info("Starting HTTP Server...");
-        super.start();
         final HttpServerOptions options = new HttpServerOptions(config.getOptions()).setHost(config.getHost())
                                                                                     .setPort(config.getPort());
         final Router router = initRouter();
-        this.httpServer = vertx.createHttpServer(options).requestHandler(router).listen(event -> {
-            if (event.succeeded()) {
-                int port = event.result().actualPort();
-                logger.info("Web Server started at {}", port);
-                this.sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(router, port));
-                promise.complete();
-                return;
-            }
-            promise.fail(QWEExceptionConverter.from(event.cause()));
-        });
+        return vertx.createHttpServer(options).requestHandler(router).listen().onSuccess(server -> {
+            this.httpServer = server;
+            logger.info("Web Server started at {}", this.httpServer.actualPort());
+            this.sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(router, this.httpServer.actualPort()));
+        }).recover(t -> Future.failedFuture(QWEExceptionConverter.from(t))).mapEmpty();
     }
 
     @Override
-    public void stop() {
-        if (Objects.nonNull(this.httpServer)) {
-            this.httpServer.close();
-        }
+    public Future<Void> onAsyncStop() {
+        return Optional.ofNullable(httpServer).map(s -> httpServer.close()).orElseGet(Future::succeededFuture);
     }
 
     @Override

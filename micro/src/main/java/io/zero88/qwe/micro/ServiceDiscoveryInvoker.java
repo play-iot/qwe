@@ -18,7 +18,6 @@ import io.github.zero88.utils.Functions;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -38,10 +37,10 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.client.HttpClientDelegate;
 import io.zero88.qwe.micro.MicroConfig.BackendConfig;
 import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
-import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
@@ -107,15 +106,15 @@ public abstract class ServiceDiscoveryInvoker implements Supplier<ServiceDiscove
         return Objects.requireNonNull(sd, kind() + " Service Discovery is not enabled");
     }
 
-    void unregister(Promise<Void> promise) {
+    Future<Void> unregister() {
         if (Objects.isNull(sd)) {
-            return;
+            return Future.succeededFuture();
         }
-        sd.getRecords(r -> registrationMap.containsKey(r.getRegistration()), true)
-          .flatMap(recs -> CompositeFuture.join(
-              recs.stream().map(r -> sd.unpublish(r.getRegistration())).collect(Collectors.toList())))
-          .onFailure(t -> logger.warn("Cannot un-published record", t))
-          .onComplete(e -> promise.tryComplete());
+        return sd.getRecords(r -> registrationMap.containsKey(r.getRegistration()), true)
+                 .flatMap(recs -> CompositeFuture.join(
+                     recs.stream().map(r -> sd.unpublish(r.getRegistration())).collect(Collectors.toList())))
+                 .onFailure(t -> logger.warn("Cannot un-published record", t))
+                 .mapEmpty();
     }
 
     public Future<Record> addRecord(@NonNull Record record) {

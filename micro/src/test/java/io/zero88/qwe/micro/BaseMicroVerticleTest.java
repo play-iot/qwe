@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -67,7 +66,7 @@ public abstract class BaseMicroVerticleTest {
     @After
     public void tearDown(TestContext context) {
         if (Objects.nonNull(micro)) {
-            micro.unregister(Promise.promise());
+            micro.unregister();
         }
         vertx.close(context.asyncAssertSuccess());
     }

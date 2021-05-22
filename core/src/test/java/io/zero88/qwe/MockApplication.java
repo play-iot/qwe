@@ -9,9 +9,8 @@ public final class MockApplication extends ApplicationVerticle {
     private boolean errorInHandler;
 
     @Override
-    public void start() {
+    public void onStart() {
         logger.info("Starting Mock Container Verticle...");
-        super.start();
         if (error) {
             throw new RuntimeException("Error when starting");
         }

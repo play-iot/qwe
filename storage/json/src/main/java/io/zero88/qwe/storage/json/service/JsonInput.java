@@ -18,13 +18,11 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.experimental.FieldNameConstants;
 import lombok.extern.jackson.Jacksonized;
 
 @Data
 @Builder
 @Jacksonized
-@FieldNameConstants
 public final class JsonInput implements JsonData {
 
     @Default
@@ -46,13 +44,13 @@ public final class JsonInput implements JsonData {
 
     public static class JsonInputBuilder {
 
-        @JsonProperty(Fields.dataToInsert)
+        @JsonProperty("dataToInsert")
         private JsonInputBuilder toInsert(Object dataToInsert) {
             this.dataToInsert = dataToInsert;
             return this;
         }
 
-        @JsonProperty(Fields.keyToRemove)
+        @JsonProperty("keyToRemove")
         private JsonInputBuilder toRemove(Object keyToRemove) {
             this.keyToRemove = keyToRemove;
             return this;

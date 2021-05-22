@@ -3,14 +3,15 @@ package io.zero88.qwe.micro;
 import java.util.Objects;
 import java.util.UUID;
 
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 import io.zero88.qwe.ComponentContext;
 import io.zero88.qwe.ComponentContext.DefaultComponentContext;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.MicroConfig.GatewayConfig;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.EventBus;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -62,9 +63,8 @@ public final class MicroContext extends DefaultComponentContext {
         EventBusClient.create(proxy).register(config.getIndexAddress(), new ServiceLocator(this));
     }
 
-    void unregister(Promise<Void> promise) {
-        this.clusterInvoker.unregister(promise);
-        this.localInvoker.unregister(promise);
+    Future<Void> unregister() {
+        return CompositeFuture.join(this.clusterInvoker.unregister(), this.localInvoker.unregister()).mapEmpty();
     }
 
     public void rescanService(EventBus eventBus) {

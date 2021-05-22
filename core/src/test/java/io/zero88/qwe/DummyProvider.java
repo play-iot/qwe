@@ -31,9 +31,8 @@ final class DummyProvider implements ComponentProvider<DummyComponentVerticle> {
         }
 
         @Override
-        public void start() {
+        public void onStart() {
             logger.info("Starting Fake Unit Verticle...");
-            super.start();
         }
 
     }

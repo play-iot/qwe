@@ -1,9 +1,9 @@
 package io.zero88.qwe.micro;
 
+import io.vertx.core.Future;
 import io.zero88.qwe.ComponentContext;
 import io.zero88.qwe.ComponentVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.vertx.core.Promise;
 
 import lombok.NonNull;
 
@@ -14,7 +14,9 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
     }
 
     @Override
-    public void stop(Promise<Void> promise) { getContext().unregister(promise); }
+    public Future<Void> onAsyncStop() {
+        return getContext().unregister();
+    }
 
     @Override
     public Class<MicroConfig> configClass() { return MicroConfig.class; }

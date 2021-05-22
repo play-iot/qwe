@@ -1,12 +1,11 @@
 package io.zero88.qwe;
 
-import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 
 import lombok.NonNull;
 
 /**
- * Represents small and independent component that integrate with verticle.
+ * Represents for a Verticle {@code component} that keeps a single duty function.
  *
  * @param <C> Type of Config
  * @param <T> Type of Component Context
@@ -23,7 +22,7 @@ public interface Component<C extends IConfig, T extends ComponentContext>
      *
      * @return hook
      * @see DeployHook
-     * @see Application#installComponents(Promise)
+     * @see Application#installComponents()
      */
     @NonNull DeployHook<T> hook();
 
