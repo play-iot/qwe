@@ -1,9 +1,6 @@
 package io.zero88.qwe;
 
-import java.util.concurrent.CompletableFuture;
-
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 
 public interface VerticleLifecycleHooks {
 
@@ -17,10 +14,6 @@ public interface VerticleLifecycleHooks {
 
     default Future<Void> onAsyncStop() {
         return Future.succeededFuture();
-    }
-
-    static Future<Void> run(Vertx vertx, Runnable runnable) {
-        return Future.fromCompletionStage(CompletableFuture.runAsync(runnable), vertx.getOrCreateContext());
     }
 
 }

@@ -36,8 +36,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final void start() {
-        final QWEConfig fileConfig = computeConfig(config());
-        this.config = new ConfigProcessor(vertx).override(fileConfig.toJson(), true, false).orElse(fileConfig);
+        this.config = computeConfig(config());
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION,
                      new EventBusDeliveryOption(this.config.getAppConfig().getDeliveryOptions()));
         this.addData(SharedDataLocalProxy.APP_DATADIR, this.config.getDataDir());
@@ -47,10 +46,9 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final void start(Promise<Void> pr) {
-        pr.handle(VerticleLifecycleHooks.run(vertx, this::start)
-                                        .flatMap(i -> onAsyncStart())
-                                        .onSuccess(ignore -> installComponents())
-                                        .onFailure(e -> logger.error("Cannot start Application[{}]", getClass(), e)));
+        this.start();
+        pr.handle(onAsyncStart().onSuccess(ignore -> installComponents())
+                                .onFailure(e -> logger.error("Cannot start Application[{}]", getClass(), e)));
     }
 
     public final void stop() {
@@ -59,10 +57,9 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final void stop(Promise<Void> promise) {
-        promise.handle(VerticleLifecycleHooks.run(vertx, this::stop)
-                                             .flatMap(i -> onAsyncStop())
-                                             .eventually(ignore -> uninstallComponents())
-                                             .onFailure(t -> logger.error("Uninstall Application failed", t)));
+        this.stop();
+        promise.handle(onAsyncStop().eventually(ignore -> uninstallComponents())
+                                    .onFailure(t -> logger.error("Uninstall Application failed", t)));
     }
 
     @Override

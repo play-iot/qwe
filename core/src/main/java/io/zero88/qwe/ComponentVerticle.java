@@ -34,7 +34,8 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
 
     @Override
     public final void start(Promise<Void> promise) throws Exception {
-        promise.handle(VerticleLifecycleHooks.run(vertx, this::start).flatMap(i -> this.onAsyncStart()));
+        this.start();
+        promise.handle(this.onAsyncStart());
     }
 
     @Override
@@ -44,7 +45,8 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
 
     @Override
     public final void stop(Promise<Void> promise) {
-        promise.handle(VerticleLifecycleHooks.run(vertx, this::stop).flatMap(i -> this.onAsyncStop()));
+        this.stop();
+        promise.handle(this.onAsyncStop());
     }
 
     @Override
