@@ -14,6 +14,11 @@ dependencies {
 
     implementation(VertxLibs.config)
 
+    compileOnly(VertxLibs.hazelcast)
+    compileOnly(VertxLibs.zookeeper)
+    compileOnly(VertxLibs.ignite)
+    compileOnly(VertxLibs.infinispan)
+
     compileOnly(VertxLibs.codegen)
     compileOnly(VertxLibs.rx2)
     compileOnly(UtilLibs.jetbrainsAnnotations)

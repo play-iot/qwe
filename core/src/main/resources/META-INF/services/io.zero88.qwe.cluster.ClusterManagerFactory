@@ -1,0 +1,2 @@
+io.zero88.qwe.cluster.HazelcastManagerFactory
+io.zero88.qwe.cluster.ZookeeperManagerFactory

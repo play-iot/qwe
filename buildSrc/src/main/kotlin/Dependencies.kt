@@ -82,6 +82,12 @@ object VertxLibs {
     const val serviceDiscovery = "io.vertx:vertx-service-discovery:${Version.vertx}"
     const val circuitBreaker = "io.vertx:vertx-circuit-breaker:${Version.vertx}"
     const val healthCheck = "io.vertx:vertx-health-check:${Version.vertx}"
+
+    const val hazelcast = "io.vertx:vertx-hazelcast:${Version.vertx}"
+    const val zookeeper = "io.vertx:vertx-zookeeper:${Version.vertx}"
+    const val ignite = "io.vertx:vertx-ignite:${Version.vertx}"
+    const val infinispan = "io.vertx:vertx-infinispan:${Version.vertx}"
+
     const val rx2 = "io.vertx:vertx-rx-java2:${Version.vertx}"
     const val junit = "io.vertx:vertx-unit:${Version.vertx}"
     const val junit5 = "io.vertx:vertx-junit5:${Version.vertx}"
