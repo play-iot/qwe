@@ -1,5 +1,4 @@
 {
-  "dataDir": "/data",
   "__system__": {
     "eventLoopPoolSize": 32,
     "workerPoolSize": 20,
@@ -23,7 +22,7 @@
       "trafficClass": -1,
       "reuseAddress": true,
       "logActivity": false,
-      "reusePort": true,
+      "reusePort": false,
       "tcpNoDelay": true,
       "tcpKeepAlive": false,
       "soLinger": -1,
@@ -84,6 +83,7 @@
     "workerPoolSize": 20
   },
   "__app__": {
+    "dataDir": "/data",
     "__delivery__": {
       "timeout": 30000,
       "localOnly": false,

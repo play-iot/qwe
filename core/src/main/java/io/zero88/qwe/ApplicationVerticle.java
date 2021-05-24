@@ -39,7 +39,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
         this.config = computeConfig(config());
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION,
                      new EventBusDeliveryOption(this.config.getAppConfig().getDeliveryOptions()));
-        this.addData(SharedDataLocalProxy.APP_DATADIR, this.config.getDataDir());
+        this.addData(SharedDataLocalProxy.APP_DATADIR, this.config.getAppConfig().getDataDir());
         this.eventBus = EventBusClient.create(sharedData());
         this.onStart();
     }
@@ -114,9 +114,9 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @SuppressWarnings("unchecked")
     private void deployComponentSuccess(Component component, String deployId) {
-        final Class<? extends Component> clazz = component.getClass();
-        logger.info("Deployed Verticle [{}] successful with id [{}]", clazz.getName(), deployId);
-        final ComponentContext def = ComponentContext.create(clazz, config.dataDir(), getSharedKey(), deployId);
+        Class<? extends Component> cls = component.getClass();
+        logger.info("Deployed Verticle [{}] successful with id [{}]", cls.getName(), deployId);
+        ComponentContext def = ComponentContext.create(cls, config.getAppConfig().dataDir(), getSharedKey(), deployId);
         contexts.add(component.setup(component.hook().onSuccess(def)));
     }
 

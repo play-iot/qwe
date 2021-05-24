@@ -24,23 +24,32 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
+import lombok.experimental.Accessors;
+import lombok.experimental.FieldNameConstants;
 
 /**
  * Boot system configuration
  *
  * @see VertxOptions
  */
+@FieldNameConstants
 public final class QWEBootConfig extends VertxOptions implements IConfig {
 
     public static final String NAME = "__system__";
     public static final int DEFAULT_EVENT_BUS_PORT = 2468;
-    public static final Path DEFAULT_CACHE_DIR = Paths.get(System.getProperty("java.io.tmpdir", "."), "qwe-cache");
+    public static final String DEFAULT_CACHE_DIR = Paths.get(System.getProperty("java.io.tmpdir", "."), "qwe-cache")
+                                                        .toString();
     public static final String DEFAULT_HA_GROUP = "__QWE__";
 
     @JsonIgnore
     private final VertxOptions delegate;
     @Getter
-    private ClusterType clusterType = ClusterType.UNDEFINED;
+    private ClusterType clusterType = ClusterType.NONE;
+    @Getter
+    private boolean clusterLiteMember = false;
+    @Getter
+    @Accessors(fluent = true)
+    private Path clusterConfigFile;
 
     public QWEBootConfig() { this.delegate = defVertxOpts(); }
 
@@ -50,19 +59,22 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
             this.delegate = defVertxOpts();
             return;
         }
+        this.clusterType = ClusterType.factory((String) map.get(Fields.clusterType));
+        this.clusterLiteMember = Boolean.parseBoolean(map.getOrDefault(Fields.clusterLiteMember, "false").toString());
+        this.clusterConfigFile = Optional.ofNullable(map.get(Fields.clusterConfigFile))
+                                         .map(s -> Paths.get(s.toString()))
+                                         .orElse(null);
         this.delegate = new VertxOptions(JsonObject.mapFrom(optimizeHA(optimizeEB(optimizeFS(map)))));
-        this.clusterType = ClusterType.factory((String) map.get("clusterType"));
+    }
+
+    public String getClusterConfigFile() {
+        return Optional.ofNullable(clusterConfigFile).map(Path::toAbsolutePath).map(Path::toString).orElse(null);
     }
 
     private VertxOptions defVertxOpts() {
         return new VertxOptions().setHAGroup(DEFAULT_HA_GROUP)
                                  .setEventBusOptions(defEventBusOpts())
                                  .setFileSystemOptions(defFileSysOpts());
-    }
-
-    public QWEBootConfig setClusterType(ClusterType clusterType) {
-        this.clusterType = Optional.ofNullable(clusterType).orElse(ClusterType.UNDEFINED);
-        return this;
     }
 
     @Override
@@ -72,7 +84,17 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
     public Class<? extends IConfig> parent() { return QWEConfig.class; }
 
     @Override
-    public JsonObject toJson(ObjectMapper mapper) { return delegate.toJson(); }
+    public JsonObject toJson() {
+        return this.toJson(getMapper());
+    }
+
+    @Override
+    public JsonObject toJson(ObjectMapper mapper) {
+        return delegate.toJson()
+                       .put(Fields.clusterType, clusterType.type())
+                       .put(Fields.clusterLiteMember, clusterLiteMember)
+                       .put(Fields.clusterConfigFile, clusterConfigFile);
+    }
 
     @Override
     public int getEventLoopPoolSize() {
@@ -310,9 +332,9 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
         opts.compute("port", (s, o) -> o instanceof Number
                                        ? Networks.validPort(((Number) o).intValue(), DEFAULT_EVENT_BUS_PORT)
                                        : DEFAULT_EVENT_BUS_PORT);
-        opts.compute("clusterPublicPort", (s, o) -> o instanceof Number
-                                                    ? Networks.validPort(((Number) o).intValue(),
-                                                                         (Integer) opts.get("port"))
+        opts.compute("clusterPublicPort", (s, prop) -> prop instanceof Number
+                                                    ? Networks.validPort(((Number) prop).intValue(),
+                                                                         (Integer) opts.get("clusterPublicPort"))
                                                     : opts.get("port"));
         return map;
     }
@@ -351,7 +373,7 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
     }
 
     private FileSystemOptions defFileSysOpts() {
-        return new FileSystemOptions().setFileCacheDir(DEFAULT_CACHE_DIR.toAbsolutePath().toString());
+        return new FileSystemOptions().setFileCacheDir(DEFAULT_CACHE_DIR);
     }
 
 }

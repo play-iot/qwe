@@ -18,7 +18,7 @@
     "clientAuth": "NONE",
     "clusterPingInterval": 20000,
     "clusterPingReplyInterval": 20000,
-    "clusterPublicPort": 2468,
+    "clusterPublicPort": -1,
     "connectTimeout": 60000,
     "crlPaths": [],
     "crlValues": [],
@@ -36,7 +36,7 @@
     "reconnectAttempts": 0,
     "reconnectInterval": 1000,
     "reuseAddress": true,
-    "reusePort": true,
+    "reusePort": false,
     "sendBufferSize": -1,
     "soLinger": -1,
     "ssl": false,
@@ -71,5 +71,8 @@
   "quorumSize": 1,
   "warningExceptionTime": 5000000000,
   "warningExceptionTimeUnit": "NANOSECONDS",
-  "workerPoolSize": 20
+  "workerPoolSize": 20,
+  "clusterType": "UNDEFINED",
+  "clusterLiteMember": false,
+  "clusterConfigFile": null
 }

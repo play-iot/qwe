@@ -138,8 +138,8 @@ public final class ConfigProcessor {
     }
 
     private String toStandardKey(String key) {
-        if (key.equalsIgnoreCase(QWEConfig.DATA_DIR)) {
-            return QWEConfig.DATA_DIR;
+        if (key.equalsIgnoreCase(QWEAppConfig.DATA_DIR)) {
+            return QWEAppConfig.DATA_DIR;
         }
         if (key.startsWith("__") && key.endsWith("__")) {
             return key;
@@ -156,7 +156,7 @@ public final class ConfigProcessor {
         JsonObject destAppConfig = new JsonObject();
         JsonObject destSystemConfig = new JsonObject();
         JsonObject destDeployConfig = new JsonObject();
-        Object inputDataDir = fileConfig.getValue(QWEConfig.DATA_DIR);
+        Object inputDataDir = fileConfig.getValue(QWEAppConfig.DATA_DIR);
 
         for (Entry<String, Object> entry : envConfig.entrySet()) {
             String[] envKeyParts = entry.getKey().split("\\.");
@@ -165,9 +165,9 @@ public final class ConfigProcessor {
             }
             Object envValue = entry.getValue();
             String standardKey = toStandardKey(envKeyParts[1]);
-            if (standardKey.equals(QWEConfig.DATA_DIR) && overrideSystemConfig) {
+            if (standardKey.equals(QWEAppConfig.DATA_DIR) && overrideSystemConfig) {
                 try {
-                    bluePrintConfig.put(QWEConfig.DATA_DIR, FileUtils.toPath((String) envValue).toString());
+                    bluePrintConfig.put(QWEAppConfig.DATA_DIR, FileUtils.toPath((String) envValue).toString());
                 } catch (QWEException ex) {
                     logger.warn("DataDir is not valid. ", ex);
                 }
@@ -189,8 +189,8 @@ public final class ConfigProcessor {
         bluePrintConfig.put(QWEDeployConfig.NAME,
                             new JsonObject(inputDeployConfig.toString()).mergeIn(destDeployConfig, true));
 
-        if (!bluePrintConfig.containsKey(QWEConfig.DATA_DIR)) {
-            bluePrintConfig.put(QWEConfig.DATA_DIR, inputDataDir);
+        if (!bluePrintConfig.containsKey(QWEAppConfig.DATA_DIR)) {
+            bluePrintConfig.put(QWEAppConfig.DATA_DIR, inputDataDir);
         }
         try {
             return Optional.of(

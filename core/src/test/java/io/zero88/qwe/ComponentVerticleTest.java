@@ -9,14 +9,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.MockProvider.MockComponent;
-import io.zero88.qwe.exceptions.QWEException;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.zero88.qwe.MockProvider.MockComponent;
+import io.zero88.qwe.exceptions.ConfigException;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -54,8 +54,8 @@ public class ComponentVerticleTest {
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, component, t -> {
             TestHelper.testComplete(async);
-            Assert.assertTrue(t instanceof QWEException);
-            Assert.assertEquals("Invalid config format", t.getMessage());
+            Assert.assertEquals("Invalid configuration format", t.getMessage());
+            TestHelper.assertThrows(() -> { throw t; }, ConfigException.class, IllegalArgumentException.class);
         });
     }
 

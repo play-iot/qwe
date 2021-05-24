@@ -199,7 +199,7 @@ public class ConfigProcessorTest {
     public void test_data_dir() {
         System.setProperty("qwe.dataDir", OSHelper.getAbsolutePathByOs("test").toString());
         overrideConfigThenAssert(
-            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.dataDir()),
+            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getAppConfig().dataDir()),
             true, true);
     }
 
@@ -392,7 +392,7 @@ public class ConfigProcessorTest {
         qweConfig = IConfig.from(jsonInput, QWEConfig.class);
         Optional<QWEConfig> finalResult = this.processor.override(qweConfig.toJson(), null, true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        MatcherAssert.assertThat(finalResult.get().dataDir().toString(), CoreMatchers.containsString("data"));
+        MatcherAssert.assertThat(finalResult.get().getAppConfig().dataDir().toString(), CoreMatchers.containsString("data"));
     }
 
     private void overrideConfigThenAssert(Consumer<QWEConfig> configConsumer, boolean overrideAppConfig,

@@ -1,5 +1,4 @@
 {
-  "dataDir": null,
   "__deploy__": {
     "ha": false,
     "instances": 1,

@@ -21,13 +21,13 @@ public class QWEConfigTest {
         System.out.println(cfg.toJson().encodePrettily());
         Assertions.assertEquals(cfg.toJson(), from.toJson());
 
-        Assertions.assertEquals(QWEConfig.DEFAULT_DATADIR, from.dataDir());
         Assertions.assertNull(from.getBootConfig());
 
         Assertions.assertNotNull(from.getDeployConfig());
         Assertions.assertEquals(new QWEDeployConfig().toJson(), from.getDeployConfig().toJson());
 
         Assertions.assertNotNull(from.getAppConfig());
+        Assertions.assertEquals(QWEAppConfig.DEFAULT_DATADIR, from.getAppConfig().dataDir());
         Assertions.assertTrue(from.getAppConfig().other().isEmpty());
         Assertions.assertEquals(new DeliveryOptions().toJson(), from.getAppConfig().getDeliveryOptions().toJson());
     }
@@ -43,7 +43,7 @@ public class QWEConfigTest {
         System.out.println(config.getBootConfig().toJson().encodePrettily());
         QWEConfig from = IConfig.fromClasspath("full-system-cfg.json", QWEConfig.class);
         JsonHelper.assertJson(config.getBootConfig().toJson(), from.getBootConfig().toJson());
-        Assertions.assertEquals("/data", from.dataDir().toString());
+        Assertions.assertEquals("/data", from.getAppConfig().getDataDir());
         Assertions.assertEquals(config.getDeployConfig().toJson(), from.getDeployConfig().toJson());
         Assertions.assertEquals(config.getAppConfig().toJson(), from.getAppConfig().toJson());
     }
@@ -132,33 +132,33 @@ public class QWEConfigTest {
 
     @Test
     public void test_blank() throws JSONException {
-        QWEConfig blank = QWEConfig.create();
-        Assertions.assertNotNull(blank);
-        Assertions.assertNotNull(blank.dataDir());
-        Assertions.assertNotNull(blank.getAppConfig());
-        Assertions.assertTrue(blank.getAppConfig().other().isEmpty());
-        Assertions.assertNotNull(blank.getDeployConfig());
+        QWEConfig cfg = QWEConfig.create();
+        Assertions.assertNotNull(cfg);
+        Assertions.assertNotNull(cfg.getAppConfig());
+        Assertions.assertNotNull(cfg.getAppConfig().dataDir());
+        Assertions.assertTrue(cfg.getAppConfig().other().isEmpty());
+        Assertions.assertNotNull(cfg.getDeployConfig());
         JSONAssert.assertEquals("{\"worker\":false,\"workerPoolSize\":20," +
                                 "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
                                 "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}",
-                                blank.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
-        Assertions.assertNull(blank.getBootConfig());
+                                cfg.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
+        Assertions.assertNull(cfg.getBootConfig());
     }
 
     @Test
     public void test_blank_with_app_cfg() throws JSONException {
-        QWEConfig blank = QWEConfig.create(new JsonObject().put("hello", 1));
-        Assertions.assertNotNull(blank);
-        Assertions.assertNotNull(blank.dataDir());
-        Assertions.assertNotNull(blank.getAppConfig());
-        Assertions.assertEquals(1, blank.getAppConfig().other().size());
-        Assertions.assertEquals(1, blank.getAppConfig().lookup("hello"));
-        Assertions.assertNotNull(blank.getDeployConfig());
+        QWEConfig config = QWEConfig.create(new JsonObject().put("hello", 1));
+        Assertions.assertNotNull(config);
+        Assertions.assertNotNull(config.getAppConfig().dataDir());
+        Assertions.assertNotNull(config.getAppConfig());
+        Assertions.assertEquals(1, config.getAppConfig().other().size());
+        Assertions.assertEquals(1, config.getAppConfig().lookup("hello"));
+        Assertions.assertNotNull(config.getDeployConfig());
         JSONAssert.assertEquals("{\"worker\":false,\"workerPoolSize\":20," +
                                 "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
                                 "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}",
-                                blank.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
-        Assertions.assertNull(blank.getBootConfig());
+                                config.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
+        Assertions.assertNull(config.getBootConfig());
     }
 
     //    @Test
