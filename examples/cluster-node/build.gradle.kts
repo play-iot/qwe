@@ -16,14 +16,15 @@ oss {
 qwe {
     app {
         appName.set("qwe-example-boot")
-        appVerticle.set("io.zero88.qwe.example.systemd.SystemdVerticle")
+        appVerticle.set("io.zero88.qwe.example.boot.BootVerticle")
+        fatJar.set(true)
         logging {
             otherLoggers.set(
                 mapOf(
                     "io.netty" to "info",
                     "io.vertx" to "info",
                     "com.hazelcast" to "info",
-                    "io.zero88" to "debug"
+                    "io.zero88" to "info"
                 )
             )
         }
