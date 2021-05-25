@@ -19,7 +19,7 @@ public interface EventAnnotationProcessor {
     }
 
     static EventAnnotationProcessor create(String[] ignorePackages) {
-        return new EventAnnotationProcessorImpl(ignorePackages);
+        return new SimpleAnnotationProcessor(ignorePackages);
     }
 
     /**

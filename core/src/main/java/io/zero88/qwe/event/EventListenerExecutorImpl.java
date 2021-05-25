@@ -55,9 +55,9 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
                          .onSuccess(data -> debug("Succeed when handling", action, address))
                          .map(data -> EventMessage.replySuccess(action, data));
         } catch (ImplementationError e) {
-            future = Future.failedFuture(new ServiceUnavailable("Service unavailable", e));
+            future = Future.failedFuture(new ServiceUnavailable(e));
         } catch (UnsupportedException e) {
-            future = Future.failedFuture(new ServiceNotFoundException("Service not found", e));
+            future = Future.failedFuture(new ServiceNotFoundException(e));
         } catch (IllegalArgumentException e) {
             future = Future.failedFuture(e);
         }

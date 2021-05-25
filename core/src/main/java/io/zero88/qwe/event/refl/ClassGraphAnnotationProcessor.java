@@ -31,7 +31,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class EventAnnotationProcessorImpl implements EventAnnotationProcessor {
+public class ClassGraphAnnotationProcessor implements EventAnnotationProcessor {
 
     private final String[] ignorePackages;
 
