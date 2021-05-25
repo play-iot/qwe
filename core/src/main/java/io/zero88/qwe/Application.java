@@ -14,21 +14,23 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ApplicationVerticle
  */
-public interface Application extends HasConfig<QWEConfig>, HasSharedKey, HasSharedData, Verticle {
+public interface Application extends HasConfig<QWEAppConfig>, HasSharedKey, HasSharedData, Verticle {
 
     @Override
-    default Class<QWEConfig> configClass() {
-        return QWEConfig.class;
+    default Class<QWEAppConfig> configClass() {
+        return QWEAppConfig.class;
     }
 
     @Override
     default String configFile() {
-        return "config.json";
+        return "app.json";
     }
 
     default String getSharedKey() {
         return this.getClass().getName();
     }
+
+    QWEAppConfig appConfig();
 
     /**
      * Add component provider to startup

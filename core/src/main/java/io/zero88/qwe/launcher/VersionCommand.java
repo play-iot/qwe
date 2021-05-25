@@ -14,7 +14,7 @@ import io.vertx.core.cli.annotations.Summary;
 import io.vertx.core.spi.launcher.DefaultCommand;
 import io.zero88.qwe.ApplicationVersion;
 
-@Name("version")
+@Name(value = "version", priority = 100)
 @Summary("Displays the Application version")
 public class VersionCommand extends DefaultCommand {
 

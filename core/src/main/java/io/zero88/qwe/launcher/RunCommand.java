@@ -3,6 +3,7 @@ package io.zero88.qwe.launcher;
 import java.io.File;
 import java.util.Optional;
 
+import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.cli.CLIException;
@@ -19,11 +20,10 @@ import io.vertx.core.spi.launcher.ExecutionContext;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.QWEBootConfig;
 import io.zero88.qwe.QWEConfig;
-import io.zero88.qwe.cluster.ClusterType;
 
 import lombok.Getter;
 
-@Name("run")
+@Name(value = "run", priority = 100)
 @Summary("Runs a QWE Application verticle")
 public final class RunCommand extends io.vertx.core.impl.launcher.commands.RunCommand {
 
@@ -31,8 +31,8 @@ public final class RunCommand extends io.vertx.core.impl.launcher.commands.RunCo
 
     private QWEConfig qweConfig;
     @Getter
-    private ClusterType clusterType;
-    private Boolean clusterLiteMember;
+    private String clusterType;
+    private boolean clusterLiteMember;
     private String clusterConfigFile;
 
     /**
@@ -56,13 +56,12 @@ public final class RunCommand extends io.vertx.core.impl.launcher.commands.RunCo
      * @param clusterType cluster type, default is false.
      */
     @Option(longName = "cluster-type", argName = "clusterType", choices = {
-        "HAZELCAST", "ZOOKEEPER", "INFINISPAN", "IGNITE", "LOCAL"
+        "HAZELCAST", "ZOOKEEPER", "INFINISPAN", "IGNITE"
     })
     @Description("Enable cluster mode with a specific type")
-    @DefaultValue("UNDEFINED")
     public void setClusteredType(String clusterType) {
-        this.clusterType = ClusterType.factory(clusterType);
-        this.setCluster(this.clusterType != ClusterType.NONE);
+        this.clusterType = clusterType;
+        this.setCluster(Strings.isNotBlank(this.clusterType));
     }
 
     /**
@@ -91,9 +90,9 @@ public final class RunCommand extends io.vertx.core.impl.launcher.commands.RunCo
     public void setUp(ExecutionContext context) throws CLIException {
         super.setUp(context);
         qweConfig = IConfig.from(Optional.ofNullable(getConfiguration()).orElseGet(JsonObject::new), QWEConfig.class);
-        delegate.setHA(ha);
+        delegate.setHighAvailability(ha);
         delegate.setHAGroup(haGroup);
-        delegate.setClusterType(clusterType.type());
+        delegate.setClusterType(clusterType);
         delegate.setClusterLiteMember(clusterLiteMember);
         delegate.setClusterConfigFile(clusterConfigFile);
         delegate.setClusterHost(clusterHost);
@@ -105,8 +104,14 @@ public final class RunCommand extends io.vertx.core.impl.launcher.commands.RunCo
         delegate.setCwd(getCwd());
         delegate.setClasspath(
             Optional.ofNullable(classpath).map(cp -> String.join(File.pathSeparator, cp)).orElse(null));
-        delegate.setVertxOptions(qweConfig.getBootConfig().toJson().encode());
-        delegate.setUp(context);
+        delegate.setVertxOptions(Optional.ofNullable(qweConfig.getBootConfig())
+                                         .map(QWEBootConfig::toJson)
+                                         .map(JsonObject::encode)
+                                         .orElseGet(
+                                             () -> Optional.ofNullable(getJsonFromFileOrString(vertxOptions, "options"))
+                                                           .map(JsonObject::encode)
+                                                           .orElse(null)));
+        delegate.canBeStandalone().setUp(context);
     }
 
     @Override

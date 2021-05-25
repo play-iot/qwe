@@ -44,7 +44,7 @@ public interface JsonHelper {
         return resp -> JsonHelper.assertJson(context, async, expected, (JsonObject) resp, mode);
     }
 
-    static void assertJson(JsonObject expected, JsonObject actual) throws JSONException {
+    static void assertJson(JsonObject expected, JsonObject actual) {
         assertJson(expected, actual, JSONCompareMode.STRICT);
     }
 
@@ -59,13 +59,13 @@ public interface JsonHelper {
         }
     }
 
-    static void assertJson(JsonObject expected, JsonObject actual, JSONCompareMode mode) throws JSONException {
+    static void assertJson(JsonObject expected, JsonObject actual, JSONCompareMode mode) {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
         } catch (JSONException | AssertionError e) {
             System.out.println("Actual: " + actual.encode());
             System.out.println("Expected: " + expected.encode());
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 

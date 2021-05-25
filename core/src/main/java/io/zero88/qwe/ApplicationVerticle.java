@@ -18,6 +18,7 @@ import io.zero88.qwe.event.EventBusDeliveryOption;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 
 import lombok.Getter;
+import lombok.experimental.Accessors;
 
 /**
  * @see Application
@@ -30,16 +31,17 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     private final Map<Class<? extends Component>, ComponentProvider<? extends Component>> providers = new HashMap<>();
     private final ContextLookupInternal contexts = new ContextLookupImpl();
     @Getter
-    protected QWEConfig config;
+    @Accessors(fluent = true)
+    protected QWEAppConfig appConfig;
     @Getter
     private EventBusClient eventBus;
 
     @Override
     public final void start() {
-        this.config = computeConfig(config());
+        this.appConfig = computeConfig(config());
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION,
-                     new EventBusDeliveryOption(this.config.getAppConfig().getDeliveryOptions()));
-        this.addData(SharedDataLocalProxy.APP_DATADIR, this.config.getAppConfig().getDataDir());
+                     new EventBusDeliveryOption(this.appConfig.getDeliveryOptions()));
+        this.addData(SharedDataLocalProxy.APP_DATADIR, this.appConfig.getDataDir());
         this.eventBus = EventBusClient.create(sharedData());
         this.onStart();
     }
@@ -101,7 +103,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     @SuppressWarnings("unchecked")
     private Future<String> deployComponent(ComponentProvider<? extends Component> provider) {
         final Component component = provider.provide(this);
-        final JsonObject deployConfig = IConfig.from(this.config, component.configClass()).toJson();
+        final JsonObject deployConfig = IConfig.from(this.appConfig, component.configClass()).toJson();
         return vertx.deployVerticle(component, new DeploymentOptions().setConfig(deployConfig))
                     .onFailure(t -> deployComponentError(component, t))
                     .onSuccess(id -> deployComponentSuccess(component, id));
@@ -116,7 +118,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     private void deployComponentSuccess(Component component, String deployId) {
         Class<? extends Component> cls = component.getClass();
         logger.info("Deployed Verticle [{}] successful with id [{}]", cls.getName(), deployId);
-        ComponentContext def = ComponentContext.create(cls, config.getAppConfig().dataDir(), getSharedKey(), deployId);
+        ComponentContext def = ComponentContext.create(cls, appConfig.dataDir(), getSharedKey(), deployId);
         contexts.add(component.setup(component.hook().onSuccess(def)));
     }
 

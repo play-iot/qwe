@@ -30,6 +30,12 @@ class QWEBootConfigTest {
     }
 
     @Test
+    public void test_deserialize_default() {
+        final QWEBootConfig qweBootConfig = IConfig.fromClasspath("def-system-cfg.json", QWEBootConfig.class);
+        JsonHelper.assertJson(new QWEBootConfig().toJson(), qweBootConfig.toJson());
+    }
+
+    @Test
     public void test_deserialize_custom() {
         String jsonStr = "{\"__system__\":{\"clusterType\":\"HAZELCAST\",\"haGroup\":\"_PLAYIO_\",\"haEnabled\":true," +
                          "\"eventBusOptions\":{\"port\":7000,\"clusterPublicPort\":3333,\"reusePort\":false," +

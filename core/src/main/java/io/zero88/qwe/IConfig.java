@@ -95,18 +95,6 @@ public interface IConfig extends JsonData, Shareable {
         return from(from, clazz).merge(from(to, clazz));
     }
 
-    static <C extends IConfig> C merge(JsonObject oldOne, JsonObject newOne, boolean isUpdated, Class<C> clazz) {
-        if (Objects.isNull(newOne)) {
-            return IConfig.from(oldOne, clazz);
-        }
-        if (isUpdated) {
-            return IConfig.from(newOne, clazz);
-        }
-        JsonObject oldApp = IConfig.from(oldOne, clazz).toJson();
-        JsonObject newApp = IConfig.from(newOne, clazz).toJson();
-        return IConfig.merge(oldApp, newApp, clazz);
-    }
-
     static <C extends IConfig> C parseConfig(JsonObject config, Class<C> clazz, Supplier<C> fallback) {
         try {
             return IConfig.from(config, clazz);
@@ -129,10 +117,6 @@ public interface IConfig extends JsonData, Shareable {
     @SuppressWarnings("unchecked")
     default <T extends IConfig> T merge(@NonNull T to) {
         return (T) merge(toJson(), to.toJson(), getClass());
-    }
-
-    default <T extends IConfig> JsonObject mergeToJson(@NonNull T to) {
-        return this.toJson().mergeIn(to.toJson(), true);
     }
 
     @Override

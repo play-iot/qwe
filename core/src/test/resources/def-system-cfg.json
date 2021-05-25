@@ -72,7 +72,7 @@
   "warningExceptionTime": 5000000000,
   "warningExceptionTimeUnit": "NANOSECONDS",
   "workerPoolSize": 20,
-  "clusterType": "UNDEFINED",
+  "clusterType": null,
   "clusterLiteMember": false,
   "clusterConfigFile": null
 }
