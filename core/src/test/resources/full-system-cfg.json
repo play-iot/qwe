@@ -1,0 +1,93 @@
+{
+  "__system__": {
+    "eventLoopPoolSize": 32,
+    "workerPoolSize": 20,
+    "internalBlockingPoolSize": 20,
+    "blockedThreadCheckInterval": 1000,
+    "maxEventLoopExecuteTime": 2000000000,
+    "maxWorkerExecuteTime": 60000000000,
+    "quorumSize": 1,
+    "metricsOptions": {
+      "enabled": false
+    },
+    "fileSystemOptions": {
+      "classPathResolvingEnabled": true,
+      "fileCachingEnabled": true,
+      "fileCacheDir": "/tmp/qwe-cache"
+    },
+    "warningExceptionTime": 5000000000,
+    "eventBusOptions": {
+      "sendBufferSize": -1,
+      "receiveBufferSize": -1,
+      "trafficClass": -1,
+      "reuseAddress": true,
+      "logActivity": false,
+      "reusePort": false,
+      "tcpNoDelay": true,
+      "tcpKeepAlive": false,
+      "soLinger": -1,
+      "idleTimeout": 0,
+      "idleTimeoutUnit": "SECONDS",
+      "ssl": false,
+      "sslHandshakeTimeout": 10,
+      "sslHandshakeTimeoutUnit": "SECONDS",
+      "enabledCipherSuites": [],
+      "crlPaths": [],
+      "crlValues": [],
+      "useAlpn": false,
+      "enabledSecureTransportProtocols": [
+        "TLSv1",
+        "TLSv1.1",
+        "TLSv1.2"
+      ],
+      "tcpFastOpen": false,
+      "tcpCork": false,
+      "tcpQuickAck": false,
+      "clusterPublicPort": 2468,
+      "clusterPingInterval": 20000,
+      "clusterPingReplyInterval": 20000,
+      "port": 2468,
+      "acceptBacklog": -1,
+      "clientAuth": "NONE",
+      "reconnectAttempts": 0,
+      "reconnectInterval": 1000,
+      "connectTimeout": 60000,
+      "trustAll": true
+    },
+    "addressResolverOptions": {
+      "optResourceEnabled": false,
+      "cacheMinTimeToLive": 0,
+      "cacheMaxTimeToLive": 2147483647,
+      "cacheNegativeTimeToLive": 0,
+      "queryTimeout": 5000,
+      "maxQueries": 4,
+      "rdFlag": true,
+      "ndots": 1,
+      "rotateServers": false,
+      "roundRobinInetAddress": false
+    },
+    "preferNativeTransport": false,
+    "maxEventLoopExecuteTimeUnit": "NANOSECONDS",
+    "maxWorkerExecuteTimeUnit": "NANOSECONDS",
+    "warningExceptionTimeUnit": "NANOSECONDS",
+    "blockedThreadCheckIntervalUnit": "MILLISECONDS",
+    "haEnabled": false,
+    "haGroup": "__DEFAULT__"
+  },
+  "__deploy__": {
+    "ha": false,
+    "instances": 1,
+    "maxWorkerExecuteTime": 60000000000,
+    "maxWorkerExecuteTimeUnit": "NANOSECONDS",
+    "worker": false,
+    "workerPoolSize": 20
+  },
+  "__app__": {
+    "dataDir": "/data",
+    "__delivery__": {
+      "timeout": 30000,
+      "localOnly": false,
+      "tracingPolicy": "PROPAGATE"
+    }
+  }
+}

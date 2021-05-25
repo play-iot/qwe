@@ -1,3 +1,0 @@
-# QWE Auth
-
-Provide

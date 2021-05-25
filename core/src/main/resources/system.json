@@ -1,0 +1,17 @@
+{
+  "__deploy__": {
+    "ha": false,
+    "instances": 1,
+    "maxWorkerExecuteTime": 60000000000,
+    "maxWorkerExecuteTimeUnit": "NANOSECONDS",
+    "worker": false,
+    "workerPoolSize": 20
+  },
+  "__app__": {
+    "__delivery__": {
+      "timeout": 30000,
+      "localOnly": false,
+      "tracingPolicy": "PROPAGATE"
+    }
+  }
+}

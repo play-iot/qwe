@@ -1,0 +1,16 @@
+{
+  "__system__": {
+    "eventBusOptions": {
+      "clientAuth": "REQUIRED",
+      "logActivity": true,
+      "pemKeyCertOptions": {
+        "certPaths": [
+          "classpath:cert.pem"
+        ],
+        "keyPaths": [
+          "classpath:key.pem"
+        ]
+      }
+    }
+  }
+}

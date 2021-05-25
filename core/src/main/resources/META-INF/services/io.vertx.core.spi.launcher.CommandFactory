@@ -1,0 +1,9 @@
+io.zero88.qwe.launcher.AboutCommandFactory
+io.zero88.qwe.launcher.BootCommandFactory
+io.zero88.qwe.launcher.VersionCommandFactory
+io.zero88.qwe.launcher.RunCommandFactory
+
+# Background application control
+io.vertx.core.impl.launcher.commands.ListCommandFactory
+io.vertx.core.impl.launcher.commands.StartCommandFactory
+io.vertx.core.impl.launcher.commands.StopCommandFactory
