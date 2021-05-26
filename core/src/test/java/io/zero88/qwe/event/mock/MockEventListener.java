@@ -1,11 +1,12 @@
 package io.zero88.qwe.event.mock;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-import io.github.zero88.utils.UUID64;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -188,12 +189,12 @@ public class MockEventListener implements EventListener {
         }
 
         @EBContract(action = "INVOKE")
-        public Future<JsonObject> invoke(@EBContext Vertx vertx, @EBParam("body") JsonObject body) {
-            final String path = "/tmp/" + UUID64.random() + ".json";
+        public Future<JsonObject> invoke(@EBContext Vertx vertx, @EBParam("body") JsonObject body) throws IOException {
+            final String path = File.createTempFile("qwe-", ".json").toPath().toString();
             System.out.println(path);
             return vertx.fileSystem()
                         .writeFile(path, body.toBuffer())
-                        .map(ignore -> new JsonObject().put("path", path));
+                        .map(ignore -> new JsonObject().put("path", path).put("body", body));
         }
 
     }

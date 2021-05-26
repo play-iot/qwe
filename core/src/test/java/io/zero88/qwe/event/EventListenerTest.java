@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.skyscreamer.jsonassert.Customization;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.mock.MockEventListener;
 import io.zero88.qwe.event.mock.MockEventListener.MockEventFailed;
@@ -144,7 +146,11 @@ public class EventListenerTest {
                           System.out.println(msg.toJson());
                           Assertions.assertEquals(EventAction.REPLY, msg.getAction());
                           Assertions.assertTrue(msg.isSuccess());
-                          Assertions.assertEquals(new JsonObject().put("received", req), msg.getData());
+                          Assertions.assertNotNull(msg.getData());
+                          JsonHelper.assertJson(
+                              new JsonObject("{\"path\":\"/tmp/qwe-\",\"body\":{\"tik\":123}}"),
+                              msg.getData(),
+                              Customization.customization("path", (o1, o2) -> ((String) o1).startsWith((String) o2)));
                           testContext.completeNow();
                       }));
     }

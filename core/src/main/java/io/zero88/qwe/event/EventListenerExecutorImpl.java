@@ -8,10 +8,10 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData.SerializerFunction;
 import io.zero88.qwe.event.refl.MethodMeta;
 import io.zero88.qwe.exceptions.ImplementationError;
+import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
 import io.zero88.qwe.exceptions.UnsupportedException;
-import io.zero88.qwe.exceptions.QWEExceptionConverter;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -36,12 +36,12 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     }
 
     @Override
-    @SuppressWarnings( {"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public Future<EventMessage> execute(Message message) {
         final EventMessage msg = EventMessage.convert(message);
         final String addr = message.address();
         debug("Received", msg.getAction(), addr);
-        return sharedData.getVertx().executeBlocking(h -> h.handle(execute(msg, addr)));
+        return sharedData.getVertx().executeBlocking(promise -> execute(msg, addr).onComplete(promise));
     }
 
     private Future<EventMessage> execute(EventMessage msg, String address) {
