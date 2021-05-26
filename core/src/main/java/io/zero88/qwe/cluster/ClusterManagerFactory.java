@@ -12,11 +12,9 @@ public interface ClusterManagerFactory {
     ClusterManager create(QWEBootConfig config);
 
     default ClusterManagerFactory validate() {
-        type().getClasses()
-              .stream()
-              .filter(c -> ReflectionClass.findClass(c) != null)
-              .findAny()
-              .orElseThrow(() -> new InitializerError("Missing " + type().getJars() + " library in classpath"));
+        if (type().getClasses().stream().anyMatch(c -> ReflectionClass.findClass(c) == null)) {
+            throw new InitializerError("Missing " + type().getJars() + " library in classpath");
+        }
         return this;
     }
 
