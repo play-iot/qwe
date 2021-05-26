@@ -137,7 +137,10 @@ jobs:
 
       - name: SonarQube
         if: needs.context.outputs.shouldPublish == 'true' && env.ENABLE_SONAR == 'true'
-        run: ./gradlew sonarqube --info -x test -Dsonar.branch.name=${{ needs.context.outputs.branch }}
+        run: |
+          ./gradlew sonarqube --info -x test \
+                  -Dsonar.branch.name=${{ needs.context.outputs.branch }} \
+                  -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.OSS_SONARQUBE_TOKEN }}
