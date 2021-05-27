@@ -1,6 +1,7 @@
 package io.zero88.qwe;
 
-import org.json.JSONException;
+import java.util.Collections;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +34,7 @@ class QWEAppConfigTest {
     }
 
     @Test
-    public void test_merge_with_empty_json() throws JSONException {
+    public void test_merge_with_empty_json() {
         QWEAppConfig appConfig = IConfig.merge("{\"__app__\":{\"test\":\"1\"}}", "{\"__app__\":{}}",
                                                QWEAppConfig.class);
         JsonHelper.assertJson(new JsonObject("{\"test\":\"1\"}"), appConfig.other());
@@ -41,7 +42,7 @@ class QWEAppConfigTest {
     }
 
     @Test
-    public void test_merge_app_config() throws JSONException {
+    public void test_merge_app_config() {
         String oldApp = "{\"__kafka__\":{\"__client__\":{\"bootstrap.servers\":[\"localhost:9092\"]}}," +
                         "\"__sql__\":{\"dialect\":\"H2\"}, \"test\":123}";
         String newApp = "{\"__kafka__\":{\"__client__\":{\"bootstrap.servers\":[\"localhost:9094\"]}}}";
@@ -54,17 +55,26 @@ class QWEAppConfigTest {
     }
 
     @Test
-    public void test_merge_with_blank_value() throws JSONException {
+    public void test_merge_with_blank_value() {
         JsonHelper.assertJson(new JsonObject("{\"test\":\"\"}"),
                               IConfig.merge("{\"__app__\":{\"test\":\"1\"}}", "{\"__app__\":{\"test\":\"\"}}",
                                             QWEAppConfig.class).other());
     }
 
     @Test
-    public void test_merge_with_null_value() throws JSONException {
+    public void test_merge_with_null_value() {
         JsonHelper.assertJson(new JsonObject("{\"test\":\"1\"}"),
                               IConfig.merge("{\"__app__\":{\"test\":\"1\"}}", "{\"__app__\":{\"test\":null}}",
                                             QWEAppConfig.class).other());
+    }
+
+    @Test
+    public void test_parse_component_config_from_app() {
+        final QWEAppConfig appConfig = new QWEAppConfig(Collections.singletonMap("mock", new JsonObject()));
+        System.out.println(appConfig.toJson());
+        final MockConfig mockConfig = IConfig.from(appConfig, MockConfig.class);
+        Assertions.assertNotNull(mockConfig);
+        JsonHelper.assertJson(new JsonObject(), mockConfig.toJson());
     }
 
 }

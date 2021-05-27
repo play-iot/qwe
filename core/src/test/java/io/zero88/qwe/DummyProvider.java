@@ -30,11 +30,6 @@ final class DummyProvider implements ComponentProvider<DummyComponentVerticle> {
             return "config.json";
         }
 
-        @Override
-        public void onStart() {
-            logger.info("Starting Fake Unit Verticle...");
-        }
-
     }
 
 }

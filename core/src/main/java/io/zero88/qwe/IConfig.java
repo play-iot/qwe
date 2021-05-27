@@ -55,13 +55,17 @@ public interface IConfig extends JsonData, Shareable {
         return from(data, clazz, null, cause);
     }
 
-    static <T extends IConfig> T from(@NonNull Object data, @NonNull Class<T> clazz, String errorMsg,
-                                      HiddenException cause) {
+    static <T extends IConfig> T from(Object data, @NonNull Class<T> clazz, String errorMsg, HiddenException cause) {
         try {
-            JsonObject entries = data instanceof String
-                                 ? new JsonObject((String) data)
-                                 : JsonObject.mapFrom(Objects.requireNonNull(data));
-            return CreateConfig.create(clazz, entries, MAPPER);
+            JsonObject cfg;
+            if (data instanceof String) {
+                cfg = new JsonObject((String) data);
+            } else if (data instanceof IConfig) {
+                cfg = ((IConfig) data).toJson();
+            } else {
+                cfg = JsonObject.mapFrom(Objects.requireNonNull(data, "Config data is null"));
+            }
+            return CreateConfig.create(clazz, cfg, MAPPER);
         } catch (IllegalArgumentException | NullPointerException | DecodeException | HiddenException ex) {
             Throwable c = ex instanceof HiddenException ? ex.getCause() : ex;
             if (Objects.nonNull(cause)) {

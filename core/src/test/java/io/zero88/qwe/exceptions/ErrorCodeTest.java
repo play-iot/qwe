@@ -8,7 +8,7 @@ public class ErrorCodeTest {
     @Test
     public void test() {
         final ErrorCode error = ErrorCode.parse("UNKNOWN_ERROR");
-        Assertions.assertEquals(ErrorCode.UNKNOWN_ERROR, error);
+        Assertions.assertEquals(io.github.zero88.exceptions.ErrorCode.UNKNOWN_ERROR, error);
     }
 
 }

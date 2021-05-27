@@ -18,8 +18,8 @@ import io.zero88.qwe.ApplicationVersion;
 @Summary("Displays the Application version")
 public class VersionCommand extends DefaultCommand {
 
+    private static ApplicationVersion appVer;
     protected boolean json;
-    private static ApplicationVersion av;
 
     @Override
     public void run() throws CLIException {
@@ -28,14 +28,6 @@ public class VersionCommand extends DefaultCommand {
         } else {
             printVersion();
         }
-    }
-
-    static void printVersion() {
-        System.out.println(getVersion());
-    }
-
-    static void printJsonVersion() {
-        System.out.println(getVersion().toJson());
     }
 
     @Option(longName = "json", flag = true)
@@ -50,24 +42,33 @@ public class VersionCommand extends DefaultCommand {
      * @return the version
      */
     public static ApplicationVersion getVersion() {
-        if (av != null) {
-            return av;
+        if (appVer != null) {
+            return appVer;
         }
-        final Manifest manifest = convert("META-INF/MANIFEST.MF", is -> {
-            try {
-                return new Manifest(is);
-            } catch (IOException e) {
-                throw new IllegalStateException(e.getMessage());
-            }
-        });
-        final Attributes attrs = manifest.getMainAttributes();
-        return av = ApplicationVersion.builder()
-                                      .name(attrs.getValue("Application"))
-                                      .title(attrs.getValue(Attributes.Name.IMPLEMENTATION_TITLE.toString()))
-                                      .version(attrs.getValue(Attributes.Name.IMPLEMENTATION_VERSION.toString()))
-                                      .hashVersion(attrs.getValue("Build-Hash"))
-                                      .coreVersion(io.vertx.core.impl.launcher.commands.VersionCommand.getVersion())
-                                      .build();
+        final Attributes attrs = loadManifest().getMainAttributes();
+        return appVer = ApplicationVersion.builder()
+                                          .name(attrs.getValue("Application"))
+                                          .title(attrs.getValue(Attributes.Name.IMPLEMENTATION_TITLE.toString()))
+                                          .version(attrs.getValue(Attributes.Name.IMPLEMENTATION_VERSION.toString()))
+                                          .hashVersion(attrs.getValue("Build-Hash"))
+                                          .coreVersion(io.vertx.core.impl.launcher.commands.VersionCommand.getVersion())
+                                          .build();
+    }
+
+    public static ApplicationVersion getVersionOrNull() {
+        try {
+            return getVersion();
+        } catch (IllegalStateException e) {
+            return null;
+        }
+    }
+
+    static void printVersion() {
+        System.out.println(getVersion());
+    }
+
+    static void printJsonVersion() {
+        System.out.println(getVersion().toJson());
     }
 
     static <T> T convert(String file, Function<InputStream, T> converter) {
@@ -77,8 +78,18 @@ public class VersionCommand extends DefaultCommand {
             }
             return converter.apply(is);
         } catch (IOException e) {
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException("Unable read input stream", e);
         }
+    }
+
+    private static Manifest loadManifest() {
+        return convert("META-INF/MANIFEST.MF", is -> {
+            try {
+                return new Manifest(is);
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable load manifest", e);
+            }
+        });
     }
 
 }

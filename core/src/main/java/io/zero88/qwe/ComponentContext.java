@@ -13,23 +13,20 @@ import lombok.experimental.Accessors;
  *
  * @see Component
  */
-@SuppressWarnings("rawtypes")
-public interface ComponentContext {
+public interface ComponentContext extends HasVerticleName {
 
     /**
      * Create default component context
      *
-     * @param aClass    an associate componentClass class
-     * @param dataDir   a current application data dir
-     * @param sharedKey a key to access shared data from {@code Application}
-     * @param deployId  a deployment id
+     * @param componentName an associate component name
+     * @param dataDir       a current application data dir
+     * @param sharedKey     a key to access shared data from {@code Application}
+     * @param deployId      a deployment id
      * @return ComponentContext
      */
-    static ComponentContext create(Class<? extends Component> aClass, Path dataDir, String sharedKey, String deployId) {
-        return new DefaultComponentContext(aClass, dataDir, sharedKey, deployId);
+    static ComponentContext create(String componentName, Path dataDir, String sharedKey, String deployId) {
+        return new DefaultComponentContext(componentName, dataDir, sharedKey, deployId);
     }
-
-    @NonNull Class<? extends Component> componentClz();
 
     @NonNull Path dataDir();
 
@@ -42,13 +39,13 @@ public interface ComponentContext {
     @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
     class DefaultComponentContext implements ComponentContext {
 
-        private final Class<? extends Component> componentClz;
+        private final String appName;
         private final Path dataDir;
         private final String sharedKey;
         private final String deployId;
 
         protected DefaultComponentContext(@NonNull ComponentContext ctx) {
-            this(ctx.componentClz(), ctx.dataDir(), ctx.sharedKey(), ctx.deployId());
+            this(ctx.appName(), ctx.dataDir(), ctx.sharedKey(), ctx.deployId());
         }
 
     }

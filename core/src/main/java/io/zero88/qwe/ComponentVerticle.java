@@ -26,27 +26,25 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
 
     @Override
     public final void start() {
-        logger.debug("Computing component configure from {} of {}", configFile(), configClass());
-        this.config = computeConfig(config());
-        logger.debug("Component Configuration: {}", config.toJson().encode());
+        logger.debug("Start Component [{}]...", appName());
+        this.config = computeConfig(logger, config());
         this.onStart();
     }
 
     @Override
-    public final void start(Promise<Void> promise) throws Exception {
-        this.start();
-        promise.handle(this.onAsyncStart());
+    public final void start(Promise<Void> promise) {
+        QWEVerticle.asyncRun(vertx, promise, this::start, this::onAsyncStart);
     }
 
     @Override
     public final void stop() {
+        logger.debug("Stop Component [{}]...", appName());
         this.onStop();
     }
 
     @Override
     public final void stop(Promise<Void> promise) {
-        this.stop();
-        promise.handle(this.onAsyncStop());
+        QWEVerticle.asyncRun(vertx, promise, this::stop, this::onAsyncStop);
     }
 
     @Override

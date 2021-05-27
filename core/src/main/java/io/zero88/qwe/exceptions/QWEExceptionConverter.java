@@ -32,7 +32,22 @@ public class QWEExceptionConverter implements Function<Throwable, QWEException> 
     private final String overrideMsg;
 
     /**
-     * Friendly converter for human user
+     * Convert throwable to friendly error that human user can understand.
+     * <p>
+     * If {@code throwable} is instance of {@code QWEException} then keep it as it is.
+     *
+     * @param throwable any exception
+     * @return QWE exception
+     */
+    public static QWEException friendlyOrKeep(Throwable throwable) {
+        if (throwable instanceof QWEException) {
+            return (QWEException) throwable;
+        }
+        return new QWEExceptionConverter(true, null).apply(throwable);
+    }
+
+    /**
+     * Convert throwable to friendly error that human user can understand
      *
      * @param throwable any exception
      * @return QWE exception
@@ -42,7 +57,7 @@ public class QWEExceptionConverter implements Function<Throwable, QWEException> 
     }
 
     /**
-     * Friendly converter for human user
+     * Convert throwable to friendly error that human user can understand
      *
      * @param throwable   any exception
      * @param overrideMsg Override message
@@ -53,7 +68,7 @@ public class QWEExceptionConverter implements Function<Throwable, QWEException> 
     }
 
     /**
-     * Raw converter for system process
+     * Convert throwable for system process
      *
      * @param throwable any exception
      * @return QWE exception

@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.junit5.VertxTestContext;
 
+@SuppressWarnings( {"unchecked", "rawtypes"})
 public interface ComponentTestHelper {
 
     static <T extends Component> SharedDataLocalProxy createSharedData(Vertx vertx, Class<T> aClass) {
@@ -26,25 +27,19 @@ public interface ComponentTestHelper {
                 context.failNow(s.cause());
                 return;
             }
-            final ComponentContext ctx = ComponentContext.create(component.getClass(), testDir,
-                                                                 provider.componentClass().getName(), s.result());
-            component.setup(component.hook().onSuccess(ctx));
+            setup(component, testDir, provider.componentClass().getName(), s.result());
             context.completeNow();
         });
         latch.await();
         return component;
     }
 
-    @SuppressWarnings("unchecked")
     static <T extends Component> T deploy(Vertx vertx, TestContext context, JsonObject config,
                                           ComponentProvider<T> provider, Path testDir) {
         final T component = initComponent(vertx, provider, testDir);
         return VertxHelper.deploy(vertx, context, new DeploymentOptions().setConfig(config), component,
-                                  TestHelper.TEST_TIMEOUT_SEC, s -> {
-                final ComponentContext ctx = ComponentContext.create(component.getClass(), testDir,
-                                                                     provider.componentClass().getName(), s);
-                component.setup(component.hook().onSuccess(ctx));
-            });
+                                  TestHelper.TEST_TIMEOUT_SEC,
+                                  s -> setup(component, testDir, provider.componentClass().getName(), s));
     }
 
     static <T extends Component> T initComponent(Vertx vertx, ComponentProvider<T> provider, Path testDir) {
@@ -57,6 +52,10 @@ public interface ComponentTestHelper {
                                                    ComponentProvider<T> provider, Handler<Throwable> handler) {
         VertxHelper.deployFailed(vertx, context, new DeploymentOptions().setConfig(config),
                                  provider.provide(createSharedData(vertx, provider.componentClass())), handler);
+    }
+
+    static <T extends Component> void setup(T comp, Path testDir, String sharedKey, String result) {
+        comp.setup(comp.hook().onSuccess(ComponentContext.create(comp.appName(), testDir, sharedKey, result)));
     }
 
 }

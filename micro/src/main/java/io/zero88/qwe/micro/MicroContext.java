@@ -29,7 +29,7 @@ public final class MicroContext extends DefaultComponentContext {
 
     MicroContext() {
         //FIXME data dir for test
-        super(MicroVerticle.class, null, MicroContext.class.getName(), UUID.randomUUID().toString());
+        super(MicroVerticle.class.getName(), null, MicroContext.class.getName(), UUID.randomUUID().toString());
     }
 
     protected MicroContext(@NonNull ComponentContext context) {

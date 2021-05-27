@@ -1,7 +1,9 @@
 package io.zero88.qwe;
 
+import java.util.Optional;
+
 import io.vertx.core.Future;
-import io.vertx.core.Verticle;
+import io.zero88.qwe.launcher.VersionCommand;
 
 import lombok.NonNull;
 
@@ -14,7 +16,20 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ApplicationVerticle
  */
-public interface Application extends HasConfig<QWEAppConfig>, HasSharedKey, HasSharedData, Verticle {
+public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
+
+    /**
+     * Application name
+     *
+     * @return an application name
+     */
+    default String appName() {
+        return Optional.ofNullable(VersionCommand.getVersionOrNull())
+                       .flatMap(v -> Optional.ofNullable(v.getName()))
+                       .orElse(getClass().getName());
+    }
+
+    QWEAppConfig appConfig();
 
     @Override
     default Class<QWEAppConfig> configClass() {
@@ -29,8 +44,6 @@ public interface Application extends HasConfig<QWEAppConfig>, HasSharedKey, HasS
     default String getSharedKey() {
         return this.getClass().getName();
     }
-
-    QWEAppConfig appConfig();
 
     /**
      * Add component provider to startup
@@ -59,7 +72,7 @@ public interface Application extends HasConfig<QWEAppConfig>, HasSharedKey, HasS
     Future<Void> uninstallComponents();
 
     /**
-     * Raise event after installed all component completely
+     * Raise event after all component are installed completely
      *
      * @param lookup Context lookup
      */

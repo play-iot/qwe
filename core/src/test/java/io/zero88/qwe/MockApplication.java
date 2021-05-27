@@ -1,25 +1,30 @@
 package io.zero88.qwe;
 
+import io.vertx.core.Handler;
+
 import lombok.Setter;
 
 @Setter
 public final class MockApplication extends ApplicationVerticle {
 
-    private boolean error;
-    private boolean errorInHandler;
+    private boolean errorOnStart;
+    private boolean errorOnCompleted;
+    private Handler<ContextLookup> onCompletedHandler;
 
     @Override
     public void onStart() {
-        logger.info("Starting Mock Container Verticle...");
-        if (error) {
+        if (errorOnStart) {
             throw new RuntimeException("Error when starting");
         }
     }
 
     @Override
     public void onInstallCompleted(ContextLookup lookup) {
-        if (errorInHandler) {
-            throw new IllegalArgumentException("Error in success handler");
+        if (errorOnCompleted) {
+            throw new IllegalArgumentException("Error onInstallCompleted");
+        }
+        if (onCompletedHandler != null) {
+            onCompletedHandler.handle(lookup);
         }
     }
 

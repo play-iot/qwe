@@ -38,7 +38,8 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final void start() {
-        this.appConfig = computeConfig(config());
+        logger.info("Start Application[{}]...", appName());
+        this.appConfig = computeConfig(logger, config());
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION,
                      new EventBusDeliveryOption(this.appConfig.getDeliveryOptions()));
         this.addData(SharedDataLocalProxy.APP_DATADIR, this.appConfig.getDataDir());
@@ -47,21 +48,25 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     }
 
     @Override
-    public final void start(Promise<Void> pr) {
-        this.start();
-        pr.handle(onAsyncStart().onSuccess(ignore -> installComponents())
-                                .onFailure(e -> logger.error("Cannot start Application[{}]", getClass(), e)));
+    public final void start(Promise<Void> promise) {
+        QWEVerticle.asyncRun(vertx, promise, this::start, () -> onAsyncStart().flatMap(ignore -> installComponents())
+                                                                              .onFailure(e -> logger.error(
+                                                                                  "Failed to start Application[{}]",
+                                                                                  appName(), e))
+                                                                              .mapEmpty());
     }
 
     public final void stop() {
+        logger.info("Stop Application[{}]...", appName());
         this.onStop();
     }
 
     @Override
     public final void stop(Promise<Void> promise) {
-        this.stop();
-        promise.handle(onAsyncStop().eventually(ignore -> uninstallComponents())
-                                    .onFailure(t -> logger.error("Uninstall Application failed", t)));
+        QWEVerticle.asyncRun(vertx, promise, this::stop, () -> onAsyncStop().eventually(ignore -> uninstallComponents())
+                                                                            .onFailure(e -> logger.error(
+                                                                                "Failed to stop Application[{}]",
+                                                                                appName(), e)));
     }
 
     @Override
@@ -71,15 +76,14 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     }
 
     @Override
-    public SharedDataLocalProxy sharedData() {
+    public final SharedDataLocalProxy sharedData() {
         return this;
     }
 
     @Override
     public final Future<Void> installComponents() {
-        return CompositeFuture.join(providers.values().stream().map(this::deployComponent).collect(Collectors.toList()))
+        return CompositeFuture.all(providers.values().stream().map(this::deployComponent).collect(Collectors.toList()))
                               .onSuccess(this::succeed)
-                              .recover(t -> Future.failedFuture(QWEExceptionConverter.from(t)))
                               .mapEmpty();
     }
 
@@ -97,38 +101,36 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     private Future<Void> uninstallComponent(ComponentContext context) {
         return vertx.undeploy(context.deployId())
                     .onSuccess(unused -> logger.info("Component [{}][{}] is uninstalled", context.deployId(),
-                                                     context.componentClz()));
+                                                     context.appName()));
     }
 
     @SuppressWarnings("unchecked")
     private Future<String> deployComponent(ComponentProvider<? extends Component> provider) {
         final Component component = provider.provide(this);
         final JsonObject deployConfig = IConfig.from(this.appConfig, component.configClass()).toJson();
+        logger.info("Deploying Component [{}]...", component.appName());
         return vertx.deployVerticle(component, new DeploymentOptions().setConfig(deployConfig))
-                    .onFailure(t -> deployComponentError(component, t))
-                    .onSuccess(id -> deployComponentSuccess(component, id));
-    }
-
-    private void deployComponentError(Component component, Throwable t) {
-        logger.error("Cannot start component verticle [{}]", component.getClass().getName(), t);
-        component.hook().onError(t);
+                    .onSuccess(id -> deployComponentSuccess(component, id))
+                    .recover(t -> Future.failedFuture(QWEExceptionConverter.friendlyOrKeep(t)));
     }
 
     @SuppressWarnings("unchecked")
     private void deployComponentSuccess(Component component, String deployId) {
-        Class<? extends Component> cls = component.getClass();
-        logger.info("Deployed Verticle [{}] successful with id [{}]", cls.getName(), deployId);
-        ComponentContext def = ComponentContext.create(cls, appConfig.dataDir(), getSharedKey(), deployId);
+        logger.info("Succeed deploying Component [{}][{}]", component.appName(), deployId);
+        ComponentContext def = ComponentContext.create(component.appName(), appConfig.dataDir(), getSharedKey(),
+                                                       deployId);
         contexts.add(component.setup(component.hook().onSuccess(def)));
     }
 
     private void succeed(CompositeFuture r) {
-        logger.info("Deployed {}/{} component verticle(s)...", r.size(), this.providers.size());
+        logger.info("Deployed {}/{} Component(s)...", r.size(), this.providers.size());
         this.providers.clear();
         try {
+            //TODO: add liveness event then readiness event
             this.onInstallCompleted(this.contexts);
         } catch (Exception e) {
-            throw QWEExceptionConverter.from(e);
+            //TODO: add failure readiness event
+            logger.warn("Failed after completed Component deployment", QWEExceptionConverter.friendlyOrKeep(e));
         }
     }
 

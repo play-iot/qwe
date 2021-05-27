@@ -1,5 +1,7 @@
 package io.zero88.qwe;
 
+import org.slf4j.Logger;
+
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.utils.Configs;
 
@@ -31,12 +33,19 @@ interface HasConfig<C extends IConfig> {
      * Compute configure based on user input configuration and default unit configuration that defined in {@link
      * #configFile()}
      *
+     * @param logger logger
      * @param config given user configuration
      * @return config instance
      * @see IConfig
      */
-    default C computeConfig(JsonObject config) {
-        return IConfig.merge(IConfig.from(Configs.loadJsonConfig(configFile()), configClass()), config, configClass());
+    default C computeConfig(Logger logger, JsonObject config) {
+        logger.debug("Computing configuration [{}][{}]", configClass().getName(), configFile());
+        C cfg = IConfig.merge(IConfig.from(Configs.silentLoadJsonConfig(configFile()), configClass()), config,
+                              configClass());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Configuration [{}][{}]", getClass().getName(), cfg.toJson().encode());
+        }
+        return cfg;
     }
 
 }

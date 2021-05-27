@@ -9,10 +9,10 @@ import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.core.Vertx;
 import io.zero88.qwe.exceptions.QWEException;
 
 import ch.qos.logback.classic.Level;
@@ -38,10 +38,10 @@ public class ApplicationVerticleTest {
 
     @Test
     public void test_contain_two_component_vertical_having_same_type_should_deploy_only_one(TestContext context) {
+        Async async = context.async(2);
         addDummyUnit();
         addDummyUnit();
-
-        Async async = context.async();
+        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
         VertxHelper.deploy(vertx, context, new DeploymentOptions(), application, deployId -> {
             context.assertNotNull(deployId);
             TestHelper.testComplete(async);
@@ -51,10 +51,10 @@ public class ApplicationVerticleTest {
 
     @Test
     public void test_contain_two_component_vertical_having_different_type_should_deploy_both(TestContext context) {
+        Async async = context.async(2);
         addDummyUnit();
         addMockUnit();
-
-        Async async = context.async();
+        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
         VertxHelper.deploy(vertx, context, new DeploymentOptions(), application, deployId -> {
             context.assertNotNull(deployId);
             TestHelper.testComplete(async);
@@ -63,24 +63,29 @@ public class ApplicationVerticleTest {
     }
 
     @Test
-    public void test_application_throw_exception_cannot_start(TestContext context) {
-        application.setError(true);
+    public void test_cannot_start_coz_throw_exception_onStart(TestContext context) {
+        application.setErrorOnStart(true);
         addDummyUnit();
-        assertDeployError(context, new RuntimeException("Error when starting"));
+        assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting"));
     }
 
     @Test
-    public void test_application_throw_exception_in_handler_cannot_start(TestContext context) {
-        application.setErrorInHandler(true);
-        addDummyUnit();
-        assertDeployError(context, new IllegalArgumentException("Error in success handler"));
-    }
-
-    @Test
-    public void test_component_throw_exception_cannot_start(TestContext context) {
+    public void test_cannot_start_coz_install_comp_that_throw_exception(TestContext context) {
         addDummyUnit();
         addMockUnitHavingException();
         assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting Component Verticle"));
+    }
+
+    @Test
+    public void test_start_but_throw_exception_onInstallCompleted(TestContext context) {
+        Async async = context.async();
+        application.setErrorOnCompleted(true);
+        addDummyUnit();
+        VertxHelper.deploy(vertx, context, new DeploymentOptions(), application, deployId -> {
+            context.assertNotNull(deployId);
+            TestHelper.testComplete(async);
+            Assert.assertEquals(2, vertx.deploymentIDs().size());
+        });
     }
 
     private void assertDeployError(TestContext context, Throwable error) {
@@ -105,8 +110,7 @@ public class ApplicationVerticleTest {
     }
 
     private void addMockUnit(boolean error) {
-        MockProvider provider = new MockProvider(error);
-        application.addProvider(provider);
+        application.addProvider(new MockProvider(error));
     }
 
     private void addDummyUnit() {

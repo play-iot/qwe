@@ -1,7 +1,5 @@
 package io.zero88.qwe;
 
-import io.vertx.core.Verticle;
-
 import lombok.NonNull;
 
 /**
@@ -14,8 +12,17 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ComponentVerticle
  */
-public interface Component<C extends IConfig, T extends ComponentContext>
-    extends HasConfig<C>, HasSharedData, Verticle {
+public interface Component<C extends IConfig, T extends ComponentContext> extends QWEVerticle<C> {
+
+    /**
+     * Component name
+     *
+     * @return a component name
+     */
+    @Override
+    default String appName() {
+        return this.getClass().getName();
+    }
 
     /**
      * Deployment hook when application install component

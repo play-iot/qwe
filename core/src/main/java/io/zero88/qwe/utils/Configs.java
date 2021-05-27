@@ -13,8 +13,8 @@ import io.github.zero88.utils.Reflections;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,6 +32,12 @@ public final class Configs {
                            log.warn("Resource file '" + file + "' not found");
                            return new JsonObject();
                        });
+    }
+
+    public static JsonObject silentLoadJsonConfig(String file) {
+        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
+                       .map(Configs::readAsJson)
+                       .orElseGet(JsonObject::new);
     }
 
     public static JsonObject readAsJson(@NonNull InputStream resourceAsStream) {

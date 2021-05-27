@@ -19,8 +19,4 @@ public interface DeployHook<T extends ComponentContext> {
         return (T) context;
     }
 
-    default void onError(Throwable error) {
-
-    }
-
 }

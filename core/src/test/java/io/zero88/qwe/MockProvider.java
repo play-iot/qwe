@@ -1,34 +1,34 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.MockProvider.MockComponent;
+import io.zero88.qwe.MockProvider.MockComponentVerticle;
 
 import lombok.Getter;
 import lombok.NonNull;
 
-public class MockProvider implements ComponentProvider<MockComponent> {
+public class MockProvider implements ComponentProvider<MockComponentVerticle> {
 
     private final boolean error;
 
     public MockProvider(boolean error) {this.error = error;}
 
     @Override
-    public Class<MockComponent> componentClass() { return MockComponent.class; }
+    public Class<MockComponentVerticle> componentClass() { return MockComponentVerticle.class; }
 
     @Override
-    public MockComponent provide(SharedDataLocalProxy proxy) {
-        return new MockComponent(proxy, error);
+    public MockComponentVerticle provide(SharedDataLocalProxy proxy) {
+        return new MockComponentVerticle(proxy, error);
     }
 
-    static final class MockComponent extends ComponentVerticle<MockConfig, ComponentContext> {
+    static final class MockComponentVerticle extends ComponentVerticle<MockConfig, ComponentContext> {
 
         @Getter
         private final boolean error;
 
-        public MockComponent(SharedDataLocalProxy sharedData) {
+        public MockComponentVerticle(SharedDataLocalProxy sharedData) {
             this(sharedData, false);
         }
 
-        public MockComponent(SharedDataLocalProxy sharedData, boolean error) {
+        public MockComponentVerticle(SharedDataLocalProxy sharedData, boolean error) {
             super(sharedData);
             this.error = error;
         }
@@ -45,7 +45,6 @@ public class MockProvider implements ComponentProvider<MockComponent> {
 
         @Override
         public void onStart() {
-            logger.info("Starting Mock Unit Verticle...");
             if (error) {
                 throw new RuntimeException("Error when starting Component Verticle");
             }
