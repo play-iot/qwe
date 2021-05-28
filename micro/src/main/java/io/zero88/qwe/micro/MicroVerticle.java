@@ -15,7 +15,7 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
 
     @Override
     public Future<Void> onAsyncStop() {
-        return getContext().unregister();
+        return componentContext().unregister();
     }
 
     @Override
@@ -26,8 +26,8 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
 
     @Override
     public MicroContext onSuccess(@NonNull ComponentContext context) {
-        logger.info("Setup micro-service...");
-        return new MicroContext(context).setup(vertx, config);
+        logger().info("Setup micro-service...");
+        return new MicroContext(context).setup(vertx, componentConfig);
     }
 
 }

@@ -6,7 +6,7 @@ public final class DockerVerticle extends CounterProducer {
 
     @Override
     public String appName() {
-        return "Docker Example";
+        return "docker-example";
     }
 
 }

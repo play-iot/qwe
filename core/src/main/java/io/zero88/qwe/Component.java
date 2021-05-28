@@ -7,22 +7,37 @@ import lombok.NonNull;
  *
  * @param <C> Type of Config
  * @param <T> Type of Component Context
- * @see IConfig
+ * @see ComponentConfig
  * @see ComponentContext
- * @see HasConfig
  * @see ComponentVerticle
  */
-public interface Component<C extends IConfig, T extends ComponentContext> extends QWEVerticle<C> {
+public interface Component<C extends ComponentConfig, T extends ComponentContext> extends QWEVerticle<C> {
 
     /**
      * Component name
      *
      * @return a component name
+     * @apiNote To better identify, {@code Component Name} convention is {@code kebab-case} or {@code snake_case}.
+     *     Should avoid {@code space} in name
      */
     @Override
     default String appName() {
         return this.getClass().getName();
     }
+
+    /**
+     * Component config
+     *
+     * @return a component config
+     */
+    C componentConfig();
+
+    /**
+     * Component context
+     *
+     * @return ComponentContext
+     */
+    @NonNull T componentContext();
 
     /**
      * Deployment hook when application install component
@@ -43,12 +58,5 @@ public interface Component<C extends IConfig, T extends ComponentContext> extend
      * @see Application
      */
     T setup(T context);
-
-    /**
-     * Component context
-     *
-     * @return ComponentContext
-     */
-    @NonNull T getContext();
 
 }

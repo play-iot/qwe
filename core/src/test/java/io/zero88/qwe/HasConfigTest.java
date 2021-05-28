@@ -22,14 +22,14 @@ public class HasConfigTest {
 
     @Test
     public void test_not_found_config_file_should_get_default_value() {
-        final MockConfig config = hasConfig.computeConfig(log, new JsonObject());
+        final MockConfig config = hasConfig.computeConfig(new JsonObject());
         Assertions.assertNotNull(config);
     }
 
     @Test
     public void test_invalid_config_should_throw_exception() {
         Assertions.assertThrows(QWEException.class,
-                                () -> hasConfig.computeConfig(log, new JsonObject().put("aaa", "yyy")));
+                                () -> hasConfig.computeConfig(new JsonObject().put("aaa", "yyy")));
     }
 
     static class MockHasConfig implements HasConfig<MockConfig> {

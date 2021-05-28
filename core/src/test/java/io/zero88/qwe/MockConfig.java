@@ -3,7 +3,7 @@ package io.zero88.qwe;
 import lombok.Getter;
 import lombok.Setter;
 
-public class MockConfig implements IConfig {
+public class MockConfig implements ComponentConfig {
 
     @Setter
     @Getter
@@ -12,11 +12,6 @@ public class MockConfig implements IConfig {
     @Override
     public String key() {
         return "mock";
-    }
-
-    @Override
-    public Class<? extends IConfig> parent() {
-        return QWEAppConfig.class;
     }
 
 }

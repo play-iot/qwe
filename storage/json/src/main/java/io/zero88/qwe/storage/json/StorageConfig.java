@@ -4,12 +4,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import io.zero88.qwe.QWEAppConfig;
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.file.FileOption;
-import io.zero88.qwe.storage.json.service.JsonStorageService;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
+import io.zero88.qwe.ComponentConfig;
+import io.zero88.qwe.file.FileOption;
+import io.zero88.qwe.storage.json.service.JsonStorageService;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder(builderClassName = "Builder")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class StorageConfig implements IConfig {
+public final class StorageConfig implements ComponentConfig {
 
     @Accessors(fluent = true)
     private Path fullPath;
@@ -54,11 +53,6 @@ public final class StorageConfig implements IConfig {
     @Override
     public String key() {
         return "__json__";
-    }
-
-    @Override
-    public Class<? extends IConfig> parent() {
-        return QWEAppConfig.class;
     }
 
     public StorageConfig makeFullPath(@NonNull String rootDir) {

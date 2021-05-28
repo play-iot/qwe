@@ -6,7 +6,7 @@ public final class FatJarVerticle extends CounterConsumer {
 
     @Override
     public String appName() {
-        return "Fat jar example";
+        return "fat-jar-example";
     }
 
 }

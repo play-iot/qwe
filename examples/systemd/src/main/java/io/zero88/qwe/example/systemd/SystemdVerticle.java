@@ -6,7 +6,7 @@ public final class SystemdVerticle extends CounterProducer {
 
     @Override
     public String appName() {
-        return "Systemd Example";
+        return "systemd-example";
     }
 
 }

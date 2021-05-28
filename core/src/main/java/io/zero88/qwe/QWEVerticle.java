@@ -8,6 +8,13 @@ import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 
+/**
+ * Represents for Vertx verticle in QWE architecture
+ *
+ * @param <C> Type of IConfig
+ * @see HasSharedData
+ * @see Verticle
+ */
 public interface QWEVerticle<C extends IConfig> extends HasConfig<C>, HasVerticleName, HasSharedData, Verticle {
 
     static void asyncRun(Vertx vertx, Promise<Void> onCompleteHandler, Runnable beforeOnAsyncAction,

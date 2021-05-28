@@ -17,7 +17,7 @@ public abstract class CounterProducer extends ApplicationVerticle implements Cou
     }
 
     protected EventMessage msg(Long c) {
-        logger.info(appName() + " count [" + c + "]");
+        logger().info(appName() + " count [" + c + "]");
         return EventMessage.initial(EventAction.NOTIFY, new JsonObject().put("count", c).put("app", appName()));
     }
 

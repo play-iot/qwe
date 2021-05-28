@@ -22,6 +22,8 @@ public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
      * Application name
      *
      * @return an application name
+     * @apiNote To better identify, {@code Application Name} convention is {@code kebab-case} or {@code snake_case}.
+     *     Should avoid {@code space} in name
      */
     default String appName() {
         return Optional.ofNullable(VersionCommand.getVersionOrNull())

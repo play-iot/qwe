@@ -76,13 +76,15 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
 
     @Override
     public Future<Void> onAsyncStart() {
-        logger.info("Starting HTTP Server...");
-        final HttpServerOptions options = new HttpServerOptions(config.getOptions()).setHost(config.getHost())
-                                                                                    .setPort(config.getPort());
+        logger().info("Starting HTTP Server...");
+        final HttpServerOptions options = new HttpServerOptions(componentConfig.getOptions()).setHost(
+            componentConfig.getHost())
+                                                                                             .setPort(
+                                                                                                 componentConfig.getPort());
         final Router router = initRouter();
         return vertx.createHttpServer(options).requestHandler(router).listen().onSuccess(server -> {
             this.httpServer = server;
-            logger.info("Web Server started at {}", this.httpServer.actualPort());
+            logger().info("Web Server started at {}", this.httpServer.actualPort());
             this.sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(router, this.httpServer.actualPort()));
         }).recover(t -> Future.failedFuture(QWEExceptionConverter.from(t))).mapEmpty();
     }
@@ -98,18 +100,18 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
     }
 
     private ServerInfo createServerInfo(Router handler, int port) {
-        final RestConfig restCfg = config.getRestConfig();
+        final RestConfig restCfg = componentConfig.getRestConfig();
         final DynamicRouteConfig dynamicCfg = restCfg.getDynamicConfig();
-        final WebSocketConfig wsCfg = config.getWebSocketConfig();
-        final FileStorageConfig storageCfg = config.getFileStorageConfig();
+        final WebSocketConfig wsCfg = componentConfig.getWebSocketConfig();
+        final FileStorageConfig storageCfg = componentConfig.getFileStorageConfig();
         final DownloadConfig downCfg = storageCfg.getDownloadConfig();
         final UploadConfig uploadCfg = storageCfg.getUploadConfig();
-        final StaticWebConfig staticWebConfig = config.getStaticWebConfig();
-        final ApiGatewayConfig gatewayConfig = config.getApiGatewayConfig();
+        final StaticWebConfig staticWebConfig = componentConfig.getStaticWebConfig();
+        final ApiGatewayConfig gatewayConfig = componentConfig.getApiGatewayConfig();
         return ServerInfo.siBuilder()
-                         .host(config.getHost())
+                         .host(componentConfig.getHost())
                          .port(port)
-                         .publicHost(config.publicServerUrl())
+                         .publicHost(componentConfig.publicServerUrl())
                          .apiPath(restCfg.isEnabled() ? restCfg.getRootApi() : null)
                          .wsPath(wsCfg.isEnabled() ? wsCfg.getRootWs() : null)
                          .servicePath(restCfg.isEnabled() && dynamicCfg.isEnabled() ? dynamicCfg.getPath() : null)
@@ -130,7 +132,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
     private Router initRouter() {
         try {
             Router root = Router.router(vertx);
-            CorsOptions corsOptions = config.getCorsOptions();
+            CorsOptions corsOptions = componentConfig.getCorsOptions();
             CorsHandler corsHandler = CorsHandler.create(corsOptions.getAllowedOriginPattern())
                                                  .allowedMethods(corsOptions.allowedMethods())
                                                  .allowedHeaders(corsOptions.getAllowedHeaders())
@@ -143,17 +145,17 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
                 .handler(ResponseTimeHandler.create())
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
-            final FileStorageConfig storageCfg = config.getFileStorageConfig();
+            final FileStorageConfig storageCfg = componentConfig.getFileStorageConfig();
             final String pathNoUpload = "(?!" + storageCfg.getUploadConfig().getPath() + ").+";
-            initFileStorageRouter(root, storageCfg, config.publicServerUrl());
+            initFileStorageRouter(root, storageCfg, componentConfig.publicServerUrl());
             root.routeWithRegex(pathNoUpload)
-                .handler(BodyHandler.create(false).setBodyLimit(config.getMaxBodySizeMB() * MB));
+                .handler(BodyHandler.create(false).setBodyLimit(componentConfig.getMaxBodySizeMB() * MB));
             initHttp2Router(root);
-            new WebSocketRouterCreator(httpRouter.getWebSocketEvents()).mount(root, config.getWebSocketConfig(),
+            new WebSocketRouterCreator(httpRouter.getWebSocketEvents()).mount(root, componentConfig.getWebSocketConfig(),
                                                                               sharedData());
-            initRestRouter(root, config.getRestConfig());
-            initGatewayRouter(root, config.getApiGatewayConfig());
-            new StaticWebRouterCreator().mount(root, config.getStaticWebConfig(), sharedData());
+            initRestRouter(root, componentConfig.getRestConfig());
+            initGatewayRouter(root, componentConfig.getApiGatewayConfig());
+            new StaticWebRouterCreator().mount(root, componentConfig.getStaticWebConfig(), sharedData());
             root.route().last().handler(new NotFoundContextHandler());
             return root;
         } catch (QWEException e) {
@@ -177,7 +179,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         if (!storageCfg.isEnabled()) {
             return router;
         }
-        final Path storageDir = Paths.get(FileUtils.createFolder(getContext().dataDir(), storageCfg.getDir()));
+        final Path storageDir = Paths.get(FileUtils.createFolder(componentContext().dataDir(), storageCfg.getDir()));
         new UploadRouterCreator(storageDir, publicUrl).mount(router, storageCfg.getUploadConfig(), sharedData());
         new DownloadRouterCreator(storageDir).mount(router, storageCfg.getDownloadConfig(), sharedData());
         return router;
@@ -193,7 +195,7 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         final Set<Class<? extends RestEventApi>> gatewayApis = Stream.concat(httpRouter.getGatewayApiClasses().stream(),
                                                                              Stream.of(GatewayIndexApi.class))
                                                                      .collect(Collectors.toSet());
-        logger.info("GATEWAY::Registering sub routers in Gateway API: '{}'...", apiGatewayConfig.getPath());
+        logger().info("GATEWAY::Registering sub routers in Gateway API: '{}'...", apiGatewayConfig.getPath());
         final Router gatewayRouter = new RestEventApisCreator(vertx).register(gatewayApis)
                                                                     .addSharedDataProxy(this.sharedData())
                                                                     .build();

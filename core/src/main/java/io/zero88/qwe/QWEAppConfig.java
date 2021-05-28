@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.github.zero88.utils.FileUtils;
-import io.github.zero88.utils.Functions;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.IOtherConfig.HasOtherConfig;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 /**
@@ -26,7 +25,7 @@ import lombok.experimental.Accessors;
  * @see Application
  * @see Component
  */
-public final class QWEAppConfig implements IConfig {
+public final class QWEAppConfig extends HasOtherConfig implements IConfig {
 
     public static final String NAME = "__app__";
     public static final String DELIVERY_OPTIONS = "__delivery__";
@@ -47,14 +46,8 @@ public final class QWEAppConfig implements IConfig {
     @Getter
     @JsonIgnore
     private final DeliveryOptions deliveryOptions;
-    /**
-     * Other Application configurations or Application component configuration
-     */
-    @JsonIgnore
-    private final Map<String, Object> other;
 
     public QWEAppConfig() {
-        this.other = new HashMap<>();
         this.dataDir = DEFAULT_DATADIR;
         this.deliveryOptions = new DeliveryOptions();
     }
@@ -68,7 +61,7 @@ public final class QWEAppConfig implements IConfig {
         this.deliveryOptions = Optional.ofNullable(m.remove(QWEAppConfig.DELIVERY_OPTIONS))
                                        .map(o -> new DeliveryOptions(JsonObject.mapFrom(o)))
                                        .orElseGet(DeliveryOptions::new);
-        this.other = m;
+        this.other.putAll(m);
     }
 
     @Override
@@ -77,21 +70,19 @@ public final class QWEAppConfig implements IConfig {
     @Override
     public Class<? extends IConfig> parent() { return QWEConfig.class; }
 
+    public String getDataDir() { return dataDir().toAbsolutePath().toString(); }
+
+    /**
+     * Other Application configurations or Application component configuration
+     */
+    @Override
+    public JsonObject other() {
+        return super.other();
+    }
+
     @Override
     public JsonObject toJson(ObjectMapper mapper) {
-        return mapper.convertValue(other, JsonObject.class).put(DELIVERY_OPTIONS, this.deliveryOptions.toJson());
+        return super.toJson(mapper).put(DELIVERY_OPTIONS, this.deliveryOptions.toJson());
     }
-
-    public String getDataDir()       { return dataDir().toAbsolutePath().toString(); }
-
-    public Object lookup(String key) { return other.get(key); }
-
-    public <T> T lookup(String key, @NonNull Class<T> configClass) {
-        return Optional.ofNullable(other.get(key))
-                       .map(o -> Functions.getOrDefault((T) null, () -> configClass.cast(o)))
-                       .orElse(null);
-    }
-
-    public JsonObject other() { return JsonObject.mapFrom(other); }
 
 }

@@ -1,8 +1,5 @@
 package io.zero88.qwe;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 
@@ -12,22 +9,23 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+@Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ComponentVerticle<C extends IConfig, T extends ComponentContext> extends AbstractVerticle
+public abstract class ComponentVerticle<C extends ComponentConfig, T extends ComponentContext> extends AbstractVerticle
     implements Component<C, T>, DeployHook<T>, VerticleLifecycleHooks {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter
     @NonNull
-    @Accessors(fluent = true)
     private final SharedDataLocalProxy sharedData;
+    @Getter
+    protected C componentConfig;
+    @Getter
     private T componentContext;
-    protected C config;
 
     @Override
     public final void start() {
-        logger.debug("Start Component [{}]...", appName());
-        this.config = computeConfig(logger, config());
+        logger().debug("Start Component [{}]...", appName());
+        this.componentConfig = computeConfig(config());
         this.onStart();
     }
 
@@ -38,7 +36,7 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
 
     @Override
     public final void stop() {
-        logger.debug("Stop Component [{}]...", appName());
+        logger().debug("Stop Component [{}]...", appName());
         this.onStop();
     }
 
@@ -55,11 +53,6 @@ public abstract class ComponentVerticle<C extends IConfig, T extends ComponentCo
     @Override
     public final T setup(T context) {
         return this.componentContext = context;
-    }
-
-    @Override
-    public final T getContext() {
-        return componentContext;
     }
 
 }

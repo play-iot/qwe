@@ -1,6 +1,6 @@
 package io.zero88.qwe;
 
-public interface HasVerticleName {
+interface HasVerticleName {
 
     /**
      * Verticle name

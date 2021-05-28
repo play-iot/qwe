@@ -5,13 +5,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.QWEAppConfig;
-import io.zero88.qwe.IConfig;
-import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.http.server.download.DownloadFileHandler;
-import io.zero88.qwe.http.server.upload.UploadFileHandler;
-import io.zero88.qwe.http.server.upload.UploadListener;
-import io.zero88.qwe.http.server.ws.WebSocketBridgeEventHandler;
 import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Urls;
@@ -20,6 +13,14 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
+import io.zero88.qwe.ComponentConfig;
+import io.zero88.qwe.IConfig;
+import io.zero88.qwe.QWEAppConfig;
+import io.zero88.qwe.http.HttpUtils;
+import io.zero88.qwe.http.server.download.DownloadFileHandler;
+import io.zero88.qwe.http.server.upload.UploadFileHandler;
+import io.zero88.qwe.http.server.upload.UploadListener;
+import io.zero88.qwe.http.server.ws.WebSocketBridgeEventHandler;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -36,7 +37,7 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Setter(value = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public final class HttpConfig implements IConfig {
+public final class HttpConfig implements ComponentConfig {
 
     public static final String NAME = "__http__";
     private String host = "0.0.0.0";

@@ -22,8 +22,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
 import io.zero88.qwe.dto.jackson.JsonModule;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -199,8 +199,6 @@ public interface JsonData {
             JsonObject entries = SerializerFunction.builder().mapper(mapper).build().apply(object);
             return mapper.convertValue(entries.getMap(), clazz);
         } catch (IllegalArgumentException | NullPointerException | DecodeException ex) {
-            //            final Throwable cause = JacksonExceptionPrettier.getCause(ex);
-            //            throw QWEExceptionConverter.friendly(cause, errorMsg);
             throw new QWEException(ErrorCode.INVALID_ARGUMENT, errorMsg, new HiddenException(ex));
         }
     }
@@ -269,7 +267,7 @@ public interface JsonData {
                 } catch (DecodeException ex) {
                     if (isJson) {
                         throw new QWEException(ErrorCode.INVALID_ARGUMENT,
-                                                "Cannot parse json data. Received data: " + buffer.toString(), ex);
+                                               "Cannot parse json data. Received data: " + buffer, ex);
                     }
                     logger.trace("Failed to parse json array. Use text", ex);
                     //TODO check length, check encode
