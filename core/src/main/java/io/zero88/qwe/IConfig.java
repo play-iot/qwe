@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-//TODO Should simplify
 public interface IConfig extends JsonData, Shareable {
 
     ObjectMapper MAPPER = JsonData.MAPPER.copy().setSerializationInclusion(Include.NON_NULL);
@@ -62,6 +61,8 @@ public interface IConfig extends JsonData, Shareable {
                 cfg = new JsonObject((String) data);
             } else if (data instanceof IConfig) {
                 cfg = ((IConfig) data).toJson();
+            } else if (data instanceof JsonObject) {
+                cfg = (JsonObject) data;
             } else {
                 cfg = JsonObject.mapFrom(Objects.requireNonNull(data, "Config data is null"));
             }
@@ -126,7 +127,7 @@ public interface IConfig extends JsonData, Shareable {
     @Override
     default JsonObject toJson(@NonNull ObjectMapper mapper) {
         List<? extends IConfig> fieldValues = ReflectionField.getFieldValuesByType(this, IConfig.class);
-        JsonObject jsonObject = getMapper().convertValue(this, JsonObject.class);
+        JsonObject jsonObject = mapper.convertValue(this, JsonObject.class);
         fieldValues.forEach(val -> jsonObject.put(val.key(), val.toJson(mapper)));
         return jsonObject;
     }
@@ -187,7 +188,9 @@ public interface IConfig extends JsonData, Shareable {
                                     : entries;
                 return mapper.convertValue(values.getMap(), clazz);
             } catch (ClassCastException e) {
-                throw new IllegalArgumentException("Entry [" + name + "] is not json format", e);
+                throw new HiddenException("Entry [" + name + "] is not json format", e);
+            } catch (IllegalArgumentException e) {
+                throw new HiddenException("Entry [" + name + "] is unable to convert", e);
             }
         }
 

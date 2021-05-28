@@ -23,8 +23,8 @@ class QWEAppConfigTest {
 
     @Test
     public void test_deserialize_appCfg_invalid_json() {
-        TestHelper.assertThrows(() -> IConfig.from("{\"__system__\":{},\"__app__\":8085}}", QWEAppConfig.class),
-                                ConfigException.class, DecodeException.class);
+        TestHelper.assertCause(() -> IConfig.from("{\"__system__\":{},\"__app__\":8085}}", QWEAppConfig.class),
+                               ConfigException.class, DecodeException.class);
     }
 
     @Test

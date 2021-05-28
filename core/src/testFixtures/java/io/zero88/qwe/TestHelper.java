@@ -56,14 +56,28 @@ public interface TestHelper {
         }
     }
 
-    static <T extends Throwable> void assertThrows(Executable ex, Class<T> throwable,
-                                                   Class<? extends Throwable> causeClass) {
-        assertThrows(Assertions.assertThrows(throwable, ex), causeClass);
+    static <T extends Throwable> void assertCause(Executable ex, Class<T> throwable,
+                                                  Class<? extends Throwable> causeClass) {
+        TestHelper.assertCause(ex, throwable, causeClass, null);
     }
 
-    static void assertThrows(Throwable ex, Class<? extends Throwable> causeClass) {
+    static <T extends Throwable> void assertCause(Executable ex, Class<T> throwable,
+                                                  Class<? extends Throwable> causeClass, String throwMsg) {
+        Assertions.assertNotNull(assertCause(Assertions.assertThrows(throwable, ex, throwMsg), causeClass));
+    }
+
+    static <T extends Throwable> void assertCause(Executable ex, Class<T> throwable,
+                                                  Class<? extends Throwable> causeClass, String throwMsg,
+                                                  String causeMsg) {
+        Throwable cause = assertCause(Assertions.assertThrows(throwable, ex, throwMsg), causeClass);
+        Assertions.assertNotNull(cause);
+        Assertions.assertEquals(causeMsg, cause.getMessage());
+    }
+
+    static Throwable assertCause(Throwable ex, Class<? extends Throwable> causeClass) {
         ex.printStackTrace(System.out);
         Assertions.assertTrue(causeClass.isInstance(ex.getCause()));
+        return ex.getCause();
     }
 
 }

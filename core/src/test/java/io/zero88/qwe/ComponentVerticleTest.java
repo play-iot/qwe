@@ -39,7 +39,8 @@ public class ComponentVerticleTest {
 
     @Test
     public void not_have_config_file_should_deploy_success(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
+        MockComponentVerticle component = new MockComponentVerticle(
+            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
         Async async = context.async();
         VertxHelper.deploy(vertx, context, new DeploymentOptions(), component, deployId -> {
             context.assertNotNull(deployId);
@@ -49,20 +50,22 @@ public class ComponentVerticleTest {
 
     @Test
     public void invalid_config_should_deploy_failed(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
+        MockComponentVerticle component = new MockComponentVerticle(
+            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, component, t -> {
             TestHelper.testComplete(async);
             Assert.assertEquals("Invalid configuration format", t.getMessage());
-            TestHelper.assertThrows(() -> { throw t; }, ConfigException.class, IllegalArgumentException.class);
+            TestHelper.assertCause(() -> { throw t; }, ConfigException.class, IllegalArgumentException.class);
         });
     }
 
     @Test
     @Ignore("Need the information from Zero")
     public void test_register_shared_data(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
+        MockComponentVerticle component = new MockComponentVerticle(
+            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
         final String key = MockComponentVerticle.class.getName();
         //        component.setup(key);
 
@@ -75,8 +78,8 @@ public class ComponentVerticleTest {
 
     @Test
     public void throw_unexpected_error_cannot_start(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class),
-                                                                    true);
+        MockComponentVerticle component = new MockComponentVerticle(
+            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class), true);
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
         VertxHelper.deployFailed(vertx, context, options, component, t -> {

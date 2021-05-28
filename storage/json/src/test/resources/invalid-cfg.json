@@ -1,0 +1,13 @@
+{
+  "__app1__": {
+    "__json__": {
+      "subDir": "storage",
+      "maxSizeInMB": 10,
+      "option": {
+        "autoCreate": true,
+        "filePerms": "rw-r--r--",
+        "folderPerms": "rwxr-xr-x"
+      }
+    }
+  }
+}
