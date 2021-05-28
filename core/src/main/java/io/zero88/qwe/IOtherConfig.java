@@ -16,7 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.NonNull;
 
-interface IOtherConfig extends IConfig {
+@SuppressWarnings("rawtypes")
+interface IOtherConfig<C extends IOtherConfig> extends IConfig {
 
     /**
      * Return view of other configuration
@@ -43,11 +44,12 @@ interface IOtherConfig extends IConfig {
      */
     @Nullable <T> T lookup(@NonNull String key, @NonNull Class<T> configClass);
 
-    void put(@NotNull String configKey, Object config);
+    C put(@NotNull String configKey, Object config);
 
-    void putAll(Map<String, Object> other);
+    C putAll(Map<String, Object> other);
 
-    abstract class HasOtherConfig implements IOtherConfig {
+    @SuppressWarnings("unchecked")
+    abstract class HasOtherConfig<C extends IOtherConfig> implements IOtherConfig<C> {
 
         @JsonIgnore
         protected final Map<String, Object> other;
@@ -71,18 +73,20 @@ interface IOtherConfig extends IConfig {
         }
 
         @Override
-        public void put(@NotNull String configKey, Object config) {
+        public C put(@NotNull String configKey, Object config) {
             if (Strings.isBlank(configKey)) {
                 throw new IllegalArgumentException("Config key must be not empty");
             }
             this.other.put(configKey, config);
+            return (C) this;
         }
 
         @Override
-        public void putAll(Map<String, Object> other) {
+        public C putAll(Map<String, Object> other) {
             if (other != null) {
                 this.other.putAll(other);
             }
+            return (C) this;
         }
 
         @Override

@@ -21,6 +21,11 @@ final class DummyProvider implements ComponentProvider<DummyComponentVerticle> {
         }
 
         @Override
+        public String appName() {
+            return "dummy";
+        }
+
+        @Override
         public @NonNull Class<MockConfig> configClass() {
             return MockConfig.class;
         }

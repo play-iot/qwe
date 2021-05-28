@@ -5,7 +5,7 @@ import lombok.NonNull;
 public interface DeployHook<T extends ComponentContext> {
 
     /**
-     * It will be called after deployed {@code component} success from {@code application}
+     * It will be called after deployed each {@code component} successfully from {@code application}
      * <p>
      * Each implementation can enrich any useful information in {@code component context} then it can be used later on
      * {@code application} after all components are deployed successfully

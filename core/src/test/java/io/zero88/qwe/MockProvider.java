@@ -28,6 +28,11 @@ public class MockProvider implements ComponentProvider<MockComponentVerticle> {
             this(sharedData, false);
         }
 
+        @Override
+        public String appName() {
+            return "mock";
+        }
+
         public MockComponentVerticle(SharedDataLocalProxy sharedData, boolean error) {
             super(sharedData);
             this.error = error;

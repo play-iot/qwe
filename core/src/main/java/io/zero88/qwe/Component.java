@@ -14,15 +14,14 @@ import lombok.NonNull;
 public interface Component<C extends ComponentConfig, T extends ComponentContext> extends QWEVerticle<C> {
 
     /**
-     * Component name
+     * Expresses a functional that this component bring to. For example: {@code http-server}, {@code sql-mysql}
      *
-     * @return a component name
-     * @apiNote To better identify, {@code Component Name} convention is {@code kebab-case} or {@code snake_case}.
-     *     Should avoid {@code space} in name
+     * @return the component function name
+     * @apiNote To better identify, {@code Component Function Name} convention is {@code kebab-case}
      */
     @Override
     default String appName() {
-        return this.getClass().getName();
+        return this.getClass().getSimpleName();
     }
 
     /**

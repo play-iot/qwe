@@ -27,7 +27,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     implements Application, SharedDataLocalProxy, VerticleLifecycleHooks {
 
     private final Map<Class<? extends Component>, ComponentProvider<? extends Component>> providers = new HashMap<>();
-    private final ContextLookupInternal contexts = new ContextLookupImpl();
+    private final ContextLookupInternal contexts = ContextLookupInternal.create();
     @Getter
     @Accessors(fluent = true)
     protected QWEAppConfig appConfig;
@@ -48,9 +48,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     @Override
     public final void start(Promise<Void> promise) {
         QWEVerticle.asyncRun(vertx, promise, this::start, () -> onAsyncStart().flatMap(ignore -> installComponents())
-                                                                              .onFailure(e -> logger().error(
-                                                                                  "Failed to start Application[{}]",
-                                                                                  appName(), e))
+                                                                              .onFailure(e -> logError(e, "start"))
                                                                               .mapEmpty());
     }
 
@@ -62,9 +60,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     @Override
     public final void stop(Promise<Void> promise) {
         QWEVerticle.asyncRun(vertx, promise, this::stop, () -> onAsyncStop().eventually(ignore -> uninstallComponents())
-                                                                            .onFailure(e -> logger().error(
-                                                                                "Failed to stop Application[{}]",
-                                                                                appName(), e)));
+                                                                            .onFailure(e -> logError(e, "stop")));
     }
 
     @Override
@@ -80,11 +76,11 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final Future<Void> installComponents() {
-        int poolSize = Math.max(VertxOptions.DEFAULT_WORKER_POOL_SIZE / Math.max(providers.size(), 2), 1);
+        final int defaultPoolSize = defaultComponentPoolSize(providers.size());
         return CompositeFuture.all(providers.values()
                                             .stream()
-                                            .map(provider -> this.deployComponent(provider, poolSize))
-                                            .collect(Collectors.toList())).onSuccess(this::succeed).mapEmpty();
+                                            .map(provider -> deployComponent(provider, defaultPoolSize))
+                                            .collect(Collectors.toList())).onSuccess(this::deployAllSuccess).mapEmpty();
     }
 
     @Override
@@ -97,13 +93,13 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     @Override
     public void onInstallCompleted(ContextLookup lookup) { }
 
-    private Future<Void> undeployComponent(ComponentContext context) {
+    Future<Void> undeployComponent(ComponentContext context) {
         return vertx.undeploy(context.deployId())
                     .onSuccess(unused -> logger().info("Component [{}][{}] is uninstalled", context.deployId(),
                                                        context.appName()));
     }
 
-    private Future<String> deployComponent(ComponentProvider<? extends Component> provider, int defaultPoolSize) {
+    Future<String> deployComponent(ComponentProvider<? extends Component> provider, int defaultPoolSize) {
         final Component component = provider.provide(this);
         logger().info("Deploying Component [{}]...", component.appName());
         return vertx.deployVerticle(component, getComponentDeploymentOptions(defaultPoolSize, component))
@@ -112,14 +108,14 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     }
 
     @SuppressWarnings("unchecked")
-    private void deployComponentSuccess(Component component, String deployId) {
+    void deployComponentSuccess(Component component, String deployId) {
         logger().info("Succeed deploying Component [{}][{}]", component.appName(), deployId);
         ComponentContext def = ComponentContext.create(component.appName(), appConfig.dataDir(), getSharedKey(),
                                                        deployId);
         contexts.add(component.setup(component.hook().onSuccess(def)));
     }
 
-    private void succeed(CompositeFuture r) {
+    void deployAllSuccess(CompositeFuture r) {
         logger().info("Deployed {}/{} Component(s)...", r.size(), this.providers.size());
         this.providers.clear();
         try {
@@ -132,7 +128,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     }
 
     @SuppressWarnings("unchecked")
-    private DeploymentOptions getComponentDeploymentOptions(int defaultPoolSize, Component component) {
+    DeploymentOptions getComponentDeploymentOptions(int defaultPoolSize, Component component) {
         final ComponentConfig compConfig = IConfig.<ComponentConfig>from(appConfig, component.configClass());
         DeploymentOptions options = Optional.ofNullable(appConfig.lookup(compConfig.deploymentKey()))
                                             .map(s -> new DeploymentOptions(JsonObject.mapFrom(s)))
@@ -140,11 +136,17 @@ public abstract class ApplicationVerticle extends AbstractVerticle
         int workerPoolSize = options.getWorkerPoolSize() == VertxOptions.DEFAULT_WORKER_POOL_SIZE
                              ? defaultPoolSize
                              : options.getWorkerPoolSize();
-        options.setWorkerPoolName(Optional.ofNullable(options.getWorkerPoolName()).orElse(component.appName()))
-               .setWorkerPoolSize(workerPoolSize)
-               .setConfig(compConfig.toJson());
-        logger().debug("Deployment Options Component [{}][{}]...", component.appName(), options.toJson());
+        String workerPool = Optional.ofNullable(options.getWorkerPoolName())
+                                    .orElseGet(() -> DEFAULT_COMPONENT_THREAD_PREFIX + component.appName());
+        options.setWorkerPoolName(workerPool).setWorkerPoolSize(workerPoolSize).setConfig(compConfig.toJson());
+        if (logger().isDebugEnabled()) {
+            logger().debug("Deployment Options Component [{}][{}]", component.appName(), options.toJson());
+        }
         return options;
+    }
+
+    private void logError(Throwable e, String action) {
+        logger().error("Failed to {} Application[{}]", action, appName(), e);
     }
 
 }

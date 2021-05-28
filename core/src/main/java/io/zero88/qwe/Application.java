@@ -3,6 +3,8 @@ package io.zero88.qwe;
 import java.util.Optional;
 
 import io.vertx.core.Future;
+import io.vertx.core.VertxOptions;
+import io.vertx.core.impl.VertxImpl;
 import io.zero88.qwe.launcher.VersionCommand;
 
 import lombok.NonNull;
@@ -18,6 +20,8 @@ import lombok.NonNull;
  */
 public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
 
+    String DEFAULT_COMPONENT_THREAD_PREFIX = "qwe-worker-thread-";
+
     /**
      * Application name
      *
@@ -30,8 +34,6 @@ public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
                        .flatMap(v -> Optional.ofNullable(v.getName()))
                        .orElse(getClass().getName());
     }
-
-    QWEAppConfig appConfig();
 
     @Override
     default Class<QWEAppConfig> configClass() {
@@ -57,12 +59,31 @@ public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
     <T extends Component> Application addProvider(ComponentProvider<T> provider);
 
     /**
+     * Compute default component pool size
+     *
+     * @param nbOfComponents Number of components will be installed under this {@code Application}
+     * @return default component pool size
+     */
+    default int defaultComponentPoolSize(int nbOfComponents) {
+        int poolSize = VertxOptions.DEFAULT_WORKER_POOL_SIZE;
+        if (getVertx() instanceof VertxImpl) {
+            poolSize = ((VertxImpl) getVertx()).getOrCreateContext()
+                                               .getDeployment()
+                                               .deploymentOptions()
+                                               .getWorkerPoolSize();
+        }
+        return Math.max(poolSize / Math.max(nbOfComponents, 2), 1);
+    }
+
+    /**
      * Install a list of register component verticle based on the order of given providers of {@link
      * #addProvider(ComponentProvider)}
      * <p>
      * If any component verticle starts failed, future will catch and report it to {@code Vertx}
      *
      * @return void future
+     * @apiNote You can override {@code DeploymentOptions} per {@code Component} by declared options with key {@link
+     *     ComponentConfig#deploymentKey()} under {@link QWEAppConfig}
      */
     Future<Void> installComponents();
 

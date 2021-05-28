@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
  * @see Application
  * @see Component
  */
-public final class QWEAppConfig extends HasOtherConfig implements IConfig {
+public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements IConfig {
 
     public static final String NAME = "__app__";
     public static final String DELIVERY_OPTIONS = "__delivery__";

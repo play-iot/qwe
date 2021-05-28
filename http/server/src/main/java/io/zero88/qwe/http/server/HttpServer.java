@@ -61,6 +61,11 @@ public final class HttpServer extends ComponentVerticle<HttpConfig, HttpServerCo
         this.httpRouter = router;
     }
 
+    @Override
+    public String appName() {
+        return "http-server";
+    }
+
     /**
      * Decorator route with produce and consume
      * <p>

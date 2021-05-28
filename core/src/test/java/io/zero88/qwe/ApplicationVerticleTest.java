@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.impl.Deployment;
+import io.vertx.core.impl.VertxImpl;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -34,6 +37,56 @@ public class ApplicationVerticleTest {
     public void before() {
         vertx = Vertx.vertx();
         application = new MockApplication();
+    }
+
+    @Test
+    public void test_compute_deployment_option_per_component(TestContext context) {
+        Async async = context.async(2);
+        addDummyUnit();
+        addMockUnit();
+        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
+        VertxHelper.deploy(vertx, context, new DeploymentOptions().setWorkerPoolSize(15), application, deployId -> {
+            context.assertNotNull(deployId);
+            TestHelper.testComplete(async);
+            Assert.assertEquals(3, vertx.deploymentIDs().size());
+            vertx.deploymentIDs()
+                 .stream()
+                 .map(id -> ((VertxImpl) vertx).getDeployment(id))
+                 .filter(Deployment::isChild)
+                 .map(Deployment::deploymentOptions)
+                 .forEach(opt -> {
+                     Assert.assertEquals(7, opt.getWorkerPoolSize());
+                     Assert.assertTrue(opt.getWorkerPoolName().startsWith(Application.DEFAULT_COMPONENT_THREAD_PREFIX));
+                 });
+        });
+    }
+
+    @Test
+    public void test_use_deployment_option_from_component(TestContext context) {
+        Async async = context.async(2);
+        addDummyUnit();
+        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
+        JsonObject config = new QWEAppConfig().put(new MockConfig().deploymentKey(),
+                                                   new DeploymentOptions().setHa(true)
+                                                                          .setWorkerPoolSize(3)
+                                                                          .setWorkerPoolName("test")
+                                                                          .toJson()).toJson();
+        VertxHelper.deploy(vertx, context, new DeploymentOptions().setConfig(config), application,
+                           deployId -> {
+                               context.assertNotNull(deployId);
+                               TestHelper.testComplete(async);
+                               Assert.assertEquals(2, vertx.deploymentIDs().size());
+                               vertx.deploymentIDs()
+                                    .stream()
+                                    .map(id -> ((VertxImpl) vertx).getDeployment(id))
+                                    .filter(Deployment::isChild)
+                                    .map(Deployment::deploymentOptions)
+                                    .forEach(opt -> {
+                                        Assert.assertTrue(opt.isHa());
+                                        Assert.assertEquals(3, opt.getWorkerPoolSize());
+                                        Assert.assertEquals("test", opt.getWorkerPoolName());
+                                    });
+                           });
     }
 
     @Test
