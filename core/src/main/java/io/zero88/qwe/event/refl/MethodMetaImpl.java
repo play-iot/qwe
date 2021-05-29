@@ -13,13 +13,6 @@ final class MethodMetaImpl implements MethodMeta {
 
     private final String declaringClass;
     private final Method method;
-    private final boolean outputIsVoid;
-    private final boolean outputIsVertxFuture;
     private final MethodParam[] params;
-
-    @Override
-    public Method toMethod() {
-        return method;
-    }
 
 }

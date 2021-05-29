@@ -18,8 +18,8 @@ import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListenerTest;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.mock.MockEventListener;
-import io.zero88.qwe.event.mock.MockEventListener.MockWithContext;
-import io.zero88.qwe.event.mock.MockEventListener.MockWithVariousParams;
+import io.zero88.qwe.event.mock.MockWithContextListener;
+import io.zero88.qwe.event.mock.MockWithVariousParamsListener;
 
 @ExtendWith(VertxExtension.class)
 class EventParameterParserTest {
@@ -38,7 +38,7 @@ class EventParameterParserTest {
     void test_extract_primitive_but_send_null() {
         final EventMessage msg = EventMessage.initial(MockEventListener.PRIMITIVE_EVENT,
                                                       new JsonObject().put("id", null));
-        final MethodMeta meta = processor.lookup(MockWithVariousParams.class, msg.getAction());
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
         Assertions.assertEquals(1, meta.params().length);
         Assertions.assertEquals("Data Field [id] is primitive type but given null data",
                                 Assertions.assertThrows(IllegalArgumentException.class,
@@ -48,7 +48,7 @@ class EventParameterParserTest {
     @Test
     void test_extract_string() {
         final EventMessage msg = EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", "123"));
-        final MethodMeta meta = processor.lookup(MockWithVariousParams.class, msg.getAction());
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
         final Object[] inputs = parser.extract(msg, meta.params());
         Assertions.assertEquals(1, inputs.length);
         Assertions.assertEquals("123", inputs[0]);
@@ -58,7 +58,7 @@ class EventParameterParserTest {
     void test_extract_all_context() {
         final RequestData reqData = RequestData.builder().body(new JsonObject().put("id", "123")).build();
         final EventMessage msg = EventMessage.initial(EventAction.GET_ONE, reqData);
-        final MethodMeta meta = processor.lookup(MockWithContext.class, msg.getAction());
+        final MethodMeta meta = processor.lookup(MockWithContextListener.class, msg.getAction());
         final Object[] inputs = parser.extract(msg, meta.params());
         Assertions.assertEquals(5, inputs.length);
         Assertions.assertEquals(EventAction.GET_ONE, inputs[0]);
@@ -73,7 +73,7 @@ class EventParameterParserTest {
     void test_extract_mixin_context_param_position() {
         final RequestData reqData = RequestData.builder().filter(new JsonObject().put("test", 1)).build();
         final EventMessage msg = EventMessage.initial(EventAction.PATCH, reqData);
-        final MethodMeta meta = processor.lookup(MockWithContext.class, msg.getAction());
+        final MethodMeta meta = processor.lookup(MockWithContextListener.class, msg.getAction());
         final Object[] inputs = parser.extract(msg, meta.params());
         Assertions.assertEquals(4, inputs.length);
         Assertions.assertTrue(ReflectionClass.assertDataType(inputs[0].getClass(), RequestFilter.class));
@@ -89,14 +89,14 @@ class EventParameterParserTest {
     @Test
     void test_register_many_actions_then_inject_correct_runtime_action() {
         final EventMessage msg1 = EventMessage.initial(EventAction.CREATE, new JsonObject().put("id", 111));
-        final MethodMeta meta1 = processor.lookup(MockWithContext.class, msg1.getAction());
+        final MethodMeta meta1 = processor.lookup(MockWithContextListener.class, msg1.getAction());
         final Object[] inputs1 = parser.extract(msg1, meta1.params());
         Assertions.assertEquals(2, inputs1.length);
         Assertions.assertEquals(EventAction.CREATE, inputs1[0]);
         Assertions.assertEquals(111, inputs1[1]);
 
         final EventMessage msg2 = EventMessage.initial(EventAction.UPDATE, new JsonObject().put("id", 222));
-        final MethodMeta meta2 = processor.lookup(MockWithContext.class, msg2.getAction());
+        final MethodMeta meta2 = processor.lookup(MockWithContextListener.class, msg2.getAction());
         final Object[] inputs2 = parser.extract(msg2, meta2.params());
         Assertions.assertEquals(2, inputs2.length);
         Assertions.assertEquals(EventAction.UPDATE, inputs2[0]);

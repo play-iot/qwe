@@ -11,12 +11,12 @@ import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.mock.MockEventListener;
-import io.zero88.qwe.event.mock.MockEventListener.MockChildListener;
-import io.zero88.qwe.event.mock.MockEventListener.MockEventFailed;
-import io.zero88.qwe.event.mock.MockEventListener.MockFuture;
-import io.zero88.qwe.event.mock.MockEventListener.MockKeepEventMessageListener;
-import io.zero88.qwe.event.mock.MockEventListener.MockParam;
-import io.zero88.qwe.event.mock.MockEventListener.MockWithVariousParams;
+import io.zero88.qwe.event.mock.MockChildListener;
+import io.zero88.qwe.event.mock.MockListenerFailed;
+import io.zero88.qwe.event.mock.MockFutureListener;
+import io.zero88.qwe.event.mock.MockKeepEventMessageListener;
+import io.zero88.qwe.event.mock.MockParam;
+import io.zero88.qwe.event.mock.MockWithVariousParamsListener;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.UnsupportedException;
 
@@ -39,36 +39,30 @@ class EventAnnotationProcessorTest {
     @Test
     void test_scan_duplicate_event_should_failed() {
         Assertions.assertEquals(Assertions.assertThrows(ImplementationError.class,
-                                                        () -> processor.lookup(MockEventFailed.class,
+                                                        () -> processor.lookup(MockListenerFailed.class,
                                                                                EventAction.parse("DUP"))).getMessage(),
                                 "More than one event [DUP]");
     }
 
     @Test
     void test_scan_no_param_success() {
-        final MethodMeta methodMeta = processor.lookup(MockWithVariousParams.class, EventAction.GET_LIST);
+        final MethodMeta methodMeta = processor.lookup(MockWithVariousParamsListener.class, EventAction.GET_LIST);
         Assertions.assertNotNull(methodMeta);
-        Assertions.assertFalse(methodMeta.outputIsVoid());
-        Assertions.assertFalse(methodMeta.outputIsVertxFuture());
         Assertions.assertEquals(0, methodMeta.params().length);
     }
 
     @Test
     void test_scan_output_is_void() {
-        final MethodMeta methodMeta = processor.lookup(MockWithVariousParams.class, EventAction.NOTIFY);
+        final MethodMeta methodMeta = processor.lookup(MockWithVariousParamsListener.class, EventAction.NOTIFY);
         Assertions.assertNotNull(methodMeta);
         Assertions.assertEquals(1, methodMeta.params().length);
         Assertions.assertEquals(JsonObject.class, methodMeta.params()[0].getParamClass());
-        Assertions.assertTrue(methodMeta.outputIsVoid());
-        Assertions.assertFalse(methodMeta.outputIsVertxFuture());
     }
 
     @Test
     void test_scan_event_success() {
         final MethodMeta methodMeta = processor.lookup(MockEventListener.class, EventAction.CREATE);
         Assertions.assertNotNull(methodMeta);
-        Assertions.assertFalse(methodMeta.outputIsVoid());
-        Assertions.assertFalse(methodMeta.outputIsVertxFuture());
         Assertions.assertEquals(1, methodMeta.params().length);
         final MethodParam param = methodMeta.params()[0];
         Assertions.assertNotNull(param.getParamName());
@@ -80,8 +74,6 @@ class EventAnnotationProcessorTest {
     void test_scan_in_child_but_method_in_parent() {
         final MethodMeta methodMeta = processor.lookup(MockChildListener.class, EventAction.CREATE);
         Assertions.assertNotNull(methodMeta);
-        Assertions.assertFalse(methodMeta.outputIsVoid());
-        Assertions.assertFalse(methodMeta.outputIsVertxFuture());
         Assertions.assertEquals(MockEventListener.class.getName(), methodMeta.declaringClass());
         Assertions.assertEquals(1, methodMeta.params().length);
         final MethodParam param = methodMeta.params()[0];
@@ -94,8 +86,6 @@ class EventAnnotationProcessorTest {
     void test_scan_in_child_and_method_is_overridden() {
         final MethodMeta methodMeta = processor.lookup(MockChildListener.class, EventAction.UPDATE);
         Assertions.assertNotNull(methodMeta);
-        Assertions.assertFalse(methodMeta.outputIsVoid());
-        Assertions.assertFalse(methodMeta.outputIsVertxFuture());
         Assertions.assertEquals(MockChildListener.class.getName(), methodMeta.declaringClass());
         Assertions.assertEquals(1, methodMeta.params().length);
         final MethodParam param = methodMeta.params()[0];
@@ -106,11 +96,9 @@ class EventAnnotationProcessorTest {
 
     @Test
     void test_scan_in_child_and_same_event_but_different_method_with_parent() {
-        final MethodMeta methodMeta = processor.lookup(MockWithVariousParams.class, EventAction.UPDATE);
+        final MethodMeta methodMeta = processor.lookup(MockWithVariousParamsListener.class, EventAction.UPDATE);
         Assertions.assertNotNull(methodMeta);
-        Assertions.assertFalse(methodMeta.outputIsVoid());
-        Assertions.assertFalse(methodMeta.outputIsVertxFuture());
-        Assertions.assertEquals(MockWithVariousParams.class.getName(), methodMeta.declaringClass());
+        Assertions.assertEquals(MockWithVariousParamsListener.class.getName(), methodMeta.declaringClass());
         Assertions.assertEquals(2, methodMeta.params().length);
         MethodParam param1 = methodMeta.params()[0];
         Assertions.assertEquals("mock", param1.getParamName());
@@ -154,7 +142,7 @@ class EventAnnotationProcessorTest {
 
     @Test
     void test_scan_one_param_value_with_param_annotation() {
-        final MethodMeta methodMeta = processor.lookup(MockWithVariousParams.class, EventAction.GET_ONE);
+        final MethodMeta methodMeta = processor.lookup(MockWithVariousParamsListener.class, EventAction.GET_ONE);
         Assertions.assertNotNull(methodMeta);
         Assertions.assertEquals(1, methodMeta.params().length);
         Assertions.assertEquals("id", methodMeta.params()[0].getParamName());
@@ -163,7 +151,7 @@ class EventAnnotationProcessorTest {
 
     @Test
     void test_scan_param_as_list() {
-        final MethodMeta methodMeta = processor.lookup(MockWithVariousParams.class, EventAction.REMOVE);
+        final MethodMeta methodMeta = processor.lookup(MockWithVariousParamsListener.class, EventAction.REMOVE);
         Assertions.assertNotNull(methodMeta);
         Assertions.assertEquals(1, methodMeta.params().length);
         Assertions.assertEquals("list", methodMeta.params()[0].getParamName());
@@ -172,13 +160,11 @@ class EventAnnotationProcessorTest {
 
     @Test
     void test_scan_output_is_future() {
-        final MethodMeta methodMeta = processor.lookup(MockFuture.class, EventAction.GET_ONE);
+        final MethodMeta methodMeta = processor.lookup(MockFutureListener.class, EventAction.GET_ONE);
         Assertions.assertNotNull(methodMeta);
         Assertions.assertEquals(1, methodMeta.params().length);
         Assertions.assertEquals("id", methodMeta.params()[0].getParamName());
         Assertions.assertEquals(int.class, methodMeta.params()[0].getParamClass());
-        Assertions.assertTrue(methodMeta.outputIsVertxFuture());
-        Assertions.assertFalse(methodMeta.outputIsVoid());
     }
 
 }

@@ -187,7 +187,10 @@ public final class EventMessage implements Serializable, JsonData {
         if (Objects.isNull(message)) {
             return EventMessage.initial(EventAction.UNKNOWN);
         }
-        return tryParse(message.body());
+        final EventMessage msg = tryParse(message.body());
+        return message.headers().contains("action")
+               ? override(msg, EventAction.parse(message.headers().get("action")))
+               : msg;
     }
 
     @JsonInclude(Include.NON_EMPTY)

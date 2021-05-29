@@ -6,6 +6,8 @@ import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData.SerializerFunction;
+import io.zero88.qwe.event.output.AnyToFuture;
+import io.zero88.qwe.event.output.OutputToFutureServiceLoader;
 import io.zero88.qwe.event.refl.MethodMeta;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
@@ -17,8 +19,10 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
+@SuppressWarnings({"rawtypes", "unchecked"})
 class EventListenerExecutorImpl implements EventListenerExecutor {
 
+    private static final OutputToFutureServiceLoader LOADER = new OutputToFutureServiceLoader();
     @Getter
     private final EventListener listener;
     @Getter
@@ -36,7 +40,6 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public Future<EventMessage> execute(Message message) {
         final EventMessage msg = EventMessage.convert(message);
         final String addr = message.address();
@@ -69,14 +72,13 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
 
     private Future<Object> executeMethod(MethodMeta methodMeta, Object[] inputs) {
         try {
-            final Object response = ReflectionMethod.execute(listener, methodMeta.toMethod(), inputs);
-            if (methodMeta.outputIsVoid()) {
-                return Future.succeededFuture();
-            }
-            if (methodMeta.outputIsVertxFuture()) {
-                return (Future<Object>) response;
-            }
-            return Future.succeededFuture(response);
+            final Object response = ReflectionMethod.execute(listener, methodMeta.method(), inputs);
+            return LOADER.getHandlers()
+                         .stream()
+                         .filter(h -> h.verify(methodMeta))
+                         .findFirst()
+                         .orElseGet(AnyToFuture::new)
+                         .transform(methodMeta, response);
         } catch (ReflectionException e) {
             return Future.failedFuture(e.getCause());
         }

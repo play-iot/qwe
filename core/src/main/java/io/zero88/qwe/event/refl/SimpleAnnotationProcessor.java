@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.vertx.core.Future;
 import io.zero88.qwe.event.EBContext;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EBParam;
@@ -57,17 +55,7 @@ public class SimpleAnnotationProcessor implements EventAnnotationProcessor {
     }
 
     protected MethodMeta analyze(Method method) {
-        Class<?> returnType = method.getReturnType();
-        return new MethodMetaImpl(method.getDeclaringClass().getName(), method, isVoid(returnType),
-                                  isFuture(returnType), analyzeParams(method.getParameters()));
-    }
-
-    protected boolean isVoid(Class<?> returnType) {
-        return returnType == void.class;
-    }
-
-    protected boolean isFuture(Class<?> returnType) {
-        return ReflectionClass.assertDataType(returnType, Future.class);
+        return new MethodMetaImpl(method.getDeclaringClass().getName(), method, analyzeParams(method.getParameters()));
     }
 
     protected MethodParam[] analyzeParams(Parameter[] params) {
