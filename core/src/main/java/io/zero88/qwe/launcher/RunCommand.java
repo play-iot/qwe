@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Optional;
 
 import io.github.zero88.utils.Strings;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.cli.CLIException;
@@ -13,7 +14,6 @@ import io.vertx.core.cli.annotations.Name;
 import io.vertx.core.cli.annotations.Option;
 import io.vertx.core.cli.annotations.Summary;
 import io.vertx.core.impl.VertxInternal;
-import io.vertx.core.impl.launcher.VertxLifecycleHooks;
 import io.vertx.core.impl.launcher.commands.ExecUtils;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.launcher.ExecutionContext;
@@ -117,17 +117,27 @@ public final class RunCommand extends io.vertx.core.impl.launcher.commands.RunCo
     @Override
     public void run() {
         if (redeploy == null || redeploy.isEmpty()) {
-            JsonObject conf = qweConfig.toJson();
-            afterConfigParsed(conf);
+            JsonObject conf = normalizeConfiguration();
 
-            doRun();
+            Vertx vertx = doRun();
 
-            deploymentOptions = qweConfig.getDeployConfig();
-            configureFromSystemProperties(deploymentOptions, DEPLOYMENT_OPTIONS_PROP_PREFIX);
-            deploymentOptions.setConfig(qweConfig.getAppConfig().toJson())
-                             .setWorker(worker)
-                             .setHa(ha)
-                             .setInstances(instances);
+            if (vertx == null) {
+                // Already logged.
+                ExecUtils.exitBecauseOfVertxInitializationIssue();
+            }
+
+            if (vertx instanceof VertxInternal) {
+                ((VertxInternal) vertx).addCloseHook(completionHandler -> {
+                    try {
+                        beforeStoppingVertx(vertx);
+                        completionHandler.handle(Future.succeededFuture());
+                    } catch (Exception e) {
+                        completionHandler.handle(Future.failedFuture(e));
+                    }
+                });
+            }
+
+            deploymentOptions = normalizeDeploymentOptions(conf);
             beforeDeployingVerticle(deploymentOptions);
             deploy();
         } else {
@@ -136,47 +146,25 @@ public final class RunCommand extends io.vertx.core.impl.launcher.commands.RunCo
         }
     }
 
-    protected void doRun() {
+    protected JsonObject normalizeConfiguration() {
+        JsonObject conf = qweConfig.toJson();
+        afterConfigParsed(conf);
+        return conf;
+    }
+
+    protected DeploymentOptions normalizeDeploymentOptions(JsonObject conf) {
+        qweConfig = IConfig.from(conf, QWEConfig.class);
+        DeploymentOptions deploymentOptions = qweConfig.getDeployConfig();
+        configureFromSystemProperties(deploymentOptions, DEPLOYMENT_OPTIONS_PROP_PREFIX);
+        return deploymentOptions.setConfig(qweConfig.getAppConfig().toJson())
+                                .setWorker(worker)
+                                .setHa(ha)
+                                .setInstances(instances);
+    }
+
+    protected Vertx doRun() {
         delegate.run(this::afterStoppingVertx);
-        vertx = delegate.vertx();
-
-        if (vertx == null) {
-            // Already logged.
-            ExecUtils.exitBecauseOfVertxInitializationIssue();
-        }
-
-        if (vertx instanceof VertxInternal) {
-            ((VertxInternal) vertx).addCloseHook(completionHandler -> {
-                try {
-                    beforeStoppingVertx(vertx);
-                    completionHandler.handle(Future.succeededFuture());
-                } catch (Exception e) {
-                    completionHandler.handle(Future.failedFuture(e));
-                }
-            });
-        }
-    }
-
-    protected void deploy() {
-        deploy(mainVerticle, vertx(), deploymentOptions, res -> {
-            if (res.failed()) {
-                handleDeployFailed(res.cause());
-            }
-        });
-    }
-
-    @Override
-    public synchronized Vertx vertx() {
-        return delegate.vertx();
-    }
-
-    private void handleDeployFailed(Throwable cause) {
-        if (executionContext.main() instanceof VertxLifecycleHooks) {
-            ((VertxLifecycleHooks) executionContext.main()).handleDeployFailed(vertx(), mainVerticle, deploymentOptions,
-                                                                               cause);
-        } else {
-            ExecUtils.exitBecauseOfVertxDeploymentIssue();
-        }
+        return vertx = delegate.vertx();
     }
 
 }

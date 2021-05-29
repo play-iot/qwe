@@ -24,8 +24,8 @@ import io.zero88.qwe.QWEBootConfig;
 import io.zero88.qwe.cluster.ClusterManagerFactory;
 import io.zero88.qwe.cluster.ClusterNodeListener;
 import io.zero88.qwe.cluster.ClusterType;
-import io.zero88.qwe.cluster.ServiceClusterFactoryLoader;
-import io.zero88.qwe.cluster.ServiceClusterNodeListenerLoader;
+import io.zero88.qwe.cluster.ClusterFactoryServiceLoader;
+import io.zero88.qwe.cluster.ClusterNodeListenerServiceLoader;
 
 import lombok.Getter;
 
@@ -243,7 +243,7 @@ public final class BootCommand extends BareCommand {
 
     @Override
     protected void afterStartingVertx(Vertx instance) {
-        final ClusterNodeListener listener = new ServiceClusterNodeListenerLoader().listener();
+        final ClusterNodeListener listener = new ClusterNodeListenerServiceLoader().listener();
         if (listener != null && instance.isClustered()) {
             options.getClusterManager().nodeListener(listener.setup(vertx, options));
         }
@@ -254,7 +254,7 @@ public final class BootCommand extends BareCommand {
         if (config.getClusterType() == ClusterType.NONE) {
             return null;
         }
-        final ClusterManagerFactory factory = new ServiceClusterFactoryLoader().lookup(config.getClusterType());
+        final ClusterManagerFactory factory = new ClusterFactoryServiceLoader().lookup(config.getClusterType());
         if (factory == null) {
             return null;
         }

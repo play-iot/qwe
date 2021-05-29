@@ -2,11 +2,11 @@ package io.zero88.qwe.cluster;
 
 import io.vertx.core.ServiceHelper;
 
-public final class ServiceClusterNodeListenerLoader {
+public final class ClusterNodeListenerServiceLoader {
 
     private final ClusterNodeListener clusterNodeListener;
 
-    public ServiceClusterNodeListenerLoader() {
+    public ClusterNodeListenerServiceLoader() {
         clusterNodeListener = ServiceHelper.loadFactoryOrNull(ClusterNodeListener.class);
     }
 

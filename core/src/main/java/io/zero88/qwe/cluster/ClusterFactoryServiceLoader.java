@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import io.vertx.core.ServiceHelper;
 
-public final class ServiceClusterFactoryLoader {
+public final class ClusterFactoryServiceLoader {
 
     private final Map<ClusterType, ClusterManagerFactory> factories;
 
-    public ServiceClusterFactoryLoader() {
+    public ClusterFactoryServiceLoader() {
         this.factories = ServiceHelper.loadFactories(ClusterManagerFactory.class, getClass().getClassLoader())
                                       .stream()
                                       .collect(Collectors.toMap(ClusterManagerFactory::type, Function.identity()));
