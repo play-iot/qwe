@@ -4,7 +4,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.MicroContext;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
 
 public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService {
 
@@ -17,11 +17,11 @@ public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService
 
     @Override
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryInvoker discovery = microContext.getLocalInvoker();
+        final ServiceDiscoveryWrapper discovery = microContext.getDiscovery();
         CompositeFuture.all(
-            discovery.addEventMessageRecord("ems-4", address, EventMethodDefinition.createDefault("/p", "/:pId")),
-            discovery.addEventMessageRecord("ems-4", address,
-                                            EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")))
+            discovery.addRecord("ems-4", address, EventMethodDefinition.createDefault("/p", "/:pId")),
+            discovery.addRecord("ems-4", address,
+                                EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")))
                        .onComplete(AsyncResult::succeeded);
     }
 

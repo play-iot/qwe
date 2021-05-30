@@ -1,6 +1,5 @@
 package io.zero88.qwe.micro.register;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,8 +17,8 @@ import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
 import io.zero88.qwe.http.EventHttpService;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
 
 import lombok.Builder;
 import lombok.NonNull;
@@ -42,7 +41,7 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
     private final String sharedKey;
     @NonNull
     private final Supplier<Set<S>> eventServices;
-    private final Consumer<S> afterRegisterEventbusAddress;
+    private final Consumer<S> afterRegisterEventBusAddress;
 
     /**
      * Publish services to external API and register event listener by address at the same time.
@@ -52,7 +51,7 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
      * @see Record
      * @since 1.0.0
      */
-    public Future<List<Record>> publish(@NonNull ServiceDiscoveryInvoker discovery) {
+    public Future<List<Record>> publish(@NonNull ServiceDiscoveryWrapper discovery) {
         final EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, sharedKey));
         return Future.succeededFuture(eventServices.get()
                                                    .stream()
@@ -65,16 +64,13 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
                      .onSuccess(recs -> LOGGER.info("Published {} Service API(s)", recs.size()));
     }
 
-    private CompositeFuture register(@NonNull EventBusClient client, @NonNull ServiceDiscoveryInvoker discovery,
+    private CompositeFuture register(@NonNull EventBusClient client, @NonNull ServiceDiscoveryWrapper discovery,
                                      @NonNull S srv) {
         client.register(srv.address(), srv);
-        Optional.ofNullable(afterRegisterEventbusAddress).ifPresent(func -> func.accept(srv));
-        if (!discovery.isEnabled()) {
-            return CompositeFuture.join(new ArrayList<>());
-        }
+        Optional.ofNullable(afterRegisterEventBusAddress).ifPresent(func -> func.accept(srv));
         return CompositeFuture.join(srv.definitions()
                                        .stream()
-                                       .map(d -> discovery.addEventMessageRecord(srv.api(), srv.address(), d))
+                                       .map(d -> discovery.addRecord(srv.api(), srv.address(), d))
                                        .collect(Collectors.toList()));
     }
 

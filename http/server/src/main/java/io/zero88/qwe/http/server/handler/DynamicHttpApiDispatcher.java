@@ -7,11 +7,11 @@ import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.handler.DynamicContextDispatcher.AbstractDynamicContextDispatcher;
 import io.zero88.qwe.http.server.rest.api.DynamicHttpRestApi;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
 
 public final class DynamicHttpApiDispatcher<T extends DynamicHttpRestApi> extends AbstractDynamicContextDispatcher<T> {
 
-    DynamicHttpApiDispatcher(T api, String gatewayPath, ServiceDiscoveryInvoker dispatcher) {
+    DynamicHttpApiDispatcher(T api, String gatewayPath, ServiceDiscoveryWrapper dispatcher) {
         super(api, gatewayPath, dispatcher);
     }
 

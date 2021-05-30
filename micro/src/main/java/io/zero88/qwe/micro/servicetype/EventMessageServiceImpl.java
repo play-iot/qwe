@@ -35,7 +35,7 @@ public class EventMessageServiceImpl implements EventMessageService {
 
         @Override
         protected EventMessagePusher retrieve() {
-            return new Pusher(EventBusClient.create(SharedDataLocalProxy.create(vertx, sharedKey)),
+            return new Pusher(SharedDataLocalProxy.create(vertx, sharedKey),
                               JsonData.from(this.record().getMetadata().getJsonObject(EVENT_METHOD_CONFIG),
                                             EventMethodDefinition.class), config,
                               record().getLocation().getString(Record.ENDPOINT));

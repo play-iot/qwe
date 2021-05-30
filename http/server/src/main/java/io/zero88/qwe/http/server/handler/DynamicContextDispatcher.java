@@ -17,7 +17,7 @@ import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.rest.api.DynamicEventRestApi;
 import io.zero88.qwe.http.server.rest.api.DynamicHttpRestApi;
 import io.zero88.qwe.http.server.rest.api.DynamicRestApi;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,7 +37,7 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
 
     @SuppressWarnings("unchecked")
     static <T extends DynamicRestApi> DynamicContextDispatcher<T> create(@NonNull T api, String gatewayPath,
-                                                                         ServiceDiscoveryInvoker dispatcher) {
+                                                                         ServiceDiscoveryWrapper dispatcher) {
         if (api instanceof DynamicHttpRestApi) {
             return new DynamicHttpApiDispatcher((DynamicHttpRestApi) api, gatewayPath, dispatcher);
         }
@@ -66,9 +66,9 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
      * Service dispatcher
      *
      * @return service dispatcher
-     * @see ServiceDiscoveryInvoker
+     * @see ServiceDiscoveryWrapper
      */
-    @NonNull ServiceDiscoveryInvoker getDispatcher();
+    @NonNull ServiceDiscoveryWrapper getDispatcher();
 
     /**
      * Gateway service path
@@ -139,7 +139,7 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
         @Getter
         private final String gatewayPath;
         @Getter
-        private final ServiceDiscoveryInvoker dispatcher;
+        private final ServiceDiscoveryWrapper dispatcher;
 
         @Override
         public T get() { return api; }

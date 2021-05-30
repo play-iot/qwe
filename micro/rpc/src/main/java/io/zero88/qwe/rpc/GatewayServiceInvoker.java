@@ -56,12 +56,12 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
     /**
      * Defines service kind to discover
      *
-     * @return service kind. Default: {@link ServiceKind#LOCAL}
+     * @return service kind. Default: {@link ServiceKind#CLUSTER}
      * @since 1.0.0
      */
     @NonNull
     default ServiceKind kind() {
-        return ServiceKind.LOCAL;
+        return ServiceKind.CLUSTER;
     }
 
     /**

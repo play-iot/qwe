@@ -15,19 +15,18 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class CircuitBreakerInvoker implements Supplier<CircuitBreaker> {
+public final class CircuitBreakerWrapper implements Supplier<CircuitBreaker> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CircuitBreakerInvoker.class);
+    private static final Logger logger = LoggerFactory.getLogger(CircuitBreakerWrapper.class);
 
     private final CircuitBreaker circuitBreaker;
 
-    static CircuitBreakerInvoker create(Vertx vertx, CircuitBreakerConfig cfg) {
+    static CircuitBreakerWrapper create(Vertx vertx, CircuitBreakerConfig cfg) {
         if (cfg.isEnabled()) {
-            logger.info("Circuit Breaker Config : {}", cfg.toJson().encode());
-            return new CircuitBreakerInvoker(CircuitBreaker.create(cfg.getCircuitName(), vertx, cfg.getOptions()));
+            return new CircuitBreakerWrapper(CircuitBreaker.create(cfg.getCircuitName(), vertx, cfg.getOptions()));
         }
         logger.info("Skip setup circuit breaker");
-        return new CircuitBreakerInvoker(null);
+        return new CircuitBreakerWrapper(null);
     }
 
     @Override
@@ -39,7 +38,7 @@ public final class CircuitBreakerInvoker implements Supplier<CircuitBreaker> {
         if (Objects.isNull(circuitBreaker)) {
             return command;
         }
-        return get().execute(event -> event.handle(command));
+        return get().execute(command::onComplete);
     }
 
 }

@@ -18,9 +18,7 @@ import io.github.zero88.utils.Functions;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
@@ -28,7 +26,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceReference;
-import io.vertx.servicediscovery.Status;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.HasSharedData;
@@ -39,71 +36,45 @@ import io.zero88.qwe.exceptions.DataNotFoundException;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.client.HttpClientDelegate;
-import io.zero88.qwe.micro.MicroConfig.BackendConfig;
 import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
-import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
-import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
 import io.zero88.qwe.micro.servicetype.EventMessageService;
 import io.zero88.qwe.micro.type.ServiceKind;
+import io.zero88.qwe.utils.Networks;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract class ServiceDiscoveryInvoker implements Supplier<ServiceDiscovery>, HasSharedData {
+public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>, HasSharedData {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceDiscoveryInvoker.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDiscoveryWrapper.class);
     @Getter
     @Accessors(fluent = true)
     private final SharedDataLocalProxy sharedData;
-    @Getter(value = AccessLevel.PACKAGE)
-    protected final ServiceDiscoveryConfig config;
     private final ServiceDiscovery sd;
-    private final CircuitBreakerInvoker cb;
+    @Getter(value = AccessLevel.PACKAGE)
+    private final CircuitBreakerWrapper cb;
     private final Map<String, Record> registrationMap = new ConcurrentHashMap<>();
 
-    static ServiceDiscovery createServiceDiscovery(Vertx vertx, ServiceDiscoveryConfig config, ServiceKind kind,
-                                                   Predicate<Vertx> predicate) {
-        if (!config.isEnabled() || !predicate.test(vertx)) {
-            logger.info("Skip setup {} Service Discovery", kind);
-            return null;
-        }
-        logger.info("{} Service Discovery Config : {}", kind, config.toJson().encode());
-        config.reloadProperty();
-        logger.debug("{} Service Discovery | {} | {}", kind, BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND,
-                     System.getProperty(BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND));
-        return ServiceDiscovery.create(vertx, config);
+    ServiceDiscoveryWrapper(SharedDataLocalProxy sharedData, ServiceDiscoveryConfig config, CircuitBreakerWrapper cb) {
+        this.sharedData = sharedData;
+        this.cb = cb;
+        this.sd = ServiceDiscovery.create(sharedData.getVertx(), config);
     }
 
-    abstract <T extends ServiceGatewayAnnounceMonitor> void subscribe(EventBus eventBus, @NonNull T announceMonitor);
-
-    abstract <T extends ServiceGatewayUsageMonitor> void subscribe(EventBus eventBus, @NonNull T usageMonitor);
-
-    abstract ServiceKind kind();
-
-    abstract String computeINet(String host);
-
-    final void subscribe(Vertx vertx, String announceMonitorClass, String usageMonitorClass) {
-        subscribe(vertx.eventBus(), ServiceGatewayAnnounceMonitor.create(sharedData, this, announceMonitorClass));
-        subscribe(vertx.eventBus(), ServiceGatewayUsageMonitor.create(sharedData, this, usageMonitorClass));
+    ServiceKind kind() {
+        return ServiceKind.CLUSTER;
     }
 
-    // TODO: find better way instead force rescan in every register call
-    final void rescanService(EventBus eventBus) {
-        eventBus.send(config.getAnnounceAddress(), new JsonObject().put("status", Status.UNKNOWN));
-    }
-
-    public boolean isEnabled() {
-        return config.isEnabled();
+    String computeINet(String host) {
+        return Networks.computeNATAddress(host);
     }
 
     @Override
     public ServiceDiscovery get() {
-        return Objects.requireNonNull(sd, kind() + " Service Discovery is not enabled");
+        return Objects.requireNonNull(sd, "Service Discovery is not enabled");
     }
 
     Future<Void> unregister() {
@@ -121,18 +92,18 @@ public abstract class ServiceDiscoveryInvoker implements Supplier<ServiceDiscove
         return addDecoratorRecord(decorator(record));
     }
 
-    public Future<Record> addHttpRecord(String name, HttpLocation location, JsonObject metadata) {
+    public Future<Record> addRecord(String name, HttpLocation location, JsonObject metadata) {
         Record record = HttpEndpoint.createRecord(name, location.isSsl(), computeINet(location.getHost()),
                                                   location.getPort(), location.getRoot(), metadata);
         return addDecoratorRecord(record);
     }
 
-    public Future<Record> addEventMessageRecord(String name, String address, EventMethodDefinition definition) {
+    public Future<Record> addRecord(String name, String address, EventMethodDefinition definition) {
         return addDecoratorRecord(EventMessageService.createRecord(name, address, definition));
     }
 
-    public Future<Record> addEventMessageRecord(String name, String address, EventMethodDefinition definition,
-                                                JsonObject metadata) {
+    public Future<Record> addRecord(String name, String address, EventMethodDefinition definition,
+                                    JsonObject metadata) {
         return addDecoratorRecord(EventMessageService.createRecord(name, address, definition, metadata));
     }
 
@@ -226,12 +197,12 @@ public abstract class ServiceDiscoveryInvoker implements Supplier<ServiceDiscove
     private Future<Record> addDecoratorRecord(@NonNull Record record) {
         return get().publish(record).onSuccess(rec -> {
             registrationMap.put(rec.getRegistration(), rec);
-            logger.info("Published {} Service | Registration: {} | API: {} | Type: {} | Endpoint: {}", kind(),
+            logger.info("Published Service | Registration[{}] | API[{}] | Type[{}] | Endpoint[{}]",
                         rec.getRegistration(), rec.getName(), rec.getType(), rec.getLocation().getString("endpoint"));
             if (logger.isTraceEnabled()) {
                 logger.trace("Published {} Service: {}", kind(), rec.toJson());
             }
-        }).onFailure(t -> logger.error("Cannot publish {} record: {}", kind(), record.toJson(), t));
+        }).onFailure(t -> logger.error("Cannot publish record[{}]", record.toJson(), t));
     }
 
     private Record decorator(Record record) {

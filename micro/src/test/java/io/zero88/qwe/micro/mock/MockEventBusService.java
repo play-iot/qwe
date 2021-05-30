@@ -7,16 +7,16 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 @ProxyGen
-public interface MockEventbusService {
+public interface MockEventBusService {
 
     String SERVICE_ADDRESS = "qwe.micro.mock.MockEventbusService";
 
     String SERVICE_NAME = "mock-eventbus";
 
     @Fluent
-    MockEventbusService get(Handler<AsyncResult<JsonObject>> resultHandler);
+    MockEventBusService get(Handler<AsyncResult<JsonObject>> resultHandler);
 
     @Fluent
-    MockEventbusService post(String data, Handler<AsyncResult<JsonObject>> resultHandler);
+    MockEventBusService post(String data, Handler<AsyncResult<JsonObject>> resultHandler);
 
 }

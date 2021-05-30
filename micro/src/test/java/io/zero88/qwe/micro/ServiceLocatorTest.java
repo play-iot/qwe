@@ -117,9 +117,10 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
         final Async async = context.async();
         final String dataKey = status == Status.FAILED ? "error" : "data";
         final JsonObject resp = new JsonObject().put("status", status)
-                                                .put("action", action.action())
+                                                .put("action", EventAction.REPLY.action())
+                                                .put("prevAction", action.action())
                                                 .put(dataKey, expected);
-        eventbus.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData))
+        ebClient.request(config.getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData))
                 .onSuccess(msg -> JsonHelper.assertJson(context, async, resp, msg.toJson(), JSONCompareMode.LENIENT));
     }
 

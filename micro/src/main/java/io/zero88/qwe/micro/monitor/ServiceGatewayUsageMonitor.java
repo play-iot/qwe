@@ -1,34 +1,42 @@
 package io.zero88.qwe.micro.monitor;
 
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 
 import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class ServiceGatewayUsageMonitor extends AbstractServiceGatewayMonitor {
+public class ServiceGatewayUsageMonitor extends AbstractServiceGatewayMonitor<UsageInfo> {
 
     protected ServiceGatewayUsageMonitor(@NonNull SharedDataLocalProxy sharedData,
-                                         @NonNull ServiceDiscoveryInvoker controller) {
+                                         @NonNull ServiceDiscoveryWrapper controller) {
         super(sharedData, controller);
     }
 
     @SuppressWarnings("unchecked")
     public static <T extends ServiceGatewayUsageMonitor> T create(SharedDataLocalProxy sharedData,
-                                                                  ServiceDiscoveryInvoker controller,
+                                                                  ServiceDiscoveryWrapper controller,
                                                                   String className) {
         return (T) ServiceGatewayMonitor.create(sharedData, controller, className, ServiceGatewayUsageMonitor.class);
     }
 
     @Override
-    public void handle(Message<Object> message) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("SERVICE USAGE GATEWAY::Receive message from: '{}' - Headers: '{}' - Body: '{}'",
-                         message.address(), message.headers(), message.body());
-        }
+    String function() {
+        return "SERVICE USAGE GATEWAY";
+    }
+
+    @Override
+    protected UsageInfo parse(Message<Object> message) {
+        return UsageInfo.parse((JsonObject) trace(message).body());
+    }
+
+    @Override
+    protected void process(UsageInfo record) {
+
     }
 
 }

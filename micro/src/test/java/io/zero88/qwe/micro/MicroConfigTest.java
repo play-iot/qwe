@@ -1,16 +1,13 @@
 package io.zero88.qwe.micro;
 
-import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.QWEConfig;
-import io.zero88.qwe.QWEAppConfig;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.IConfig;
-import io.zero88.qwe.micro.MicroConfig.BackendConfig;
-import io.zero88.qwe.micro.MicroConfig.LocalServiceDiscoveryConfig;
+import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.QWEAppConfig;
+import io.zero88.qwe.QWEConfig;
 import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
 
 public class MicroConfigTest {
@@ -18,77 +15,49 @@ public class MicroConfigTest {
     @Test
     public void test_default() {
         MicroConfig def = new MicroConfig();
-        Assertions.assertTrue(def.getDiscoveryConfig().isEnabled());
         Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_ANNOUNCE_ADDRESS,
                                 def.getDiscoveryConfig().getAnnounceAddress());
         Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_ADDRESS,
                                 def.getDiscoveryConfig().getUsageAddress());
-        Assertions.assertFalse(def.getDiscoveryConfig().isLocal());
-
-        Assertions.assertFalse(def.getLocalDiscoveryConfig().isEnabled());
-        Assertions.assertEquals(LocalServiceDiscoveryConfig.SERVICE_DISCOVERY_ANNOUNCE_LOCAL_ADDRESS,
-                                def.getLocalDiscoveryConfig().getAnnounceAddress());
-        Assertions.assertEquals(LocalServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_LOCAL_ADDRESS,
-                                def.getLocalDiscoveryConfig().getUsageAddress());
-        Assertions.assertTrue(def.getLocalDiscoveryConfig().isLocal());
 
         Assertions.assertFalse(def.getCircuitConfig().isEnabled());
-        System.out.println(def.toJson());
+        System.out.println(def.toJson().encodePrettily());
     }
 
     @Test
-    public void test_parse() throws JSONException {
+    public void test_parse() {
         MicroConfig from = IConfig.fromClasspath("micro.json", MicroConfig.class);
-        JSONAssert.assertEquals(new MicroConfig().toJson().encode(), from.toJson().encode(), JSONCompareMode.STRICT);
+        JsonHelper.assertJson(new MicroConfig().toJson(), from.toJson());
     }
 
     @Test
-    public void test_parse_from_root() throws JSONException {
-        MicroConfig fromRoot = IConfig.from(IConfig.fromClasspath("micro.json", QWEConfig.class),
-                                            MicroConfig.class);
+    public void test_parse_from_root() {
+        MicroConfig fromRoot = IConfig.from(IConfig.fromClasspath("micro.json", QWEConfig.class), MicroConfig.class);
         MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
-        System.out.println(fromRoot.toJson());
-        System.out.println(fromMicro.toJson());
-        JSONAssert.assertEquals(fromRoot.toJson().encode(), fromMicro.toJson().encode(), JSONCompareMode.STRICT);
+        JsonHelper.assertJson(fromRoot.toJson(), fromMicro.toJson());
     }
 
     @Test
-    public void test_parse_from_appConfig() throws JSONException {
+    public void test_parse_from_appConfig() {
         MicroConfig fromApp = IConfig.from(IConfig.fromClasspath("micro.json", QWEAppConfig.class), MicroConfig.class);
         MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
         System.out.println(fromApp.toJson());
         System.out.println(fromMicro.toJson());
-        JSONAssert.assertEquals(fromMicro.toJson().encode(), fromApp.toJson().encode(), JSONCompareMode.STRICT);
+        JsonHelper.assertJson(fromMicro.toJson(), fromApp.toJson());
     }
 
     @Test
-    public void test_reload_backend() {
-        MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
-        Assertions.assertFalse(fromMicro.getDiscoveryConfig().isLocal());
-        fromMicro.getDiscoveryConfig().reloadProperty();
-        Assertions.assertFalse(
-            Boolean.parseBoolean(System.getProperty(BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND)));
-
-        Assertions.assertTrue(fromMicro.getLocalDiscoveryConfig().isLocal());
-        fromMicro.getLocalDiscoveryConfig().reloadProperty();
-        Assertions.assertTrue(
-            Boolean.parseBoolean(System.getProperty(BackendConfig.DEFAULT_SERVICE_DISCOVERY_BACKEND)));
-    }
-
-    @Test
-    public void test_merge() throws JSONException {
+    public void test_merge() {
         MicroConfig config = IConfig.fromClasspath("micro.json", MicroConfig.class)
-                                    .merge(IConfig.from("{\"serviceName\": \"cookco\",\"__serviceDiscovery__" +
-                                                        "\":{\"announceAddress\":\"x\"," +
+                                    .merge(IConfig.from("{\"__serviceDiscovery__\":{\"announceAddress\":\"x\"," +
                                                         "\"backendConfiguration\":{\"backend-name\":\"a\"," +
                                                         "\"local\":false,\"more\":\"test\"},\"usageAddress\":\"y\"}}",
                                                         MicroConfig.class));
         System.out.println(config.toJson().encodePrettily());
-        Assertions.assertEquals("cookco", config.getServiceName());
         Assertions.assertEquals("x", config.getDiscoveryConfig().getAnnounceAddress());
         Assertions.assertEquals("y", config.getDiscoveryConfig().getUsageAddress());
-        JSONAssert.assertEquals("{\"backend-name\":\"a\"," + "\"local\":false, \"more\": \"test\"}",
-                                config.getDiscoveryConfig().getBackendConfiguration().encode(), JSONCompareMode.STRICT);
+        JsonHelper.assertJson(new JsonObject("{\"backend-name\":\"a\",\"local\":false, \"more\": \"test\"}"),
+                              config.getDiscoveryConfig().getBackendConfiguration());
     }
 
 }

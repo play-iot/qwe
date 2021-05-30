@@ -22,13 +22,13 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
     @Before
     public void setup(TestContext context) {
         super.setup(context);
-        eventbus.register(EVENT_ADDRESS_1, new MockServiceListener());
+        ebClient.register(EVENT_ADDRESS_1, new MockServiceListener());
     }
 
     @Test
     public void test_get_not_found_service(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), eventbus,
+        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1 + "...");
         invoker.execute(EventAction.CREATE, RequestData.builder().build()).onSuccess(d -> {
             System.out.println(d);
@@ -48,7 +48,7 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
     @Test
     public void test_get_not_found_action(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), eventbus,
+        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1);
         invoker.execute(EventAction.UNKNOWN, RequestData.builder().build()).onSuccess(d -> {
             System.out.println(d);
@@ -68,7 +68,7 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
     @Test
     public void test_execute_service_failed(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), eventbus,
+        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1);
         invoker.execute(EventAction.UPDATE, RequestData.builder().build())
                .onSuccess(d -> JsonHelper.assertJson(context, async,
@@ -80,7 +80,7 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
     @Test
     public void test_execute_service_success(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), eventbus,
+        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1);
         final JsonObject expected = new JsonObject().put(Headers.X_REQUEST_BY, "service/" + invoker.requester())
                                                     .put("action", EventAction.CREATE.action());

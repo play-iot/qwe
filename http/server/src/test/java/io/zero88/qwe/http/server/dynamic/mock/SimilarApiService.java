@@ -10,7 +10,7 @@ import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.micro.MicroContext;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
 
 public class SimilarApiService extends MockEventOneApiOneLocService {
 
@@ -30,12 +30,12 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
 
     @Override
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryInvoker discovery = microContext.getLocalInvoker();
-        CompositeFuture.all(discovery.addEventMessageRecord("ems-5", EVENT_1.getAddress(),
-                                                            EventMethodDefinition.createDefault("/client/:cId/site",
+        final ServiceDiscoveryWrapper discovery = microContext.getDiscovery();
+        CompositeFuture.all(discovery.addRecord("ems-5", EVENT_1.getAddress(),
+                                                EventMethodDefinition.createDefault("/client/:cId/site",
                                                                                                 "/:sId")),
-                            discovery.addEventMessageRecord("ems-5", EVENT_2.getAddress(),
-                                                            EventMethodDefinition.createDefault(
+                            discovery.addRecord("ems-5", EVENT_2.getAddress(),
+                                                EventMethodDefinition.createDefault(
                                                                 "/client/:cId/site/:sId/product", "/:pId")))
                        .onComplete(ar -> ar.succeeded());
     }

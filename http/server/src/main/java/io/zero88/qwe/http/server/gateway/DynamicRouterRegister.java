@@ -29,7 +29,7 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLog
         return LoggerFactory.getLogger(RouterCreator.class);
     }
 
-    default boolean register(Record record) {
+    default boolean registerRouter(Record record) {
         try {
             DynamicRestApi api = DynamicRestApi.create(record);
             ServerInfo serverInfo = sharedData().getData(HttpServer.SERVER_INFO_DATA_KEY);
@@ -43,7 +43,7 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLog
                                     .collect(Collectors.toList());
             if (record.getStatus() == Status.UP) {
                 DynamicContextDispatcher<DynamicRestApi> handler = DynamicContextDispatcher.create(api, gatewayPath,
-                                                                                                   getInvoker());
+                                                                                                   getDiscovery());
                 paths.forEach(path -> {
                     log().info(decor("Enable dynamic route | API: {} | Order: {} | Path: {}"), api.name(),
                                api.order(), path);

@@ -14,14 +14,14 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.handler.DynamicContextDispatcher.AbstractDynamicContextDispatcher;
 import io.zero88.qwe.http.server.rest.api.DynamicEventRestApi;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.servicetype.EventMessageService;
 
 public final class DynamicEventApiDispatcher<T extends DynamicEventRestApi>
     extends AbstractDynamicContextDispatcher<T> {
 
-    DynamicEventApiDispatcher(T api, String gatewayPath, ServiceDiscoveryInvoker dispatcher) {
+    DynamicEventApiDispatcher(T api, String gatewayPath, ServiceDiscoveryWrapper dispatcher) {
         super(api, gatewayPath, dispatcher);
     }
 

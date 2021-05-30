@@ -4,6 +4,7 @@ import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
@@ -18,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 class Pusher implements EventMessagePusher {
 
     @NonNull
-    private final EventBusClient eventbus;
+    private final SharedDataLocalProxy sharedData;
     @NonNull
     private final EventMethodDefinition definition;
     @NonNull
@@ -37,7 +38,9 @@ class Pusher implements EventMessagePusher {
         //                                                    (msg)))
         //                                                     .exception(errorConsumer)
         //                                                     .build();
-        return eventbus.request(address, EventMessage.initial(action, requestData), options).map(ResponseData::from);
+        return EventBusClient.create(sharedData)
+                             .request(address, EventMessage.initial(action, requestData), options)
+                             .map(ResponseData::from);
     }
 
 }

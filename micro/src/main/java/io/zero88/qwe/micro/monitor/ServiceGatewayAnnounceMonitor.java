@@ -1,41 +1,43 @@
 package io.zero88.qwe.micro.monitor;
 
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
-import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 
 import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class ServiceGatewayAnnounceMonitor extends AbstractServiceGatewayMonitor {
+public class ServiceGatewayAnnounceMonitor extends AbstractServiceGatewayMonitor<Record> {
 
     protected ServiceGatewayAnnounceMonitor(@NonNull SharedDataLocalProxy proxy,
-                                            @NonNull ServiceDiscoveryInvoker controller) {
-        super(proxy, controller);
+                                            @NonNull ServiceDiscoveryWrapper invoker) {
+        super(proxy, invoker);
     }
 
     @SuppressWarnings("unchecked")
     public static <T extends ServiceGatewayAnnounceMonitor> T create(SharedDataLocalProxy proxy,
-                                                                     ServiceDiscoveryInvoker controller,
+                                                                     ServiceDiscoveryWrapper wrapper,
                                                                      String className) {
-        return (T) ServiceGatewayMonitor.create(proxy, controller, className, ServiceGatewayAnnounceMonitor.class);
+        return (T) ServiceGatewayMonitor.create(proxy, wrapper, className, ServiceGatewayAnnounceMonitor.class);
     }
 
-    protected void handle(Record record) { }
+    @Override
+    protected Record parse(Message<Object> message) {
+        return new Record((JsonObject) trace(message).body());
+    }
 
     @Override
-    public final void handle(Message<Object> message) {
-        String msg = "SERVICE ANNOUNCEMENT GATEWAY::Receive message from:";
-        logger.info("{} '{}'", msg, message.address());
-        if (logger.isTraceEnabled()) {
-            logger.trace("{} '{}' - Headers: '{}' - Body: '{}'", msg, message.address(), message.headers(),
-                         message.body());
-        }
-        handle(new Record((JsonObject) message.body()));
+    String function() {
+        return "SERVICE ANNOUNCEMENT GATEWAY";
+    }
+
+    @Override
+    protected void process(Record record) {
+
     }
 
 }

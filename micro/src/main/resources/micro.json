@@ -4,26 +4,12 @@
       "__gateway__": {
         "enabled": false,
         "indexAddress": "qwe.service.gateway.index",
-        "clusterAnnounceMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
-        "clusterUsageMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor",
-        "localAnnounceMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
-        "localUsageMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor"
+        "announceMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
+        "usageMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor"
       },
       "__serviceDiscovery__": {
         "announceAddress": "qwe.service.discovery.announce",
-        "backendConfig": {
-          "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
-        },
-        "usageAddress": "qwe.service.discovery.usage",
-        "enabled": true
-      },
-      "__localServiceDiscovery__": {
-        "announceAddress": "qwe.service.local.discovery.announce",
-        "backendConfig": {
-          "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
-        },
-        "usageAddress": "qwe.service.local.discovery.usage",
-        "enabled": false
+        "backendClass": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
       },
       "__circuitBreaker__": {
         "enabled": false,

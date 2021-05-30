@@ -41,7 +41,7 @@ public final class MockServiceInvoker implements GatewayServiceInvoker {
 
     @Override
     public @NonNull SharedDataLocalProxy sharedData() {
-        return null;
+        return client.sharedData();
     }
 
 }

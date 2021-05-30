@@ -7,19 +7,7 @@
       },
       "__serviceDiscovery__": {
         "announceAddress": "qwe.service.discovery.announce",
-        "backendConfig": {
-          "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
-        },
-        "usageAddress": "qwe.service.discovery.usage",
-        "enabled": false
-      },
-      "__localServiceDiscovery__": {
-        "announceAddress": "qwe.service.local.discovery.announce",
-        "backendConfig": {
-          "className": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
-        },
-        "usageAddress": "qwe.service.local.discovery.usage",
-        "enabled": true
+        "usageAddress": "qwe.service.discovery.usage"
       },
       "__circuitBreaker__": {
         "enabled": true,
@@ -30,7 +18,7 @@
           "resetTimeout": 30000,
           "notificationAddress": "qwe.circuit.breaker",
           "notificationPeriod": 2000,
-          "maxRetries": 0,
+          "maxRetries": 1,
           "metricsRollingWindow": 10000,
           "metricsRollingBuckets": 10,
           "failuresRollingWindow": 10000
