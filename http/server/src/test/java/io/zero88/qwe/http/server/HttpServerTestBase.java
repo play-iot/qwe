@@ -1,6 +1,7 @@
 package io.zero88.qwe.http.server;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +48,7 @@ import io.zero88.qwe.http.server.ws.WebSocketEventMessage;
 import lombok.NonNull;
 
 @RunWith(VertxUnitRunner.class)
-public abstract class HttpServerTestBase {
+public abstract class HttpServerTestBase implements ComponentTestHelper {
 
     protected static final String DEFAULT_HOST = "127.0.0.1";
 
@@ -59,7 +60,12 @@ public abstract class HttpServerTestBase {
     protected RequestOptions requestOptions;
 
     @BeforeClass
-    public static void beforeSuite() throws Exception { TestHelper.setup(); }
+    public static void beforeSuite() { TestHelper.setup(); }
+
+    @Override
+    public Path testDir() {
+        return folder.getRoot().toPath();
+    }
 
     @Before
     public void before(TestContext context) throws IOException {
@@ -139,13 +145,11 @@ public abstract class HttpServerTestBase {
     }
 
     protected HttpServer startServer(TestContext context, HttpServerRouter httpRouter) {
-        return ComponentTestHelper.deploy(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter),
-                                          folder.getRoot().toPath());
+        return deploy(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter));
     }
 
-    protected void startServer(TestContext context, HttpServerRouter httpRouter, Handler<Throwable> consumer) {
-        ComponentTestHelper.deployFailed(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter),
-                                         consumer);
+    protected void startServer(TestContext context, HttpServerRouter httpRouter, Consumer<Throwable> consumer) {
+        deployFailed(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter), consumer);
     }
 
     protected JsonObject notFoundResponse(int port, String path) {
@@ -166,7 +170,7 @@ public abstract class HttpServerTestBase {
     }
 
     protected void assertJsonData(Async async, String address, Consumer<Object> asserter) {
-        EventBusHelper.assertReceivedData(vertx, async, address, asserter, closeClient());
+        EventBusHelper.registerAssertReceivedData(vertx, async, address, asserter, closeClient());
     }
 
     protected WebSocket setupSockJsClient(TestContext context, Async async, Consumer<Throwable> error)

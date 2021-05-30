@@ -1,5 +1,7 @@
 package io.zero88.qwe;
 
+import java.util.function.Consumer;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,7 +14,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.impl.Deployment;
 import io.vertx.core.impl.VertxImpl;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -25,7 +26,7 @@ import ch.qos.logback.classic.Logger;
 public class ApplicationVerticleTest {
 
     private Vertx vertx;
-    private MockApplication application;
+    private MockApplication app;
 
     @BeforeClass
     public static void beforeSuite() {
@@ -36,7 +37,7 @@ public class ApplicationVerticleTest {
     @Before
     public void before() {
         vertx = Vertx.vertx();
-        application = new MockApplication();
+        app = new MockApplication();
     }
 
     @Test
@@ -44,9 +45,7 @@ public class ApplicationVerticleTest {
         Async async = context.async(2);
         addDummyUnit();
         addMockUnit();
-        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
-        VertxHelper.deploy(vertx, context, new DeploymentOptions().setWorkerPoolSize(15), application, deployId -> {
-            context.assertNotNull(deployId);
+        Consumer<String> asserter = deployId -> {
             TestHelper.testComplete(async);
             Assert.assertEquals(3, vertx.deploymentIDs().size());
             vertx.deploymentIDs()
@@ -58,35 +57,43 @@ public class ApplicationVerticleTest {
                      Assert.assertEquals(7, opt.getWorkerPoolSize());
                      Assert.assertTrue(opt.getWorkerPoolName().startsWith(Application.DEFAULT_COMPONENT_THREAD_PREFIX));
                  });
-        });
+        };
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .verticle(app.onCompleted(i -> TestHelper.testComplete(async)))
+                                                        .options(new DeploymentOptions().setWorkerPoolSize(15))
+                                                        .successAsserter(asserter)
+                                                        .build());
     }
 
     @Test
     public void test_use_deployment_option_from_component(TestContext context) {
         Async async = context.async(2);
         addDummyUnit();
-        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
-        JsonObject config = new QWEAppConfig().put(new MockConfig().deploymentKey(),
-                                                   new DeploymentOptions().setHa(true)
-                                                                          .setWorkerPoolSize(3)
-                                                                          .setWorkerPoolName("test")
-                                                                          .toJson()).toJson();
-        VertxHelper.deploy(vertx, context, new DeploymentOptions().setConfig(config), application,
-                           deployId -> {
-                               context.assertNotNull(deployId);
-                               TestHelper.testComplete(async);
-                               Assert.assertEquals(2, vertx.deploymentIDs().size());
-                               vertx.deploymentIDs()
-                                    .stream()
-                                    .map(id -> ((VertxImpl) vertx).getDeployment(id))
-                                    .filter(Deployment::isChild)
-                                    .map(Deployment::deploymentOptions)
-                                    .forEach(opt -> {
-                                        Assert.assertTrue(opt.isHa());
-                                        Assert.assertEquals(3, opt.getWorkerPoolSize());
-                                        Assert.assertEquals("test", opt.getWorkerPoolName());
-                                    });
-                           });
+        QWEAppConfig config = new QWEAppConfig().put(new MockConfig().deploymentKey(),
+                                                     new DeploymentOptions().setHa(true)
+                                                                            .setWorkerPoolSize(3)
+                                                                            .setWorkerPoolName("test")
+                                                                            .toJson());
+        Consumer<String> asserter = deployId -> {
+            context.assertNotNull(deployId);
+            TestHelper.testComplete(async);
+            Assert.assertEquals(2, vertx.deploymentIDs().size());
+            vertx.deploymentIDs()
+                 .stream()
+                 .map(id -> ((VertxImpl) vertx).getDeployment(id))
+                 .filter(Deployment::isChild)
+                 .map(Deployment::deploymentOptions)
+                 .forEach(opt -> {
+                     Assert.assertTrue(opt.isHa());
+                     Assert.assertEquals(3, opt.getWorkerPoolSize());
+                     Assert.assertEquals("test", opt.getWorkerPoolName());
+                 });
+        };
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .verticle(app.onCompleted(i -> TestHelper.testComplete(async)))
+                                                        .options(new DeploymentOptions().setConfig(config.toJson()))
+                                                        .successAsserter(asserter)
+                                                        .build());
     }
 
     @Test
@@ -94,12 +101,13 @@ public class ApplicationVerticleTest {
         Async async = context.async(2);
         addDummyUnit();
         addDummyUnit();
-        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
-        VertxHelper.deploy(vertx, context, new DeploymentOptions(), application, deployId -> {
-            context.assertNotNull(deployId);
-            TestHelper.testComplete(async);
-            Assert.assertEquals(2, vertx.deploymentIDs().size());
-        });
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .verticle(app.onCompleted(i -> TestHelper.testComplete(async)))
+                                                        .successAsserter(deployId -> {
+                                                            TestHelper.testComplete(async);
+                                                            Assert.assertEquals(2, vertx.deploymentIDs().size());
+                                                        })
+                                                        .build());
     }
 
     @Test
@@ -107,17 +115,18 @@ public class ApplicationVerticleTest {
         Async async = context.async(2);
         addDummyUnit();
         addMockUnit();
-        application.setOnCompletedHandler(lookup -> TestHelper.testComplete(async));
-        VertxHelper.deploy(vertx, context, new DeploymentOptions(), application, deployId -> {
-            context.assertNotNull(deployId);
-            TestHelper.testComplete(async);
-            Assert.assertEquals(3, vertx.deploymentIDs().size());
-        });
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .verticle(app.onCompleted(i -> TestHelper.testComplete(async)))
+                                                        .successAsserter(i -> {
+                                                            TestHelper.testComplete(async);
+                                                            Assert.assertEquals(3, vertx.deploymentIDs().size());
+                                                        })
+                                                        .build());
     }
 
     @Test
     public void test_cannot_start_coz_throw_exception_onStart(TestContext context) {
-        application.setErrorOnStart(true);
+        app.errorOnStart(true);
         addDummyUnit();
         assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting"));
     }
@@ -132,18 +141,17 @@ public class ApplicationVerticleTest {
     @Test
     public void test_start_but_throw_exception_onInstallCompleted(TestContext context) {
         Async async = context.async();
-        application.setErrorOnCompleted(true);
         addDummyUnit();
-        VertxHelper.deploy(vertx, context, new DeploymentOptions(), application, deployId -> {
-            context.assertNotNull(deployId);
-            TestHelper.testComplete(async);
-            Assert.assertEquals(2, vertx.deploymentIDs().size());
-        });
+        VertxHelper.deploy(vertx, context,
+                           DeployContext.builder().verticle(app.errorOnCompleted(true)).successAsserter(i -> {
+                               TestHelper.testComplete(async);
+                               Assert.assertEquals(2, vertx.deploymentIDs().size());
+                           }).build());
     }
 
     private void assertDeployError(TestContext context, Throwable error) {
         Async async = context.async();
-        VertxHelper.deployFailed(vertx, context, new DeploymentOptions(), application, t -> {
+        VertxHelper.deploy(vertx, context, DeployContext.builder().verticle(app).failedAsserter(t -> {
             try {
                 Assert.assertTrue(error.getClass().isInstance(t));
                 Assert.assertEquals(error.getMessage(), t.getMessage());
@@ -151,7 +159,7 @@ public class ApplicationVerticleTest {
             } finally {
                 TestHelper.testComplete(async);
             }
-        });
+        }).build());
     }
 
     private void addMockUnit() {
@@ -163,11 +171,11 @@ public class ApplicationVerticleTest {
     }
 
     private void addMockUnit(boolean error) {
-        application.addProvider(new MockProvider(error));
+        app.addProvider(new MockProvider(error));
     }
 
     private void addDummyUnit() {
-        application.addProvider(new DummyProvider());
+        app.addProvider(new DummyProvider());
     }
 
     @After

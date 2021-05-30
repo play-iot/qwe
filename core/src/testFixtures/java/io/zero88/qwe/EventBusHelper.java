@@ -39,12 +39,12 @@ public interface EventBusHelper {
         return context.asyncAssertSuccess(result -> bodyAsserter.handle((JsonObject) result.body()));
     }
 
-    static void assertReceivedData(Vertx vertx, Async async, String address, Consumer<Object> assertData) {
-        assertReceivedData(vertx, async, address, assertData, null);
+    static void registerAssertReceivedData(Vertx vertx, Async async, String address, Consumer<Object> assertData) {
+        registerAssertReceivedData(vertx, async, address, assertData, null);
     }
 
-    static void assertReceivedData(Vertx vertx, Async async, String address, Consumer<Object> assertData,
-                                   Handler<Void> testCompleted) {
+    static void registerAssertReceivedData(Vertx vertx, Async async, String address, Consumer<Object> assertData,
+                                           Handler<Void> testCompleted) {
         MessageConsumer<Object> consumer = vertx.eventBus().consumer(address);
         consumer.handler(event -> {
             System.out.println("Received message from address: " + address);

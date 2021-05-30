@@ -1,61 +1,67 @@
 package io.zero88.qwe;
 
 import java.nio.file.Path;
-import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.junit5.VertxTestContext;
 
-@SuppressWarnings( {"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public interface ComponentTestHelper {
 
-    static <T extends Component> SharedDataLocalProxy createSharedData(Vertx vertx, Class<T> aClass) {
-        return SharedDataLocalProxy.create(vertx, aClass.getName());
+    Path testDir();
+
+    default String sharedKey() {
+        return getClass().getName();
     }
 
-    static <T extends Component> T deploy(Vertx vertx, VertxTestContext context, JsonObject config,
-                                          ComponentProvider<T> provider, Path testDir) throws InterruptedException {
-        final T component = initComponent(vertx, provider, testDir);
-        CountDownLatch latch = new CountDownLatch(1);
-        vertx.deployVerticle(component, new DeploymentOptions().setConfig(config), s -> {
-            latch.countDown();
-            if (s.failed()) {
-                context.failNow(s.cause());
-                return;
-            }
-            setup(component, testDir, provider.componentClass().getName(), s.result());
-            context.completeNow();
-        });
-        latch.await();
-        return component;
+    default SharedDataLocalProxy createSharedData(Vertx vertx) {
+        return SharedDataLocalProxy.create(vertx, sharedKey());
     }
 
-    static <T extends Component> T deploy(Vertx vertx, TestContext context, JsonObject config,
-                                          ComponentProvider<T> provider, Path testDir) {
-        final T component = initComponent(vertx, provider, testDir);
-        return VertxHelper.deploy(vertx, context, new DeploymentOptions().setConfig(config), component,
-                                  TestHelper.TEST_TIMEOUT_SEC,
-                                  s -> setup(component, testDir, provider.componentClass().getName(), s));
+    default <T extends Component> T deploy(Vertx vertx, VertxTestContext context, JsonObject config,
+                                           ComponentProvider<T> provider) {
+        final T verticle = initComponent(vertx, provider);
+        return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
+                                                               .verticle(verticle)
+                                                               .options(new DeploymentOptions().setConfig(config))
+                                                               .successAsserter(id -> {
+                                                                   setup(verticle, id);
+                                                                   context.completeNow();
+                                                               })
+                                                               .build());
     }
 
-    static <T extends Component> T initComponent(Vertx vertx, ComponentProvider<T> provider, Path testDir) {
-        final SharedDataLocalProxy proxy = createSharedData(vertx, provider.componentClass());
-        proxy.addData(SharedDataLocalProxy.APP_DATADIR, testDir.toString());
+    default <T extends Component> T deploy(Vertx vertx, TestContext context, JsonObject config,
+                                           ComponentProvider<T> provider) {
+        final T verticle = initComponent(vertx, provider);
+        return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
+                                                               .verticle(verticle)
+                                                               .options(new DeploymentOptions().setConfig(config))
+                                                               .successAsserter(id -> setup(verticle, id))
+                                                               .build());
+    }
+
+    default <T extends Component> T initComponent(Vertx vertx, ComponentProvider<T> provider) {
+        final SharedDataLocalProxy proxy = createSharedData(vertx);
+        proxy.addData(SharedDataLocalProxy.APP_DATADIR, testDir().toString());
         return provider.provide(proxy);
     }
 
-    static <T extends Component> void deployFailed(Vertx vertx, TestContext context, JsonObject config,
-                                                   ComponentProvider<T> provider, Handler<Throwable> handler) {
-        VertxHelper.deployFailed(vertx, context, new DeploymentOptions().setConfig(config),
-                                 provider.provide(createSharedData(vertx, provider.componentClass())), handler);
+    default <T extends Component> void deployFailed(Vertx vertx, TestContext context, JsonObject config,
+                                                    ComponentProvider<T> provider, Consumer<Throwable> handler) {
+        VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
+                                                        .verticle(provider.provide(createSharedData(vertx)))
+                                                        .options(new DeploymentOptions().setConfig(config))
+                                                        .failedAsserter(handler)
+                                                        .build());
     }
 
-    static <T extends Component> void setup(T comp, Path testDir, String sharedKey, String result) {
-        comp.setup(comp.hook().onSuccess(ComponentContext.create(comp.appName(), testDir, sharedKey, result)));
+    default <T extends Component> void setup(T comp, String result) {
+        comp.setup(comp.hook().onSuccess(ComponentContext.create(comp.appName(), testDir(), sharedKey(), result)));
     }
 
 }

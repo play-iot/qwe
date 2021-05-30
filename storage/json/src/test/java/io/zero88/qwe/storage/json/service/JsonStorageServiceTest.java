@@ -27,15 +27,22 @@ import io.zero88.qwe.storage.json.StorageConfig;
 import io.zero88.qwe.utils.Configs;
 
 @ExtendWith(VertxExtension.class)
-class JsonStorageServiceTest {
+class JsonStorageServiceTest implements ComponentTestHelper {
 
     StorageConfig config;
     EventBusClient client;
+    @TempDir
+    Path tmp;
+
+    @Override
+    public Path testDir() {
+        return tmp;
+    }
 
     @BeforeEach
-    void before(Vertx vertx, VertxTestContext context, @TempDir Path tmp) throws InterruptedException {
+    void before(Vertx vertx, VertxTestContext context) {
         config = StorageConfig.builder().build().makeFullPath(tmp);
-        ComponentTestHelper.deploy(vertx, context, config.toJson(), new JsonStorageProvider(), tmp);
+        deploy(vertx, context, config.toJson(), new JsonStorageProvider());
         client = EventBusClient.create(SharedDataLocalProxy.create(vertx, JsonStorageServiceTest.class.getName()));
     }
 
