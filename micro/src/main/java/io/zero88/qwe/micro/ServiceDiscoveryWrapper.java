@@ -29,12 +29,16 @@ import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.HasSharedData;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
+import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.exceptions.DataNotFoundException;
+import io.zero88.qwe.exceptions.ServiceException;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.client.HttpClientDelegate;
 import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
+import io.zero88.qwe.micro.filter.RecordPredicateFactory;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
 import io.zero88.qwe.utils.Networks;
@@ -167,12 +171,18 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
         return get().getRecord(r -> type.equals(r.getType()) && filter.apply(r)).map(Objects::nonNull);
     }
 
-    public Future<@Nullable Record> find(@NonNull Function<Record, Boolean> filter) {
-        return get().getRecord(filter);
+    public Future<List<Record>> findMany(EventAction action, RequestFilter filter) {
+        logger.debug("Lookup by [{}] filter [{}]", action, filter.toJson());
+        return get().getRecords(RecordPredicateFactory.filter(filter, action));
     }
 
-    public Future<List<Record>> getRecords() {
-        return get().getRecords(r -> true, true);
+    public Future<Record> findOne(RequestFilter filter) {
+        return findMany(EventAction.GET_ONE, filter).map(recs -> recs.stream().reduce((m1, m2) -> {
+            if (m1.equals(m2)) {
+                throw new ServiceException("More than one service by given parameters [" + filter + "]");
+            }
+            return m1;
+        }).orElseThrow(() -> new ServiceNotFoundException("Not found service by given parameters [" + filter + "]")));
     }
 
     public Future<Void> removeRecord(String registration) {
