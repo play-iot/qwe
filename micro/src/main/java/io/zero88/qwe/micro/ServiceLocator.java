@@ -3,9 +3,9 @@ package io.zero88.qwe.micro;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.msg.Filters;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
@@ -13,12 +13,10 @@ import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
-import io.zero88.qwe.micro.filter.RecordPredicate;
+import io.zero88.qwe.micro.filter.RecordPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceLocatorParams;
-import io.zero88.qwe.micro.transfomer.RecordOutput;
-import io.zero88.qwe.micro.transfomer.RecordTransformer;
-import io.zero88.qwe.micro.transfomer.RecordTransformer.RecordView;
-import io.zero88.qwe.micro.type.ServiceKind;
+import io.zero88.qwe.micro.transfomer.RecordTransformer.ViewType;
+import io.zero88.qwe.micro.transfomer.RecordTransformerLoader;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,37 +28,40 @@ public final class ServiceLocator implements EventListener {
     private final ServiceDiscoveryWrapper discovery;
 
     @EBContract(action = "GET_ONE")
-    public Future<JsonObject> get(@NonNull RequestData reqData) {
-        final RequestFilter filter = new RequestFilter(reqData.filter());
+    public Future<JsonObject> get(RequestData reqData) {
+        final RequestFilter filter = getFilter(reqData);
+        final ViewType view = ViewType.parse((String) filter.remove(ServiceLocatorParams.VIEW));
         filter.remove(Filters.PRETTY);
-        filter.remove(ServiceLocatorParams.KIND);
-        final RecordView view = RecordView.parse((String) filter.remove(ServiceLocatorParams.VIEW));
-        final String identifier = Optional.ofNullable(reqData.body())
-                                          .map(body -> body.getString(ServiceLocatorParams.IDENTIFIER))
-                                          .orElse("");
-        filter.put(ServiceLocatorParams.IDENTIFIER, Strings.requireNotBlank(identifier, "Missing record identifier"));
-        return discovery.get()
-                        .getRecord(RecordPredicate.filter(filter, EventAction.GET_ONE))
+        filter.put(ServiceLocatorParams.IDENTIFIER, Optional.ofNullable(reqData)
+                                                            .flatMap(req -> Optional.ofNullable(req.body()))
+                                                            .map(b -> b.getString(ServiceLocatorParams.IDENTIFIER))
+                                                            .orElse(null));
+        logger().debug("Lookup by filter [{}]", filter.toJson());
+        return discovery.find(RecordPredicateFactory.filter(filter, EventAction.GET_ONE))
                         .map(r -> Optional.ofNullable(r)
                                           .orElseThrow(() -> new ServiceNotFoundException(
-                                              "Not found service by given parameters: " + filter)))
-                        .map(RecordTransformer.create(view)::transform)
-                        .map(RecordOutput::toJson);
+                                              "Not found service by given parameters [" + filter + "]")))
+                        .map(r -> transform(r, view));
     }
 
     @EBContract(action = "GET_LIST")
-    public Future<JsonObject> list(@NonNull RequestData requestData) {
-        final RequestFilter filter = new RequestFilter(requestData.filter());
+    public Future<JsonObject> list(RequestData reqData) {
+        final RequestFilter filter = getFilter(reqData);
+        final ViewType view = ViewType.parse((String) filter.remove(ServiceLocatorParams.VIEW));
         filter.remove(Filters.PRETTY);
-        filter.remove(ServiceLocatorParams.KIND);
-        RecordTransformer transformer = RecordTransformer.create(RecordView.END_USER);
+        logger().debug("Lookup by filter [{}]", filter.toJson());
         return discovery.get()
-                        .getRecords(RecordPredicate.filter(filter, EventAction.GET_LIST))
-                        .map(records -> records.stream()
-                                               .map(transformer::transform)
-                                               .map(RecordOutput::toJson)
-                                               .collect(Collectors.toList()))
+                        .getRecords(RecordPredicateFactory.filter(filter, EventAction.GET_LIST))
+                        .map(records -> records.stream().map(r -> transform(r, view)).collect(Collectors.toList()))
                         .map(records -> new JsonObject().put("apis", records));
+    }
+
+    private RequestFilter getFilter(RequestData reqData) {
+        return new RequestFilter(Optional.ofNullable(reqData).map(RequestData::filter).orElseGet(RequestFilter::new));
+    }
+
+    private JsonObject transform(Record record, ViewType view) {
+        return RecordTransformerLoader.instance().lookup(record.getType(), view).transform(record).toJson();
     }
 
 }

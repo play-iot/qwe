@@ -1,23 +1,22 @@
 package io.zero88.qwe.micro.servicetype;
 
-import java.util.Objects;
+import java.util.Optional;
 
-import io.zero88.qwe.http.EventMethodDefinition;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.spi.ServiceType;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 import lombok.NonNull;
 
-public interface EventMessageService extends ServiceType {
+public interface EventMessageHttpService extends ServiceType {
 
     /**
      * Name of the type.
      */
-    String TYPE = "eventbus-message-service";
+    String TYPE = "eventbus-message-http";
     String SHARED_KEY_CONFIG = "sharedKey";
-    String EVENT_METHOD_CONFIG = "eventMethods";
     String DELIVERY_OPTIONS_CONFIG = "options";
 
     static Record createRecord(@NonNull String name, @NonNull String address,
@@ -27,11 +26,10 @@ public interface EventMessageService extends ServiceType {
 
     static Record createRecord(@NonNull String name, @NonNull String address, @NonNull EventMethodDefinition definition,
                                JsonObject metadata) {
-        JsonObject meta = Objects.isNull(metadata) ? new JsonObject() : metadata.copy();
         return new Record().setType(TYPE)
                            .setName(Strings.requireNotBlank(name))
-                           .setMetadata(meta.put(EVENT_METHOD_CONFIG, definition.toJson()))
-                           .setLocation(new JsonObject().put(Record.ENDPOINT, Strings.requireNotBlank(address)));
+                           .setMetadata(Optional.ofNullable(metadata).orElseGet(JsonObject::new))
+                           .setLocation(definition.toJson().put(Record.ENDPOINT, Strings.requireNotBlank(address)));
     }
 
     @Override

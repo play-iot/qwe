@@ -3,6 +3,7 @@ package io.zero88.qwe;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
+import io.github.zero88.utils.UUID64;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -15,7 +16,7 @@ public interface ComponentTestHelper {
     Path testDir();
 
     default String sharedKey() {
-        return getClass().getName();
+        return getClass().getName() + "--" + UUID64.random();
     }
 
     default SharedDataLocalProxy createSharedData(Vertx vertx) {

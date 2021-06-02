@@ -2,10 +2,8 @@ package io.zero88.qwe.micro;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -37,9 +35,8 @@ import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.client.HttpClientDelegate;
 import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
+import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
-import io.zero88.qwe.micro.servicetype.EventMessageService;
-import io.zero88.qwe.micro.type.ServiceKind;
 import io.zero88.qwe.utils.Networks;
 
 import lombok.AccessLevel;
@@ -56,16 +53,11 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
     private final ServiceDiscovery sd;
     @Getter(value = AccessLevel.PACKAGE)
     private final CircuitBreakerWrapper cb;
-    private final Map<String, Record> registrationMap = new ConcurrentHashMap<>();
 
     ServiceDiscoveryWrapper(SharedDataLocalProxy sharedData, ServiceDiscoveryConfig config, CircuitBreakerWrapper cb) {
         this.sharedData = sharedData;
         this.cb = cb;
         this.sd = ServiceDiscovery.create(sharedData.getVertx(), config);
-    }
-
-    ServiceKind kind() {
-        return ServiceKind.CLUSTER;
     }
 
     String computeINet(String host) {
@@ -81,10 +73,10 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
         if (Objects.isNull(sd)) {
             return Future.succeededFuture();
         }
-        return sd.getRecords(r -> registrationMap.containsKey(r.getRegistration()), true)
+        return sd.getRecords(r -> true, true)
                  .flatMap(recs -> CompositeFuture.join(
                      recs.stream().map(r -> sd.unpublish(r.getRegistration())).collect(Collectors.toList())))
-                 .onFailure(t -> logger.warn("Cannot un-published record", t))
+                 .onFailure(t -> logger.warn("Cannot un-published record(s)", t))
                  .mapEmpty();
     }
 
@@ -99,12 +91,12 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
     }
 
     public Future<Record> addRecord(String name, String address, EventMethodDefinition definition) {
-        return addDecoratorRecord(EventMessageService.createRecord(name, address, definition));
+        return addDecoratorRecord(EventMessageHttpService.createRecord(name, address, definition));
     }
 
     public Future<Record> addRecord(String name, String address, EventMethodDefinition definition,
                                     JsonObject metadata) {
-        return addDecoratorRecord(EventMessageService.createRecord(name, address, definition, metadata));
+        return addDecoratorRecord(EventMessageHttpService.createRecord(name, address, definition, metadata));
     }
 
     public Future<ResponseData> executeHttpService(Predicate<Record> filter, String path, HttpMethod method,
@@ -125,7 +117,7 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
                            return Future.succeededFuture();
                        });
                    })
-                   .onFailure(t -> logger.error("Failed when redirect to {}::{}", method, path, t));
+                   .onFailure(t -> logger.error("Failed when redirect [{}::{}]", method, path, t));
     }
 
     public Future<ResponseData> executeEventMessageService(Predicate<Record> filter, String path, HttpMethod method,
@@ -141,15 +133,13 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
     public Future<ResponseData> executeEventMessageService(Predicate<Record> filter, String path, HttpMethod method,
                                                            JsonObject requestData, DeliveryOptions options) {
         //TODO filter by exact path if many paths
-        final Comparator<Record> comparator = Comparator.comparingInt(
-            r -> EventMethodDefinition.from(r.getMetadata().getJsonObject(EventMessageService.EVENT_METHOD_CONFIG))
-                                      .getOrder());
-        return this.findRecord(filter, EventMessageService.TYPE)
-                   .map(recs -> recs.stream().min(comparator).orElseThrow(ServiceNotFoundException::new))
+        Comparator<Record> c = Comparator.comparingInt(r -> EventMethodDefinition.from(r.getLocation()).getOrder());
+        return this.findRecord(filter, EventMessageHttpService.TYPE)
+                   .map(recs -> recs.stream().min(c).orElseThrow(ServiceNotFoundException::new))
                    .flatMap(record -> {
-                       JsonObject config = new JsonObject().put(EventMessageService.SHARED_KEY_CONFIG,
+                       JsonObject config = new JsonObject().put(EventMessageHttpService.SHARED_KEY_CONFIG,
                                                                 sharedData().getSharedKey())
-                                                           .put(EventMessageService.DELIVERY_OPTIONS_CONFIG,
+                                                           .put(EventMessageHttpService.DELIVERY_OPTIONS_CONFIG,
                                                                 Objects.isNull(options) ? null : options.toJson());
                        ServiceReference ref = get().getReferenceWithConfiguration(record, config);
                        Future<ResponseData> command = ref.getAs(EventMessagePusher.class)
@@ -159,7 +149,7 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
                            return Future.succeededFuture();
                        });
                    })
-                   .onFailure(t -> logger.error("Failed when redirect to {} :: {}", method, path, t));
+                   .onFailure(t -> logger.error("Failed when redirect to [{}::{}]", method, path, t));
     }
 
     private Future<List<Record>> findRecord(Predicate<Record> filter, String type) {
@@ -177,7 +167,7 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
         return get().getRecord(r -> type.equals(r.getType()) && filter.apply(r)).map(Objects::nonNull);
     }
 
-    public Future<@Nullable Record> get(@NonNull Function<Record, Boolean> filter) {
+    public Future<@Nullable Record> find(@NonNull Function<Record, Boolean> filter) {
         return get().getRecord(filter);
     }
 
@@ -190,17 +180,15 @@ public final class ServiceDiscoveryWrapper implements Supplier<ServiceDiscovery>
                     .map(r -> Optional.ofNullable(r)
                                       .orElseThrow(() -> new ServiceNotFoundException(
                                           "Not found service registration: " + registration)))
-                    .onSuccess(r -> registrationMap.remove(r.getRegistration()))
                     .flatMap(record -> get().unpublish(registration));
     }
 
     private Future<Record> addDecoratorRecord(@NonNull Record record) {
         return get().publish(record).onSuccess(rec -> {
-            registrationMap.put(rec.getRegistration(), rec);
             logger.info("Published Service | Registration[{}] | API[{}] | Type[{}] | Endpoint[{}]",
                         rec.getRegistration(), rec.getName(), rec.getType(), rec.getLocation().getString("endpoint"));
             if (logger.isTraceEnabled()) {
-                logger.trace("Published {} Service: {}", kind(), rec.toJson());
+                logger.trace("Published Service [{}]", rec.toJson());
             }
         }).onFailure(t -> logger.error("Cannot publish record[{}]", record.toJson(), t));
     }

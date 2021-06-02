@@ -11,12 +11,11 @@ import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.handler.DynamicContextDispatcher.AbstractDynamicContextDispatcher;
 import io.zero88.qwe.http.server.rest.api.DynamicEventRestApi;
 import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
-import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.micro.servicetype.EventMessageService;
 
 public final class DynamicEventApiDispatcher<T extends DynamicEventRestApi>
     extends AbstractDynamicContextDispatcher<T> {
@@ -37,8 +36,8 @@ public final class DynamicEventApiDispatcher<T extends DynamicEventRestApi>
 
     @Override
     public Predicate<Record> filter(HttpMethod method, String path) {
-        return Functions.and(super.filter(method, path), record -> EventMethodDefinition.from(
-            record.getMetadata().getJsonObject(EventMessageService.EVENT_METHOD_CONFIG)).search(path).isPresent());
+        return Functions.and(super.filter(method, path),
+                             record -> EventMethodDefinition.from(record.getLocation()).search(path).isPresent());
     }
 
     @Override

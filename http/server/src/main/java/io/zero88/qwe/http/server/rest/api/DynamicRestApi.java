@@ -10,7 +10,7 @@ import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.micro.servicetype.EventMessageService;
+import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 
 import lombok.NonNull;
 
@@ -26,7 +26,7 @@ public interface DynamicRestApi {
         if (HttpEndpoint.TYPE.equals(record.getType())) {
             return (T) DynamicHttpRestApi.create(record);
         }
-        if (EventMessageService.TYPE.equals(record.getType())) {
+        if (EventMessageHttpService.TYPE.equals(record.getType())) {
             return (T) DynamicEventRestApi.create(record);
         }
         throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Dynamic Rest API unsupported type " + record.getType());

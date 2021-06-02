@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 import org.slf4j.LoggerFactory;
 
+import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
 import io.vertx.ext.unit.Async;
 
@@ -18,6 +19,8 @@ public interface TestHelper {
 
     int TEST_TIMEOUT_SEC = 8;
 
+    org.slf4j.Logger LOGGER = LoggerFactory.getLogger("LOG_TEST");
+
     static int getRandomPort() throws IOException {
         try (ServerSocket socket = new ServerSocket(0)) {
             return socket.getLocalPort();
@@ -27,7 +30,7 @@ public interface TestHelper {
     static void setup() {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
         ((Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.INFO);
-        ((Logger) LoggerFactory.getLogger("io.github.zero88")).setLevel(Level.DEBUG);
+        ((Logger) LoggerFactory.getLogger("io.zero88")).setLevel(Level.DEBUG);
     }
 
     static void testComplete(Async async) {
@@ -35,8 +38,10 @@ public interface TestHelper {
     }
 
     static void testComplete(Async async, String msgEvent, Handler<Void> completeAction) {
-        System.out.println("Current Test Async Count: " + async.count() + ". Countdown...");
-        System.out.println(msgEvent);
+        LOGGER.info("Current Test Async Count: " + async.count() + ". Countdown...");
+        if (Strings.isBlank(msgEvent)) {
+            LOGGER.debug(msgEvent);
+        }
         if (async.count() > 0) {
             async.countDown();
         }

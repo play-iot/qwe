@@ -13,15 +13,13 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
-import io.zero88.qwe.micro.filter.ByPredicate;
 import io.zero88.qwe.micro.filter.ServiceLocatorParams;
+import io.zero88.qwe.micro.filter.ServiceScope;
 import io.zero88.qwe.micro.transfomer.RecordOutput;
-import io.zero88.qwe.micro.transfomer.RecordTransformer.RecordView;
-import io.zero88.qwe.micro.type.ServiceKind;
-import io.zero88.qwe.micro.type.ServiceScope;
+import io.zero88.qwe.micro.transfomer.RecordTransformer.ViewType;
 
 import lombok.NonNull;
 
@@ -51,17 +49,6 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
     @NonNull
     default ServiceScope scope() {
         return ServiceScope.ALL;
-    }
-
-    /**
-     * Defines service kind to discover
-     *
-     * @return service kind. Default: {@link ServiceKind#CLUSTER}
-     * @since 1.0.0
-     */
-    @NonNull
-    default ServiceKind kind() {
-        return ServiceKind.CLUSTER;
     }
 
     /**
@@ -104,21 +91,20 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
         final RequestData searchReq = RequestData.builder()
                                                  .body(new JsonObject().put(ServiceLocatorParams.IDENTIFIER,
                                                                             destination()))
-                                                 .filter(
-                                                     new JsonObject().put(ServiceLocatorParams.BY, ByPredicate.BY_NAME)
-                                                                     .put(ServiceLocatorParams.STATUS, Status.UP)
-                                                                     .put(ServiceLocatorParams.SCOPE, scope())
-                                                                     .put(ServiceLocatorParams.KIND, kind())
-                                                                     .put(ServiceLocatorParams.VIEW,
-                                                                          RecordView.TECHNICAL)
-                                                                     .put(ServiceLocatorParams.ACTION, action.action()))
+                                                 .filter(new JsonObject().put(ServiceLocatorParams.BY, "NAME")
+                                                                         .put(ServiceLocatorParams.STATUS, Status.UP)
+                                                                         .put(ServiceLocatorParams.SCOPE, scope())
+                                                                         .put(ServiceLocatorParams.VIEW,
+                                                                              ViewType.TECHNICAL)
+                                                                         .put(ServiceLocatorParams.ACTION,
+                                                                              action.action()))
                                                  .build();
         final Future<EventMessage> invoker = invoke(gatewayAddress(), EventAction.GET_ONE, searchReq);
         return invoker.flatMap(out -> out.isError()
                                       ? Future.failedFuture(notFound().apply(out.getError()))
                                       : Future.succeededFuture(
                                           Optional.ofNullable(out.getData()).orElse(new JsonObject())))
-                      .map(json -> json.getString(RecordOutput.Fields.location))
+                      .map(json -> json.getString(RecordOutput.Fields.endpoint))
                       .flatMap(addr -> Strings.isBlank(addr)
                                        ? Future.failedFuture(new ServiceNotFoundException(
                           "Not found destination address of service name '" + destination() + "'"))

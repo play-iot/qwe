@@ -1,9 +1,9 @@
-package io.zero88.qwe.micro.type;
+package io.zero88.qwe.micro.filter;
 
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import io.zero88.qwe.micro.servicetype.EventMessageService;
+import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 
@@ -27,6 +27,6 @@ public enum ServiceScope {
 
     private static boolean isPublic(Record record) {
         return HttpEndpoint.TYPE.equalsIgnoreCase(record.getType()) ||
-               EventMessageService.TYPE.equalsIgnoreCase(record.getType());
+               EventMessageHttpService.TYPE.equalsIgnoreCase(record.getType());
     }
 }

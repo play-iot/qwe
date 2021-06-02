@@ -4,16 +4,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.github.zero88.utils.Strings;
+import io.github.zero88.utils.Urls;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.utils.Networks;
-import io.github.zero88.utils.Strings;
-import io.github.zero88.utils.Urls;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,6 +25,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.FieldNameConstants;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,18 +40,11 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = EventMethodDefinition.Builder.class)
+@FieldNameConstants
 public final class EventMethodDefinition implements JsonData {
 
     @EqualsAndHashCode.Include
     private final String servicePath;
-    /**
-     * Web Router order
-     */
-    @JsonIgnore
-    private final int order;
-    private final Set<EventMethodMapping> mapping;
-    @JsonIgnore
-    private final HttpPathRule rule;
     /**
      * Identify using {@link RequestData} or not. Default is {@code True}
      * <p>
@@ -57,6 +52,14 @@ public final class EventMethodDefinition implements JsonData {
      * data in {@code HTTP Request query params} and {@code HTTP Request Header}
      */
     private final boolean useRequestData;
+    private final Set<EventMethodMapping> mapping;
+    /**
+     * Web Router order
+     */
+    @JsonIgnore
+    private final int order;
+    @JsonIgnore
+    private final HttpPathRule rule;
 
     private EventMethodDefinition(String servicePath, boolean useRequestData,
                                   @NonNull Set<EventMethodMapping> mapping) {
@@ -202,7 +205,14 @@ public final class EventMethodDefinition implements JsonData {
     }
 
     public static EventMethodDefinition from(@NonNull JsonObject json) {
-        return JsonData.from(json, EventMethodDefinition.class);
+        return EventMethodDefinition.builder()
+                                    .servicePath(json.getString(Fields.servicePath))
+                                    .useRequestData(json.getBoolean(Fields.useRequestData, true))
+                                    .mapping(json.getJsonArray(Fields.mapping, new JsonArray())
+                                                 .stream()
+                                                 .map(o -> JsonData.from(o, EventMethodMapping.class))
+                                                 .collect(Collectors.toSet()))
+                                    .build();
     }
 
     public Optional<String> search(String actualPath) {

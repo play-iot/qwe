@@ -18,9 +18,9 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class DeployContext<T extends Verticle> {
 
-    public static final Function<Class<? extends Verticle>, Consumer<String>> DEFAULT_ASSERTER = cls -> id -> {
-        System.out.println("DEPLOY VERTICLE [" + cls.getName() + "][" + Objects.requireNonNull(id) + "]");
-    };
+    public static final Function<Class<? extends Verticle>, Consumer<String>> DEFAULT_ASSERTER
+        = cls -> id -> TestHelper.LOGGER.info(
+        "DEPLOY VERTICLE [" + cls.getName() + "][" + Objects.requireNonNull(id) + "]");
 
     @NonNull
     private final T verticle;

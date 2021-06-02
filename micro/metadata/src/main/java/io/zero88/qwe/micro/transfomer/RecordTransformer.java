@@ -4,22 +4,22 @@ import io.vertx.servicediscovery.Record;
 
 import lombok.NonNull;
 
+/**
+ * Transform {@link Record} to response output
+ */
 public interface RecordTransformer {
 
-    static RecordTransformer create(@NonNull RecordView view) {
-        if (view == RecordView.END_USER) {
-            return new PublicRecordTransformer();
-        }
-        return new DetailRecordTransformer();
-    }
+    @NonNull String serviceType();
+
+    @NonNull ViewType viewType();
 
     @NonNull RecordOutput transform(@NonNull Record record);
 
-    enum RecordView {
+    enum ViewType {
 
         END_USER, TECHNICAL;
 
-        public static RecordView parse(String view) {
+        public static ViewType parse(String view) {
             if (TECHNICAL.name().equalsIgnoreCase(view)) {
                 return TECHNICAL;
             }

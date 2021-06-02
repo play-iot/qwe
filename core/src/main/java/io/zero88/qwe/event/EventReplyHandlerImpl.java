@@ -5,10 +5,7 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.exceptions.TimeoutException;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 class EventReplyHandlerImpl implements EventReplyHandler {
 
     private final String system;
@@ -31,16 +28,10 @@ class EventReplyHandlerImpl implements EventReplyHandler {
     }
 
     @Override
-    public Message from(EventMessage eventMessage) {
-        return null;
-    }
-
-    @Override
     public EventMessage to(Message objectMessage) {
-        @SuppressWarnings("unchecked")
         final EventMessage msg = EventMessage.convert(objectMessage);
-        log.info("{}::Backend EventBus response | Address: {} | Action: {} | Status: {}", replySystem(), address,
-                 msg.getAction(), msg.getStatus());
+        logger().info("{}::Response [{}][{}=>{}][{}]", replySystem(), address, msg.getAction(), msg.getPrevAction(),
+                      msg.getStatus());
         return msg;
     }
 

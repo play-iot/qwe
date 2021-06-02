@@ -14,7 +14,7 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.Status;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.micro.filter.ServiceLocatorParams;
-import io.zero88.qwe.micro.transfomer.RecordTransformer.RecordView;
+import io.zero88.qwe.micro.transfomer.RecordTransformer.ViewType;
 
 public class ServiceLocatorTest extends BaseMicroVerticleTest {
 
@@ -22,7 +22,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
     public void test_not_found(TestContext context) {
         final JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_NOT_FOUND.code())
                                                     .put("message", "Not found service by given parameters: " +
-                                                                    "{\"_by\":\"name\",\"identifier\":\"event.not" +
+                                                                    "{\"by\":\"name\",\"identifier\":\"event.not" +
                                                                     ".found\"}");
         testFailed(context, RequestData.builder()
                                        .body(new JsonObject().put(ServiceLocatorParams.IDENTIFIER, "event.not.found"))
@@ -58,7 +58,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
         testSuccess(context, RequestData.builder()
                                         .body(new JsonObject().put(ServiceLocatorParams.IDENTIFIER, "event.record.1"))
                                         .filter(new JsonObject().put(ServiceLocatorParams.BY, "name")
-                                                                .put(ServiceLocatorParams.VIEW, RecordView.TECHNICAL))
+                                                                .put(ServiceLocatorParams.VIEW, ViewType.TECHNICAL))
                                         .build(), EventAction.GET_ONE, value);
     }
 

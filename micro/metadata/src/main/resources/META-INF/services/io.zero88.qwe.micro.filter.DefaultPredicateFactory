@@ -1,0 +1,9 @@
+io.zero88.qwe.micro.filter.ByRegistrationPredicateFactory
+io.zero88.qwe.micro.filter.ByNamePredicateFactory
+io.zero88.qwe.micro.filter.ByGroupPredicateFactory
+io.zero88.qwe.micro.filter.HttpEndpointPathPredicate
+io.zero88.qwe.micro.filter.EventMessageServicePathPredicate
+
+io.zero88.qwe.micro.filter.ServiceTypePredicateFactory
+io.zero88.qwe.micro.filter.ServiceStatusPredicateFactory
+io.zero88.qwe.micro.filter.ServiceScopePredicateFactory

@@ -53,8 +53,8 @@ public interface JsonHelper {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
         } catch (JSONException | AssertionError e) {
-            System.out.println("Actual: " + actual.encode());
-            System.out.println("Expected: " + expected.encode());
+            TestHelper.LOGGER.error("Actual: " + actual.encode());
+            TestHelper.LOGGER.error("Expected: " + expected.encode());
             throw e;
         }
     }
@@ -63,8 +63,8 @@ public interface JsonHelper {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
         } catch (JSONException | AssertionError e) {
-            System.out.println("Actual: " + actual.encode());
-            System.out.println("Expected: " + expected.encode());
+            TestHelper.LOGGER.error("Actual: " + actual.encode());
+            TestHelper.LOGGER.error("Expected: " + expected.encode());
             throw new RuntimeException(e);
         }
     }
@@ -77,10 +77,10 @@ public interface JsonHelper {
                            JSONCompareMode mode) {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
-            System.out.println("Actual: " + actual.encode());
+            TestHelper.LOGGER.debug("Actual: " + actual.encode());
         } catch (JSONException | AssertionError e) {
-            System.out.println("Actual: " + actual.encode());
-            System.out.println("Expected: " + expected.encode());
+            TestHelper.LOGGER.error("Actual: " + actual.encode());
+            TestHelper.LOGGER.error("Expected: " + expected.encode());
             context.fail(e);
         } finally {
             TestHelper.testComplete(async);

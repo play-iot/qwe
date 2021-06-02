@@ -8,6 +8,7 @@ dependencies {
     api(JacksonLibs.datetime)
     api(LogLibs.slf4j)
     api(UtilLibs.classgraph)
+    api(UtilLibs.jetbrainsAnnotations)
     api(VertxLibs.core)
     api(ZeroLibs.utils)
     api(ZeroLibs.jpaExt)
@@ -21,7 +22,6 @@ dependencies {
 
     compileOnly(VertxLibs.codegen)
     compileOnly(VertxLibs.rx2)
-    compileOnly(UtilLibs.jetbrainsAnnotations)
     compileOnlyApi(JacksonLibs.annotations)
     annotationProcessor(VertxLibs.codegen)
 
