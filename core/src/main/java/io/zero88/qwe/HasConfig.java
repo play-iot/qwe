@@ -1,7 +1,7 @@
 package io.zero88.qwe;
 
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.utils.Configs;
+import io.zero88.qwe.utils.JsonUtils;
 
 import lombok.NonNull;
 
@@ -37,7 +37,7 @@ interface HasConfig<C extends IConfig> extends HasLogger {
      */
     default C computeConfig(JsonObject config) {
         logger().debug("Computing configuration [{}][{}]", configClass().getName(), configFile());
-        C cfg = IConfig.merge(IConfig.from(Configs.silentLoadJsonConfig(configFile()), configClass()), config,
+        C cfg = IConfig.merge(IConfig.from(JsonUtils.silentLoadJsonInClasspath(configFile()), configClass()), config,
                               configClass());
         if (logger().isDebugEnabled()) {
             logger().debug("Configuration [{}][{}]", getClass().getName(), cfg.toJson().encode());

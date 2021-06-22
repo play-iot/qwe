@@ -1,22 +1,33 @@
 package io.zero88.qwe.utils;
 
+import java.io.InputStream;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.github.zero88.utils.DateTimes;
 import io.github.zero88.utils.DateTimes.Iso8601Formatter;
+import io.github.zero88.utils.Reflections;
+import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JsonUtils {
 
@@ -46,6 +57,37 @@ public final class JsonUtils {
         final ZonedDateTime utcTime = DateTimes.toUTC(zonedDateTime);
         return new JsonObject().put("local", Iso8601Formatter.format(zonedDateTime))
                                .put("utc", Iso8601Formatter.format(utcTime));
+    }
+
+    public static JsonObject loadJsonInClasspath(String file) {
+        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
+                       .map(JsonUtils::readAsJson)
+                       .orElseGet(() -> {
+                           log.warn("Resource file '" + file + "' not found");
+                           return new JsonObject();
+                       });
+    }
+
+    public static JsonObject silentLoadJsonInClasspath(String file) {
+        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
+                       .map(JsonUtils::readAsJson)
+                       .orElseGet(JsonObject::new);
+    }
+
+    public static JsonObject readAsJson(@NonNull InputStream resourceAsStream) {
+        try (Scanner scanner = new Scanner(resourceAsStream).useDelimiter("\\A")) {
+            return new JsonObject(scanner.next());
+        } catch (DecodeException | NoSuchElementException e) {
+            throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
+        }
+    }
+
+    public static JsonArray readAsArray(@NonNull InputStream resourceAsStream) {
+        try (Scanner scanner = new Scanner(resourceAsStream).useDelimiter("\\A")) {
+            return new JsonArray(scanner.next());
+        } catch (DecodeException | NoSuchElementException e) {
+            throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Config file is not valid JSON object", e);
+        }
     }
 
 }

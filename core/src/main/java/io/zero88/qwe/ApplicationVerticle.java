@@ -15,6 +15,7 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventBusDeliveryOption;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
+import io.zero88.qwe.utils.NetworkUtils;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -38,9 +39,10 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     public final void start() {
         logger().info("Start Application[{}]...", appName());
         this.appConfig = computeConfig(config());
-        this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION,
+        this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION_KEY,
                      new EventBusDeliveryOption(this.appConfig.getDeliveryOptions()));
-        this.addData(SharedDataLocalProxy.APP_DATADIR, this.appConfig.getDataDir());
+        this.addData(SharedDataLocalProxy.APP_DATADIR_KEY, this.appConfig.getDataDir());
+        this.addData(SharedDataLocalProxy.PUBLIC_IPV4_KEY, NetworkUtils.getPublicIpv4());
         this.eventBus = EventBusClient.create(sharedData());
         this.onStart();
     }

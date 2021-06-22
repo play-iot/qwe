@@ -65,7 +65,7 @@ final class EventBusClientImpl implements EventBusClient {
         if (Objects.nonNull(opts)) {
             return opts;
         }
-        final EventBusDeliveryOption option = sharedData.getData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION);
+        final EventBusDeliveryOption option = sharedData.getData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION_KEY);
         return Optional.ofNullable(option).map(EventBusDeliveryOption::get).orElseGet(DeliveryOptions::new);
     }
 

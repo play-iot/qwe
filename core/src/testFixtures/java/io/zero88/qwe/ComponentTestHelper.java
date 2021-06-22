@@ -48,7 +48,7 @@ public interface ComponentTestHelper {
 
     default <T extends Component> T initComponent(Vertx vertx, ComponentProvider<T> provider) {
         final SharedDataLocalProxy proxy = createSharedData(vertx);
-        proxy.addData(SharedDataLocalProxy.APP_DATADIR, testDir().toString());
+        proxy.addData(SharedDataLocalProxy.APP_DATADIR_KEY, testDir().toString());
         return provider.provide(proxy);
     }
 

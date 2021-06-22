@@ -21,7 +21,7 @@ import io.vertx.core.shareddata.Shareable;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.exceptions.ConfigException;
 import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.utils.Configs;
+import io.zero88.qwe.utils.JsonUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -39,7 +39,7 @@ public interface IConfig extends JsonData, Shareable {
                                                                    false);
 
     static <T extends IConfig> T fromClasspath(String jsonFile, Class<T> clazz) {
-        return IConfig.from(Configs.loadJsonConfig(jsonFile), clazz);
+        return IConfig.from(JsonUtils.loadJsonInClasspath(jsonFile), clazz);
     }
 
     static <T extends IConfig> T from(Object data, Class<T> clazz) {

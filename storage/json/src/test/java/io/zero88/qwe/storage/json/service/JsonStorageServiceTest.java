@@ -24,7 +24,7 @@ import io.zero88.qwe.file.FileOption;
 import io.zero88.qwe.file.TextFileOperatorImpl;
 import io.zero88.qwe.storage.json.JsonStorageProvider;
 import io.zero88.qwe.storage.json.StorageConfig;
-import io.zero88.qwe.utils.Configs;
+import io.zero88.qwe.utils.JsonUtils;
 
 @ExtendWith(VertxExtension.class)
 class JsonStorageServiceTest implements ComponentTestHelper {
@@ -62,7 +62,7 @@ class JsonStorageServiceTest implements ComponentTestHelper {
               .onFailure(context::failNow)
               .onSuccess(result -> context.verify(() -> {
                   System.out.println(result.toJson());
-                  final JsonObject json = Configs.readAsJson(new FileInputStream(file));
+                  final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file));
                   Assertions.assertTrue(result.isSuccess());
                   Assertions.assertNotNull(result.getData());
                   Assertions.assertEquals(data, result.getData().getJsonObject(ji.getOutputKey()));
@@ -86,7 +86,7 @@ class JsonStorageServiceTest implements ComponentTestHelper {
                             .flatMap(g -> client.request(config.getServiceAddress(), msg))
                             .onFailure(context::failNow)
                             .onSuccess(result -> context.verify(() -> {
-                                final JsonObject json = Configs.readAsJson(new FileInputStream(file.toString()));
+                                final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
                                 System.out.println(result.toJson());
                                 System.out.println(json);
                                 Assertions.assertTrue(result.isSuccess());
@@ -111,7 +111,7 @@ class JsonStorageServiceTest implements ComponentTestHelper {
                             .write(file, FileOption.builder().build(), data.toBuffer())
                             .flatMap(g -> client.request(config.getServiceAddress(), msg))
                             .onComplete(context.succeeding(result -> context.verify(() -> {
-                                final JsonObject json = Configs.readAsJson(new FileInputStream(file.toString()));
+                                final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
                                 System.out.println(json);
                                 System.out.println(result.toJson());
                                 Assertions.assertTrue(result.isSuccess());
@@ -156,7 +156,7 @@ class JsonStorageServiceTest implements ComponentTestHelper {
                             .write(file, FileOption.builder().build(), data.toBuffer())
                             .flatMap(g -> client.request(config.getServiceAddress(), msg))
                             .onComplete(context.succeeding(result -> context.verify(() -> {
-                                final JsonObject json = Configs.readAsJson(new FileInputStream(file.toString()));
+                                final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
                                 System.out.println(json);
                                 System.out.println(result.toJson());
                                 Assertions.assertTrue(result.isSuccess());

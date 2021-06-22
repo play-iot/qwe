@@ -14,7 +14,7 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
-import io.zero88.qwe.utils.Networks;
+import io.zero88.qwe.utils.PriorityUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -73,7 +73,7 @@ public final class EventMethodDefinition implements JsonData {
             log.warn("HTTP Path '{}' is not using `RequestData` that will omit data in `HTTP Request Query` and " +
                      "`HTTP Request Header`", this.servicePath);
         }
-        this.order = Networks.priorityOrder(this.servicePath.length());
+        this.order = PriorityUtils.priorityOrder(this.servicePath.length());
         this.mapping = mapping;
     }
 
