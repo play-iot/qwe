@@ -23,7 +23,14 @@ include("http:client", "http:server")
 
 include("storage:json")
 
-include(":micro:micro-config", ":micro:micro-metadata", "micro:rpc", ":micro:circuit-breaker", ":micro:gateway", "micro")
+include(
+    ":micro:micro-config",
+    ":micro:micro-metadata",
+    ":micro:circuit-breaker",
+    ":micro:discovery",
+    ":micro:gateway",
+    ":micro:rpc"
+)
 project(":micro:micro-config").projectDir = file("micro/config")
 project(":micro:micro-metadata").projectDir = file("micro/metadata")
 
