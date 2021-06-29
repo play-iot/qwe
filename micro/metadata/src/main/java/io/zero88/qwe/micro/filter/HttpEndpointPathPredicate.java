@@ -1,6 +1,7 @@
 package io.zero88.qwe.micro.filter;
 
 import io.github.zero88.utils.Urls;
+import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
@@ -18,7 +19,7 @@ public final class HttpEndpointPathPredicate implements ByPathPredicateFactory<H
     }
 
     @Override
-    public boolean testLocation(HttpLocation location, String path) {
+    public boolean testLocation(HttpLocation location, String path, JsonObject filter) {
         return location.getRoot().equals(Urls.combinePath(path));
     }
 

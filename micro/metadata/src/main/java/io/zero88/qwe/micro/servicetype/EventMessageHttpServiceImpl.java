@@ -8,7 +8,6 @@ import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.types.AbstractServiceReference;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.http.EventMethodDefinition;
 
 import lombok.NonNull;
 
@@ -33,8 +32,7 @@ public final class EventMessageHttpServiceImpl implements EventMessageHttpServic
 
         @Override
         protected EventMessagePusher retrieve() {
-            return new Pusher(SharedDataLocalProxy.create(vertx, sharedKey),
-                              EventMethodDefinition.from(record().getLocation()), config,
+            return new Pusher(SharedDataLocalProxy.create(vertx, sharedKey), config,
                               record().getLocation().getString(Record.ENDPOINT));
         }
 

@@ -12,7 +12,7 @@ public final class ServiceTypePredicateFactory
 
     @Override
     public @NotNull String attribute() {
-        return ServiceLocatorParams.TYPE;
+        return ServiceFilterParam.TYPE;
     }
 
     @Override

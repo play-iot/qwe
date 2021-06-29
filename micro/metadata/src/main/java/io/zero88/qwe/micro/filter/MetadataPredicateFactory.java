@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-import io.zero88.qwe.event.EventAction;
 
 import lombok.NonNull;
 
@@ -15,8 +14,8 @@ import lombok.NonNull;
 public interface MetadataPredicateFactory extends SimplePredicateFactory<JsonObject> {
 
     @Override
-    default @NonNull Predicate<Record> apply(@NonNull EventAction action, @NonNull JsonObject filter) {
-        return r -> Objects.isNull(r.getMetadata()) || test(r.getMetadata(), action, filter);
+    default @NonNull Predicate<Record> apply(@NonNull JsonObject filter, SearchFlag searchFlag) {
+        return r -> Objects.isNull(r.getMetadata()) || test(r.getMetadata(), searchFlag, filter);
     }
 
     @Override
@@ -24,6 +23,6 @@ public interface MetadataPredicateFactory extends SimplePredicateFactory<JsonObj
         return filter;
     }
 
-    boolean test(@NonNull JsonObject recordMetadata, @NonNull EventAction action, @NonNull JsonObject filter);
+    boolean test(@NonNull JsonObject recordMetadata, @NonNull SearchFlag searchFlag, @NonNull JsonObject filter);
 
 }

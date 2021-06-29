@@ -2,25 +2,24 @@ package io.zero88.qwe.micro.filter;
 
 import java.util.function.Predicate;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-import io.zero88.qwe.event.EventAction;
 
 public final class ByNamePredicateFactory implements ByPredicateFactory, DefaultPredicateFactory {
 
+    public static final String INDICATOR = "name";
+
     @Override
     public String by() {
-        return "NAME";
+        return INDICATOR;
     }
 
     @Override
-    public Predicate<Record> apply(EventAction action, String name) {
-        if (action == EventAction.GET_LIST) {
+    public Predicate<Record> apply(String name, SearchFlag searchFlag, JsonObject filter) {
+        if (searchFlag.isMany()) {
             return r -> r.getName().toLowerCase().contains(name.toLowerCase());
         }
-        if (action == EventAction.GET_ONE) {
-            return r -> r.getName().equalsIgnoreCase(name.toLowerCase());
-        }
-        return r -> true;
+        return r -> r.getName().equalsIgnoreCase(name.toLowerCase());
     }
 
 }

@@ -4,24 +4,26 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-import io.zero88.qwe.event.EventAction;
 
 import lombok.NonNull;
 
 public interface ByPathPredicateFactory<T> extends ByPredicateFactory {
 
+    String INDICATOR = "location";
+
     @Override
     default String by() {
-        return "LOCATION";
+        return INDICATOR;
     }
 
     @Override
-    default Predicate<Record> apply(EventAction action, String identifier) {
-        return testTypePredicate().and(record -> testLocation(parseLocation(record), identifier));
+    default Predicate<Record> apply(String identifier, SearchFlag searchFlag, JsonObject filter) {
+        return typePredicate().and(record -> testLocation(parseLocation(record), identifier, filter));
     }
 
-    default Predicate<Record> testTypePredicate() {
+    default Predicate<Record> typePredicate() {
         return record -> serviceType().equals(record.getType());
     }
 
@@ -33,6 +35,6 @@ public interface ByPathPredicateFactory<T> extends ByPredicateFactory {
 
     @Nullable T parseLocation(Record record);
 
-    boolean testLocation(T location, String identifier);
+    boolean testLocation(T location, String identifier, JsonObject filter);
 
 }

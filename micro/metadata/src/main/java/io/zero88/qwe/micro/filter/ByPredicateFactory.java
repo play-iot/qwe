@@ -7,8 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.micro.filter.FilterAttributeFinder.FilterStringFinder;
+import io.zero88.qwe.utils.JsonUtils;
 
 import lombok.NonNull;
 
@@ -17,25 +17,25 @@ import lombok.NonNull;
  * <p>
  * For example:
  * <pre>
- * /find?identifier=sample.name&_by=name
- * /find?identifier=sample&_by=group
- * /find?identifier=uuid&_by=registration
- * /find?identifier="/test/123"&_by=path
+ * /find?identifier=sample.name&by=name
+ * /find?identifier=sample&by=group
+ * /find?identifier=uuid&by=registration
+ * /find?identifier="/test/123"&by=location
  * </pre>
  *
  * @see RecordPredicateFactory
- * @see ServiceLocatorParams#BY
- * @see ServiceLocatorParams#IDENTIFIER
+ * @see ServiceFilterParam#BY
+ * @see ServiceFilterParam#IDENTIFIER
  */
 public interface ByPredicateFactory extends RecordPredicateFactory, FilterStringFinder {
 
-    String DEFAULT_INDICATOR = "REGISTRATION";
+    String DEFAULT_INDICATOR = "registration";
 
     @Override
-    default @NonNull Predicate<Record> apply(@NonNull EventAction action, @NonNull JsonObject filter) {
+    default @NonNull Predicate<Record> apply(@NonNull JsonObject filter, @NonNull SearchFlag searchFlag) {
         final String identifier = findAttribute(filter);
         if (Strings.isBlank(identifier)) {
-            if (action == EventAction.GET_ONE) {
+            if (searchFlag.isOne()) {
                 throw new IllegalArgumentException("Missing record identifier");
             }
             return r -> true;
@@ -43,12 +43,12 @@ public interface ByPredicateFactory extends RecordPredicateFactory, FilterString
         if (!by().equalsIgnoreCase(findIndicator(filter))) {
             return r -> true;
         }
-        return apply(action, identifier);
+        return apply(identifier, searchFlag, filter);
     }
 
     @Override
     default @NotNull String attribute() {
-        return ServiceLocatorParams.IDENTIFIER;
+        return ServiceFilterParam.IDENTIFIER;
     }
 
     /**
@@ -61,14 +61,15 @@ public interface ByPredicateFactory extends RecordPredicateFactory, FilterString
     /**
      * Build record predicate
      *
-     * @param action     request action
      * @param identifier given identifier
+     * @param searchFlag search flag
+     * @param filter     origin filter
      * @return a record predicate
      */
-    Predicate<Record> apply(EventAction action, String identifier);
+    Predicate<Record> apply(String identifier, SearchFlag searchFlag, JsonObject filter);
 
     default String findIndicator(JsonObject filter) {
-        return FilterAttributeFinder.findString(filter, ServiceLocatorParams.BY).orElse(DEFAULT_INDICATOR);
+        return JsonUtils.findString(filter, ServiceFilterParam.BY).orElse(DEFAULT_INDICATOR);
     }
 
 }

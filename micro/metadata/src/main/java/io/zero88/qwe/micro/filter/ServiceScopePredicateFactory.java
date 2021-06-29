@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
+import io.zero88.qwe.utils.JsonUtils;
 
 /**
  * @see ServiceScope
@@ -16,12 +17,12 @@ public final class ServiceScopePredicateFactory
 
     @Override
     public @NotNull String attribute() {
-        return ServiceLocatorParams.SCOPE;
+        return ServiceFilterParam.SCOPE;
     }
 
     @Override
     public ServiceScope findAttribute(JsonObject filter) {
-        return FilterAttributeFinder.findString(filter, attribute()).map(ServiceScope::parse).orElse(null);
+        return JsonUtils.findString(filter, attribute()).map(ServiceScope::parse).orElse(null);
     }
 
     @Override

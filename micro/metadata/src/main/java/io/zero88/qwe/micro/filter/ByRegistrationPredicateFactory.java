@@ -2,8 +2,8 @@ package io.zero88.qwe.micro.filter;
 
 import java.util.function.Predicate;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-import io.zero88.qwe.event.EventAction;
 
 public final class ByRegistrationPredicateFactory implements ByPredicateFactory, DefaultPredicateFactory {
 
@@ -13,7 +13,7 @@ public final class ByRegistrationPredicateFactory implements ByPredicateFactory,
     }
 
     @Override
-    public Predicate<Record> apply(EventAction action, String registration) {
+    public Predicate<Record> apply(String registration, SearchFlag searchFlag, JsonObject filter) {
         return record -> registration.equalsIgnoreCase(record.getRegistration());
     }
 

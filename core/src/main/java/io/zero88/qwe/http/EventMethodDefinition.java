@@ -215,14 +215,8 @@ public final class EventMethodDefinition implements JsonData {
                                     .build();
     }
 
-    public Optional<String> search(String actualPath) {
-        return Optional.of(Strings.requireNotBlank(actualPath))
-                       .filter(path -> path.matches(this.rule.createRegexPathForSearch(this.servicePath)));
-    }
-
     public EventAction search(String actualPath, @NonNull HttpMethod method) {
-        final String path = search(actualPath).orElseThrow(
-            () -> new ServiceNotFoundException("Not found path " + actualPath));
+        final String path = validatePath(actualPath);
         return mapping.stream()
                       .filter(mapping -> {
                           String regex = Strings.isBlank(mapping.getRegexPath()) ? servicePath : mapping.getRegexPath();
@@ -231,7 +225,33 @@ public final class EventMethodDefinition implements JsonData {
                       .map(EventMethodMapping::getAction)
                       .findFirst()
                       .orElseThrow(() -> new ServiceNotFoundException(
-                          Strings.format("Unsupported HTTP method {0} in ''{1}''", method, actualPath)));
+                          Strings.format("Unsupported HTTP method [{0}][{1}]", method, actualPath)));
+    }
+
+    public boolean test(String actualPath, EventAction action) {
+        final String path = validatePath(actualPath);
+        return mapping.stream().anyMatch(mapping -> {
+            String regex = Strings.isBlank(mapping.getRegexPath())
+                           ? rule.createRegexPathForSearch(servicePath)
+                           : mapping.getRegexPath();
+            return mapping.getAction() == action && path.matches(regex);
+        });
+    }
+
+    public boolean test(String actualPath, HttpMethod method) {
+        final String path = validatePath(actualPath);
+        return mapping.stream().anyMatch(mapping -> {
+            String regex = Strings.isBlank(mapping.getRegexPath())
+                           ? rule.createRegexPathForSearch(servicePath)
+                           : mapping.getRegexPath();
+            return mapping.getMethod() == method && path.matches(regex);
+        });
+    }
+
+    private String validatePath(String actualPath) {
+        return Optional.of(Strings.requireNotBlank(actualPath))
+                       .filter(p -> p.matches(rule.createRegexPathForSearch(servicePath)))
+                       .orElseThrow(() -> new ServiceNotFoundException("Not found path " + actualPath));
     }
 
     @JsonPOJOBuilder(withPrefix = "")

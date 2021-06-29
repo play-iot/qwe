@@ -1,17 +1,13 @@
 package io.zero88.qwe.micro.filter;
 
-import java.util.Objects;
-import java.util.function.Predicate;
-
-import io.github.zero88.utils.Strings;
-import io.github.zero88.utils.Urls;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
+import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
-
-import lombok.NonNull;
+import io.zero88.qwe.utils.JsonUtils;
 
 public final class EventMessageServicePathPredicate
     implements ByPathPredicateFactory<EventMethodDefinition>, DefaultPredicateFactory {
@@ -22,31 +18,19 @@ public final class EventMessageServicePathPredicate
     }
 
     @Override
-    public @NonNull Predicate<Record> apply(@NonNull EventAction action, @NonNull JsonObject filter) {
-        final String identifier = findAttribute(filter);
-        if (Strings.isBlank(identifier) || !by().equalsIgnoreCase(findIndicator(filter))) {
-            return r -> true;
-        }
-        return testTypePredicate().and(record -> testLocation(record, identifier, filter));
-    }
-
-    @Override
     public EventMethodDefinition parseLocation(Record record) {
         return EventMethodDefinition.from(record.getLocation());
     }
 
     @Override
-    public boolean testLocation(EventMethodDefinition definition, String path) {
-        return definition.getServicePath().equals(Urls.combinePath(path));
-    }
-
-    private boolean testLocation(Record record, String identifier, JsonObject filter) {
-        final EventMethodDefinition definition = Objects.requireNonNull(parseLocation(record));
-        final EventAction locationAction = FilterAttributeFinder.findString(filter, ServiceLocatorParams.ACTION)
-                                                                .map(EventAction::parse)
-                                                                .orElse(EventAction.UNKNOWN);
-        return testLocation(definition, identifier) &&
-               definition.getMapping().stream().anyMatch(map -> map.getAction().equals(locationAction));
+    public boolean testLocation(EventMethodDefinition definition, String path, JsonObject filter) {
+        return JsonUtils.findString(filter, ServiceFilterParam.ACTION)
+                        .map(EventAction::parse)
+                        .map(action -> definition.test(path, action))
+                        .orElseGet(() -> JsonUtils.findString(filter, GatewayHeadersBuilder.X_FORWARDED_METHOD)
+                                                  .map(HttpMethod::valueOf)
+                                                  .map(m -> definition.test(path, m))
+                                                  .orElse(false));
     }
 
 }

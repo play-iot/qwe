@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-import io.zero88.qwe.event.EventAction;
 
 /**
  * Simple predicate for one attribute
@@ -16,7 +15,7 @@ import io.zero88.qwe.event.EventAction;
  */
 public interface SimplePredicateFactory<T> extends RecordPredicateFactory, FilterAttributeFinder<T> {
 
-    default Predicate<Record> apply(EventAction action, JsonObject filter) {
+    default Predicate<Record> apply(JsonObject filter, SearchFlag searchFlag) {
         final T attribute = findAttribute(filter);
         return Objects.isNull(attribute) ? r -> true : apply(attribute);
     }
