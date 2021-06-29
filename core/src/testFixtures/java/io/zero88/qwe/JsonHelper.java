@@ -12,11 +12,13 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 
-import io.zero88.qwe.dto.JsonData;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.vertx.junit5.Checkpoint;
+import io.vertx.junit5.VertxTestContext;
+import io.zero88.qwe.dto.JsonData;
 
 import lombok.NonNull;
 
@@ -36,14 +38,6 @@ public interface JsonHelper {
         return new CustomComparator(JSONCompareMode.LENIENT, customizations);
     }
 
-    static Consumer<Object> asserter(TestContext context, Async async, JsonObject expected) {
-        return resp -> JsonHelper.assertJson(context, async, expected, (JsonObject) resp, JSONCompareMode.STRICT);
-    }
-
-    static Consumer<Object> asserter(TestContext context, Async async, JsonObject expected, JSONCompareMode mode) {
-        return resp -> JsonHelper.assertJson(context, async, expected, (JsonObject) resp, mode);
-    }
-
     static void assertJson(JsonObject expected, JsonObject actual) {
         assertJson(expected, actual, JSONCompareMode.STRICT);
     }
@@ -53,9 +47,7 @@ public interface JsonHelper {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
         } catch (JSONException | AssertionError e) {
-            TestHelper.LOGGER.error("Actual: " + actual.encode());
-            TestHelper.LOGGER.error("Expected: " + expected.encode());
-            throw e;
+            throw logError(expected, actual, e);
         }
     }
 
@@ -63,51 +55,111 @@ public interface JsonHelper {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
         } catch (JSONException | AssertionError e) {
-            TestHelper.LOGGER.error("Actual: " + actual.encode());
-            TestHelper.LOGGER.error("Expected: " + expected.encode());
-            throw new RuntimeException(e);
+            throw logError(expected, actual, e);
         }
     }
 
-    static void assertJson(TestContext context, Async async, JsonObject expected, Buffer buffer) {
-        assertJson(context, async, expected, JsonData.tryParse(buffer).toJson());
+    final class Junit4 {
+
+        public static Consumer<Object> asserter(TestContext context, Async async, JsonObject expected) {
+            return resp -> assertJson(context, async, expected, (JsonObject) resp, JSONCompareMode.STRICT);
+        }
+
+        public static Consumer<Object> asserter(TestContext context, Async async, JsonObject expected,
+                                                JSONCompareMode mode) {
+            return resp -> assertJson(context, async, expected, (JsonObject) resp, mode);
+        }
+
+        public static void assertJson(TestContext context, Async async, JsonObject expected, Buffer buffer) {
+            assertJson(context, async, expected, JsonData.tryParse(buffer).toJson());
+        }
+
+        public static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
+                                      JSONCompareMode mode) {
+            try {
+                JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
+                TestHelper.LOGGER.debug("Actual: " + actual.encode());
+            } catch (JSONException | AssertionError e) {
+                context.fail(logError(expected, actual, e));
+            } finally {
+                TestHelper.testComplete(async);
+            }
+        }
+
+        public static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
+                                      List<Customization> customizations) {
+            assertJson(context, async, expected, actual,
+                       Optional.ofNullable(customizations).orElse(new ArrayList<>()).toArray(new Customization[] {}));
+        }
+
+        public static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
+                                      Customization... customizations) {
+            if (customizations.length == 0) {
+                assertJson(context, async, expected, actual, JSONCompareMode.STRICT);
+                return;
+            }
+            try {
+                JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
+            } catch (JSONException | AssertionError e) {
+                context.fail(logError(expected, actual, e));
+            } finally {
+                TestHelper.testComplete(async);
+            }
+        }
+
     }
 
-    static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
-                           JSONCompareMode mode) {
-        try {
-            JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
-            TestHelper.LOGGER.debug("Actual: " + actual.encode());
-        } catch (JSONException | AssertionError e) {
-            TestHelper.LOGGER.error("Actual: " + actual.encode());
-            TestHelper.LOGGER.error("Expected: " + expected.encode());
-            context.fail(e);
-        } finally {
-            TestHelper.testComplete(async);
+
+    final class Junit5 {
+
+        public static Consumer<Object> asserter(VertxTestContext context, Checkpoint flag, JsonObject expected) {
+            return resp -> assertJson(context, flag, expected, (JsonObject) resp, JSONCompareMode.STRICT);
         }
+
+        public static Consumer<Object> asserter(VertxTestContext context, Checkpoint flag, JsonObject expected,
+                                                JSONCompareMode mode) {
+            return resp -> assertJson(context, flag, expected, (JsonObject) resp, mode);
+        }
+
+        public static void assertJson(VertxTestContext context, Checkpoint flag, JsonObject expected, JsonObject actual,
+                                      JSONCompareMode mode) {
+            try {
+                JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
+                TestHelper.LOGGER.debug("Actual: " + actual.encode());
+            } catch (JSONException | AssertionError e) {
+                context.failNow(logError(expected, actual, e));
+            } finally {
+                flag.flag();
+            }
+        }
+
+        public static void assertJson(VertxTestContext context, Checkpoint flag, JsonObject expected, JsonObject actual,
+                                      List<Customization> customizations) {
+            assertJson(context, flag, expected, actual,
+                       Optional.ofNullable(customizations).orElse(new ArrayList<>()).toArray(new Customization[] {}));
+        }
+
+        public static void assertJson(VertxTestContext context, Checkpoint flag, JsonObject expected, JsonObject actual,
+                                      Customization... customizations) {
+            if (customizations.length == 0) {
+                assertJson(context, flag, expected, actual, JSONCompareMode.STRICT);
+                return;
+            }
+            try {
+                JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
+            } catch (JSONException | AssertionError e) {
+                context.failNow(logError(expected, actual, e));
+            } finally {
+                flag.flag();
+            }
+        }
+
     }
 
-    static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
-                           List<Customization> customizations) {
-        assertJson(context, async, expected, actual,
-                   Optional.ofNullable(customizations).orElse(new ArrayList<>()).toArray(new Customization[] {}));
-    }
-
-    static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
-                           Customization... customizations) {
-        if (customizations.length == 0) {
-            assertJson(context, async, expected, actual, JSONCompareMode.STRICT);
-            return;
-        }
-        try {
-            JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
-        } catch (JSONException | AssertionError e) {
-            System.out.println("Actual: " + actual.encode());
-            System.out.println("Expected: " + expected.encode());
-            context.fail(e);
-        } finally {
-            TestHelper.testComplete(async);
-        }
+    static RuntimeException logError(JsonObject expected, JsonObject actual, Throwable e) {
+        TestHelper.LOGGER.error("Actual: " + actual.encode());
+        TestHelper.LOGGER.error("Expected: " + expected.encode());
+        return new RuntimeException(e);
     }
 
 }

@@ -13,6 +13,7 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.zero88.qwe.JsonHelper.Junit4;
 
 public interface EventBusHelper {
 
@@ -23,13 +24,13 @@ public interface EventBusHelper {
     static Handler<AsyncResult<Message<Object>>> replyAsserter(TestContext context, Async async, JsonObject expected,
                                                                JSONCompareMode mode) {
         return context.asyncAssertSuccess(
-            result -> JsonHelper.assertJson(context, async, expected, (JsonObject) result.body(), mode));
+            result -> Junit4.assertJson(context, async, expected, (JsonObject) result.body(), mode));
     }
 
     static Handler<AsyncResult<Message<Object>>> replyAsserter(TestContext context, Async async, JsonObject expected,
                                                                Customization... customizations) {
         return context.asyncAssertSuccess(
-            result -> JsonHelper.assertJson(context, async, expected, (JsonObject) result.body(), customizations));
+            result -> Junit4.assertJson(context, async, expected, (JsonObject) result.body(), customizations));
     }
 
     static Handler<AsyncResult<Message<Object>>> replyAsserter(TestContext context, Handler<JsonObject> bodyAsserter) {

@@ -2,8 +2,8 @@ package io.zero88.qwe.dto.jpa;
 
 import io.github.zero88.jpa.Pageable;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.msg.Filters;
 import io.github.zero88.utils.Strings;
+import io.zero88.qwe.dto.msg.RequestFilter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Pagination implements Pageable, JsonData {
 
-    @JsonProperty(Filters.PAGE)
+    @JsonProperty(RequestFilter.PAGE)
     private int page;
-    @JsonProperty(Filters.PER_PAGE)
+    @JsonProperty(RequestFilter.PER_PAGE)
     private int perPage;
 
     public static Pagination oneValue() {

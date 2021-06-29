@@ -17,7 +17,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.JsonHelper.Junit4;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
@@ -76,7 +76,7 @@ public class WebSocketClientDelegateTest {
                                                         .put("action", "OPEN")
                                                         .put("error", new JsonObject().put("code", "HTTP_ERROR")
                                                                                       .put("message", error));
-            JsonHelper.assertJson(context, async, expected, msg.toJson());
+            Junit4.assertJson(context, async, expected, msg.toJson());
         }).eventually(complete(async));
     }
 
@@ -92,7 +92,7 @@ public class WebSocketClientDelegateTest {
                                                         .put("action", "OPEN")
                                                         .put("error", new JsonObject().put("code", "HTTP_ERROR")
                                                                                       .put("message", error));
-            JsonHelper.assertJson(context, async, expected, msg.toJson());
+            Junit4.assertJson(context, async, expected, msg.toJson());
         }).eventually(complete(async));
     }
 
@@ -161,7 +161,7 @@ public class WebSocketClientDelegateTest {
 
         @EBContract(action = "UNKNOWN")
         public int send(JsonObject data) {
-            JsonHelper.assertJson(context, async, expected, data);
+            Junit4.assertJson(context, async, expected, data);
             return 1;
         }
 

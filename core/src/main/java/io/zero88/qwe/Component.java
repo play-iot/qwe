@@ -11,6 +11,7 @@ import lombok.NonNull;
  * @see ComponentContext
  * @see ComponentVerticle
  */
+//FIXME: Rename to Plugin
 public interface Component<C extends ComponentConfig, T extends ComponentContext> extends QWEVerticle<C> {
 
     /**

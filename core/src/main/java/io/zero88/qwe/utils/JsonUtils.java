@@ -90,4 +90,8 @@ public final class JsonUtils {
         }
     }
 
+    public static Optional<String> findString(JsonObject filter, String attribute) {
+        return Optional.ofNullable(filter).flatMap(f -> Optional.ofNullable(f.getString(attribute)));
+    }
+
 }
