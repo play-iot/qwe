@@ -2,7 +2,7 @@
 
 It provides:
 
-- `Local service discovery` Helps to discover service that run in one java process. It is suitable for using
+- `Service discovery` Helps to discover service that run in one java process. It is suitable for using
   in `IoT device`
 - `Cluster service discovery` Helps to discover service that run in cluster mode. It is suitable for using
   in `Cloud/bare meta server`

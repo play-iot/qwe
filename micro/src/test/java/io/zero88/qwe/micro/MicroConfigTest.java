@@ -8,26 +8,35 @@ import io.zero88.qwe.IConfig;
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.QWEConfig;
-import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
+import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
+import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 
 public class MicroConfigTest {
 
     @Test
-    public void test_default() {
+    public void test_blank() {
         MicroConfig def = new MicroConfig();
-        Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_ANNOUNCE_ADDRESS,
-                                def.getDiscoveryConfig().getAnnounceAddress());
-        Assertions.assertEquals(ServiceDiscoveryConfig.SERVICE_DISCOVERY_USAGE_ADDRESS,
-                                def.getDiscoveryConfig().getUsageAddress());
-
-        Assertions.assertFalse(def.getCircuitConfig().isEnabled());
-        System.out.println(def.toJson().encodePrettily());
+        Assertions.assertNull(def.lookup(ServiceDiscoveryConfig.NAME, ServiceDiscoveryConfig.class));
+        Assertions.assertNull(def.lookup(ServiceGatewayConfig.NAME, ServiceGatewayConfig.class));
     }
 
     @Test
-    public void test_parse() {
+    public void test_parse_from_classpath() {
         MicroConfig from = IConfig.fromClasspath("micro.json", MicroConfig.class);
-        JsonHelper.assertJson(new MicroConfig().toJson(), from.toJson());
+
+        ServiceDiscoveryConfig discoveryCfg = from.lookup(ServiceDiscoveryConfig.NAME, ServiceDiscoveryConfig.class);
+        Assertions.assertNotNull(discoveryCfg);
+        Assertions.assertEquals("qwe.service.discovery.announce", discoveryCfg.getAnnounceAddress());
+        Assertions.assertNull(discoveryCfg.getUsageAddress());
+        JsonHelper.assertJson(
+            new JsonObject("{\"backend-name\":\"io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend\"}"),
+            discoveryCfg.getBackendConfiguration());
+
+        ServiceGatewayConfig gwCfg = from.lookup(ServiceGatewayConfig.NAME, ServiceGatewayConfig.class);
+        Assertions.assertNotNull(gwCfg);
+        Assertions.assertEquals("qwe.service.gateway.index", gwCfg.getIndexAddress());
+        Assertions.assertEquals(ServiceGatewayAnnounceMonitor.class.getName(), gwCfg.getAnnounceMonitorClass());
+        Assertions.assertEquals(ServiceGatewayUsageMonitor.class.getName(), gwCfg.getUsageMonitorClass());
     }
 
     @Test
@@ -41,9 +50,21 @@ public class MicroConfigTest {
     public void test_parse_from_appConfig() {
         MicroConfig fromApp = IConfig.from(IConfig.fromClasspath("micro.json", QWEAppConfig.class), MicroConfig.class);
         MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
-        System.out.println(fromApp.toJson());
-        System.out.println(fromMicro.toJson());
         JsonHelper.assertJson(fromMicro.toJson(), fromApp.toJson());
+    }
+
+    @Test
+    public void test_parse_from_string() {
+        final MicroConfig config = IConfig.from("{\"__serviceDiscovery__\":{\"announceAddress\":\"x\"," +
+                                                "\"backendConfiguration\":{\"backend-name\":\"a\"," +
+                                                "\"local\":false,\"more\":\"test\"},\"usageAddress\":\"y\"}}",
+                                                MicroConfig.class);
+        final ServiceDiscoveryConfig cfg = config.lookup(ServiceDiscoveryConfig.NAME, ServiceDiscoveryConfig.class);
+        Assertions.assertNotNull(cfg);
+        Assertions.assertEquals("x", cfg.getAnnounceAddress());
+        Assertions.assertEquals("y", cfg.getUsageAddress());
+        JsonHelper.assertJson(new JsonObject("{\"backend-name\":\"a\",\"local\":false,\"more\":\"test\"}"),
+                              cfg.getBackendConfiguration());
     }
 
     @Test
@@ -53,11 +74,12 @@ public class MicroConfigTest {
                                                         "\"backendConfiguration\":{\"backend-name\":\"a\"," +
                                                         "\"local\":false,\"more\":\"test\"},\"usageAddress\":\"y\"}}",
                                                         MicroConfig.class));
-        System.out.println(config.toJson().encodePrettily());
-        Assertions.assertEquals("x", config.getDiscoveryConfig().getAnnounceAddress());
-        Assertions.assertEquals("y", config.getDiscoveryConfig().getUsageAddress());
+        ServiceDiscoveryConfig discoveryCfg = config.lookup(ServiceDiscoveryConfig.NAME, ServiceDiscoveryConfig.class);
+        Assertions.assertNotNull(discoveryCfg);
+        Assertions.assertEquals("x", discoveryCfg.getAnnounceAddress());
+        Assertions.assertEquals("y", discoveryCfg.getUsageAddress());
         JsonHelper.assertJson(new JsonObject("{\"backend-name\":\"a\",\"local\":false, \"more\": \"test\"}"),
-                              config.getDiscoveryConfig().getBackendConfiguration());
+                              discoveryCfg.getBackendConfiguration());
     }
 
 }

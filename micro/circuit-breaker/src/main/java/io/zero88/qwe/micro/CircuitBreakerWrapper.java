@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.zero88.qwe.micro.MicroConfig.CircuitBreakerConfig;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ public final class CircuitBreakerWrapper implements Supplier<CircuitBreaker> {
     private final CircuitBreaker circuitBreaker;
 
     static CircuitBreakerWrapper create(Vertx vertx, CircuitBreakerConfig cfg) {
-        if (cfg.isEnabled()) {
+        if (Objects.nonNull(cfg) && cfg.isEnabled()) {
             return new CircuitBreakerWrapper(CircuitBreaker.create(cfg.getCircuitName(), vertx, cfg.getOptions()));
         }
         logger.info("Skip setup circuit breaker");
