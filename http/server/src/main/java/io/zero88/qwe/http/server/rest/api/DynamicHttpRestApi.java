@@ -8,7 +8,7 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.utils.Networks;
+import io.zero88.qwe.utils.PriorityUtils;
 
 import lombok.NonNull;
 
@@ -16,7 +16,7 @@ public interface DynamicHttpRestApi extends DynamicRestApi {
 
     static DynamicHttpRestApi create(@NonNull Record record) {
         final HttpLocation location = record.getLocation().mapTo(HttpLocation.class);
-        final int order = Networks.priorityOrder(location.getRoot().length());
+        final int order = PriorityUtils.priorityOrder(location.getRoot().length());
         final String path = BasePaths.addWildcards(location.getRoot());
         return new DynamicHttpRestApi() {
             @Override
@@ -40,6 +40,6 @@ public interface DynamicHttpRestApi extends DynamicRestApi {
     default Optional<Set<String>> alternativePaths() { return Optional.empty(); }
 
     @Override
-    default String type() { return HttpEndpoint.TYPE; }
+    default String serviceType() { return HttpEndpoint.TYPE; }
 
 }

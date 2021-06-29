@@ -11,19 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 public final class MicroContext extends DefaultComponentContext {
 
     @Getter
-    private ServiceDiscoveryWrapper discovery;
+    private ServiceDiscoveryApi discovery;
 
     protected MicroContext(@NonNull ComponentContext context) {
         super(context);
     }
 
-    MicroContext setup(ServiceDiscoveryWrapper discovery) {
+    MicroContext setup(ServiceDiscoveryApi discovery) {
         this.discovery = discovery;
         return this;
-    }
-
-    public CircuitBreakerWrapper getBreaker() {
-        return discovery.getCb();
     }
 
 }

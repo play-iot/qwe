@@ -16,7 +16,7 @@ import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
-import io.zero88.qwe.micro.filter.ServiceLocatorParams;
+import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.filter.ServiceScope;
 import io.zero88.qwe.micro.transfomer.RecordOutput;
 import io.zero88.qwe.micro.transfomer.RecordTransformer.ViewType;
@@ -89,14 +89,14 @@ public interface GatewayServiceInvoker extends RemoteServiceInvoker {
      */
     default Future<String> search(@NonNull EventAction action) {
         final RequestData searchReq = RequestData.builder()
-                                                 .body(new JsonObject().put(ServiceLocatorParams.IDENTIFIER,
+                                                 .body(new JsonObject().put(ServiceFilterParam.IDENTIFIER,
                                                                             destination()))
-                                                 .filter(new JsonObject().put(ServiceLocatorParams.BY, "NAME")
-                                                                         .put(ServiceLocatorParams.STATUS, Status.UP)
-                                                                         .put(ServiceLocatorParams.SCOPE, scope())
-                                                                         .put(ServiceLocatorParams.VIEW,
+                                                 .filter(new JsonObject().put(ServiceFilterParam.BY, "NAME")
+                                                                         .put(ServiceFilterParam.STATUS, Status.UP)
+                                                                         .put(ServiceFilterParam.SCOPE, scope())
+                                                                         .put(ServiceFilterParam.VIEW,
                                                                               ViewType.TECHNICAL)
-                                                                         .put(ServiceLocatorParams.ACTION,
+                                                                         .put(ServiceFilterParam.ACTION,
                                                                               action.action()))
                                                  .build();
         final Future<EventMessage> invoker = invoke(gatewayAddress(), EventAction.GET_ONE, searchReq);

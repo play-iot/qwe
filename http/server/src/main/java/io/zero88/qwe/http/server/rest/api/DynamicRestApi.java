@@ -10,6 +10,7 @@ import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.HttpUtils;
+import io.zero88.qwe.micro.HasServiceType;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 
 import lombok.NonNull;
@@ -19,7 +20,7 @@ import lombok.NonNull;
  * <p>
  * To use it, your project must depends on {@code :core:micro}
  */
-public interface DynamicRestApi {
+public interface DynamicRestApi extends HasServiceType {
 
     @SuppressWarnings("unchecked")
     static <T extends DynamicRestApi> T create(@NonNull Record record) {
@@ -54,7 +55,7 @@ public interface DynamicRestApi {
     boolean useRequestData();
 
     /**
-     * It is capturePath paths. It might be empty
+     * It is capturePath paths, might be empty
      *
      * @return alternative paths
      */
@@ -65,7 +66,7 @@ public interface DynamicRestApi {
      *
      * @return Service Type
      */
-    @NonNull String type();
+    @NonNull String serviceType();
 
     /**
      * Service name

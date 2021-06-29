@@ -1,13 +1,14 @@
 package io.zero88.qwe.micro;
 
+import java.util.Objects;
+
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.zero88.qwe.ComponentContext;
 import io.zero88.qwe.ComponentVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.micro.MicroConfig.GatewayConfig;
-import io.zero88.qwe.micro.MicroConfig.ServiceDiscoveryConfig;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 
@@ -19,9 +20,10 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
         super(sharedData);
     }
 
+    //TODO: Fix it
     @Override
     public Future<Void> onAsyncStop() {
-        return componentContext().getDiscovery().unregister();
+        return componentContext().getDiscovery().unregister(new RequestFilter());
     }
 
     @Override
@@ -33,26 +35,32 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
     @Override
     public MicroContext onSuccess(@NonNull ComponentContext context) {
         logger().info("Setup service discovery...");
-        CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx, componentConfig.getCircuitConfig());
-        ServiceDiscoveryConfig discoveryConfig = componentConfig.getDiscoveryConfig();
-        return new MicroContext(context).setup(setupGateway(new ServiceDiscoveryWrapper(sharedData(), discoveryConfig, breaker),
-                         discoveryConfig.getAnnounceAddress(), discoveryConfig.getUsageAddress()));
+        CircuitBreakerConfig breakerConfig = componentConfig.lookup(CircuitBreakerConfig.NAME,
+                                                                    CircuitBreakerConfig.class);
+        CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx, breakerConfig);
+        ServiceDiscoveryConfig discoveryConfig = componentConfig.lookupOrDefault(ServiceDiscoveryConfig.NAME,
+                                                                                 ServiceDiscoveryConfig.class,
+                                                                                 ServiceDiscoveryConfig::new);
+        ServiceDiscoveryApi discoveryApi = new ServiceDiscoveryApiImpl(sharedData(), discoveryConfig, breaker);
+        return new MicroContext(context).setup(setupGateway(discoveryApi, discoveryConfig));
     }
 
-    private ServiceDiscoveryWrapper setupGateway(ServiceDiscoveryWrapper serviceDiscovery, String announceAddress,
-                                                 String usageAddress) {
-        final GatewayConfig gwCfg = componentConfig.getGatewayConfig();
-        if (!gwCfg.isEnabled()) {
+    private ServiceDiscoveryApi setupGateway(ServiceDiscoveryApi serviceDiscovery,
+                                             ServiceDiscoveryConfig discoveryConfig) {
+        ServiceGatewayConfig gwCfg = componentConfig.lookup(ServiceGatewayConfig.NAME, ServiceGatewayConfig.class);
+        if (Objects.isNull(gwCfg) || !gwCfg.isEnabled()) {
             logger().info("Skip setup service discovery gateway");
             return serviceDiscovery;
         }
         vertx.eventBus()
-             .consumer(announceAddress, ServiceGatewayAnnounceMonitor.create(sharedData(), serviceDiscovery,
-                                                                             gwCfg.getAnnounceMonitorClass()));
-        if (Strings.isNotBlank(componentConfig.getDiscoveryConfig().getUsageAddress())) {
+             .consumer(discoveryConfig.getAnnounceAddress(),
+                       ServiceGatewayAnnounceMonitor.create(sharedData(), serviceDiscovery,
+                                                            gwCfg.getAnnounceMonitorClass()));
+        if (Strings.isNotBlank(discoveryConfig.getUsageAddress())) {
             vertx.eventBus()
-                 .consumer(usageAddress, ServiceGatewayUsageMonitor.create(sharedData(), serviceDiscovery,
-                                                                           gwCfg.getUsageMonitorClass()));
+                 .consumer(discoveryConfig.getUsageAddress(),
+                           ServiceGatewayUsageMonitor.create(sharedData(), serviceDiscovery,
+                                                             gwCfg.getUsageMonitorClass()));
         }
         EventBusClient.create(sharedData()).register(gwCfg.getIndexAddress(), new ServiceLocator(serviceDiscovery));
         return serviceDiscovery;

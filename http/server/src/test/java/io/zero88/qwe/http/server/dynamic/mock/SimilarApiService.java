@@ -1,5 +1,9 @@
 package io.zero88.qwe.http.server.dynamic.mock;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
@@ -10,7 +14,8 @@ import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.micro.MicroContext;
-import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.RecordHelper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
 public class SimilarApiService extends MockEventOneApiOneLocService {
 
@@ -30,14 +35,15 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
 
     @Override
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryWrapper discovery = microContext.getDiscovery();
-        CompositeFuture.all(discovery.addRecord("ems-5", EVENT_1.getAddress(),
-                                                EventMethodDefinition.createDefault("/client/:cId/site",
-                                                                                                "/:sId")),
-                            discovery.addRecord("ems-5", EVENT_2.getAddress(),
-                                                EventMethodDefinition.createDefault(
-                                                                "/client/:cId/site/:sId/product", "/:pId")))
-                       .onComplete(ar -> ar.succeeded());
+        final ServiceDiscoveryApi discovery = microContext.getDiscovery();
+        CompositeFuture.all(Stream.of(RecordHelper.create("ems-5", EVENT_1.getAddress(),
+                                                          EventMethodDefinition.createDefault("/client/:cId/site",
+                                                                                              "/:sId")),
+                                      RecordHelper.create("ems-5", EVENT_2.getAddress(),
+                                                          EventMethodDefinition.createDefault(
+                                                              "/client/:cId/site/:sId/product", "/:pId")))
+                                  .map(discovery::register)
+                                  .collect(Collectors.toList())).onComplete(AsyncResult::succeeded);
     }
 
     static class MockSiteListener implements EventListener {

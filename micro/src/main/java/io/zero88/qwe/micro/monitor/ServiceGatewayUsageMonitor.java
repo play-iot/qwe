@@ -3,7 +3,7 @@ package io.zero88.qwe.micro.monitor;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
 import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 
 import lombok.Getter;
@@ -13,14 +13,13 @@ import lombok.NonNull;
 public class ServiceGatewayUsageMonitor extends AbstractServiceGatewayMonitor<UsageInfo> {
 
     protected ServiceGatewayUsageMonitor(@NonNull SharedDataLocalProxy sharedData,
-                                         @NonNull ServiceDiscoveryWrapper controller) {
+                                         @NonNull ServiceDiscoveryApi controller) {
         super(sharedData, controller);
     }
 
     @SuppressWarnings("unchecked")
     public static <T extends ServiceGatewayUsageMonitor> T create(SharedDataLocalProxy sharedData,
-                                                                  ServiceDiscoveryWrapper controller,
-                                                                  String className) {
+                                                                  ServiceDiscoveryApi controller, String className) {
         return (T) ServiceGatewayMonitor.create(sharedData, controller, className, ServiceGatewayUsageMonitor.class);
     }
 

@@ -1,51 +1,71 @@
 package io.zero88.qwe.http.server.handler;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.ErrorMessage;
+import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.HttpException;
 import io.zero88.qwe.http.HttpStatusMapping;
 import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.http.server.rest.api.DynamicEventRestApi;
-import io.zero88.qwe.http.server.rest.api.DynamicHttpRestApi;
+import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.rest.api.DynamicRestApi;
-import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
+import io.zero88.qwe.micro.filter.ByNamePredicateFactory;
+import io.zero88.qwe.micro.filter.ByPathPredicateFactory;
+import io.zero88.qwe.micro.filter.RecordPredicateFactory;
+import io.zero88.qwe.micro.filter.ServiceFilterParam;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
- * Represents for {@code HTTP request} dispatcher between {@code client} and {@code micro service owner}
+ * Represents for {@code HTTP request} dispatcher in {@code Gateway} that forward request from a {@code client} to a
+ * backend {@code micro-service}.
  * <p>
  * It's responsible for keeping {@code micro REST API} definition to handle an incoming request context then forwarding
  * to {@code micro service owner}. After receiving {@code micro service owner} response, it will return back result to
  * client
  *
- * @param <T> Dynamic REST API
  * @see DynamicRestApi
  */
-public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Handler<RoutingContext>, Supplier<T> {
+public interface DynamicContextDispatcher extends Handler<RoutingContext> {
 
-    @SuppressWarnings("unchecked")
-    static <T extends DynamicRestApi> DynamicContextDispatcher<T> create(@NonNull T api, String gatewayPath,
-                                                                         ServiceDiscoveryWrapper dispatcher) {
-        if (api instanceof DynamicHttpRestApi) {
-            return new DynamicHttpApiDispatcher((DynamicHttpRestApi) api, gatewayPath, dispatcher);
-        }
-        if (api instanceof DynamicEventRestApi) {
-            return new DynamicEventApiDispatcher((DynamicEventRestApi) api, gatewayPath, dispatcher);
-        }
-        return null;
+    static DynamicContextDispatcher create(@NonNull DynamicRestApi api, ServiceDiscoveryApi dispatcher,
+                                           String gatewayPath) {
+        return new DynamicContextDispatcherImpl(api, gatewayPath, dispatcher);
     }
+
+    /**
+     * Dynamic rest API
+     *
+     * @return api
+     * @see DynamicRestApi
+     */
+    @NonNull DynamicRestApi api();
+
+    /**
+     * Service dispatcher
+     *
+     * @return service dispatcher
+     * @see ServiceDiscoveryApi
+     */
+    @NonNull ServiceDiscoveryApi dispatcher();
+
+    /**
+     * Gateway service path
+     *
+     * @return gateway service path
+     */
+    @NonNull String gatewayPath();
 
     /**
      * Handle incoming request
@@ -54,49 +74,58 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
      */
     @Override
     default void handle(RoutingContext context) {
-        HttpMethod httpMethod = validateMethod(context.request().method());
-        String path = context.request().path();
-        String servicePath = Urls.normalize(path.replaceAll("^" + getGatewayPath(), ""));
-        this.handle(httpMethod, servicePath, context)
-            .map(r -> handleSuccess(context, r))
-            .otherwise(t -> handleError(context, ErrorMessage.parse(t)));
+        final RequestData reqData = normalizeHeader(context, createRequestData(context));
+        dispatcher().execute(createFilter(reqData), reqData)
+                    .map(r -> handleSuccess(context, r))
+                    .otherwise(t -> handleError(context, ErrorMessage.parse(t)));
     }
 
     /**
-     * Service dispatcher
+     * Convert request data from request context
      *
-     * @return service dispatcher
-     * @see ServiceDiscoveryWrapper
+     * @param context request context
+     * @return request data
      */
-    @NonNull ServiceDiscoveryWrapper getDispatcher();
+    default RequestData createRequestData(RoutingContext context) {
+        return api().useRequestData()
+               ? RequestDataConverter.convert(context)
+               : RequestData.builder().body(RequestDataConverter.body(context)).build();
+    }
 
     /**
-     * Gateway service path
+     * Normalize request header as gateway context based on request context
      *
-     * @return gateway service path
+     * @param context request context
+     * @param reqData request data
+     * @return request data
      */
-    @NonNull String getGatewayPath();
+    default RequestData normalizeHeader(RoutingContext context, RequestData reqData) {
+        final String originPath = context.request().path();
+        final String servicePath = Urls.normalize(originPath.replaceAll("^" + gatewayPath(), ""));
+        final JsonObject headers = reqData.headers();
+        return reqData.setHeaders(new GatewayHeadersBuilder(headers).addCorrelationId()
+                                                                    .addForwardedProto(context.request().scheme())
+                                                                    .addForwardedHost(context.request().host())
+                                                                    .addForwardedMethod(getMethod(context))
+                                                                    .addForwardedURI(originPath)
+                                                                    .addRequestURI(servicePath)
+                                                                    .getHeaders());
+    }
 
     /**
-     * Handle incoming request then dispatch to a {@code micro service owner}
+     * Create a gateway filter based on incoming request to find a {@code micro service owner}
      *
-     * @param httpMethod HTTP method
-     * @param path       url path
-     * @param context    Request context
-     * @return single response data
-     * @see ResponseData
+     * @param reqData current request data
+     * @return request filter
+     * @see RecordPredicateFactory
      */
-    Future<ResponseData> handle(HttpMethod httpMethod, String path, RoutingContext context);
-
-    /**
-     * Filter {@code micro service owner} based on incoming request
-     *
-     * @param method Current request {@code HTTP Method}
-     * @param path   Current request {@code HTTP Path}
-     * @return filter function
-     */
-    default Predicate<Record> filter(HttpMethod method, String path) {
-        return record -> record.getName().equals(get().name());
+    default RequestFilter createFilter(@NonNull RequestData reqData) {
+        final RequestFilter filter = new RequestFilter(reqData.filter());
+        return filter.put(ServiceFilterParam.TYPE, api().serviceType())
+                     .put(ByNamePredicateFactory.INDICATOR, api().name())
+                     .put(ServiceFilterParam.BY, ByPathPredicateFactory.INDICATOR)
+                     .put(ServiceFilterParam.IDENTIFIER,
+                          reqData.headers().getString(GatewayHeadersBuilder.X_REQUEST_URI));
     }
 
     /**
@@ -116,7 +145,7 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
      * Handle error response from {@code micro service owner}
      *
      * @param context      Routing context
-     * @param errorMessage Response data
+     * @param errorMessage Response error data
      * @return future
      */
     default Future<Void> handleError(@NonNull RoutingContext context, ErrorMessage errorMessage) {
@@ -125,24 +154,24 @@ public interface DynamicContextDispatcher<T extends DynamicRestApi> extends Hand
                       .end(HttpUtils.prettify(errorMessage.toJson(), context.request()));
     }
 
-    default HttpMethod validateMethod(HttpMethod method) {
-        if (get().availableMethods().contains(method)) {
+    default HttpMethod getMethod(RoutingContext context) {
+        HttpMethod method = context.request().method();
+        if (api().availableMethods().contains(method)) {
             return method;
         }
         throw new HttpException("Not support HTTP Method " + method);
     }
 
+    @Accessors(fluent = true)
     @RequiredArgsConstructor
-    abstract class AbstractDynamicContextDispatcher<T extends DynamicRestApi> implements DynamicContextDispatcher<T> {
+    class DynamicContextDispatcherImpl implements DynamicContextDispatcher {
 
-        private final T api;
+        @Getter
+        private final DynamicRestApi api;
         @Getter
         private final String gatewayPath;
         @Getter
-        private final ServiceDiscoveryWrapper dispatcher;
-
-        @Override
-        public T get() { return api; }
+        private final ServiceDiscoveryApi dispatcher;
 
     }
 

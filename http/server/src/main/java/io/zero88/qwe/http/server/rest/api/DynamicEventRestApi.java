@@ -48,7 +48,7 @@ public interface DynamicEventRestApi extends DynamicRestApi {
     }
 
     @Override
-    default String type() {
+    default String serviceType() {
         return EventMessageHttpService.TYPE;
     }
 

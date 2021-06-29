@@ -1,34 +1,36 @@
 package io.zero88.qwe.rpc;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import io.zero88.qwe.JsonHelper;
+import io.vertx.junit5.VertxTestContext;
+import io.zero88.qwe.JsonHelper.Junit4;
 import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.dto.msg.DataTransferObject.Headers;
+import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.micro.BaseMicroVerticleTest;
 import io.zero88.qwe.rpc.mock.MockServiceInvoker;
 import io.zero88.qwe.rpc.mock.MockServiceListener;
 
 public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
 
-    @Before
-    public void setup(TestContext context) {
-        super.setup(context);
+    @BeforeEach
+    public void setup(Vertx vertx, VertxTestContext context) {
+        super.setup(vertx, context);
         ebClient.register(EVENT_ADDRESS_1, new MockServiceListener());
     }
 
     @Test
     public void test_get_not_found_service(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
+        MockServiceInvoker invoker = new MockServiceInvoker(getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1 + "...");
         invoker.execute(EventAction.CREATE, RequestData.builder().build()).onSuccess(d -> {
             System.out.println(d);
@@ -48,7 +50,7 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
     @Test
     public void test_get_not_found_action(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
+        MockServiceInvoker invoker = new MockServiceInvoker(getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1);
         invoker.execute(EventAction.UNKNOWN, RequestData.builder().build()).onSuccess(d -> {
             System.out.println(d);
@@ -68,24 +70,25 @@ public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
     @Test
     public void test_execute_service_failed(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
+        MockServiceInvoker invoker = new MockServiceInvoker(getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1);
         invoker.execute(EventAction.UPDATE, RequestData.builder().build())
-               .onSuccess(d -> JsonHelper.assertJson(context, async,
-                                                     new JsonObject().put("code", ErrorCode.INVALID_ARGUMENT.code())
-                                                                     .put("message", "hey"), d))
+               .onSuccess(d -> Junit4.assertJson(context, async,
+                                                 new JsonObject().put("code", ErrorCode.INVALID_ARGUMENT.code())
+                                                                 .put("message", "hey"), d))
                .onFailure(context::fail);
     }
 
     @Test
     public void test_execute_service_success(TestContext context) {
         Async async = context.async();
-        MockServiceInvoker invoker = new MockServiceInvoker(config.getGatewayConfig().getIndexAddress(), ebClient,
+        MockServiceInvoker invoker = new MockServiceInvoker(getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1);
-        final JsonObject expected = new JsonObject().put(Headers.X_REQUEST_BY, "service/" + invoker.requester())
+        final JsonObject expected = new JsonObject().put(GatewayHeadersBuilder.X_REQUEST_BY,
+                                                         "service/" + invoker.requester())
                                                     .put("action", EventAction.CREATE.action());
         invoker.execute(EventAction.CREATE, RequestData.builder().build())
-               .onSuccess(d -> JsonHelper.assertJson(context, async, expected, d))
+               .onSuccess(d -> Junit4.assertJson(context, async, expected, d))
                .onFailure(context::fail);
     }
 

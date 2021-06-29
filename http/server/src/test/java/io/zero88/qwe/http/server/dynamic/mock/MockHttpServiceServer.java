@@ -17,6 +17,7 @@ import io.zero88.qwe.http.server.ServerInfo;
 import io.zero88.qwe.http.server.rest.api.RestApi;
 import io.zero88.qwe.micro.MicroContext;
 import io.zero88.qwe.micro.MicroVerticleProvider;
+import io.zero88.qwe.micro.RecordHelper;
 
 public class MockHttpServiceServer extends ApplicationVerticle {
 
@@ -33,10 +34,8 @@ public class MockHttpServiceServer extends ApplicationVerticle {
         final HttpServerContext httpContext = lookup.query(HttpServerContext.class);
         final MicroContext microContext = lookup.query(MicroContext.class);
         final ServerInfo info = httpContext.getServerInfo();
-        microContext.getDiscovery()
-                    .addRecord("httpService", new HttpLocation(info.toJson()).setRoot(info.getApiPath()),
-                               new JsonObject())
-                    .mapEmpty();
+        final HttpLocation location = new HttpLocation(info.toJson()).setRoot(info.getApiPath());
+        microContext.getDiscovery().register(RecordHelper.create("httpService", location));
     }
 
     @Path("/test")

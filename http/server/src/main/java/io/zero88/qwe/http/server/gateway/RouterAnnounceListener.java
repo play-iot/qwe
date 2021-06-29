@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server.gateway;
 
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 
 import lombok.NonNull;
@@ -20,16 +20,7 @@ import lombok.NonNull;
  *     "__micro__": {
  *       "__gateway__": {
  *         "enabled": true,
- *         "localAnnounceMonitorClass": "io.zero88.qwe.http.server.gateway.RouterAnnounceListener"
- *       },
- *       "__serviceDiscovery__": {
- *         "enabled": false
- *       },
- *       "__localServiceDiscovery__": {
- *         "enabled": true
- *       },
- *       "__circuitBreaker__": {
- *         "enabled": true
+ *         "announceMonitorClass": "io.zero88.qwe.http.server.gateway.RouterAnnounceListener"
  *       }
  *     },
  *     "__http__": {
@@ -46,7 +37,7 @@ import lombok.NonNull;
  */
 public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implements DynamicRouterRegister {
 
-    protected RouterAnnounceListener(@NonNull SharedDataLocalProxy proxy, @NonNull ServiceDiscoveryWrapper discovery) {
+    protected RouterAnnounceListener(@NonNull SharedDataLocalProxy proxy, @NonNull ServiceDiscoveryApi discovery) {
         super(proxy, discovery);
     }
 

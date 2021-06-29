@@ -13,7 +13,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.HasSharedData;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,12 +23,11 @@ import lombok.experimental.Accessors;
 
 public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasSharedData {
 
-    static <T extends ServiceGatewayMonitor> T create(@NonNull SharedDataLocalProxy proxy,
-                                                      @NonNull ServiceDiscoveryWrapper wrapper, String className,
-                                                      @NonNull Class<T> fallback) {
+    static <T extends ServiceGatewayMonitor> T create(@NonNull SharedDataLocalProxy proxy, ServiceDiscoveryApi wrapper,
+                                                      String className, @NonNull Class<T> fallback) {
         Map<Class, Object> inputs = new LinkedHashMap<>();
         inputs.put(SharedDataLocalProxy.class, proxy);
-        inputs.put(ServiceDiscoveryWrapper.class, wrapper);
+        inputs.put(ServiceDiscoveryApi.class, wrapper);
         if (fallback.getName().equals(className) || Strings.isBlank(className)) {
             return ReflectionClass.createObject(fallback, inputs);
         }
@@ -36,7 +35,7 @@ public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasShar
         return Objects.isNull(monitor) ? ReflectionClass.createObject(fallback, inputs) : monitor;
     }
 
-    @NonNull ServiceDiscoveryWrapper getDiscovery();
+    @NonNull ServiceDiscoveryApi getDiscovery();
 
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -47,7 +46,7 @@ public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasShar
         @Accessors(fluent = true)
         private final SharedDataLocalProxy sharedData;
         @NonNull
-        private final ServiceDiscoveryWrapper discovery;
+        private final ServiceDiscoveryApi discovery;
 
         abstract String function();
 

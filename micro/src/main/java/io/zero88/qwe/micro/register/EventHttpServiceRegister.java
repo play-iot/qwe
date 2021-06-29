@@ -18,7 +18,8 @@ import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.http.EventHttpService;
-import io.zero88.qwe.micro.ServiceDiscoveryWrapper;
+import io.zero88.qwe.micro.RecordHelper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
 import lombok.Builder;
 import lombok.NonNull;
@@ -51,7 +52,7 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
      * @see Record
      * @since 1.0.0
      */
-    public Future<List<Record>> publish(@NonNull ServiceDiscoveryWrapper discovery) {
+    public Future<List<Record>> publish(@NonNull ServiceDiscoveryApi discovery) {
         final EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, sharedKey));
         return Future.succeededFuture(eventServices.get()
                                                    .stream()
@@ -64,13 +65,13 @@ public final class EventHttpServiceRegister<S extends EventHttpService> {
                      .onSuccess(recs -> LOGGER.info("Published {} Service API(s)", recs.size()));
     }
 
-    private CompositeFuture register(@NonNull EventBusClient client, @NonNull ServiceDiscoveryWrapper discovery,
+    private CompositeFuture register(@NonNull EventBusClient client, @NonNull ServiceDiscoveryApi discovery,
                                      @NonNull S srv) {
         client.register(srv.address(), srv);
         Optional.ofNullable(afterRegisterEventBusAddress).ifPresent(func -> func.accept(srv));
         return CompositeFuture.join(srv.definitions()
                                        .stream()
-                                       .map(d -> discovery.addRecord(srv.api(), srv.address(), d))
+                                       .map(d -> discovery.register(RecordHelper.create(srv.api(), srv.address(), d)))
                                        .collect(Collectors.toList()));
     }
 
