@@ -4,8 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.CompositeFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
@@ -16,28 +19,64 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 
-import lombok.NonNull;
-
+@VertxGen
 public interface ServiceDiscoveryApi extends Supplier<ServiceDiscovery>, HasSharedData, HasLogger {
 
-    Future<Record> register(@NonNull Record record);
+    /**
+     * Register new record
+     *
+     * @param record service record
+     * @return record future
+     */
+    Future<Record> register(Record record);
 
-    default CompositeFuture register(@NonNull Record... records) {
+    /**
+     * Register one or many records
+     *
+     * @param records service records
+     * @return a composite future
+     */
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    default Future<List<Record>> register(Record... records) {
         return register(Arrays.asList(records));
     }
 
-    CompositeFuture register(@NonNull List<Record> records);
+    /**
+     * Register list of records
+     *
+     * @param records service records
+     * @return a composite future
+     */
+    Future<List<Record>> register(List<Record> records);
 
-    Future<Record> update(@NonNull Record record);
+    Future<Record> update(Record record);
 
-    Future<Record> updateMany(@NonNull RequestFilter filter, @NonNull JsonObject updateData);
+    /**
+     * Batch update records
+     *
+     * @param filter     request filter
+     * @param updateData a update data
+     * @return a composite future
+     */
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    Future<List<Record>> batchUpdate(RequestFilter filter, JsonObject updateData);
 
-    Future<Void> unregister(@NonNull RequestFilter filter);
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    Future<Void> unregister(RequestFilter filter);
 
-    Future<@Nullable Record> findOne(@NonNull RequestFilter filter);
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    Future<Record> findOne(RequestFilter filter);
 
-    Future<List<Record>> findMany(@NonNull RequestFilter filter);
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    Future<List<Record>> findMany(RequestFilter filter);
 
-    Future<ResponseData> execute(@NonNull RequestFilter filter, RequestData requestData);
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    Future<ResponseData> execute(RequestFilter filter, RequestData requestData);
+
+    @Override
+    @GenIgnore(GenIgnore.PERMITTED_TYPE)
+    default Logger logger() {
+        return LoggerFactory.getLogger(ServiceDiscoveryApi.class);
+    }
 
 }

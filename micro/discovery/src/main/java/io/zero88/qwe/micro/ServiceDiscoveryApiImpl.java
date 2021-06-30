@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import io.github.zero88.utils.Strings;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -19,11 +20,11 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.exceptions.ServiceException;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
 import io.zero88.qwe.micro.filter.PredicateFactoryLoader;
 import io.zero88.qwe.micro.filter.RecordPredicateFactory.SearchFlag;
+import io.zero88.qwe.micro.filter.ServiceFilterParam;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -59,30 +60,37 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
     }
 
     @Override
-    public CompositeFuture register(@NonNull List<Record> records) {
-        return CompositeFuture.join(records.stream().map(this::register).collect(Collectors.toList()));
+    public Future<List<Record>> register(@NonNull List<Record> records) {
+        return CompositeFuture.join(records.stream().map(this::register).collect(Collectors.toList()))
+                              .flatMap(ar -> Future.succeededFuture(ar.list()));
     }
 
     @Override
     public Future<Record> update(@NonNull Record record) {
-        return Future.failedFuture("Not yet implemented");
+        return this.findOne(new RequestFilter().put(ServiceFilterParam.IDENTIFIER,
+                                                    Strings.requireNotBlank(record.getRegistration(),
+                                                                            "Missing record registration")))
+                   .flatMap(r -> doUpdate(r, record));
     }
 
     @Override
-    public Future<Record> updateMany(@NonNull RequestFilter filter, @NonNull JsonObject updateData) {
-        return Future.failedFuture("Not yet implemented");
+    public Future<List<Record>> batchUpdate(@NonNull RequestFilter filter, @NonNull JsonObject updateData) {
+        final Record r = new Record(updateData);
+        return findMany(filter).map(recs -> CompositeFuture.join(batchUpdate(r, recs)))
+                               .flatMap(ar -> Future.succeededFuture(ar.list()));
     }
 
     @Override
     public Future<Void> unregister(@NonNull RequestFilter filter) {
-        return Future.succeededFuture();
+        return findMany(filter).flatMap(recs -> CompositeFuture.join(
+            recs.stream().map(r -> get().unpublish(r.getRegistration())).collect(Collectors.toList()))).mapEmpty();
     }
 
     @Override
-    public Future<@Nullable Record> findOne(@NonNull RequestFilter filter) {
+    public Future<Record> findOne(@NonNull RequestFilter filter) {
         return find(filter, SearchFlag.ONE).map(recs -> recs.stream().reduce((m1, m2) -> {
-            if (m1.equals(m2)) {
-                throw new ServiceException("More than one service by given parameters [" + filter + "]");
+            if (!m1.equals(m2)) {
+                throw new IllegalArgumentException("More than one service by given parameters [" + filter + "]");
             }
             return m1;
         }).orElseThrow(() -> new ServiceNotFoundException("Not found service by given parameters [" + filter + "]")));
@@ -101,14 +109,6 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
                                          .orElseThrow(() -> new ServiceUnavailable("Unable execute service")));
     }
 
-    public Future<Void> unregister(String registration) {
-        return get().getRecord(r -> r.getRegistration().equals(registration), true)
-                    .map(r -> Optional.ofNullable(r)
-                                      .orElseThrow(() -> new ServiceNotFoundException(
-                                          "Not found service registration: " + registration)))
-                    .flatMap(record -> get().unpublish(registration));
-    }
-
     private Future<Record> addDecoratorRecord(@NonNull Record record) {
         return get().publish(record).onSuccess(rec -> {
             logger().info("Published Service | Registration[{}] | API[{}] | Type[{}] | Endpoint[{}]",
@@ -121,11 +121,20 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
 
     private Future<List<Record>> find(RequestFilter filter, SearchFlag searchFlag) {
         logger().debug("Lookup by filter [{}][{}]", searchFlag, filter.toJson());
-        return get().getRecords(predicateLoader.getPredicatesFactories()
-                                               .stream()
-                                               .map(p -> p.apply(filter, searchFlag))
-                                               .reduce(Predicate::and)
-                                               .orElseGet(() -> r -> false)::test);
+        return predicateLoader.getPredicatesFactories()
+                              .stream()
+                              .map(p -> p.apply(filter, searchFlag))
+                              .reduce(Predicate::and)
+                              .map(predicate -> get().getRecords(predicate::test, true))
+                              .orElseGet(() -> get().getRecords(filter));
+    }
+
+    private List<Future> batchUpdate(Record c, List<Record> recs) {
+        return recs.stream().map(r -> doUpdate(r, c)).collect(Collectors.toList());
+    }
+
+    private Future<Record> doUpdate(Record prev, Record current) {
+        return get().update(new Record(prev.toJson().mergeIn(current.toJson(), true)));
     }
 
     private Record decorator(Record record) {

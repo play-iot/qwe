@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 
 @Getter
-public class ServiceDiscoveryConfig extends ServiceDiscoveryOptions implements IConfig {
+public final class ServiceDiscoveryConfig extends ServiceDiscoveryOptions implements IConfig {
 
     public static final String NAME = "__serviceDiscovery__";
 

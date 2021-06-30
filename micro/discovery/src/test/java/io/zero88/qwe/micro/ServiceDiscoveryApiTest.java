@@ -8,11 +8,13 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.servicediscovery.Record;
+import io.vertx.servicediscovery.Status;
 import io.vertx.servicediscovery.types.EventBusService;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.mock.MockEventBusService;
 
@@ -30,12 +32,12 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
 
     @Test
     public void test_serviceDiscovery_register_http(VertxTestContext context) {
-        final JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"http://123.456.0.1:1234/xyz\"," +
-                                                   "\"host\":\"123.456.0.1\",\"port\":1234,\"root\":\"/xyz\"," +
+        final JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"http://127.0.0.1:1111/xyz\"," +
+                                                   "\"host\":\"127.0.0.1\",\"port\":1111,\"root\":\"/xyz\"," +
                                                    "\"ssl\":false},\"metadata\":{\"meta\":\"test\"},\"name\":\"http" +
-                                                   ".test\"," + "\"status\":\"UP\",\"type\":\"http-endpoint\"}");
+                                                   ".test\",\"status\":\"UP\",\"type\":\"http-endpoint\"}");
         final Record rec = RecordHelper.create("http.test",
-                                               new HttpLocation().setHost("123.456.0.1").setPort(1234).setRoot("/xyz"),
+                                               new HttpLocation().setHost("127.0.0.1").setPort(1111).setRoot("/xyz"),
                                                new JsonObject().put("meta", "test"));
         registerThenAssert(context, expected, rec);
     }
@@ -56,18 +58,60 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
         registerThenAssert(context, expected, rec);
     }
 
-    private void registerThenAssert(VertxTestContext context, JsonObject expected, Record rec) {
-        final ServiceDiscoveryApi dis = microContext.getDiscovery();
+    @Test
+    public void test_serviceDiscovery_register_many(VertxTestContext context) {
+        final Record rec1 = RecordHelper.create("http.test.1",
+                                                new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
+        final Record rec2 = RecordHelper.create("http.test.2",
+                                                new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/abc"));
+
         final Checkpoint checkpoint = context.checkpoint();
-        dis.register(rec)
-           .flatMap(r1 -> dis.findOne(new RequestFilter().put(ServiceFilterParam.IDENTIFIER, r1.getRegistration()))
-                             .onSuccess(r2 -> context.verify(() -> {
-                                 Assertions.assertEquals(r2, r1);
-                                 JsonHelper.assertJson(expected, r1.toJson(),
-                                                       Customization.customization("registration", (o1, o2) -> true));
-                             })))
-           .onSuccess(msg -> checkpoint.flag())
-           .onFailure(context::failNow);
+        final RequestFilter filter = new RequestFilter().put(ServiceFilterParam.IDENTIFIER, "http.test")
+                                                        .put(ServiceFilterParam.BY, ByPredicateFactory.BY_GROUP)
+                                                        .put(ServiceFilterParam.STATUS, "all");
+        discovery.register(rec1, rec2)
+                 .flatMap(cf -> discovery.batchUpdate(filter, new JsonObject().put("status", "DOWN")))
+                 .onSuccess(cf -> Assertions.assertEquals(2, cf.size()))
+                 .flatMap(cf -> discovery.findMany(filter))
+                 .onSuccess(records -> context.verify(() -> {
+                     Assertions.assertEquals(2, records.size());
+                     Assertions.assertEquals(Status.DOWN, records.get(0).getStatus());
+                     Assertions.assertEquals(Status.DOWN, records.get(1).getStatus());
+                 }))
+                 .onSuccess(event -> checkpoint.flag())
+                 .onFailure(context::failNow);
+    }
+
+    @Test
+    public void test_serviceDiscovery_update(VertxTestContext context) {
+        final Record rec1 = RecordHelper.create("http.test.1",
+                                                new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
+        final Checkpoint checkpoint = context.checkpoint();
+        final RequestFilter filter = new RequestFilter().put(ServiceFilterParam.IDENTIFIER, "http.test.1")
+                                                        .put(ServiceFilterParam.BY, ServiceFilterParam.NAME)
+                                                        .put(ServiceFilterParam.STATUS, "all");
+        discovery.register(rec1)
+                 .map(r -> new Record(new JsonObject().put("status", "DOWN").put("registration", r.getRegistration())))
+                 .flatMap(discovery::update)
+                 .flatMap(cf -> discovery.findOne(filter))
+                 .onSuccess(records -> context.verify(() -> Assertions.assertEquals(Status.DOWN, records.getStatus())))
+                 .onSuccess(event -> checkpoint.flag())
+                 .onFailure(context::failNow);
+    }
+
+    private void registerThenAssert(VertxTestContext context, JsonObject expected, Record rec) {
+        final Checkpoint checkpoint = context.checkpoint();
+        discovery.register(rec)
+                 .flatMap(r1 -> discovery.findOne(
+                     new RequestFilter().put(ServiceFilterParam.IDENTIFIER, r1.getRegistration()))
+                                         .onSuccess(r2 -> context.verify(() -> {
+                                             Assertions.assertEquals(r2, r1);
+                                             JsonHelper.assertJson(expected, r1.toJson(),
+                                                                   Customization.customization("registration",
+                                                                                               (o1, o2) -> true));
+                                         })))
+                 .onSuccess(msg -> checkpoint.flag())
+                 .onFailure(context::failNow);
     }
 
 }

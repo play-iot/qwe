@@ -22,8 +22,8 @@ import io.zero88.qwe.rpc.mock.MockServiceListener;
 public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
 
     @BeforeEach
-    public void setup(Vertx vertx, VertxTestContext context) {
-        super.setup(vertx, context);
+    public void setup(Vertx vertx, VertxTestContext ctx) {
+        super.setup(vertx, ctx);
         ebClient.register(EVENT_ADDRESS_1, new MockServiceListener());
     }
 

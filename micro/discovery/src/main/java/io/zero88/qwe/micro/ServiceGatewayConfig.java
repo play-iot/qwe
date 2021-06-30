@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ServiceGatewayConfig implements IConfig {
+public final class ServiceGatewayConfig implements IConfig {
 
     static final String NAME = "__gateway__";
 
