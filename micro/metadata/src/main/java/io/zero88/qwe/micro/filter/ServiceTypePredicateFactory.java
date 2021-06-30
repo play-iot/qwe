@@ -8,7 +8,7 @@ import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.micro.filter.FilterAttributeFinder.FilterStringFinder;
 
 public final class ServiceTypePredicateFactory
-    implements SimplePredicateFactory<String>, FilterStringFinder, DefaultPredicateFactory {
+    implements SimplePredicateFactory<String>, FilterStringFinder {
 
     @Override
     public @NotNull String attribute() {
@@ -17,7 +17,11 @@ public final class ServiceTypePredicateFactory
 
     @Override
     public Predicate<Record> apply(String type) {
-        return record -> record.getType().equals(type);
+        return record -> testType(record, type);
+    }
+
+    static boolean testType(Record record, String type) {
+        return record.getType().equals(type);
     }
 
 }

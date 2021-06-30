@@ -12,8 +12,7 @@ import io.zero88.qwe.utils.JsonUtils;
 /**
  * @see ServiceScope
  */
-public final class ServiceScopePredicateFactory
-    implements SimplePredicateFactory<ServiceScope>, DefaultPredicateFactory {
+public final class ServiceScopePredicateFactory implements SimplePredicateFactory<ServiceScope> {
 
     @Override
     public @NotNull String attribute() {

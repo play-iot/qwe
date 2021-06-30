@@ -1,6 +1,5 @@
 package io.zero88.qwe.http;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -216,11 +215,10 @@ public final class EventMethodDefinition implements JsonData {
     }
 
     public EventAction search(String actualPath, @NonNull HttpMethod method) {
-        final String path = validatePath(actualPath);
         return mapping.stream()
                       .filter(mapping -> {
                           String regex = Strings.isBlank(mapping.getRegexPath()) ? servicePath : mapping.getRegexPath();
-                          return mapping.getMethod() == method && path.matches(regex);
+                          return mapping.getMethod() == method && actualPath.matches(regex);
                       })
                       .map(EventMethodMapping::getAction)
                       .findFirst()
@@ -229,29 +227,25 @@ public final class EventMethodDefinition implements JsonData {
     }
 
     public boolean test(String actualPath, EventAction action) {
-        final String path = validatePath(actualPath);
         return mapping.stream().anyMatch(mapping -> {
             String regex = Strings.isBlank(mapping.getRegexPath())
                            ? rule.createRegexPathForSearch(servicePath)
                            : mapping.getRegexPath();
-            return mapping.getAction() == action && path.matches(regex);
+            return mapping.getAction() == action && actualPath.matches(regex);
         });
     }
 
     public boolean test(String actualPath, HttpMethod method) {
-        final String path = validatePath(actualPath);
         return mapping.stream().anyMatch(mapping -> {
             String regex = Strings.isBlank(mapping.getRegexPath())
                            ? rule.createRegexPathForSearch(servicePath)
                            : mapping.getRegexPath();
-            return mapping.getMethod() == method && path.matches(regex);
+            return mapping.getMethod() == method && actualPath.matches(regex);
         });
     }
 
-    private String validatePath(String actualPath) {
-        return Optional.of(Strings.requireNotBlank(actualPath))
-                       .filter(p -> p.matches(rule.createRegexPathForSearch(servicePath)))
-                       .orElseThrow(() -> new ServiceNotFoundException("Not found path " + actualPath));
+    public boolean test(String actualPath) {
+        return Strings.isNotBlank(actualPath) && actualPath.matches(rule.createRegexPathForSearch(servicePath));
     }
 
     @JsonPOJOBuilder(withPrefix = "")

@@ -6,32 +6,20 @@ import org.jetbrains.annotations.Nullable;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
+import io.zero88.qwe.micro.HasServiceType;
 
-import lombok.NonNull;
-
-public interface ByPathPredicateFactory<T> extends ByPredicateFactory {
-
-    String INDICATOR = "location";
+public interface ByPathPredicateFactory<T> extends ByPredicateFactory, HasServiceType {
 
     @Override
     default String by() {
-        return INDICATOR;
+        return BY_PATH;
     }
 
     @Override
     default Predicate<Record> apply(String identifier, SearchFlag searchFlag, JsonObject filter) {
-        return typePredicate().and(record -> testLocation(parseLocation(record), identifier, filter));
+        return record -> !ServiceTypePredicateFactory.testType(record, serviceType()) ||
+                         testLocation(parseLocation(record), identifier, filter);
     }
-
-    default Predicate<Record> typePredicate() {
-        return record -> serviceType().equals(record.getType());
-    }
-
-    /**
-     * Declares service type
-     * @return service type
-     */
-    @NonNull String serviceType();
 
     @Nullable T parseLocation(Record record);
 

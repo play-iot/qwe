@@ -20,7 +20,7 @@ import lombok.NonNull;
  * /find?identifier=sample.name&by=name
  * /find?identifier=sample&by=group
  * /find?identifier=uuid&by=registration
- * /find?identifier="/test/123"&by=location
+ * /find?identifier="/test/123"&by=path
  * </pre>
  *
  * @see RecordPredicateFactory
@@ -29,7 +29,10 @@ import lombok.NonNull;
  */
 public interface ByPredicateFactory extends RecordPredicateFactory, FilterStringFinder {
 
-    String DEFAULT_INDICATOR = "registration";
+    String BY_REGISTRATION = "registration";
+    String BY_GROUP = "group";
+    String BY_PATH = "path";
+    String BY_ENDPOINT = "endpoint";
 
     @Override
     default @NonNull Predicate<Record> apply(@NonNull JsonObject filter, @NonNull SearchFlag searchFlag) {
@@ -69,7 +72,7 @@ public interface ByPredicateFactory extends RecordPredicateFactory, FilterString
     Predicate<Record> apply(String identifier, SearchFlag searchFlag, JsonObject filter);
 
     default String findIndicator(JsonObject filter) {
-        return JsonUtils.findString(filter, ServiceFilterParam.BY).orElse(DEFAULT_INDICATOR);
+        return JsonUtils.findString(filter, ServiceFilterParam.BY).orElse(BY_REGISTRATION);
     }
 
 }

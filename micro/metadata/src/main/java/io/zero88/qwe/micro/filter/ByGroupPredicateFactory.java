@@ -5,11 +5,11 @@ import java.util.function.Predicate;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 
-public final class ByGroupPredicateFactory implements ByPredicateFactory, DefaultPredicateFactory {
+public final class ByGroupPredicateFactory implements ByPredicateFactory {
 
     @Override
     public String by() {
-        return "group";
+        return BY_GROUP;
     }
 
     @Override

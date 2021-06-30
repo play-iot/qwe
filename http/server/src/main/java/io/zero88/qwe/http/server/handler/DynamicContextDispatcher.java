@@ -17,8 +17,7 @@ import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.rest.api.DynamicRestApi;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
-import io.zero88.qwe.micro.filter.ByNamePredicateFactory;
-import io.zero88.qwe.micro.filter.ByPathPredicateFactory;
+import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.RecordPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 
@@ -122,8 +121,8 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext> {
     default RequestFilter createFilter(@NonNull RequestData reqData) {
         final RequestFilter filter = new RequestFilter(reqData.filter());
         return filter.put(ServiceFilterParam.TYPE, api().serviceType())
-                     .put(ByNamePredicateFactory.INDICATOR, api().name())
-                     .put(ServiceFilterParam.BY, ByPathPredicateFactory.INDICATOR)
+                     .put(ServiceFilterParam.NAME, api().name())
+                     .put(ServiceFilterParam.BY, ByPredicateFactory.BY_PATH)
                      .put(ServiceFilterParam.IDENTIFIER,
                           reqData.headers().getString(GatewayHeadersBuilder.X_REQUEST_URI));
     }

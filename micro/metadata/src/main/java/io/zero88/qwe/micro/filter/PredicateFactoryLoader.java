@@ -19,10 +19,7 @@ public final class PredicateFactoryLoader {
     private final Collection<RecordPredicateFactory> predicatesFactories;
 
     public PredicateFactoryLoader() {
-        this.predicatesFactories = Stream.of(ServiceHelper.loadFactories(DefaultPredicateFactory.class),
-                                             ServiceHelper.loadFactories(RecordPredicateFactory.class))
-                                         .flatMap(Collection::stream)
-                                         .collect(Collectors.toSet());
+        this.predicatesFactories = ServiceHelper.loadFactories(RecordPredicateFactory.class);
     }
 
 }

@@ -5,11 +5,11 @@ import java.util.function.Predicate;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 
-public final class ByRegistrationPredicateFactory implements ByPredicateFactory, DefaultPredicateFactory {
+public final class ByRegistrationPredicateFactory implements ByPredicateFactory {
 
     @Override
     public String by() {
-        return DEFAULT_INDICATOR;
+        return BY_REGISTRATION;
     }
 
     @Override

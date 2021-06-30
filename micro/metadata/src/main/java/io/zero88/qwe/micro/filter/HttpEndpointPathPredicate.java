@@ -6,7 +6,7 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
 
-public final class HttpEndpointPathPredicate implements ByPathPredicateFactory<HttpLocation>, DefaultPredicateFactory {
+public final class HttpEndpointPathPredicate implements ByPathPredicateFactory<HttpLocation> {
 
     @Override
     public String serviceType() {

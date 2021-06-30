@@ -9,8 +9,7 @@ import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.utils.JsonUtils;
 
-public final class EventMessageServicePathPredicate
-    implements ByPathPredicateFactory<EventMethodDefinition>, DefaultPredicateFactory {
+public final class EventMessageServicePathPredicate implements ByPathPredicateFactory<EventMethodDefinition> {
 
     @Override
     public String serviceType() {
@@ -30,7 +29,7 @@ public final class EventMessageServicePathPredicate
                         .orElseGet(() -> JsonUtils.findString(filter, GatewayHeadersBuilder.X_FORWARDED_METHOD)
                                                   .map(HttpMethod::valueOf)
                                                   .map(m -> definition.test(path, m))
-                                                  .orElse(false));
+                                                  .orElseGet(() -> definition.test(path)));
     }
 
 }

@@ -1,6 +1,7 @@
 package io.zero88.qwe.micro.filter;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,7 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
 import io.zero88.qwe.utils.JsonUtils;
 
-public final class ServiceStatusPredicateFactory implements SimplePredicateFactory<Status>, DefaultPredicateFactory {
+public final class ServiceStatusPredicateFactory implements SimplePredicateFactory<Status> {
 
     @Override
     public @NotNull String attribute() {
@@ -19,10 +20,14 @@ public final class ServiceStatusPredicateFactory implements SimplePredicateFacto
 
     @Override
     public Status findAttribute(JsonObject filter) {
-        return JsonUtils.findString(filter, attribute())
-                        .map(s -> s.toUpperCase(Locale.ROOT))
+        final Optional<String> statusOpt = JsonUtils.findString(filter, attribute());
+        if (!statusOpt.isPresent()) {
+            return Status.UP;
+        }
+        return statusOpt.map(s -> s.toUpperCase(Locale.ROOT))
+                        .filter(s -> !"all".equalsIgnoreCase(s))
                         .map(Status::valueOf)
-                        .orElse(Status.UP);
+                        .orElse(null);
     }
 
     @Override
