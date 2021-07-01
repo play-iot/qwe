@@ -1,6 +1,7 @@
 package io.zero88.qwe.event;
 
 import io.github.zero88.exceptions.ReflectionException;
+import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Reflections.ReflectionMethod;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
@@ -75,7 +76,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
             final Object response = ReflectionMethod.execute(listener, methodMeta.method(), inputs);
             return LOADER.getHandlers()
                          .stream()
-                         .filter(h -> h.verify(methodMeta))
+                         .filter(h -> Functions.getOrDefault(false, () -> h.verify(methodMeta)))
                          .findFirst()
                          .orElseGet(AnyToFuture::new)
                          .transform(methodMeta, response);
