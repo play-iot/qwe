@@ -29,6 +29,7 @@ import lombok.NonNull;
  */
 public interface ByPredicateFactory extends RecordPredicateFactory, FilterStringFinder {
 
+    String BY_NAME = ServiceFilterParam.NAME;
     String BY_REGISTRATION = "registration";
     String BY_GROUP = "group";
     String BY_PATH = "path";

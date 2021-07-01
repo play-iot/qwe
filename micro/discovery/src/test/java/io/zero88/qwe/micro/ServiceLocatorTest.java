@@ -156,11 +156,10 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
 
     @Test
     public void test_update_but_no_registration(VertxTestContext context) {
-        final RequestData reqData = RequestData.builder().body(new JsonObject()).build();
         final JsonObject failed = new JsonObject().put("code", "INVALID_ARGUMENT")
                                                   .put("message", "Missing record identifier[registration]");
         discovery.register(RecordHelper.create("g.er1", "ea1", EventMethodDefinition.createDefault("/a", "/:b")))
-                 .flatMap(cf -> queryOneButFailed(context, reqData, failed));
+                 .flatMap(cf -> queryOneButFailed(context, RequestData.empty(), failed));
     }
 
     @Test
@@ -182,10 +181,41 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                  .flatMap(cf -> invokeThenAssert(context, req, EventAction.REMOVE, expected))
                  .onSuccess(c -> cp.flag())
                  .flatMap(r -> ebClient.request(getGatewayConfig().getIndexAddress(),
-                                                EventMessage.initial(EventAction.GET_LIST, RequestData.blank())))
+                                                EventMessage.initial(EventAction.GET_LIST, RequestData.empty())))
                  .onSuccess(msg -> context.verify(() -> {
                      Assertions.assertNotNull(msg.getData());
                      Assertions.assertEquals(1, msg.getData().getJsonArray("apis").size());
+                 }))
+                 .onSuccess(msg -> cp.flag())
+                 .onFailure(context::failNow);
+    }
+
+    @Test
+    public void test_batch_update(VertxTestContext context) {
+        final Record rec1 = RecordHelper.create("http.test.1",
+                                                new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/abc"));
+        final Record rec2 = RecordHelper.create("http.test.2",
+                                                new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
+        final JsonObject expected = new JsonObject(
+            "{\"apis\":[{\"name\":\"http.test.1\",\"type\":\"http-endpoint\",\"status\":\"UP\"," +
+            "\"endpoint\":\"http://127.0.0.1:1111/abc\"}," +
+            "{\"name\":\"http.test.2\",\"type\":\"http-endpoint\",\"status\":\"UP\"," +
+            "\"endpoint\":\"http://127.0.0.1:1111/xyz\"}]}");
+        RequestFilter filter = new RequestFilter().put(ServiceFilterParam.IDENTIFIER, "http.test")
+                                                  .put(ServiceFilterParam.BY, ByPredicateFactory.BY_GROUP);
+        RequestData reqData = RequestData.builder()
+                                         .filter(filter)
+                                         .body(new JsonObject().put("location", new JsonObject().put("port", 1111)))
+                                         .build();
+        Checkpoint cp = context.checkpoint(2);
+        discovery.register(rec1, rec2)
+                 .flatMap(rr -> invokeThenAssert(context, reqData, EventAction.BATCH_UPDATE, expected))
+                 .onSuccess(c -> cp.flag())
+                 .flatMap(r -> ebClient.request(getGatewayConfig().getIndexAddress(),
+                                                EventMessage.initial(EventAction.GET_LIST, RequestData.empty())))
+                 .onSuccess(msg -> context.verify(() -> {
+                     Assertions.assertNotNull(msg.getData());
+                     Assertions.assertEquals(2, msg.getData().getJsonArray("apis").size());
                  }))
                  .onSuccess(msg -> cp.flag())
                  .onFailure(context::failNow);
@@ -201,18 +231,17 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
         return test(context, reqData, EventAction.GET_ONE, expected, Status.FAILED);
     }
 
-    protected Future<EventMessage> test(VertxTestContext context, RequestData reqData, EventAction action,
+    protected Future<EventMessage> test(VertxTestContext ctx, RequestData reqData, EventAction action,
                                         JsonObject expected, Status status) {
-        final Checkpoint async = context.checkpoint();
+        final Checkpoint async = ctx.checkpoint();
         final String dataKey = status == Status.FAILED ? "error" : "data";
         final JsonObject resp = new JsonObject().put("status", status)
                                                 .put("action", EventAction.REPLY.action())
                                                 .put("prevAction", action.action())
                                                 .put(dataKey, expected);
         return ebClient.request(getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData))
-                       .onSuccess(
-                           m -> Junit5.assertJson(context, async, resp, m.toJson(), JSONCompareMode.NON_EXTENSIBLE))
-                       .onSuccess(c -> context.completeNow());
+                       .onSuccess(m -> Junit5.assertJson(ctx, async, resp, m.toJson(), JSONCompareMode.NON_EXTENSIBLE))
+                       .onSuccess(c -> ctx.completeNow());
     }
 
 }

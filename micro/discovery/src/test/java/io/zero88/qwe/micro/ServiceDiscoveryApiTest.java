@@ -16,6 +16,7 @@ import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
+import io.zero88.qwe.micro.filter.ServiceStatusPredicateFactory;
 import io.zero88.qwe.micro.mock.MockEventBusService;
 
 public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
@@ -24,7 +25,8 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
     public void test_register_eventbus_service(VertxTestContext context) {
         final JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"address1\"},\"metadata\":{\"service" +
                                                    ".interface\":\"io.zero88.qwe.micro.mock.MockEventBusService\"}," +
-                                                   "\"name\":\"test\",\"status\":\"UP\",\"type\":\"eventbus-service-proxy\"}");
+                                                   "\"name\":\"test\",\"status\":\"UP\"," +
+                                                   "\"type\":\"eventbus-service-proxy\"}");
         final Record rec = EventBusService.createRecord("test", "address1", MockEventBusService.class);
         registerThenAssert(context, expected, rec);
     }
@@ -65,9 +67,9 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
                                                 new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/abc"));
 
         final Checkpoint checkpoint = context.checkpoint();
-        final RequestFilter filter = new RequestFilter().put(ServiceFilterParam.IDENTIFIER, "http.test")
-                                                        .put(ServiceFilterParam.BY, ByPredicateFactory.BY_GROUP)
-                                                        .put(ServiceFilterParam.STATUS, "all");
+        RequestFilter filter = new RequestFilter().put(ServiceFilterParam.IDENTIFIER, "http.test")
+                                                  .put(ServiceFilterParam.BY, ByPredicateFactory.BY_GROUP)
+                                                  .put(ServiceFilterParam.STATUS, ServiceStatusPredicateFactory.ALL);
         discovery.register(rec1, rec2)
                  .flatMap(cf -> discovery.batchUpdate(filter, new JsonObject().put("status", "DOWN")))
                  .onSuccess(cf -> Assertions.assertEquals(2, cf.size()))
@@ -91,13 +93,13 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
     }
 
     @Test
-    public void test_batch_update(VertxTestContext context) {
+    public void test_update(VertxTestContext context) {
         final Record rec1 = RecordHelper.create("http.test.1",
                                                 new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
         final Checkpoint checkpoint = context.checkpoint();
-        final RequestFilter filter = new RequestFilter().put(ServiceFilterParam.IDENTIFIER, "http.test.1")
-                                                        .put(ServiceFilterParam.BY, ServiceFilterParam.NAME)
-                                                        .put(ServiceFilterParam.STATUS, "all");
+        RequestFilter filter = new RequestFilter().put(ServiceFilterParam.IDENTIFIER, "http.test.1")
+                                                  .put(ServiceFilterParam.BY, ByPredicateFactory.BY_NAME)
+                                                  .put(ServiceFilterParam.STATUS, ServiceStatusPredicateFactory.ALL);
         discovery.register(rec1)
                  .map(r -> new Record(new JsonObject().put("status", "DOWN").put("registration", r.getRegistration())))
                  .flatMap(discovery::update)

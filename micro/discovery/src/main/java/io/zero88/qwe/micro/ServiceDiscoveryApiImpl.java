@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceReference;
+import io.vertx.servicediscovery.Status;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -145,8 +146,9 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
     }
 
     private Future<Record> update(Record prev, Record current) {
-        return get().update(new Record(prev.toJson().mergeIn(current.toJson(), true)))
-                    .onSuccess(r -> logger().info("Updated record[{}][{}]...", prev.getType(), prev.getRegistration()));
+        Status status = current.getStatus() == Status.UNKNOWN ? prev.getStatus() : current.getStatus();
+        return get().update(new Record(prev.toJson().mergeIn(current.toJson(), true)).setStatus(status))
+                    .onSuccess(r -> logger().info("Updated record[{}][{}]", prev.getType(), prev.getRegistration()));
     }
 
     private Future<Void> unregister(Record r) {

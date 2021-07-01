@@ -48,7 +48,7 @@ public final class RequestData extends AbstractDTO {
         return builder().body(msg.getData()).build();
     }
 
-    public static RequestData blank() {
+    public static RequestData empty() {
         return RequestData.builder().build();
     }
 

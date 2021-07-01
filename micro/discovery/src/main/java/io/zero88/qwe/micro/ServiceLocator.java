@@ -1,5 +1,6 @@
 package io.zero88.qwe.micro;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ServiceLocator implements EventListener {
 
+    public static final String APIS_KEY = "apis";
     @NonNull
     private final ServiceDiscoveryApi discovery;
 
@@ -37,23 +39,36 @@ public class ServiceLocator implements EventListener {
     @EBContract(action = "GET_LIST")
     public Future<JsonObject> list(RequestData reqData) {
         final RequestFilter filter = parseFilter(reqData);
-        final ViewType view = ViewType.parse((String) filter.remove(ServiceFilterParam.VIEW));
-        return discovery.findMany(filter)
-                        .map(records -> records.stream().map(r -> transform(r, view)).collect(Collectors.toList()))
-                        .map(records -> new JsonObject().put("apis", records));
+        return collect(discovery.findMany(filter), ViewType.parse(filter.getString(ServiceFilterParam.VIEW)));
     }
 
     @EBContract(action = "CREATE")
     public Future<JsonObject> create(RequestData reqData) {
         final RequestFilter filter = parseFilter(reqData);
-        final ViewType view = ViewType.parse((String) filter.remove(ServiceFilterParam.VIEW));
-        return discovery.register(new Record(reqData.body())).map(r -> transform(r, view));
+        final ViewType view = ViewType.parse(filter.getString(ServiceFilterParam.VIEW));
+        final JsonObject body = Optional.ofNullable(reqData.body()).orElseGet(JsonObject::new);
+        if (body.containsKey(APIS_KEY)) {
+            return collect(discovery.register(body.getJsonArray(APIS_KEY)
+                                                  .stream()
+                                                  .filter(JsonObject.class::isInstance)
+                                                  .map(r -> new Record((JsonObject) r))
+                                                  .collect(Collectors.toList())), view);
+        } else {
+            return discovery.register(new Record(body)).map(r -> transform(r, view));
+        }
     }
 
     @EBContract(action = "UPDATE")
-    public Future<JsonObject> update(RequestData reqData) {
+    public Future<JsonObject> update(RequestData req) {
+        return discovery.update(new Record(req.body()))
+                        .map(r -> transform(r, ViewType.parse(parseFilter(req).getString(ServiceFilterParam.VIEW))));
+    }
+
+    @EBContract(action = "BATCH_UPDATE")
+    public Future<JsonObject> batchUpdate(RequestData reqData) {
         final RequestFilter filter = parseFilter(reqData);
-        return discovery.update(new Record()).map(Record::toJson);
+        return collect(discovery.batchUpdate(filter, reqData.body()),
+                       ViewType.parse(filter.getString(ServiceFilterParam.VIEW)));
     }
 
     @EBContract(action = "REMOVE")
@@ -62,12 +77,20 @@ public class ServiceLocator implements EventListener {
     }
 
     private RequestFilter parseFilter(RequestData reqData) {
-        return new RequestFilter(
-            Optional.ofNullable(reqData).map(RequestData::filter).orElseGet(RequestFilter::new)).getAppFilter();
+        return Optional.ofNullable(reqData)
+                       .map(RequestData::filter)
+                       .map(RequestFilter::new)
+                       .orElseGet(RequestFilter::new)
+                       .getAppFilter();
     }
 
     private JsonObject transform(Record record, ViewType view) {
         return RecordTransformerLoader.instance().lookup(record.getType(), view).transform(record).toJson();
+    }
+
+    private Future<JsonObject> collect(Future<List<Record>> records, ViewType viewType) {
+        return records.map(rr -> rr.stream().map(r -> transform(r, viewType)).collect(Collectors.toList()))
+                      .map(rr -> new JsonObject().put(APIS_KEY, rr));
     }
 
 }

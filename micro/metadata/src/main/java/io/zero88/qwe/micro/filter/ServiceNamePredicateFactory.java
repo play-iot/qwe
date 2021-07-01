@@ -29,7 +29,7 @@ public final class ServiceNamePredicateFactory
 
     @Override
     public String by() {
-        return ServiceFilterParam.NAME;
+        return ByPredicateFactory.BY_NAME;
     }
 
     @Override

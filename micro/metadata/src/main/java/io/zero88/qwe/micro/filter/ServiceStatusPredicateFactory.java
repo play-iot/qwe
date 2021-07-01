@@ -13,6 +13,11 @@ import io.zero88.qwe.utils.JsonUtils;
 
 public final class ServiceStatusPredicateFactory implements SimplePredicateFactory<Status> {
 
+    /**
+     * Define special case
+     */
+    public static String ALL = "all";
+
     @Override
     public @NotNull String attribute() {
         return ServiceFilterParam.STATUS;
@@ -25,7 +30,7 @@ public final class ServiceStatusPredicateFactory implements SimplePredicateFacto
             return Status.UP;
         }
         return statusOpt.map(s -> s.toUpperCase(Locale.ROOT))
-                        .filter(s -> !"all".equalsIgnoreCase(s))
+                        .filter(s -> !ALL.equalsIgnoreCase(s))
                         .map(Status::valueOf)
                         .orElse(null);
     }
