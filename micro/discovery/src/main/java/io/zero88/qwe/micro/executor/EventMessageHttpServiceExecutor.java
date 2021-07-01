@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro.spi;
+package io.zero88.qwe.micro.executor;
 
 import java.util.Optional;
 
@@ -10,11 +10,12 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.ErrorMessageConverter;
 import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.micro.ServiceExecutor;
+import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
 
@@ -34,11 +35,19 @@ public final class EventMessageHttpServiceExecutor implements ServiceExecutor {
     }
 
     @Override
-    public Future<ResponseData> execute(ServiceReference serviceReference, RequestData reqData) {
+    public Future<ResponseData> execute(ServiceReference serviceReference, RequestData reqData, RequestFilter filter) {
+        return serviceReference.getAs(EventMessagePusher.class)
+                               .execute(Optional.ofNullable(filter.getString(ServiceFilterParam.ACTION))
+                                                .map(EventAction::parse)
+                                                .orElseGet(() -> findActionInHeader(serviceReference, reqData)),
+                                        reqData)
+                               .map(this::from);
+    }
+
+    private EventAction findActionInHeader(ServiceReference serviceReference, RequestData reqData) {
         GatewayHeadersBuilder headers = new GatewayHeadersBuilder(reqData.headers());
-        EventMethodDefinition definition = EventMethodDefinition.from(serviceReference.record().getLocation());
-        EventAction action = definition.search(headers.getRequestURI(), headers.getForwardedMethod());
-        return serviceReference.getAs(EventMessagePusher.class).execute(action, reqData).map(this::from);
+        return EventMethodDefinition.from(serviceReference.record().getLocation())
+                                    .search(headers.getRequestURI(), headers.getForwardedMethod());
     }
 
     private ResponseData from(@NonNull EventMessage message) {

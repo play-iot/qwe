@@ -1,5 +1,7 @@
 package io.zero88.qwe.micro.servicetype;
 
+import java.util.Optional;
+
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.JsonObject;
@@ -27,7 +29,9 @@ public final class EventMessageHttpServiceImpl implements EventMessageHttpServic
                                      @NonNull JsonObject config) {
             super(vertx, discovery, record);
             this.sharedKey = config.getString(SHARED_KEY_CONFIG, this.getClass().getName());
-            this.config = new DeliveryOptions(config.getJsonObject(DELIVERY_OPTIONS_CONFIG, new JsonObject()));
+            this.config = Optional.ofNullable(config.getJsonObject(DELIVERY_OPTIONS_CONFIG))
+                                  .map(DeliveryOptions::new)
+                                  .orElseGet(DeliveryOptions::new);
         }
 
         @Override

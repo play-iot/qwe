@@ -12,12 +12,16 @@ import io.vertx.servicediscovery.Status;
 import io.vertx.servicediscovery.types.EventBusService;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
+import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
+import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.filter.ServiceStatusPredicateFactory;
 import io.zero88.qwe.micro.mock.MockEventBusService;
+import io.zero88.qwe.micro.mock.MockServiceListener;
 
 public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
 
@@ -124,6 +128,26 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
                  .onSuccess(json -> context.verify(
                      () -> JsonHelper.assertJson(expected, json, JsonHelper.ignore("filter.identifier"))))
                  .onSuccess(event -> checkpoint.flag())
+                 .onFailure(context::failNow);
+    }
+
+    @Test
+    public void test_execute_event(VertxTestContext context) {
+        ebClient.register("ar1", new MockServiceListener());
+        RequestFilter filter = new RequestFilter().put(ServiceFilterParam.BY, ByPredicateFactory.BY_NAME)
+                                                  .put(ServiceFilterParam.IDENTIFIER, "g.er1")
+                                                  .put(ServiceFilterParam.ACTION, EventAction.CREATE.action());
+        RequestData reqData = RequestData.builder()
+                                         .headers(new JsonObject().put(GatewayHeadersBuilder.X_REQUEST_BY, "test"))
+                                         .build();
+        JsonObject expected = new JsonObject("{\"headers\":{\"status\":\"SUCCESS\",\"action\":\"REPLY\"," +
+                                             "\"prevAction\":\"CREATE\"},\"body\":{\"X-Request-By\":\"test\"," +
+                                             "\"action\":\"CREATE\"}}");
+        Checkpoint cp = context.checkpoint();
+        discovery.register(RecordHelper.create("g.er1", "ar1", EventMethodDefinition.createDefault("/a", "/:b")))
+                 .flatMap(r -> discovery.execute(filter, reqData))
+                 .onSuccess(resp -> context.verify(() -> JsonHelper.assertJson(expected, resp.toJson())))
+                 .onSuccess(v -> cp.flag())
                  .onFailure(context::failNow);
     }
 

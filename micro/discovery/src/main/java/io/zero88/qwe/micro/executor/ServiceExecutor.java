@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro;
+package io.zero88.qwe.micro.executor;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -8,12 +8,14 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceReference;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
+import io.zero88.qwe.micro.HasServiceType;
 
 public interface ServiceExecutor extends HasServiceType {
 
     @Nullable JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedDataLocalProxy);
 
-    Future<ResponseData> execute(ServiceReference serviceReference, RequestData requestData);
+    Future<ResponseData> execute(ServiceReference serviceReference, RequestData requestData, RequestFilter filter);
 
 }

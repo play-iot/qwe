@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro.spi;
+package io.zero88.qwe.micro.executor;
 
 import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Urls;
@@ -12,9 +12,9 @@ import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.client.HttpClientDelegate;
-import io.zero88.qwe.micro.ServiceExecutor;
 
 public final class HttpClientServiceExecutor implements ServiceExecutor {
 
@@ -29,7 +29,8 @@ public final class HttpClientServiceExecutor implements ServiceExecutor {
     }
 
     @Override
-    public Future<ResponseData> execute(ServiceReference serviceReference, RequestData requestData) {
+    public Future<ResponseData> execute(ServiceReference serviceReference, RequestData requestData,
+                                        RequestFilter filter) {
         GatewayHeadersBuilder headers = new GatewayHeadersBuilder(requestData.headers());
         HttpLocation loc = new HttpLocation(serviceReference.record().getLocation());
         String endpoint = Urls.combinePath(

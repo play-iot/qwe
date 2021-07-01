@@ -22,6 +22,8 @@ import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
+import io.zero88.qwe.micro.executor.ServiceExecutor;
+import io.zero88.qwe.micro.executor.ServiceExecutorFactory;
 import io.zero88.qwe.micro.filter.PredicateFactoryLoader;
 import io.zero88.qwe.micro.filter.RecordPredicateFactory.SearchFlag;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
@@ -117,11 +119,10 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
 
     @Override
     public Future<ResponseData> execute(@NonNull RequestFilter filter, RequestData requestData) {
-        return this.findOne(filter)
-                   .flatMap(r -> Optional.ofNullable(executorFactory.lookup(r.getType()))
-                                         .map(s -> execute(r, s, requestData))
-                                         .orElseThrow(() -> new ServiceUnavailable(
-                                             "Unknown service executor [" + r.getType() + "]")));
+        return findOne(filter).flatMap(r -> Optional.ofNullable(executorFactory.lookup(r.getType()))
+                                                    .map(s -> execute(r, s, requestData, filter))
+                                                    .orElseThrow(() -> new ServiceUnavailable(
+                                                        "Unknown service executor [" + r.getType() + "]")));
     }
 
     private Future<Record> doRegister(@NonNull Record record) {
@@ -168,10 +169,11 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
         return record.setLocation(loc.setHost(sharedData().getData(SharedDataLocalProxy.PUBLIC_IPV4_KEY)).toJson());
     }
 
-    private Future<ResponseData> execute(Record record, ServiceExecutor serviceExecutor, RequestData requestData) {
+    private Future<ResponseData> execute(Record record, ServiceExecutor serviceExecutor, RequestData requestData,
+                                         RequestFilter filter) {
         final JsonObject configuration = serviceExecutor.getConfiguration(record, sharedData());
         final ServiceReference ref = get().getReferenceWithConfiguration(record, configuration);
-        return serviceExecutor.execute(ref, requestData).eventually(ignore -> {
+        return serviceExecutor.execute(ref, requestData, filter).eventually(ignore -> {
             ref.release();
             return Future.succeededFuture();
         });
