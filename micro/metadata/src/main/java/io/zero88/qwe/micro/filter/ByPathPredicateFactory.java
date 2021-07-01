@@ -18,11 +18,11 @@ public interface ByPathPredicateFactory<T> extends ByPredicateFactory, HasServic
     @Override
     default Predicate<Record> apply(String identifier, SearchFlag searchFlag, JsonObject filter) {
         return record -> !ServiceTypePredicateFactory.testType(record, serviceType()) ||
-                         testLocation(parseLocation(record), identifier, filter);
+                         test(parseLocation(record), identifier, filter);
     }
 
     @Nullable T parseLocation(Record record);
 
-    boolean testLocation(T location, String identifier, JsonObject filter);
+    boolean test(T location, String identifier, JsonObject filter);
 
 }

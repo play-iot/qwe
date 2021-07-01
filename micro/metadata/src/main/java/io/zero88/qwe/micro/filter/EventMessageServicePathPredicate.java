@@ -22,7 +22,7 @@ public final class EventMessageServicePathPredicate implements ByPathPredicateFa
     }
 
     @Override
-    public boolean testLocation(EventMethodDefinition definition, String path, JsonObject filter) {
+    public boolean test(EventMethodDefinition definition, String path, JsonObject filter) {
         return JsonUtils.findString(filter, ServiceFilterParam.ACTION)
                         .map(EventAction::parse)
                         .map(action -> definition.test(path, action))

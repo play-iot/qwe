@@ -19,7 +19,7 @@ public final class HttpEndpointPathPredicate implements ByPathPredicateFactory<H
     }
 
     @Override
-    public boolean testLocation(HttpLocation location, String path, JsonObject filter) {
+    public boolean test(HttpLocation location, String path, JsonObject filter) {
         return location.getRoot().equals(Urls.combinePath(path));
     }
 
