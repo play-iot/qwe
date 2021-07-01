@@ -1,12 +1,9 @@
 package io.zero88.qwe.micro;
 
 import io.github.zero88.utils.Strings;
-import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.ServiceDiscoveryOptions;
 import io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend;
 import io.zero88.qwe.IConfig;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
 
@@ -20,12 +17,17 @@ public final class ServiceDiscoveryConfig extends ServiceDiscoveryOptions implem
     static final String BACKEND_NAME = "backend-name";
 
     private final String backendClass;
+    private final boolean cleanupBeforeStop;
 
+    /**
+     * For json creator
+     */
     ServiceDiscoveryConfig() { this(null); }
 
     ServiceDiscoveryConfig(String backendClass) {
         this.setUsageAddress(null);
         this.backendClass = Strings.fallback(backendClass, DefaultServiceDiscoveryBackend.class.getName());
+        this.cleanupBeforeStop = false;
         this.reload();
     }
 
@@ -48,11 +50,6 @@ public final class ServiceDiscoveryConfig extends ServiceDiscoveryOptions implem
             Strings.isBlank(this.getBackendConfiguration().getString(BACKEND_NAME))) {
             this.getBackendConfiguration().put(BACKEND_NAME, backendClass);
         }
-    }
-
-    @Override
-    public JsonObject toJson(ObjectMapper mapper) {
-        return super.toJson();
     }
 
 }

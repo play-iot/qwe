@@ -20,12 +20,6 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
         super(sharedData);
     }
 
-    //TODO: Fix it
-    @Override
-    public Future<Void> onAsyncStop() {
-        return componentContext().getDiscovery().unregister(new RequestFilter());
-    }
-
     @Override
     public Class<MicroConfig> configClass() { return MicroConfig.class; }
 
@@ -33,14 +27,23 @@ public final class MicroVerticle extends ComponentVerticle<MicroConfig, MicroCon
     public String configFile() { return "micro.json"; }
 
     @Override
+    public Future<Void> onAsyncStop() {
+        ServiceDiscoveryConfig discoveryConfig = componentConfig.lookup(ServiceDiscoveryConfig.NAME,
+                                                                        ServiceDiscoveryConfig.class);
+        if (discoveryConfig != null && discoveryConfig.isCleanupBeforeStop()) {
+            return componentContext().getDiscovery().unregister(new RequestFilter()).mapEmpty();
+        }
+        return Future.succeededFuture();
+    }
+
+    @Override
     public MicroContext onSuccess(@NonNull ComponentContext context) {
         logger().info("Setup service discovery...");
-        CircuitBreakerConfig breakerConfig = componentConfig.lookup(CircuitBreakerConfig.NAME,
-                                                                    CircuitBreakerConfig.class);
-        CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx, breakerConfig);
-        ServiceDiscoveryConfig discoveryConfig = componentConfig.lookupOrDefault(ServiceDiscoveryConfig.NAME,
-                                                                                 ServiceDiscoveryConfig.class,
-                                                                                 ServiceDiscoveryConfig::new);
+        CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx,
+                                                                     componentConfig.lookup(CircuitBreakerConfig.NAME,
+                                                                                            CircuitBreakerConfig.class));
+        ServiceDiscoveryConfig discoveryConfig = componentConfig.lookup(ServiceDiscoveryConfig.NAME,
+                                                                        ServiceDiscoveryConfig.class);
         ServiceDiscoveryApi discoveryApi = new ServiceDiscoveryApiImpl(sharedData(), discoveryConfig, breaker);
         return new MicroContext(context).setup(setupGateway(discoveryApi, discoveryConfig));
     }
