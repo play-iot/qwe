@@ -2,8 +2,8 @@ package io.zero88.qwe.micro;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.Customization;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
@@ -21,17 +21,16 @@ import io.zero88.qwe.micro.mock.MockEventBusService;
 public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
 
     @Test
-    public void test_serviceDiscovery_register_eventbus_service(VertxTestContext context) {
+    public void test_register_eventbus_service(VertxTestContext context) {
         final JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"address1\"},\"metadata\":{\"service" +
                                                    ".interface\":\"io.zero88.qwe.micro.mock.MockEventBusService\"}," +
-                                                   "\"name\":\"test\",\"status\":\"UP\"," +
-                                                   "\"type\":\"eventbus-service-proxy\"}");
+                                                   "\"name\":\"test\",\"status\":\"UP\",\"type\":\"eventbus-service-proxy\"}");
         final Record rec = EventBusService.createRecord("test", "address1", MockEventBusService.class);
         registerThenAssert(context, expected, rec);
     }
 
     @Test
-    public void test_serviceDiscovery_register_http(VertxTestContext context) {
+    public void test_register_http(VertxTestContext context) {
         final JsonObject expected = new JsonObject("{\"location\":{\"endpoint\":\"http://127.0.0.1:1111/xyz\"," +
                                                    "\"host\":\"127.0.0.1\",\"port\":1111,\"root\":\"/xyz\"," +
                                                    "\"ssl\":false},\"metadata\":{\"meta\":\"test\"},\"name\":\"http" +
@@ -43,7 +42,7 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
     }
 
     @Test
-    public void test_serviceDiscovery_register_eventMessage(VertxTestContext context) {
+    public void test_register_eventMessage(VertxTestContext context) {
         final JsonObject expected = new JsonObject(
             "{\"location\":{\"servicePath\":\"/abc\",\"useRequestData\":true,\"mapping\":[{\"action\":\"CREATE\"," +
             "\"capturePath\":\"/abc\",\"regexPath\":\"/abc\",\"method\":\"POST\"},{\"action\":\"UPDATE\"," +
@@ -59,7 +58,7 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
     }
 
     @Test
-    public void test_serviceDiscovery_register_many(VertxTestContext context) {
+    public void test_register_many(VertxTestContext context) {
         final Record rec1 = RecordHelper.create("http.test.1",
                                                 new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
         final Record rec2 = RecordHelper.create("http.test.2",
@@ -83,7 +82,16 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
     }
 
     @Test
-    public void test_serviceDiscovery_update(VertxTestContext context) {
+    public void test_update_without_id_should_failed() {
+        Record r = RecordHelper.create("http.test.1",
+                                       new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
+        Assertions.assertEquals("Missing record identifier[registration]",
+                                Assertions.assertThrows(IllegalArgumentException.class, () -> discovery.update(r))
+                                          .getMessage());
+    }
+
+    @Test
+    public void test_batch_update(VertxTestContext context) {
         final Record rec1 = RecordHelper.create("http.test.1",
                                                 new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
         final Checkpoint checkpoint = context.checkpoint();
@@ -99,6 +107,24 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
                  .onFailure(context::failNow);
     }
 
+    @Test
+    public void test_unregister_by_id(VertxTestContext context) {
+        final Record rec1 = RecordHelper.create("http.test.1",
+                                                new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/xyz"));
+        final Checkpoint checkpoint = context.checkpoint();
+        final JsonObject expected = new JsonObject().put("total", 1)
+                                                    .put("removed", 1)
+                                                    .put("filter", new JsonObject().put("identifier", "ignore"))
+                                                    .put("errors", new JsonArray());
+        discovery.register(rec1)
+                 .map(r -> new RequestFilter().put(ServiceFilterParam.IDENTIFIER, r.getRegistration()))
+                 .flatMap(filter -> discovery.unregister(filter))
+                 .onSuccess(json -> context.verify(
+                     () -> JsonHelper.assertJson(expected, json, JsonHelper.ignore("filter.identifier"))))
+                 .onSuccess(event -> checkpoint.flag())
+                 .onFailure(context::failNow);
+    }
+
     private void registerThenAssert(VertxTestContext context, JsonObject expected, Record rec) {
         final Checkpoint checkpoint = context.checkpoint();
         discovery.register(rec)
@@ -107,8 +133,7 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
                                          .onSuccess(r2 -> context.verify(() -> {
                                              Assertions.assertEquals(r2, r1);
                                              JsonHelper.assertJson(expected, r1.toJson(),
-                                                                   Customization.customization("registration",
-                                                                                               (o1, o2) -> true));
+                                                                   JsonHelper.ignore("registration"));
                                          })))
                  .onSuccess(msg -> checkpoint.flag())
                  .onFailure(context::failNow);

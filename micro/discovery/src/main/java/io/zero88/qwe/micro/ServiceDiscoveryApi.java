@@ -62,7 +62,7 @@ public interface ServiceDiscoveryApi extends Supplier<ServiceDiscovery>, HasShar
     Future<List<Record>> batchUpdate(RequestFilter filter, JsonObject updateData);
 
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
-    Future<Void> unregister(RequestFilter filter);
+    Future<JsonObject> unregister(RequestFilter filter);
 
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
     Future<Record> findOne(RequestFilter filter);

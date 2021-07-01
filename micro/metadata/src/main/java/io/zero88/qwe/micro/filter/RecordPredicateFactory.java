@@ -34,6 +34,7 @@ public interface RecordPredicateFactory extends BiFunction<JsonObject, SearchFla
      * @param filter     the filter
      * @param searchFlag search flag
      * @return the record predicate
+     * @throws RuntimeException if any invalid data/rule in filter
      */
     @NonNull Predicate<Record> apply(@NonNull JsonObject filter, @NonNull SearchFlag searchFlag);
 

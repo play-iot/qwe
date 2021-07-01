@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import io.github.zero88.utils.Strings;
-import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -17,6 +15,7 @@ import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
@@ -31,6 +30,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+@SuppressWarnings("rawtypes")
 final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
 
     @Getter
@@ -56,7 +56,7 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
     }
 
     public Future<Record> register(@NonNull Record record) {
-        return addDecoratorRecord(decorator(record));
+        return doRegister(decorator(record));
     }
 
     @Override
@@ -67,23 +67,36 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
 
     @Override
     public Future<Record> update(@NonNull Record record) {
-        return this.findOne(new RequestFilter().put(ServiceFilterParam.IDENTIFIER,
-                                                    Strings.requireNotBlank(record.getRegistration(),
-                                                                            "Missing record registration")))
-                   .flatMap(r -> doUpdate(r, record));
+        return this.findOne(new RequestFilter().put(ServiceFilterParam.IDENTIFIER, record.getRegistration()))
+                   .flatMap(r -> update(r, record));
     }
 
     @Override
     public Future<List<Record>> batchUpdate(@NonNull RequestFilter filter, @NonNull JsonObject updateData) {
-        final Record r = new Record(updateData);
-        return findMany(filter).map(recs -> CompositeFuture.join(batchUpdate(r, recs)))
-                               .flatMap(ar -> Future.succeededFuture(ar.list()));
+        final Record c = new Record(updateData);
+        return this.findMany(filter)
+                   .map(rr -> rr.stream().map(r -> update(r, c)).collect(Collectors.<Future>toList()))
+                   .flatMap(CompositeFuture::join)
+                   .flatMap(ar -> Future.succeededFuture(ar.list()));
     }
 
     @Override
-    public Future<Void> unregister(@NonNull RequestFilter filter) {
-        return findMany(filter).flatMap(recs -> CompositeFuture.join(
-            recs.stream().map(r -> get().unpublish(r.getRegistration())).collect(Collectors.toList()))).mapEmpty();
+    public Future<JsonObject> unregister(@NonNull RequestFilter filter) {
+        return this.findMany(filter)
+                   .map(rr -> rr.stream().map(this::unregister).collect(Collectors.<Future>toList()))
+                   .flatMap(CompositeFuture::join)
+                   .map(ar -> {
+                       List<JsonObject> causes = ar.causes()
+                                                   .stream()
+                                                   .filter(Objects::nonNull)
+                                                   .map(ErrorMessage::parse)
+                                                   .map(ErrorMessage::toJson)
+                                                   .collect(Collectors.toList());
+                       return new JsonObject().put("total", ar.size())
+                                              .put("removed", ar.size() - causes.size())
+                                              .put("filter", filter)
+                                              .put("errors", causes);
+                   });
     }
 
     @Override
@@ -97,8 +110,8 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
     }
 
     @Override
-    public Future<List<Record>> findMany(@NonNull RequestFilter filter) {
-        return find(filter, SearchFlag.MANY);
+    public Future<List<Record>> findMany(RequestFilter filter) {
+        return find(Optional.ofNullable(filter).orElseGet(RequestFilter::new), SearchFlag.MANY);
     }
 
     @Override
@@ -106,10 +119,11 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
         return this.findOne(filter)
                    .flatMap(r -> Optional.ofNullable(executorFactory.lookup(r.getType()))
                                          .map(s -> execute(r, s, requestData))
-                                         .orElseThrow(() -> new ServiceUnavailable("Unable execute service")));
+                                         .orElseThrow(() -> new ServiceUnavailable(
+                                             "Unknown service executor [" + r.getType() + "]")));
     }
 
-    private Future<Record> addDecoratorRecord(@NonNull Record record) {
+    private Future<Record> doRegister(@NonNull Record record) {
         return get().publish(record).onSuccess(rec -> {
             logger().info("Published Service | Registration[{}] | API[{}] | Type[{}] | Endpoint[{}]",
                           rec.getRegistration(), rec.getName(), rec.getType(), rec.getLocation().getString("endpoint"));
@@ -120,21 +134,25 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
     }
 
     private Future<List<Record>> find(RequestFilter filter, SearchFlag searchFlag) {
-        logger().debug("Lookup by filter [{}][{}]", searchFlag, filter.toJson());
         return predicateLoader.getPredicatesFactories()
                               .stream()
                               .map(p -> p.apply(filter, searchFlag))
                               .reduce(Predicate::and)
                               .map(predicate -> get().getRecords(predicate::test, true))
-                              .orElseGet(() -> get().getRecords(filter));
+                              .orElseGet(() -> get().getRecords(filter))
+                              .onSuccess(recs -> logger().info("Found [{}] record(s) by filter [{}][{}]", recs.size(),
+                                                               searchFlag, filter.toJson()));
     }
 
-    private List<Future> batchUpdate(Record c, List<Record> recs) {
-        return recs.stream().map(r -> doUpdate(r, c)).collect(Collectors.toList());
+    private Future<Record> update(Record prev, Record current) {
+        return get().update(new Record(prev.toJson().mergeIn(current.toJson(), true)))
+                    .onSuccess(r -> logger().info("Updated record[{}][{}]...", prev.getType(), prev.getRegistration()));
     }
 
-    private Future<Record> doUpdate(Record prev, Record current) {
-        return get().update(new Record(prev.toJson().mergeIn(current.toJson(), true)));
+    private Future<Void> unregister(Record r) {
+        return get().unpublish(r.getRegistration())
+                    .onSuccess(v -> logger().info("Unregistered record[{}][{}]", r.getType(), r.getRegistration()))
+                    .onFailure(t -> logger().warn("Cannot un-published record[{}]", r.toJson(), t));
     }
 
     private Record decorator(Record record) {
@@ -148,25 +166,13 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
         return record.setLocation(loc.setHost(sharedData().getData(SharedDataLocalProxy.PUBLIC_IPV4_KEY)).toJson());
     }
 
-    private Future<ResponseData> execute(@Nullable Record record, ServiceExecutor serviceExecutor,
-                                         RequestData requestData) {
+    private Future<ResponseData> execute(Record record, ServiceExecutor serviceExecutor, RequestData requestData) {
         final JsonObject configuration = serviceExecutor.getConfiguration(record, sharedData());
         final ServiceReference ref = get().getReferenceWithConfiguration(record, configuration);
         return serviceExecutor.execute(ref, requestData).eventually(ignore -> {
             ref.release();
             return Future.succeededFuture();
         });
-    }
-
-    private Future<Void> unregister() {
-        if (Objects.isNull(sd)) {
-            return Future.succeededFuture();
-        }
-        return sd.getRecords(r -> true, true)
-                 .flatMap(recs -> CompositeFuture.join(
-                     recs.stream().map(r -> sd.unpublish(r.getRegistration())).collect(Collectors.toList())))
-                 .onFailure(t -> logger().warn("Cannot un-published record(s)", t))
-                 .mapEmpty();
     }
 
 }

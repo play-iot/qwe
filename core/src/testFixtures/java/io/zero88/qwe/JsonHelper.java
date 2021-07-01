@@ -42,8 +42,7 @@ public interface JsonHelper {
         assertJson(expected, actual, JSONCompareMode.STRICT);
     }
 
-    static void assertJson(JsonObject expected, JsonObject actual, Customization... customizations)
-        throws JSONException {
+    static void assertJson(JsonObject expected, JsonObject actual, Customization... customizations) {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
         } catch (JSONException | AssertionError e) {

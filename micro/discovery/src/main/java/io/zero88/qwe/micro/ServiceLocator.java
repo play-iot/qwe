@@ -58,7 +58,7 @@ public class ServiceLocator implements EventListener {
 
     @EBContract(action = "REMOVE")
     public Future<JsonObject> remove(RequestData reqData) {
-        return discovery.unregister(parseFilter(reqData)).map(ignore -> new JsonObject());
+        return discovery.unregister(parseFilter(reqData));
     }
 
     private RequestFilter parseFilter(RequestData reqData) {

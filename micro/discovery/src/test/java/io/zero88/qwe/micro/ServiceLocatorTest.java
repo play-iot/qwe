@@ -1,11 +1,15 @@
 package io.zero88.qwe.micro;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
+import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.JsonHelper.Junit5;
 import io.zero88.qwe.dto.msg.RequestData;
@@ -45,7 +49,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                                .build();
         discovery.register(RecordHelper.create("er1", "ea1", EventMethodDefinition.createDefault("/path", "/:param")),
                            RecordHelper.create("er2", "ea2", EventMethodDefinition.createDefault("/p", "/:r")))
-                 .onSuccess(r -> queryThenAssert(context, reqData, EventAction.GET_ONE, expected));
+                 .flatMap(r -> invokeThenAssert(context, reqData, EventAction.GET_ONE, expected));
     }
 
     @Test
@@ -60,7 +64,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                                                               .setPort(1234)
                                                                               .setSsl(true)
                                                                               .setRoot("/api")))
-                 .onSuccess(r -> queryThenAssert(context, reqData, EventAction.GET_ONE, value));
+                 .flatMap(r -> invokeThenAssert(context, reqData, EventAction.GET_ONE, value));
     }
 
     @Test
@@ -76,7 +80,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                                                  .put(RequestFilter.PRETTY, true))
                                          .build();
         discovery.register(RecordHelper.create("er2", "ea2", EventMethodDefinition.createDefault("/xy", "/:z")))
-                 .onSuccess(r -> queryThenAssert(context, reqData, EventAction.GET_ONE, expected));
+                 .flatMap(r -> invokeThenAssert(context, reqData, EventAction.GET_ONE, expected));
     }
 
     @Test
@@ -95,7 +99,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                                                  .put(ServiceFilterParam.VIEW, ViewType.TECHNICAL))
                                          .build();
         discovery.register(RecordHelper.create("er1", "ea1", EventMethodDefinition.createDefault("/path", "/:param")))
-                 .onSuccess(r -> queryThenAssert(context, reqData, EventAction.GET_ONE, value));
+                 .flatMap(r -> invokeThenAssert(context, reqData, EventAction.GET_ONE, value));
     }
 
     @Test
@@ -115,7 +119,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                                .build();
         discovery.register(RecordHelper.create("g.er1", "ea1", EventMethodDefinition.createDefault("/path", "/:param")),
                            RecordHelper.create("g.er2", "ea2", EventMethodDefinition.createDefault("/xy", "/:z")))
-                 .onSuccess(cf -> queryThenAssert(context, reqData, EventAction.GET_LIST, expected));
+                 .flatMap(cf -> invokeThenAssert(context, reqData, EventAction.GET_LIST, expected));
     }
 
     @Test
@@ -129,7 +133,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                                                   "[{\"by\":\"group\",\"identifier\":\"g\"}]");
         discovery.register(RecordHelper.create("g.er1", "ea1", EventMethodDefinition.createDefault("/a", "/:b")),
                            RecordHelper.create("g.er2", "ea2", EventMethodDefinition.createDefault("/x", "/:y")))
-                 .onSuccess(cf -> queryOneButFailed(context, reqData, failed));
+                 .flatMap(cf -> queryOneButFailed(context, reqData, failed));
     }
 
     @Test
@@ -147,29 +151,68 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                          .build();
         discovery.register(RecordHelper.create("api1", "ea1", EventMethodDefinition.createDefault("/a/b", "/:c")),
                            RecordHelper.create("api2", "ea2", EventMethodDefinition.createDefault("/a", "/:c")))
-                 .onSuccess(cf -> queryThenAssert(context, reqData, EventAction.GET_ONE, expected));
+                 .flatMap(cf -> invokeThenAssert(context, reqData, EventAction.GET_ONE, expected));
     }
 
-    protected void queryThenAssert(VertxTestContext context, RequestData reqData, EventAction action,
-                                   JsonObject expected) {
-        test(context, reqData, action, expected, Status.SUCCESS);
+    @Test
+    public void test_update_but_no_registration(VertxTestContext context) {
+        final RequestData reqData = RequestData.builder().body(new JsonObject()).build();
+        final JsonObject failed = new JsonObject().put("code", "INVALID_ARGUMENT")
+                                                  .put("message", "Missing record identifier[registration]");
+        discovery.register(RecordHelper.create("g.er1", "ea1", EventMethodDefinition.createDefault("/a", "/:b")))
+                 .flatMap(cf -> queryOneButFailed(context, reqData, failed));
     }
 
-    protected void queryOneButFailed(VertxTestContext context, RequestData reqData, JsonObject expected) {
-        test(context, reqData, EventAction.GET_ONE, expected, Status.FAILED);
+    @Test
+    public void test_unregister_many(VertxTestContext context) {
+        RequestData req = RequestData.builder()
+                                     .filter(new JsonObject().put(ServiceFilterParam.BY, ByPredicateFactory.BY_ENDPOINT)
+                                                             .put(ServiceFilterParam.IDENTIFIER, "r1"))
+                                     .build();
+        JsonObject expected = new JsonObject().put("filter", req.filter())
+                                              .put("total", 2)
+                                              .put("removed", 2)
+                                              .put("errors", new JsonArray());
+        Record r1 = RecordHelper.create("g.er1", "r1", EventMethodDefinition.createDefault("/a", "/:b"));
+        Record r2 = RecordHelper.create("g.er2", "r1", EventMethodDefinition.createDefault("/ab", "/:b"));
+        Record r3 = RecordHelper.create("http.test.1",
+                                        new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/abc"));
+        Checkpoint cp = context.checkpoint(2);
+        discovery.register(r1, r2, r3)
+                 .flatMap(cf -> invokeThenAssert(context, req, EventAction.REMOVE, expected))
+                 .onSuccess(c -> cp.flag())
+                 .flatMap(r -> ebClient.request(getGatewayConfig().getIndexAddress(),
+                                                EventMessage.initial(EventAction.GET_LIST, RequestData.blank())))
+                 .onSuccess(msg -> context.verify(() -> {
+                     Assertions.assertNotNull(msg.getData());
+                     Assertions.assertEquals(1, msg.getData().getJsonArray("apis").size());
+                 }))
+                 .onSuccess(msg -> cp.flag())
+                 .onFailure(context::failNow);
     }
 
-    protected void test(VertxTestContext context, RequestData reqData, EventAction action, JsonObject expected,
-                        Status status) {
+    protected Future<EventMessage> invokeThenAssert(VertxTestContext context, RequestData reqData, EventAction action,
+                                                    JsonObject expected) {
+        return test(context, reqData, action, expected, Status.SUCCESS);
+    }
+
+    protected Future<EventMessage> queryOneButFailed(VertxTestContext context, RequestData reqData,
+                                                     JsonObject expected) {
+        return test(context, reqData, EventAction.GET_ONE, expected, Status.FAILED);
+    }
+
+    protected Future<EventMessage> test(VertxTestContext context, RequestData reqData, EventAction action,
+                                        JsonObject expected, Status status) {
         final Checkpoint async = context.checkpoint();
         final String dataKey = status == Status.FAILED ? "error" : "data";
         final JsonObject resp = new JsonObject().put("status", status)
                                                 .put("action", EventAction.REPLY.action())
                                                 .put("prevAction", action.action())
                                                 .put(dataKey, expected);
-        ebClient.request(getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData))
-                .onSuccess(msg -> Junit5.assertJson(context, async, resp, msg.toJson(), JSONCompareMode.NON_EXTENSIBLE))
-                .onSuccess(c -> context.completeNow());
+        return ebClient.request(getGatewayConfig().getIndexAddress(), EventMessage.initial(action, reqData))
+                       .onSuccess(
+                           m -> Junit5.assertJson(context, async, resp, m.toJson(), JSONCompareMode.NON_EXTENSIBLE))
+                       .onSuccess(c -> context.completeNow());
     }
 
 }

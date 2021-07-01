@@ -39,7 +39,7 @@ public interface ByPredicateFactory extends RecordPredicateFactory, FilterString
         final String identifier = findAttribute(filter);
         if (Strings.isBlank(identifier)) {
             if (searchFlag.isOne()) {
-                throw new IllegalArgumentException("Missing record identifier");
+                throw new IllegalArgumentException("Missing record identifier[" + by() + "]");
             }
             return r -> true;
         }
