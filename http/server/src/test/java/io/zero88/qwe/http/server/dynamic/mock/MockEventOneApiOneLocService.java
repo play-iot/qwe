@@ -1,12 +1,18 @@
 package io.zero88.qwe.http.server.dynamic.mock;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.ContextLookup;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.MicroContext;
 import io.zero88.qwe.micro.MicroVerticleProvider;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.RecordHelper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
 public class MockEventOneApiOneLocService extends ApplicationVerticle {
 
@@ -25,19 +31,20 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
 
     @Override
     public void onInstallCompleted(ContextLookup lookup) {
-        publishService(lookup.query(MicroContext.class));
+        publishService(Objects.requireNonNull(lookup.query(MicroContext.class)));
     }
 
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryInvoker discovery = microContext.getLocalInvoker();
-        CompositeFuture.all(discovery.addEventMessageRecord("ems-1", MockEventServiceListener.TEST_EVENT_1.getAddress(),
-                                                            EventMethodDefinition.createDefault("/hey", "/:id")),
-                            discovery.addEventMessageRecord("ems-2", MockEventServiceListener.TEST_EVENT_2.getAddress(),
-                                                            EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")),
-                            discovery.addEventMessageRecord("ems-3", MockEventServiceListener.TEST_EVENT_3.getAddress(),
-                                                            EventMethodDefinition.createDefault("/x/:xId/y", "/:yId",
-                                                                                                false)))
-                       .onComplete(ar -> ar.succeeded());
+        final ServiceDiscoveryApi discovery = microContext.getDiscovery();
+        CompositeFuture.all(Stream.of(RecordHelper.create("ems-1", MockEventServiceListener.TEST_EVENT_1.getAddress(),
+                                                          EventMethodDefinition.createDefault("/hey", "/:id")),
+                                      RecordHelper.create("ems-2", MockEventServiceListener.TEST_EVENT_2.getAddress(),
+                                                          EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")),
+                                      RecordHelper.create("ems-3", MockEventServiceListener.TEST_EVENT_3.getAddress(),
+                                                          EventMethodDefinition.createDefault("/x/:xId/y", "/:yId",
+                                                                                              false)))
+                                  .map(discovery::register)
+                                  .collect(Collectors.toList())).onComplete(AsyncResult::succeeded);
     }
 
 }

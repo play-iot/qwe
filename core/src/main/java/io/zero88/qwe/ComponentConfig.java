@@ -1,5 +1,7 @@
 package io.zero88.qwe;
 
+import java.util.Map;
+
 public interface ComponentConfig extends IConfig {
 
     String COMP_DEPLOY_CONFIG_KEY = "__deployment__";
@@ -19,6 +21,21 @@ public interface ComponentConfig extends IConfig {
      */
     default String deploymentKey() {
         return COMP_DEPLOY_CONFIG_KEY + key();
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    interface DynamicComponentConfig<C extends DynamicComponentConfig> extends ComponentConfig, IOtherConfig<C> {
+
+        default Map<String, Object> find(Map<String, Object> map) {
+            if (map.containsKey(QWEAppConfig.NAME)) {
+                return find((Map<String, Object>) map.get(QWEAppConfig.NAME));
+            }
+            if (map.containsKey(key())) {
+                return (Map<String, Object>) map.get(key());
+            }
+            return map;
+        }
+
     }
 
 }

@@ -19,7 +19,7 @@ public class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, W
         if (config.isInResource()) {
             staticHandler.setWebRoot(config.getWebRoot());
         } else {
-            String webDir = FileUtils.createFolder(sharedData.getData(SharedDataLocalProxy.APP_DATADIR),
+            String webDir = FileUtils.createFolder(sharedData.getData(SharedDataLocalProxy.APP_DATADIR_KEY),
                                                    config.getWebRoot());
             log().info(decor("Registering route '{}' with web dir '{}'"), config.getWebPath(), webDir);
             staticHandler.setEnableRangeSupport(true)

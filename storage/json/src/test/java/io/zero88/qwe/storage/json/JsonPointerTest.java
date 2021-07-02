@@ -3,10 +3,10 @@ package io.zero88.qwe.storage.json;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.zero88.qwe.utils.Configs;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.pointer.JsonPointer;
+import io.zero88.qwe.utils.JsonUtils;
 
 class JsonPointerTest {
 
@@ -15,7 +15,7 @@ class JsonPointerTest {
         final JsonPointer pointer = JsonPointer.create();
         Assertions.assertTrue(pointer.isRootPointer());
         Assertions.assertTrue(pointer.isLocalPointer());
-        final Object obj = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        final Object obj = pointer.queryJson(JsonUtils.loadJsonInClasspath("jp.json"));
         Assertions.assertEquals("{\"abc\":{\"1\":\"a\",\"2\":\"b\"},\"xyz\":{},\"array\":[1],\"array2\":[1,2]}",
                                 obj.toString());
     }
@@ -25,14 +25,14 @@ class JsonPointerTest {
         final JsonPointer pointer = JsonPointer.from("/abc/1");
         Assertions.assertFalse(pointer.isRootPointer());
         Assertions.assertTrue(pointer.isParent(JsonPointer.from("/abc/1/2")));
-        final Object obj = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        final Object obj = pointer.queryJson(JsonUtils.loadJsonInClasspath("jp.json"));
         Assertions.assertEquals("a", obj);
     }
 
     @Test
     void test_write_into_existing_json_element() {
         final JsonPointer pointer = JsonPointer.from("/xyz");
-        final Object obj = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        final Object obj = pointer.queryJson(JsonUtils.loadJsonInClasspath("jp.json"));
         Assertions.assertTrue(obj instanceof JsonObject);
         Assertions.assertTrue(((JsonObject) obj).isEmpty());
         final Object alo = pointer.writeJson(obj, new JsonObject().put("alo", 222));
@@ -55,7 +55,7 @@ class JsonPointerTest {
     @Test
     void test_write_new_json_element() {
         final JsonPointer pointer = JsonPointer.from("/hey");
-        final JsonObject json = Configs.loadJsonConfig("jp.json");
+        final JsonObject json = JsonUtils.loadJsonInClasspath("jp.json");
         final JsonObject toInsert = new JsonObject().put("alo", 222);
         final Object obj = pointer.queryJson(json);
         Assertions.assertNull(obj);
@@ -116,7 +116,7 @@ class JsonPointerTest {
     void test_append_json_array() {
         JsonPointer pointer = JsonPointer.create();
         final JsonPointer arrayPointer = JsonPointer.from("/array");
-        final Object root = pointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        final Object root = pointer.queryJson(JsonUtils.loadJsonInClasspath("jp.json"));
         System.out.println(root);
         final Object newRoot = arrayPointer.copy().append(0).writeJson(root, 2);
         System.out.println(newRoot);
@@ -129,7 +129,7 @@ class JsonPointerTest {
     void test_remove_item_in_json_array() {
         JsonPointer rootPointer = JsonPointer.create();
         JsonPointer array2Pointer = JsonPointer.from("/array2");
-        final Object root = rootPointer.queryJson(Configs.loadJsonConfig("jp.json"));
+        final Object root = rootPointer.queryJson(JsonUtils.loadJsonInClasspath("jp.json"));
         System.out.println(root);
         final Object array2 = array2Pointer.queryJson(root);
         System.out.println(array2);

@@ -21,7 +21,7 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.JsonHelper.Junit4;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.event.EventAction;
@@ -83,10 +83,10 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ALL_EVENTS));
         Async async = context.async(2);
         assertJsonData(async, MockWebSocketEvent.ALL_EVENTS.getPublisher().getAddress(),
-                       JsonHelper.asserter(context, async, expected));
+                       Junit4.asserter(context, async, expected));
         WebSocket ws = setupSockJsClient(context, async, context::fail);
         clientSend(pushAddress, message).accept(
-            ws.handler(buffer -> JsonHelper.assertJson(context, async, responseExpected, buffer)));
+            ws.handler(buffer -> Junit4.assertJson(context, async, responseExpected, buffer)));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         Async async = context.async(1);
         WebSocket ws = setupSockJsClient(context, async, context::fail);
         clientSend(pushAddress, message).accept(
-            ws.handler(buffer -> JsonHelper.assertJson(context, async, responseExpected, buffer)));
+            ws.handler(buffer -> Junit4.assertJson(context, async, responseExpected, buffer)));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, this.getClass().getName()));
         vertx.setPeriodic(1000, t -> client.fire(publisher.getAddress(), publisher.getPattern(), echo));
         Async async = context.async(1);
-        assertJsonData(async, publisher.getAddress(), JsonHelper.asserter(context, async, echo.toJson()));
+        assertJsonData(async, publisher.getAddress(), Junit4.asserter(context, async, echo.toJson()));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         WebSocket ws = setupSockJsClient(context, async,
                                          Urls.combinePath("/ws", MockWebSocketEvent.ONLY_PUBLISHER.getPath()),
                                          clientRegister(publisher.getAddress()), context::fail);
-        ws.handler(buffer -> JsonHelper.assertJson(context, async, expected, buffer));
+        ws.handler(buffer -> Junit4.assertJson(context, async, expected, buffer));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_PUBLISHER));
         Async async = context.async(1);
         WebSocket ws = setupSockJsClient(context, async, context::fail);
-        ws.handler(buffer -> JsonHelper.assertJson(context, async, expected, buffer));
+        ws.handler(buffer -> Junit4.assertJson(context, async, expected, buffer));
         ws.writeTextMessage("xx");
     }
 
@@ -147,7 +147,7 @@ public class WebSocketEventServerTest extends HttpServerTestBase {
         JsonObject msg = socketMsg.put("body", new JsonObject("{\"type\":\"err\"}"));
         Async async = context.async(1);
         WebSocket ws = setupSockJsClient(context, async, context::fail);
-        clientWrite(msg).accept(ws.handler(buffer -> JsonHelper.assertJson(context, async, body.toJson(), buffer)));
+        clientWrite(msg).accept(ws.handler(buffer -> Junit4.assertJson(context, async, body.toJson(), buffer)));
     }
 
     private void assertGreeting(TestContext context, Async async, String uri) {

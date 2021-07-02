@@ -17,7 +17,7 @@ import io.vertx.core.metrics.MetricsOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.tracing.TracingOptions;
 import io.zero88.qwe.cluster.ClusterType;
-import io.zero88.qwe.utils.Networks;
+import io.zero88.qwe.utils.NetworkUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -344,11 +344,11 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
     private Map<String, Object> optimizeEB(Map<String, Object> map) {
         final Map<String, Object> opts = getOpts(map, "eventBusOptions");
         opts.compute("port", (s, o) -> o instanceof Number
-                                       ? Networks.validPort(((Number) o).intValue(), DEFAULT_EVENT_BUS_PORT)
+                                       ? NetworkUtils.validPort(((Number) o).intValue(), DEFAULT_EVENT_BUS_PORT)
                                        : DEFAULT_EVENT_BUS_PORT);
         opts.compute("clusterPublicPort",
                      (s, prop) -> prop instanceof Number
-                                  ? Networks.validPort(((Number) prop).intValue(), (Integer) opts.get("port"))
+                                  ? NetworkUtils.validPort(((Number) prop).intValue(), (Integer) opts.get("port"))
                                   : opts.get("port"));
         return map;
     }

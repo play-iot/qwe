@@ -1,6 +1,7 @@
 package io.zero88.qwe.dto.msg;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -9,9 +10,9 @@ import java.util.stream.Collector.Characteristics;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.zero88.qwe.dto.JsonData;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.dto.JsonData;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
@@ -32,6 +33,72 @@ public final class RequestFilter extends JsonObject implements JsonData {
         Characteristics.IDENTITY_FINISH);
 
     /**
+     * The constant SYSTEM_SIGN.
+     */
+    public static final String SYSTEM_SIGN = "_";
+    /**
+     * For {@code advance query}
+     *
+     * @since 1.0.0
+     */
+    public static final String QUERY = "_q";
+    /**
+     * To {@code prettify} response
+     *
+     * @since 1.0.0
+     */
+    public static final String PRETTY = "_pretty";
+    /**
+     * For {@code language}
+     *
+     * @since 1.0.0
+     */
+    public static final String LANG = "_lang";
+    /**
+     * For {@code pagination}
+     *
+     * @since 1.0.0
+     */
+    public static final String PAGE = "_page";
+    /**
+     * For {@code pagination}
+     *
+     * @since 1.0.0
+     */
+    public static final String PER_PAGE = "_per_page";
+    /**
+     * For {@code audit}
+     *
+     * @since 1.0.0
+     */
+    public static final String AUDIT = "_audit";
+    /**
+     * For {@code audit} in temporary
+     *
+     * @since 1.0.0
+     */
+    public static final String TEMP_AUDIT = "_temp_audit";
+    /**
+     * For {@code sort}
+     *
+     * @since 1.0.0
+     */
+    public static final String SORT = "_sort";
+    /**
+     * For {@code include}
+     *
+     * @since 1.0.0
+     */
+    public static final String INCLUDE = "_incl";
+    /**
+     * For {@code force}
+     *
+     * @since 1.0.0
+     */
+    public static final String FORCE = "_force";
+    public static final List<String> BOOLEAN_PARAMS = Arrays.asList(PRETTY, AUDIT, TEMP_AUDIT, FORCE);
+
+    /**
      * Instantiates a new Request filter.
      *
      * @param filter the filter
@@ -46,55 +113,55 @@ public final class RequestFilter extends JsonObject implements JsonData {
      * Is pretty.
      *
      * @return the boolean
-     * @see Filters#PRETTY
+     * @see RequestFilter#PRETTY
      * @since 1.0.0
      */
     public boolean isPretty() {
-        return parseBoolean(Filters.PRETTY);
+        return parseBoolean(PRETTY);
     }
 
     /**
      * Has force.
      *
      * @return the boolean
-     * @see Filters#FORCE
+     * @see RequestFilter#FORCE
      * @since 1.0.0
      */
     public boolean hasForce() {
-        return parseBoolean(Filters.FORCE);
+        return parseBoolean(FORCE);
     }
 
     /**
      * Has audit.
      *
      * @return the boolean
-     * @see Filters#AUDIT
+     * @see RequestFilter#AUDIT
      * @since 1.0.0
      */
     public boolean hasAudit() {
-        return parseBoolean(Filters.AUDIT);
+        return parseBoolean(AUDIT);
     }
 
     /**
      * Has temp audit.
      *
      * @return the boolean
-     * @see Filters#TEMP_AUDIT
+     * @see RequestFilter#TEMP_AUDIT
      * @since 1.0.0
      */
     public boolean hasTempAudit() {
-        return parseBoolean(Filters.TEMP_AUDIT);
+        return parseBoolean(TEMP_AUDIT);
     }
 
     /**
      * Get advance query.
      *
      * @return the advance query
-     * @see Filters#QUERY
+     * @see RequestFilter#QUERY
      * @since 1.0.0
      */
     public String advanceQuery() {
-        return getString(Filters.QUERY);
+        return getString(QUERY);
     }
 
     public RequestFilter put(String key, Object value) {
@@ -108,40 +175,37 @@ public final class RequestFilter extends JsonObject implements JsonData {
      * @since 1.0.0
      */
     public Set<String> getIncludes() {
-        return Arrays.stream(getString(Filters.INCLUDE, "").split(",")).collect(Collectors.toSet());
+        return Arrays.stream(getString(INCLUDE, "").split(",")).collect(Collectors.toSet());
     }
 
     /**
      * Gets system filter by filter system identifier sign
      *
      * @return the system filter
-     * @see Filters#SYSTEM_SIGN
+     * @see RequestFilter#SYSTEM_SIGN
      * @since 1.0.0
      */
     public RequestFilter getSystemFilter() {
-        return make(entry -> entry.getKey().startsWith(Filters.SYSTEM_SIGN)).collect(COLLECTOR);
+        return make(this, entry -> entry.getKey().startsWith(SYSTEM_SIGN)).collect(COLLECTOR);
     }
 
     /**
-     * Gets extra filter.
+     * Gets application filter.
      *
-     * @return the extra filter
+     * @return the application filter
      * @since 1.0.0
      */
-    public RequestFilter getExtraFilter() {
-        return make(entry -> !entry.getKey().startsWith(Filters.SYSTEM_SIGN)).collect(COLLECTOR);
+    public RequestFilter getAppFilter() {
+        return make(this, entry -> !entry.getKey().startsWith(SYSTEM_SIGN)).collect(COLLECTOR);
     }
 
-    public Stream<Entry<String, Object>> streamExtraFilter() {
-        return make(entry -> !entry.getKey().startsWith(Filters.SYSTEM_SIGN));
-    }
-
-    private Stream<Entry<String, Object>> make(@NonNull Predicate<Entry<String, Object>> predicate) {
-        return this.stream().filter(predicate);
+    private static Stream<Entry<String, Object>> make(JsonObject json,
+                                                      @NonNull Predicate<Entry<String, Object>> predicate) {
+        return json.stream().filter(predicate);
     }
 
     private boolean parseBoolean(String pretty) {
-        return Boolean.parseBoolean(Strings.toString(this.getValue(pretty)));
+        return Boolean.parseBoolean(Strings.toString(getValue(pretty)));
     }
 
 }

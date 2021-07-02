@@ -47,6 +47,10 @@ public final class ErrorMessageConverter implements QWEConverter<ErrorMessage, Q
         return new ErrorMessage(exception);
     }
 
+    public static QWEException convert(@NonNull ErrorMessage error) {
+        return ErrorMessageConverter.builder().build().from(error);
+    }
+
     public static QWEException override(@NonNull ErrorMessage error, ErrorCode errorCode, String overrideMsg) {
         return ErrorMessageConverter.builder().code(errorCode).overrideMsg(overrideMsg).build().from(error);
     }

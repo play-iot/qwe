@@ -1,6 +1,7 @@
 package io.zero88.qwe.event;
 
 import io.github.zero88.exceptions.ReflectionException;
+import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Reflections.ReflectionMethod;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
@@ -49,7 +50,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
 
     private Future<EventMessage> execute(EventMessage msg, String address) {
         final EventAction action = msg.getAction();
-        debug("Invoking", action, address);
+        debug("Execute", action, address, "...");
         Future<EventMessage> future;
         try {
             final MethodMeta methodMeta = annotationProcessor().lookup(listener.getClass(), action);
@@ -65,7 +66,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
             future = Future.failedFuture(e);
         }
         return future.otherwise(t -> {
-            debug("Error when handling", action, address, t);
+            debugError(action, address, t);
             return EventMessage.replyError(action, QWEExceptionConverter.friendly(t));
         });
     }
@@ -75,7 +76,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
             final Object response = ReflectionMethod.execute(listener, methodMeta.method(), inputs);
             return LOADER.getHandlers()
                          .stream()
-                         .filter(h -> h.verify(methodMeta))
+                         .filter(h -> Functions.getOrDefault(false, () -> h.verify(methodMeta)))
                          .findFirst()
                          .orElseGet(AnyToFuture::new)
                          .transform(methodMeta, response);
@@ -85,11 +86,19 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     }
 
     private void debug(String lifecycleMsg, EventAction action, String address) {
-        debug(lifecycleMsg, action, address, null);
+        debug(lifecycleMsg, action, address, "");
     }
 
-    private void debug(String lifecycleMsg, EventAction action, String address, Throwable t) {
-        listener.logger().debug("{} EventAction [{}] in address [{}]", lifecycleMsg, action, address, t);
+    private void debug(String lifecycleMsg, EventAction action, String address, String suffix) {
+        debug(lifecycleMsg, action, address, suffix, null);
+    }
+
+    private void debugError(EventAction action, String address, Throwable t) {
+        debug("Error when handling", action, address, "", t);
+    }
+
+    private void debug(String lifecycleMsg, EventAction action, String address, String suffix, Throwable t) {
+        listener.logger().debug("{} [{}][{}]{}", lifecycleMsg, address, action, suffix, t);
     }
 
 }

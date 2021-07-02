@@ -3,6 +3,7 @@ package io.zero88.qwe;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 
 @SuppressWarnings("rawtypes")
-interface IOtherConfig<C extends IOtherConfig> extends IConfig {
+public interface IOtherConfig<C extends IOtherConfig> extends IConfig {
 
     /**
      * Return view of other configuration
@@ -44,6 +45,8 @@ interface IOtherConfig<C extends IOtherConfig> extends IConfig {
      */
     @Nullable <T> T lookup(@NonNull String key, @NonNull Class<T> configClass);
 
+    <T> T lookupOrDefault(@NonNull String key, @NonNull Class<T> configClass, @NonNull Supplier<T> def);
+
     C put(@NotNull String configKey, Object config);
 
     C putAll(Map<String, Object> other);
@@ -68,8 +71,15 @@ interface IOtherConfig<C extends IOtherConfig> extends IConfig {
 
         public <T> T lookup(String key, @NonNull Class<T> configClass) {
             return Optional.ofNullable(other.get(key))
-                           .map(o -> Functions.getOrDefault((T) null, () -> configClass.cast(o)))
+                           .map(o -> Functions.getOrDefault((T) null, () -> parse(configClass, o)))
                            .orElse(null);
+        }
+
+        @Override
+        public <T> T lookupOrDefault(@NonNull String key, @NonNull Class<T> configClass, @NonNull Supplier<T> def) {
+            final T cfg = Optional.ofNullable(lookup(key, configClass)).orElseGet(def);
+            this.put(key, cfg);
+            return cfg;
         }
 
         @Override
@@ -92,6 +102,13 @@ interface IOtherConfig<C extends IOtherConfig> extends IConfig {
         @Override
         public JsonObject toJson(@NonNull ObjectMapper mapper) {
             return mapper.convertValue(other, JsonObject.class);
+        }
+
+        protected <T> T parse(Class<T> configClass, Object o) {
+            if (IConfig.class.isAssignableFrom(configClass)) {
+                return (T) IConfig.from(o, (Class<IConfig>) configClass);
+            }
+            return configClass.cast(o);
         }
 
     }

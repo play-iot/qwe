@@ -13,8 +13,9 @@ public interface SharedDataLocalProxy extends HasSharedKey {
      *
      * @see EventBusClient
      */
-    String EVENTBUS_DELIVERY_OPTION = "EVENTBUS_OPTION";
-    String APP_DATADIR = "APP_DATADIR";
+    String EVENTBUS_DELIVERY_OPTION_KEY = "EVENTBUS_OPTION";
+    String APP_DATADIR_KEY = "APP_DATADIR";
+    String PUBLIC_IPV4_KEY = "PUBLIC_IPV4";
 
     Vertx getVertx();
 
@@ -38,6 +39,10 @@ public interface SharedDataLocalProxy extends HasSharedKey {
         return getVertx().sharedData().getLocalMap(getSharedKey());
     }
 
+    default SharedData unwrap() {
+        return getVertx().sharedData();
+    }
+
     static SharedDataLocalProxy create(Vertx vertx, String sharedKey) {
         return new SharedDataLocalProxy() {
             @Override
@@ -50,10 +55,6 @@ public interface SharedDataLocalProxy extends HasSharedKey {
                 return sharedKey;
             }
         };
-    }
-
-    default SharedData unwrap() {
-        return getVertx().sharedData();
     }
 
 }

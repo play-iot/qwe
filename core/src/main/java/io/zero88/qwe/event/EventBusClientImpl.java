@@ -51,8 +51,8 @@ final class EventBusClientImpl implements EventBusClient {
 
     @Override
     public EventBusClient register(String address, boolean local, @NonNull EventListener listener) {
-        LOGGER.info("Registering {} Event Listener '{}' | Address '{}'...", local ? "Local" : "Cluster",
-                    listener.getClass().getName(), Strings.requireNotBlank(address));
+        LOGGER.info("Register EventListener [{}][{}][{}]", Strings.requireNotBlank(address),
+                    listener.getClass().getName(), local ? "Local" : "Cluster");
         if (local) {
             unwrap().localConsumer(address, msg -> listener.handle(sharedData, msg));
         } else {
@@ -65,7 +65,7 @@ final class EventBusClientImpl implements EventBusClient {
         if (Objects.nonNull(opts)) {
             return opts;
         }
-        final EventBusDeliveryOption option = sharedData.getData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION);
+        final EventBusDeliveryOption option = sharedData.getData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION_KEY);
         return Optional.ofNullable(option).map(EventBusDeliveryOption::get).orElseGet(DeliveryOptions::new);
     }
 

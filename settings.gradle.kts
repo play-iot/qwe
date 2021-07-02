@@ -15,22 +15,23 @@ pluginManagement {
         maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
     }
 }
-
 //include("manifest")
-
 include(":qwe-core")
 project(":qwe-core").projectDir = file("core")
 
-include("http:client")
-include("http:server")
+include("http:client", "http:server")
 
 include("storage:json")
 
-include("micro:rpc", ":micro:micro-metadata", "micro")
+include(
+    ":micro:micro-config",
+    ":micro:micro-metadata",
+    ":micro:circuit-breaker",
+    ":micro:discovery",
+    ":micro:gateway",
+    ":micro:rpc"
+)
+project(":micro:micro-config").projectDir = file("micro/config")
 project(":micro:micro-metadata").projectDir = file("micro/metadata")
 
-include("examples:shared")
-include("examples:systemd")
-include("examples:docker")
-include("examples:fatjar")
-include("examples:cluster-node")
+include("examples:shared", "examples:systemd", "examples:docker", "examples:fatjar", "examples:cluster-node")

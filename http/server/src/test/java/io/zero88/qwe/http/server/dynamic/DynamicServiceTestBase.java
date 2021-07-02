@@ -14,6 +14,7 @@ import io.vertx.ext.unit.TestContext;
 import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.VertxHelper;
+import io.zero88.qwe.DeployContext;
 import io.zero88.qwe.http.server.HttpServerTestBase;
 import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 
@@ -30,15 +31,17 @@ public abstract class DynamicServiceTestBase extends HttpServerTestBase {
     protected void startGatewayAndService(TestContext context, ApplicationVerticle service,
                                           DeploymentOptions serviceOptions) {
         CountDownLatch latch = new CountDownLatch(2);
-        DeploymentOptions config = new DeploymentOptions().setConfig(deployConfig(httpConfig.getPort()));
-        VertxHelper.deploy(vertx, context, config, gateway().get(), id -> {
-            System.out.println("Gateway Deploy Id: " + id);
-            latch.countDown();
-            VertxHelper.deploy(vertx, context, serviceOptions, service, d -> {
-                System.out.println("Service Deploy Id: " + d);
-                latch.countDown();
-            });
-        });
+        DeploymentOptions options = new DeploymentOptions().setConfig(deployConfig(httpConfig.getPort()));
+        VertxHelper.deploy(vertx, context,
+                           DeployContext.builder().options(options).verticle(gateway().get()).successAsserter(id -> {
+                               System.out.println("Gateway Deploy Id: " + id);
+                               latch.countDown();
+                               VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                                               .options(serviceOptions)
+                                                                               .verticle(service)
+                                                                               .successAsserter(d -> latch.countDown())
+                                                                               .build());
+                           }).build());
         long start = System.nanoTime();
         try {
             context.assertTrue(latch.await(timeoutInSecond(), TimeUnit.SECONDS),

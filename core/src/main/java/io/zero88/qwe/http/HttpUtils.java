@@ -1,6 +1,5 @@
 package io.zero88.qwe.http;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +26,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.jpa.Sort;
-import io.zero88.qwe.dto.msg.Filters;
+import io.zero88.qwe.dto.msg.RequestFilter;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -44,14 +43,15 @@ public final class HttpUtils {
                       HttpMethod.HEAD, HttpMethod.OPTIONS)));
 
     private static boolean isPretty(HttpServerRequest request) {
-        return Boolean.parseBoolean(request.getParam(Filters.PRETTY));
+        return Boolean.parseBoolean(request.getParam(RequestFilter.PRETTY));
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> String prettify(T result, HttpServerRequest request) {
         boolean pretty = isPretty(request);
         if (result instanceof Collection) {
-            final JsonArray jsonArray = new JsonArray(new ArrayList((Collection) result));
+            final JsonArray jsonArray = ((Collection<?>) result).stream()
+                                                                .collect(JsonArray::new, JsonArray::add,
+                                                                         JsonArray::addAll);
             return pretty ? jsonArray.encodePrettily() : jsonArray.encode();
         }
         final JsonObject jsonObject = JsonObject.mapFrom(result);
@@ -64,8 +64,8 @@ public final class HttpUtils {
             return serializeHeaders(request.headers());
         }
 
-        public static JsonObject serializeHeaders(@NonNull HttpServerResponse request) {
-            return serializeHeaders(request.headers());
+        public static JsonObject serializeHeaders(@NonNull HttpServerResponse response) {
+            return serializeHeaders(response.headers());
         }
 
         public static JsonObject serializeHeaders(@NonNull HttpClientRequest request) {
@@ -115,7 +115,7 @@ public final class HttpUtils {
         private static final String SEPARATE = "&";
 
         public static String language(@NonNull HttpServerRequest request) {
-            String lang = request.getParam(Filters.LANG);
+            String lang = request.getParam(RequestFilter.LANG);
             if (Strings.isBlank(lang)) {
                 return "en";
             }
@@ -125,8 +125,8 @@ public final class HttpUtils {
         public static Pagination pagination(@NonNull HttpServerRequest request) {
             if (request.method() == HttpMethod.GET) {
                 return Pagination.builder()
-                                 .page(request.getParam(Filters.PAGE))
-                                 .perPage(request.getParam(Filters.PER_PAGE))
+                                 .page(request.getParam(RequestFilter.PAGE))
+                                 .perPage(request.getParam(RequestFilter.PER_PAGE))
                                  .build();
             }
             return null;
@@ -134,7 +134,7 @@ public final class HttpUtils {
 
         public static Sort sort(@NonNull HttpServerRequest request) {
             if (request.method() == HttpMethod.GET) {
-                return Sort.from(Urls.decode(Optional.ofNullable(request.getParam(Filters.SORT)).orElse("")));
+                return Sort.from(Urls.decode(Optional.ofNullable(request.getParam(RequestFilter.SORT)).orElse("")));
             }
             return null;
         }
@@ -143,15 +143,14 @@ public final class HttpUtils {
             final Map<String, Object> map = request.params()
                                                    .entries()
                                                    .stream()
-                                                   .collect(Collectors.toMap(Entry::getKey, Entry::getValue,
-                                                                             (o, o2) -> {
-                                                                                 if (o instanceof String) {
-                                                                                     return new JsonArray().add(o)
-                                                                                                           .add(o2);
-                                                                                 }
-                                                                                 return ((JsonArray) o).add(o2);
-                                                                             }));
-            Filters.BOOLEAN_PARAMS.forEach(s -> map.computeIfPresent(s, (s1, o) -> true));
+                                                   .collect(
+                                                       Collectors.toMap(Entry::getKey, Entry::getValue, (o, o2) -> {
+                                                           if (o instanceof String) {
+                                                               return new JsonArray().add(o).add(o2);
+                                                           }
+                                                           return ((JsonArray) o).add(o2);
+                                                       }));
+            RequestFilter.BOOLEAN_PARAMS.forEach(s -> map.computeIfPresent(s, (s1, o) -> true));
             return JsonObject.mapFrom(map);
         }
 
@@ -160,7 +159,7 @@ public final class HttpUtils {
             for (String property : query.split("\\" + SEPARATE)) {
                 String[] keyValues = property.split("\\" + EQUAL);
                 String propKey = Urls.decode(keyValues[0]);
-                if (Filters.AUDIT.equals(propKey) || Filters.PRETTY.equals(propKey)) {
+                if (RequestFilter.AUDIT.equals(propKey) || RequestFilter.PRETTY.equals(propKey)) {
                     map.put(propKey, true);
                     continue;
                 }

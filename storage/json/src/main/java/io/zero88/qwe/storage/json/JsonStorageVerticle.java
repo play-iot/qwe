@@ -26,7 +26,7 @@ public final class JsonStorageVerticle extends ComponentVerticle<StorageConfig, 
 
     @Override
     public void onStart() {
-        componentConfig.makeFullPath((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR));
+        componentConfig.makeFullPath((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR_KEY));
         EventBusClient.create(sharedData())
                       .register(componentConfig.getServiceAddress(),
                                 JsonStorageService.create(componentConfig, componentConfig.serviceHandlerClass()));

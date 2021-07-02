@@ -133,7 +133,7 @@ public final class BootCommand extends BareCommand {
      */
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     protected Vertx startVertx() {
-        options = normalizeVertxOptions();
+        options = buildVertxOptions();
         VertxBuilder builder = new VertxBuilder(options);
 
         beforeStartingVertx(options);
@@ -172,7 +172,7 @@ public final class BootCommand extends BareCommand {
         return instance;
     }
 
-    protected QWEBootConfig normalizeVertxOptions() {
+    protected QWEBootConfig buildVertxOptions() {
         JsonObject cfg = Optional.ofNullable(getJsonFromFileOrString(vertxOptions, "options"))
                                  .orElseGet(JsonObject::new);
         QWEBootConfig config = IConfig.from(cfg, QWEBootConfig.class);

@@ -3,13 +3,15 @@ package io.zero88.qwe;
 import io.vertx.core.Handler;
 
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Setter
+@Accessors(fluent = true)
 public final class MockApplication extends ApplicationVerticle {
 
     private boolean errorOnStart;
     private boolean errorOnCompleted;
-    private Handler<ContextLookup> onCompletedHandler;
+    private Handler<ContextLookup> onCompleted;
 
     @Override
     public void onStart() {
@@ -23,8 +25,8 @@ public final class MockApplication extends ApplicationVerticle {
         if (errorOnCompleted) {
             throw new IllegalArgumentException("Error onInstallCompleted");
         }
-        if (onCompletedHandler != null) {
-            onCompletedHandler.handle(lookup);
+        if (onCompleted != null) {
+            onCompleted.handle(lookup);
         }
     }
 

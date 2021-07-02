@@ -1,19 +1,19 @@
 package io.zero88.qwe.http;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.github.zero88.utils.Strings;
+import io.github.zero88.utils.Urls;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
-import io.zero88.qwe.utils.Networks;
-import io.github.zero88.utils.Strings;
-import io.github.zero88.utils.Urls;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.utils.PriorityUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,6 +24,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.FieldNameConstants;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,18 +39,11 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = EventMethodDefinition.Builder.class)
+@FieldNameConstants
 public final class EventMethodDefinition implements JsonData {
 
     @EqualsAndHashCode.Include
     private final String servicePath;
-    /**
-     * Web Router order
-     */
-    @JsonIgnore
-    private final int order;
-    private final Set<EventMethodMapping> mapping;
-    @JsonIgnore
-    private final HttpPathRule rule;
     /**
      * Identify using {@link RequestData} or not. Default is {@code True}
      * <p>
@@ -57,6 +51,14 @@ public final class EventMethodDefinition implements JsonData {
      * data in {@code HTTP Request query params} and {@code HTTP Request Header}
      */
     private final boolean useRequestData;
+    private final Set<EventMethodMapping> mapping;
+    /**
+     * Web Router order
+     */
+    @JsonIgnore
+    private final int order;
+    @JsonIgnore
+    private final HttpPathRule rule;
 
     private EventMethodDefinition(String servicePath, boolean useRequestData,
                                   @NonNull Set<EventMethodMapping> mapping) {
@@ -70,7 +72,7 @@ public final class EventMethodDefinition implements JsonData {
             log.warn("HTTP Path '{}' is not using `RequestData` that will omit data in `HTTP Request Query` and " +
                      "`HTTP Request Header`", this.servicePath);
         }
-        this.order = Networks.priorityOrder(this.servicePath.length());
+        this.order = PriorityUtils.priorityOrder(this.servicePath.length());
         this.mapping = mapping;
     }
 
@@ -202,26 +204,48 @@ public final class EventMethodDefinition implements JsonData {
     }
 
     public static EventMethodDefinition from(@NonNull JsonObject json) {
-        return JsonData.from(json, EventMethodDefinition.class);
-    }
-
-    public Optional<String> search(String actualPath) {
-        return Optional.of(Strings.requireNotBlank(actualPath))
-                       .filter(path -> path.matches(this.rule.createRegexPathForSearch(this.servicePath)));
+        return EventMethodDefinition.builder()
+                                    .servicePath(json.getString(Fields.servicePath))
+                                    .useRequestData(json.getBoolean(Fields.useRequestData, true))
+                                    .mapping(json.getJsonArray(Fields.mapping, new JsonArray())
+                                                 .stream()
+                                                 .map(o -> JsonData.from(o, EventMethodMapping.class))
+                                                 .collect(Collectors.toSet()))
+                                    .build();
     }
 
     public EventAction search(String actualPath, @NonNull HttpMethod method) {
-        final String path = search(actualPath).orElseThrow(
-            () -> new ServiceNotFoundException("Not found path " + actualPath));
         return mapping.stream()
                       .filter(mapping -> {
                           String regex = Strings.isBlank(mapping.getRegexPath()) ? servicePath : mapping.getRegexPath();
-                          return mapping.getMethod() == method && path.matches(regex);
+                          return mapping.getMethod() == method && actualPath.matches(regex);
                       })
                       .map(EventMethodMapping::getAction)
                       .findFirst()
                       .orElseThrow(() -> new ServiceNotFoundException(
-                          Strings.format("Unsupported HTTP method {0} in ''{1}''", method, actualPath)));
+                          Strings.format("Unsupported HTTP method [{0}][{1}]", method, actualPath)));
+    }
+
+    public boolean test(String actualPath, EventAction action) {
+        return mapping.stream().anyMatch(mapping -> {
+            String regex = Strings.isBlank(mapping.getRegexPath())
+                           ? rule.createRegexPathForSearch(servicePath)
+                           : mapping.getRegexPath();
+            return mapping.getAction() == action && actualPath.matches(regex);
+        });
+    }
+
+    public boolean test(String actualPath, HttpMethod method) {
+        return mapping.stream().anyMatch(mapping -> {
+            String regex = Strings.isBlank(mapping.getRegexPath())
+                           ? rule.createRegexPathForSearch(servicePath)
+                           : mapping.getRegexPath();
+            return mapping.getMethod() == method && actualPath.matches(regex);
+        });
+    }
+
+    public boolean test(String actualPath) {
+        return Strings.isNotBlank(actualPath) && actualPath.matches(rule.createRegexPathForSearch(servicePath));
     }
 
     @JsonPOJOBuilder(withPrefix = "")

@@ -18,7 +18,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.JsonHelper.Junit4;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.QWEException;
@@ -57,8 +57,8 @@ public class HttpClientDelegateTest {
         client.request("/get?foo1=bar1&foo2=bar2", HttpMethod.GET, null).onSuccess(resp -> {
             System.out.println(resp.body());
             System.out.println(resp.headers());
-            JsonHelper.assertJson(context, async, new JsonObject("{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}"),
-                                  resp.body().getJsonObject("args"), JSONCompareMode.STRICT);
+            Junit4.assertJson(context, async, new JsonObject("{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}"),
+                              resp.body().getJsonObject("args"), JSONCompareMode.STRICT);
             //FIXME Cache?
             //                  context.assertNotNull(HttpClientRegistry.getInstance().getHttpRegistries().get
             //                  (hostInfo));

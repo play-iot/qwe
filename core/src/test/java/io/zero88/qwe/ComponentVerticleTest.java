@@ -1,5 +1,8 @@
 package io.zero88.qwe;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,7 +25,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 
 @RunWith(VertxUnitRunner.class)
-public class ComponentVerticleTest {
+public class ComponentVerticleTest implements ComponentTestHelper {
 
     private Vertx vertx;
 
@@ -39,19 +42,17 @@ public class ComponentVerticleTest {
 
     @Test
     public void not_have_config_file_should_deploy_success(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(
-            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
+        MockComponentVerticle component = new MockComponentVerticle(createSharedData(vertx));
         Async async = context.async();
-        VertxHelper.deploy(vertx, context, new DeploymentOptions(), component, deployId -> {
-            context.assertNotNull(deployId);
-            TestHelper.testComplete(async);
-        });
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .verticle(component)
+                                                        .successAsserter(id -> TestHelper.testComplete(async))
+                                                        .build());
     }
 
     @Test
     public void invalid_config_should_deploy_failed(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(
-            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
+        MockComponentVerticle component = new MockComponentVerticle(createSharedData(vertx));
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, component, t -> {
@@ -64,22 +65,20 @@ public class ComponentVerticleTest {
     @Test
     @Ignore("Need the information from Zero")
     public void test_register_shared_data(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(
-            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class));
+        MockComponentVerticle component = new MockComponentVerticle(createSharedData(vertx));
         final String key = MockComponentVerticle.class.getName();
         //        component.setup(key);
 
         Async async = context.async();
-        DeploymentOptions options = new DeploymentOptions();
-        VertxHelper.deploy(vertx, context, options, component, t -> {
-            TestHelper.testComplete(async);
-        });
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .verticle(component)
+                                                        .successAsserter(id -> TestHelper.testComplete(async))
+                                                        .build());
     }
 
     @Test
     public void throw_unexpected_error_cannot_start(TestContext context) {
-        MockComponentVerticle component = new MockComponentVerticle(
-            ComponentTestHelper.createSharedData(vertx, MockComponentVerticle.class), true);
+        MockComponentVerticle component = new MockComponentVerticle(createSharedData(vertx), true);
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
         VertxHelper.deployFailed(vertx, context, options, component, t -> {
@@ -91,6 +90,11 @@ public class ComponentVerticleTest {
 
     @After
     public void after() { vertx.close(); }
+
+    @Override
+    public Path testDir() {
+        return Paths.get("/tmp");
+    }
 
 }
 

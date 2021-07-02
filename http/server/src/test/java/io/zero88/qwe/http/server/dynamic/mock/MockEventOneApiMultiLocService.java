@@ -1,10 +1,14 @@
 package io.zero88.qwe.http.server.dynamic.mock;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.MicroContext;
-import io.zero88.qwe.micro.ServiceDiscoveryInvoker;
+import io.zero88.qwe.micro.RecordHelper;
+import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
 public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService {
 
@@ -17,12 +21,12 @@ public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService
 
     @Override
     protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryInvoker discovery = microContext.getLocalInvoker();
+        final ServiceDiscoveryApi discovery = microContext.getDiscovery();
         CompositeFuture.all(
-            discovery.addEventMessageRecord("ems-4", address, EventMethodDefinition.createDefault("/p", "/:pId")),
-            discovery.addEventMessageRecord("ems-4", address,
-                                            EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")))
-                       .onComplete(AsyncResult::succeeded);
+            Stream.of(RecordHelper.create("ems-4", address, EventMethodDefinition.createDefault("/p", "/:pId")),
+                      RecordHelper.create("ems-4", address, EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")))
+                  .map(discovery::register)
+                  .collect(Collectors.toList())).onComplete(AsyncResult::succeeded);
     }
 
 }

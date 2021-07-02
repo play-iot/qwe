@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import io.zero88.qwe.JsonHelper.Junit4;
 import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.HttpUtils;
 import io.vertx.core.http.HttpHeaders;
@@ -56,9 +56,9 @@ public class ExpectedResponse {
             context.assertNotNull(actual.headers().getString("x-response-time"));
             context.assertEquals(code, actual.getStatus().code());
             if (customizations.isEmpty()) {
-                JsonHelper.assertJson(context, async, expected, actual.body(), mode);
+                Junit4.assertJson(context, async, expected, actual.body(), mode);
             } else {
-                JsonHelper.assertJson(context, async, expected, actual.body(), customizations);
+                Junit4.assertJson(context, async, expected, actual.body(), customizations);
             }
             Optional.ofNullable(after).ifPresent(c -> c.accept(actual));
         } finally {

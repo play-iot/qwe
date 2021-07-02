@@ -22,7 +22,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.file.converter.BufferConverter;
-import io.zero88.qwe.utils.Configs;
+import io.zero88.qwe.utils.JsonUtils;
 
 @ExtendWith(VertxExtension.class)
 class TextFileOperatorTest {
@@ -104,7 +104,7 @@ class TextFileOperatorTest {
         final JsonArray object = new JsonArray().add("ab").add("cd");
         final Path axy = tempDir.resolve("axy");
         helper.write(axy, FileOption.create(), object, BufferConverter.JSON_ARRAY_CONVERTER)
-              .map(p -> Configs.readAsArray(toStream(p)))
+              .map(p -> JsonUtils.readAsArray(toStream(p)))
               .onFailure(testContext::failNow)
               .onSuccess(array -> testContext.verify(() -> {
                   System.out.println(array);
@@ -150,7 +150,7 @@ class TextFileOperatorTest {
         final BufferConverter<JsonObject> converter = BufferConverter.JSON_OBJECT_CONVERTER;
         helper.write(a1, option, new JsonObject(), converter)
               .flatMap(b -> helper.write(a1, option, new JsonObject().put("1", "2"), converter))
-              .map(p -> Configs.readAsJson(toStream(p)))
+              .map(p -> JsonUtils.readAsJson(toStream(p)))
               .onFailure(testContext::failNow)
               .onSuccess(json -> testContext.verify(() -> {
                   System.out.println(json);
