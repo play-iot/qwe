@@ -88,22 +88,21 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     @Override
     public final Future<Void> uninstallPlugins() {
         return CompositeFuture.join(contexts.list().stream().map(this::undeployPlugin).collect(Collectors.toList()))
-                              .onSuccess(ar -> logger().info("Uninstall {} plugin(s) successfully", ar.size()))
+                              .onSuccess(ar -> logger().info("Uninstalled [{}] plugin(s)", ar.size()))
                               .mapEmpty();
     }
 
     @Override
     public void onInstallCompleted(PluginContextLookup lookup) { }
 
-    Future<Void> undeployPlugin(PluginContext context) {
-        return vertx.undeploy(context.deployId())
-                    .onSuccess(unused -> logger().info("plugin [{}][{}] is uninstalled", context.deployId(),
-                                                       context.appName()));
+    Future<Void> undeployPlugin(PluginContext ctx) {
+        return vertx.undeploy(ctx.deployId())
+                    .onSuccess(unused -> logger().info("Uninstalled Plugin[{}][{}]", ctx.deployId(), ctx.pluginName()));
     }
 
     Future<String> deployPlugin(PluginProvider<? extends Plugin> provider, int defaultPoolSize) {
         final Plugin plugin = provider.provide(this);
-        logger().info("Deploying plugin [{}]...", plugin.appName());
+        logger().info("Deploying Plugin[{}]...", plugin.pluginName());
         return vertx.deployVerticle(plugin, getPluginDeploymentOptions(defaultPoolSize, plugin))
                     .onSuccess(id -> deployPluginSuccess(plugin, id))
                     .recover(t -> Future.failedFuture(QWEExceptionConverter.friendlyOrKeep(t)));
@@ -111,9 +110,10 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @SuppressWarnings("unchecked")
     void deployPluginSuccess(Plugin plugin, String deployId) {
-        logger().info("Succeed deploying plugin [{}][{}]", plugin.appName(), deployId);
-        PluginContext def = PluginContext.create(plugin.appName(), appConfig.dataDir(), getSharedKey(), deployId);
-        contexts.add(plugin.setup(plugin.hook().onSuccess(def)));
+        logger().info("Setting-up Plugin[{}][{}]...", plugin.pluginName(), deployId);
+        PluginContext def = PluginContext.create(appName(), plugin.pluginName(), appConfig.dataDir(), getSharedKey(),
+                                                 deployId);
+        contexts.add(plugin.setup(plugin.hook().onDeploySuccess(def)));
     }
 
     void deployAllSuccess(CompositeFuture r) {
@@ -138,10 +138,10 @@ public abstract class ApplicationVerticle extends AbstractVerticle
                              ? defaultPoolSize
                              : options.getWorkerPoolSize();
         String workerPool = Optional.ofNullable(options.getWorkerPoolName())
-                                    .orElseGet(() -> DEFAULT_PLUGIN_THREAD_PREFIX + plugin.appName());
+                                    .orElseGet(() -> DEFAULT_PLUGIN_THREAD_PREFIX + plugin.pluginName());
         options.setWorkerPoolName(workerPool).setWorkerPoolSize(workerPoolSize).setConfig(compConfig.toJson());
         if (logger().isDebugEnabled()) {
-            logger().debug("Deployment Options plugin [{}][{}]", plugin.appName(), options.toJson());
+            logger().debug("Plugin deployment options [{}][{}]", plugin.pluginName(), options.toJson());
         }
         return options;
     }

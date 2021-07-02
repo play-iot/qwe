@@ -62,7 +62,9 @@ public interface PluginTestHelper {
     }
 
     default <T extends Plugin> void setup(T comp, String result) {
-        comp.setup(comp.hook().onSuccess(PluginContext.create(comp.appName(), testDir(), sharedKey(), result)));
+        comp.setup(comp.hook()
+                       .onDeploySuccess(
+                           PluginContext.create("PluginTest", comp.pluginName(), testDir(), sharedKey(), result)));
     }
 
 }

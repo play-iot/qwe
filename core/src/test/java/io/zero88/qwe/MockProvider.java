@@ -1,39 +1,39 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.MockProvider.MockPluginVerticle;
+import io.zero88.qwe.MockProvider.MockPlugin;
 
 import lombok.Getter;
 import lombok.NonNull;
 
-public class MockProvider implements PluginProvider<MockPluginVerticle> {
+public class MockProvider implements PluginProvider<MockPlugin> {
 
     private final boolean error;
 
     public MockProvider(boolean error) {this.error = error;}
 
     @Override
-    public Class<MockPluginVerticle> pluginClass() { return MockPluginVerticle.class; }
+    public Class<MockPlugin> pluginClass() { return MockPlugin.class; }
 
     @Override
-    public MockPluginVerticle provide(SharedDataLocalProxy proxy) {
-        return new MockPluginVerticle(proxy, error);
+    public MockPlugin provide(SharedDataLocalProxy proxy) {
+        return new MockPlugin(proxy, error);
     }
 
-    static final class MockPluginVerticle extends PluginVerticle<MockConfig, PluginContext> {
+    static final class MockPlugin extends PluginVerticle<MockConfig, PluginContext> {
 
         @Getter
         private final boolean error;
 
-        public MockPluginVerticle(SharedDataLocalProxy sharedData) {
+        public MockPlugin(SharedDataLocalProxy sharedData) {
             this(sharedData, false);
         }
 
         @Override
-        public String appName() {
+        public String pluginName() {
             return "mock";
         }
 
-        public MockPluginVerticle(SharedDataLocalProxy sharedData, boolean error) {
+        public MockPlugin(SharedDataLocalProxy sharedData, boolean error) {
             super(sharedData);
             this.error = error;
         }
@@ -51,7 +51,7 @@ public class MockProvider implements PluginProvider<MockPluginVerticle> {
         @Override
         public void onStart() {
             if (error) {
-                throw new RuntimeException("Error when starting plugin Verticle");
+                throw new RuntimeException("Error when starting plugin[" + pluginName() + "]");
             }
         }
 

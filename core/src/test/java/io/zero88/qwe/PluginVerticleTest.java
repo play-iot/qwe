@@ -18,7 +18,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.MockProvider.MockPluginVerticle;
+import io.zero88.qwe.MockProvider.MockPlugin;
 import io.zero88.qwe.exceptions.ConfigException;
 
 import ch.qos.logback.classic.Level;
@@ -42,7 +42,7 @@ public class PluginVerticleTest implements PluginTestHelper {
 
     @Test
     public void not_have_config_file_should_deploy_success(TestContext context) {
-        MockPluginVerticle plugin = new MockPluginVerticle(createSharedData(vertx));
+        MockPlugin plugin = new MockPlugin(createSharedData(vertx));
         Async async = context.async();
         VertxHelper.deploy(vertx, context, DeployContext.builder()
                                                         .verticle(plugin)
@@ -52,7 +52,7 @@ public class PluginVerticleTest implements PluginTestHelper {
 
     @Test
     public void invalid_config_should_deploy_failed(TestContext context) {
-        MockPluginVerticle plugin = new MockPluginVerticle(createSharedData(vertx));
+        MockPlugin plugin = new MockPlugin(createSharedData(vertx));
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, plugin, t -> {
@@ -65,8 +65,8 @@ public class PluginVerticleTest implements PluginTestHelper {
     @Test
     @Ignore("Need the information from Zero")
     public void test_register_shared_data(TestContext context) {
-        MockPluginVerticle plugin = new MockPluginVerticle(createSharedData(vertx));
-        final String key = MockPluginVerticle.class.getName();
+        MockPlugin plugin = new MockPlugin(createSharedData(vertx));
+        final String key = MockPlugin.class.getName();
         //        plugin.setup(key);
 
         Async async = context.async();
@@ -78,7 +78,7 @@ public class PluginVerticleTest implements PluginTestHelper {
 
     @Test
     public void throw_unexpected_error_cannot_start(TestContext context) {
-        MockPluginVerticle plugin = new MockPluginVerticle(createSharedData(vertx), true);
+        MockPlugin plugin = new MockPlugin(createSharedData(vertx), true);
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
         VertxHelper.deployFailed(vertx, context, options, plugin, t -> {

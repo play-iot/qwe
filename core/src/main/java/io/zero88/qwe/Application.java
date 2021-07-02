@@ -18,7 +18,7 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ApplicationVerticle
  */
-public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
+public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasSharedKey {
 
     String DEFAULT_PLUGIN_THREAD_PREFIX = "qwe-plugin-thread-";
 

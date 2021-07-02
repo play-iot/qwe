@@ -11,8 +11,7 @@ import lombok.NonNull;
  * @see PluginContext
  * @see PluginVerticle
  */
-//FIXME: Rename to Plugin
-public interface Plugin<C extends PluginConfig, T extends PluginContext> extends QWEVerticle<C> {
+public interface Plugin<C extends PluginConfig, T extends PluginContext> extends QWEVerticle<C>, HasPluginName {
 
     /**
      * Expresses a functional that this plugin bring to. For example: {@code http-server}, {@code sql-mysql}
@@ -21,7 +20,7 @@ public interface Plugin<C extends PluginConfig, T extends PluginContext> extends
      * @apiNote To better identify, {@code plugin Function Name} convention is {@code kebab-case}
      */
     @Override
-    default String appName() {
+    default String pluginName() {
         return this.getClass().getSimpleName();
     }
 

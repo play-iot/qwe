@@ -135,7 +135,7 @@ public class ApplicationVerticleTest {
     public void test_cannot_start_coz_install_comp_that_throw_exception(TestContext context) {
         addDummyUnit();
         addMockUnitHavingException();
-        assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting plugin Verticle"));
+        assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting Plugin[mock]"));
     }
 
     @Test

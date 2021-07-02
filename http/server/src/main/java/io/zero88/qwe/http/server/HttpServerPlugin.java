@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
+import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
@@ -54,7 +55,7 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
     private static final long MB = 1024L * 1024L;
     @NonNull
     private final HttpServerRouter httpRouter;
-    private io.vertx.core.http.HttpServer httpServer;
+    private HttpServer httpServer;
 
     HttpServerPlugin(SharedDataLocalProxy sharedData, HttpServerRouter router) {
         super(sharedData);
@@ -62,7 +63,7 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
     }
 
     @Override
-    public String appName() {
+    public String pluginName() {
         return "http-server";
     }
 
@@ -98,7 +99,7 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
     }
 
     @Override
-    public HttpServerPluginContext onSuccess(@NonNull PluginContext context) {
+    public HttpServerPluginContext onDeploySuccess(@NonNull PluginContext context) {
         return new HttpServerPluginContext(context, sharedData().getData(SERVER_INFO_DATA_KEY));
     }
 

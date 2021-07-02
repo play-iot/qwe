@@ -15,7 +15,7 @@ public interface PluginDeployHook<T extends PluginContext> {
      * @see Application#onInstallCompleted(PluginContextLookup)
      */
     @SuppressWarnings("unchecked")
-    default T onSuccess(@NonNull PluginContext context) {
+    default T onDeploySuccess(@NonNull PluginContext context) {
         return (T) context;
     }
 

@@ -24,7 +24,7 @@ public abstract class PluginVerticle<C extends PluginConfig, T extends PluginCon
 
     @Override
     public final void start() {
-        logger().debug("Start plugin [{}]...", appName());
+        logger().debug("Start plugin [{}]...", pluginName());
         this.pluginConfig = computeConfig(config());
         this.onStart();
     }
@@ -36,7 +36,7 @@ public abstract class PluginVerticle<C extends PluginConfig, T extends PluginCon
 
     @Override
     public final void stop() {
-        logger().debug("Stop plugin [{}]...", appName());
+        logger().debug("Stop plugin [{}]...", pluginName());
         this.onStop();
     }
 
