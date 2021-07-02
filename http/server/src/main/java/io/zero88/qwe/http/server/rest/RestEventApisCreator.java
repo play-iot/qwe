@@ -14,7 +14,7 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.event.RestEventApiMetadata;
-import io.zero88.qwe.http.server.HttpServer;
+import io.zero88.qwe.http.server.HttpServerPlugin;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.rest.api.RestEventApi;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
@@ -101,7 +101,7 @@ public final class RestEventApisCreator implements ApisCreator {
             final String format = "Path:{}::{} --- Event:{}::{}::{}";
             log().info(decor("Registering route: " + format), mapping.getMethod(), path, metadata.getAddress(),
                        mapping.getAction(), metadata.getPattern());
-            HttpServer.restrictJsonRoute(
+            HttpServerPlugin.restrictJsonRoute(
                 router.route(mapping.getMethod(), path).order(definition.getOrder()).handler(restHandler));
         }
     }

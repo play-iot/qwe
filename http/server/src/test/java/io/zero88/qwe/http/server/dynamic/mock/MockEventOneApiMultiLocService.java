@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.micro.MicroContext;
+import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
@@ -20,8 +20,8 @@ public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService
     }
 
     @Override
-    protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryApi discovery = microContext.getDiscovery();
+    protected void publishService(DiscoveryContext discoveryContext) {
+        final ServiceDiscoveryApi discovery = discoveryContext.getDiscovery();
         CompositeFuture.all(
             Stream.of(RecordHelper.create("ems-4", address, EventMethodDefinition.createDefault("/p", "/:pId")),
                       RecordHelper.create("ems-4", address, EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")))

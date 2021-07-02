@@ -23,7 +23,7 @@ import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.transfomer.RecordTransformer.ViewType;
 
-public class ServiceLocatorTest extends BaseMicroVerticleTest {
+public class ServiceLocatorTest extends BaseDiscoveryPluginTest {
 
     @Test
     public void test_get_not_found(VertxTestContext context) {

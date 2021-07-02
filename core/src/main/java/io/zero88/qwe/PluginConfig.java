@@ -2,9 +2,9 @@ package io.zero88.qwe;
 
 import java.util.Map;
 
-public interface ComponentConfig extends IConfig {
+public interface PluginConfig extends IConfig {
 
-    String COMP_DEPLOY_CONFIG_KEY = "__deployment__";
+    String PLUGIN_DEPLOY_CONFIG_KEY = "__deployment__";
 
     @Override
     default Class<? extends IConfig> parent() {
@@ -12,19 +12,19 @@ public interface ComponentConfig extends IConfig {
     }
 
     /**
-     * Defines a particular deployment options for component.
+     * Defines a particular deployment options for plugin.
      * <p>
-     * If a {@code component} want to declare its deployment options, the config must be used this key and attach under
+     * If a {@code plugin} want to declare its deployment options, the config must be used this key and attach under
      * {@link QWEAppConfig}
      *
      * @return particular
      */
     default String deploymentKey() {
-        return COMP_DEPLOY_CONFIG_KEY + key();
+        return PLUGIN_DEPLOY_CONFIG_KEY + key();
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    interface DynamicComponentConfig<C extends DynamicComponentConfig> extends ComponentConfig, IOtherConfig<C> {
+    interface DynamicPluginConfig<C extends DynamicPluginConfig> extends PluginConfig, IOtherConfig<C> {
 
         default Map<String, Object> find(Map<String, Object> map) {
             if (map.containsKey(QWEAppConfig.NAME)) {

@@ -1,27 +1,27 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.DummyProvider.DummyComponentVerticle;
+import io.zero88.qwe.DummyProvider.DummyPlugin;
 
 import lombok.NonNull;
 
-final class DummyProvider implements ComponentProvider<DummyComponentVerticle> {
+final class DummyProvider implements PluginProvider<DummyPlugin> {
 
     @Override
-    public Class<DummyComponentVerticle> componentClass() { return DummyComponentVerticle.class; }
+    public Class<DummyPlugin> pluginClass() { return DummyPlugin.class; }
 
     @Override
-    public DummyComponentVerticle provide(SharedDataLocalProxy proxy) {
-        return new DummyComponentVerticle(proxy);
+    public DummyPlugin provide(SharedDataLocalProxy proxy) {
+        return new DummyPlugin(proxy);
     }
 
-    static final class DummyComponentVerticle extends ComponentVerticle<MockConfig, ComponentContext> {
+    static final class DummyPlugin extends PluginVerticle<MockConfig, PluginContext> {
 
-        DummyComponentVerticle(SharedDataLocalProxy sharedData) {
+        DummyPlugin(SharedDataLocalProxy sharedData) {
             super(sharedData);
         }
 
         @Override
-        public String appName() {
+        public String pluginName() {
             return "dummy";
         }
 

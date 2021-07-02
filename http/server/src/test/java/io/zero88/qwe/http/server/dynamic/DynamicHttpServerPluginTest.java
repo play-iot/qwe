@@ -18,7 +18,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class DynamicHttpServerTest extends DynamicServiceTestBase {
+public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
 
     private int port;
 

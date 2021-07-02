@@ -14,7 +14,7 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.server.HttpLogSystem.GatewayLogSystem;
-import io.zero88.qwe.http.server.HttpServer;
+import io.zero88.qwe.http.server.HttpServerPlugin;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.ServerInfo;
 import io.zero88.qwe.http.server.handler.DynamicContextDispatcher;
@@ -32,7 +32,7 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLog
     default boolean registerRouter(Record record) {
         try {
             DynamicRestApi api = DynamicRestApi.create(record);
-            ServerInfo serverInfo = sharedData().getData(HttpServer.SERVER_INFO_DATA_KEY);
+            ServerInfo serverInfo = sharedData().getData(HttpServerPlugin.SERVER_INFO_DATA_KEY);
             Router router = serverInfo.getRouter();
             String gatewayPath = Urls.combinePath(serverInfo.getApiPath(), serverInfo.getServicePath());
             List<String> paths = api.alternativePaths()

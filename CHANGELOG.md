@@ -22,9 +22,9 @@
 **Closed issues:**
 
 - Upgrade `Vertx` to `v4.0.0`
-- Add `scheduler` component [\#12](https://github.com/zero88/qwe/issues/12)
-- Add `protocol` component [\#11](https://github.com/zero88/qwe/issues/11)
-- Add `JSON file storage` component [\#10](https://github.com/zero88/qwe/issues/10)
+- Add `scheduler` plugin [\#12](https://github.com/zero88/qwe/issues/12)
+- Add `protocol` plugin [\#11](https://github.com/zero88/qwe/issues/11)
+- Add `JSON file storage` plugin [\#10](https://github.com/zero88/qwe/issues/10)
 
 **Merged pull requests:**
 

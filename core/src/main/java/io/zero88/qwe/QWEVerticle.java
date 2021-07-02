@@ -15,7 +15,7 @@ import io.zero88.qwe.exceptions.QWEExceptionConverter;
  * @see HasSharedData
  * @see Verticle
  */
-public interface QWEVerticle<C extends IConfig> extends HasConfig<C>, HasVerticleName, HasSharedData, Verticle {
+public interface QWEVerticle<C extends IConfig> extends HasConfig<C>, HasSharedData, Verticle {
 
     static void asyncRun(Vertx vertx, Promise<Void> onCompleteHandler, Runnable beforeOnAsyncAction,
                          Supplier<Future<Void>> asyncActionProvider) {

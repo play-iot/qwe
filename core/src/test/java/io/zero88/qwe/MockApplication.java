@@ -11,7 +11,7 @@ public final class MockApplication extends ApplicationVerticle {
 
     private boolean errorOnStart;
     private boolean errorOnCompleted;
-    private Handler<ContextLookup> onCompleted;
+    private Handler<PluginContextLookup> onCompleted;
 
     @Override
     public void onStart() {
@@ -21,7 +21,7 @@ public final class MockApplication extends ApplicationVerticle {
     }
 
     @Override
-    public void onInstallCompleted(ContextLookup lookup) {
+    public void onInstallCompleted(PluginContextLookup lookup) {
         if (errorOnCompleted) {
             throw new IllegalArgumentException("Error onInstallCompleted");
         }

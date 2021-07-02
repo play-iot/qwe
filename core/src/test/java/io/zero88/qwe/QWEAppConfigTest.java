@@ -69,7 +69,7 @@ class QWEAppConfigTest {
     }
 
     @Test
-    public void test_parse_component_config_from_app() {
+    public void test_parse_plugin_config_from_app() {
         final QWEAppConfig appConfig = new QWEAppConfig(Collections.singletonMap("mock", new JsonObject()));
         System.out.println(appConfig.toJson());
         final MockConfig mockConfig = IConfig.from(appConfig, MockConfig.class);

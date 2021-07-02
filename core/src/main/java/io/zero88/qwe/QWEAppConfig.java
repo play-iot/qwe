@@ -20,10 +20,10 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 
 /**
- * An {@code Application} configuration can contains itself configuration and its {@code Component} configurations
+ * An {@code Application} configuration can contains itself configuration and its {@code plugin} configurations
  *
  * @see Application
- * @see Component
+ * @see Plugin
  */
 public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements IConfig {
 
@@ -73,7 +73,7 @@ public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements 
     public String getDataDir() { return dataDir().toAbsolutePath().toString(); }
 
     /**
-     * Other Application configurations or Application component configuration
+     * Other Application configurations or Application plugin configuration
      */
     @Override
     public JsonObject other() {

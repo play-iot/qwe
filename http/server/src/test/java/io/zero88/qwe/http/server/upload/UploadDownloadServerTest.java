@@ -7,14 +7,14 @@ import org.junit.runner.RunWith;
 
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.http.server.HttpServerRouter;
-import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class UploadDownloadServerTest extends HttpServerTestBase {
+public class UploadDownloadServerTest extends HttpServerPluginTestBase {
 
     @Rule
     public Timeout timeout = Timeout.seconds(TestHelper.TEST_TIMEOUT_SEC);

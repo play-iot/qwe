@@ -23,7 +23,7 @@ import io.zero88.qwe.micro.filter.ServiceStatusPredicateFactory;
 import io.zero88.qwe.micro.mock.MockEventBusService;
 import io.zero88.qwe.micro.mock.MockServiceListener;
 
-public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
+public class ServiceDiscoveryApiTest extends BaseDiscoveryPluginTest {
 
     @Test
     public void test_register_eventbus_service(VertxTestContext context) {

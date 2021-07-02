@@ -11,7 +11,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.junit5.VertxTestContext;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public interface ComponentTestHelper {
+public interface PluginTestHelper {
 
     Path testDir();
 
@@ -23,9 +23,9 @@ public interface ComponentTestHelper {
         return SharedDataLocalProxy.create(vertx, sharedKey());
     }
 
-    default <T extends Component> T deploy(Vertx vertx, VertxTestContext context, JsonObject config,
-                                           ComponentProvider<T> provider) {
-        final T verticle = initComponent(vertx, provider);
+    default <T extends Plugin> T deploy(Vertx vertx, VertxTestContext context, JsonObject config,
+                                        PluginProvider<T> provider) {
+        final T verticle = initPlugin(vertx, provider);
         return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
                                                                .verticle(verticle)
                                                                .options(new DeploymentOptions().setConfig(config))
@@ -36,9 +36,9 @@ public interface ComponentTestHelper {
                                                                .build());
     }
 
-    default <T extends Component> T deploy(Vertx vertx, TestContext context, JsonObject config,
-                                           ComponentProvider<T> provider) {
-        final T verticle = initComponent(vertx, provider);
+    default <T extends Plugin> T deploy(Vertx vertx, TestContext context, JsonObject config,
+                                        PluginProvider<T> provider) {
+        final T verticle = initPlugin(vertx, provider);
         return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
                                                                .verticle(verticle)
                                                                .options(new DeploymentOptions().setConfig(config))
@@ -46,14 +46,14 @@ public interface ComponentTestHelper {
                                                                .build());
     }
 
-    default <T extends Component> T initComponent(Vertx vertx, ComponentProvider<T> provider) {
+    default <T extends Plugin> T initPlugin(Vertx vertx, PluginProvider<T> provider) {
         final SharedDataLocalProxy proxy = createSharedData(vertx);
         proxy.addData(SharedDataLocalProxy.APP_DATADIR_KEY, testDir().toString());
         return provider.provide(proxy);
     }
 
-    default <T extends Component> void deployFailed(Vertx vertx, TestContext context, JsonObject config,
-                                                    ComponentProvider<T> provider, Consumer<Throwable> handler) {
+    default <T extends Plugin> void deployFailed(Vertx vertx, TestContext context, JsonObject config,
+                                                 PluginProvider<T> provider, Consumer<Throwable> handler) {
         VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
                                                         .verticle(provider.provide(createSharedData(vertx)))
                                                         .options(new DeploymentOptions().setConfig(config))
@@ -61,8 +61,10 @@ public interface ComponentTestHelper {
                                                         .build());
     }
 
-    default <T extends Component> void setup(T comp, String result) {
-        comp.setup(comp.hook().onSuccess(ComponentContext.create(comp.appName(), testDir(), sharedKey(), result)));
+    default <T extends Plugin> void setup(T comp, String result) {
+        comp.setup(comp.hook()
+                       .onDeploySuccess(
+                           PluginContext.create("PluginTest", comp.pluginName(), testDir(), sharedKey(), result)));
     }
 
 }

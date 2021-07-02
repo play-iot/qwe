@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpServerRouter;
-import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.mock.MockApiDefinition.MockAPI;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
@@ -21,7 +21,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @Ignore
 @RunWith(VertxUnitRunner.class)
 //TODO FIX `javax.ws.rs`
-public class AcceptAndContentHeaderTest extends HttpServerTestBase {
+public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
 
     private static final JsonObject SUCCESS_EXPECTED = new JsonObject("{\"abc\":\"xxx\"}");
     private static final String PATH = "/api/test";

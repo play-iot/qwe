@@ -14,7 +14,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.ComponentTestHelper;
+import io.zero88.qwe.PluginTestHelper;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
@@ -27,7 +27,7 @@ import io.zero88.qwe.storage.json.StorageConfig;
 import io.zero88.qwe.utils.JsonUtils;
 
 @ExtendWith(VertxExtension.class)
-class JsonStorageServiceTest implements ComponentTestHelper {
+class JsonStorageServiceTest implements PluginTestHelper {
 
     StorageConfig config;
     EventBusClient client;

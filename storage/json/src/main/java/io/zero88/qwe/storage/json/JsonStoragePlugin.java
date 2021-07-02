@@ -1,16 +1,16 @@
 package io.zero88.qwe.storage.json;
 
-import io.zero88.qwe.ComponentContext;
-import io.zero88.qwe.ComponentVerticle;
+import io.zero88.qwe.PluginContext;
+import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.storage.json.service.JsonStorageService;
 
 import lombok.NonNull;
 
-public final class JsonStorageVerticle extends ComponentVerticle<StorageConfig, ComponentContext> {
+public final class JsonStoragePlugin extends PluginVerticle<StorageConfig, PluginContext> {
 
-    JsonStorageVerticle(@NonNull SharedDataLocalProxy sharedData) {
+    JsonStoragePlugin(@NonNull SharedDataLocalProxy sharedData) {
         super(sharedData);
     }
 
@@ -26,10 +26,10 @@ public final class JsonStorageVerticle extends ComponentVerticle<StorageConfig, 
 
     @Override
     public void onStart() {
-        componentConfig.makeFullPath((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR_KEY));
+        pluginConfig.makeFullPath((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR_KEY));
         EventBusClient.create(sharedData())
-                      .register(componentConfig.getServiceAddress(),
-                                JsonStorageService.create(componentConfig, componentConfig.serviceHandlerClass()));
+                      .register(pluginConfig.getServiceAddress(),
+                                JsonStorageService.create(pluginConfig, pluginConfig.serviceHandlerClass()));
     }
 
 }

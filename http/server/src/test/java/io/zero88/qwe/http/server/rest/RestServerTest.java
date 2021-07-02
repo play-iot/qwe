@@ -10,7 +10,7 @@ import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.server.HttpServerRouter;
-import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.mock.MockApiDefinition;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -19,7 +19,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class RestServerTest extends HttpServerTestBase {
+public class RestServerTest extends HttpServerPluginTestBase {
 
     @Rule
     public Timeout timeout = Timeout.seconds(TestHelper.TEST_TIMEOUT_SEC);

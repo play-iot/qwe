@@ -16,12 +16,15 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.micro.BaseMicroVerticleTest;
-import io.zero88.qwe.rpc.mock.MockServiceInvoker;
+import io.zero88.qwe.micro.BaseDiscoveryPluginTest;
 import io.zero88.qwe.micro.mock.MockServiceListener;
+import io.zero88.qwe.rpc.mock.MockServiceInvoker;
 
 @Disabled
-public class GatewayServiceInvokerTest extends BaseMicroVerticleTest {
+public class GatewayServiceInvokerTest extends BaseDiscoveryPluginTest {
+
+    public static final String EVENT_RECORD_1 = "event.record.1";
+    public static final String EVENT_ADDRESS_1 = "event.address.1";
 
     @BeforeEach
     public void setup(Vertx vertx, VertxTestContext ctx) {
