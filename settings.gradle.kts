@@ -28,7 +28,6 @@ include(
     ":micro:micro-metadata",
     ":micro:circuit-breaker",
     ":micro:discovery",
-    ":micro:gateway",
     ":micro:rpc"
 )
 project(":micro:micro-config").projectDir = file("micro/config")
