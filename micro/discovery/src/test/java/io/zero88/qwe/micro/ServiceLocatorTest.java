@@ -163,6 +163,27 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
     }
 
     @Test
+    public void test_unregister_by_registration(VertxTestContext context) {
+        Checkpoint cp = context.checkpoint(2);
+        discovery.register(RecordHelper.create("g.er1", "r1", EventMethodDefinition.createDefault("/a", "/:b")))
+                 .map(r -> new JsonObject().put(ServiceFilterParam.IDENTIFIER, r.getRegistration()))
+                 .flatMap(f -> invokeThenAssert(context, RequestData.builder().body(f).build(), EventAction.REMOVE,
+                                                new JsonObject().put("filter", f)
+                                                                .put("total", 1)
+                                                                .put("removed", 1)
+                                                                .put("errors", new JsonArray())))
+                 .onSuccess(c -> cp.flag())
+                 .flatMap(r -> ebClient.request(getGatewayConfig().getIndexAddress(),
+                                                EventMessage.initial(EventAction.GET_LIST, RequestData.empty())))
+                 .onSuccess(msg -> context.verify(() -> {
+                     Assertions.assertNotNull(msg.getData());
+                     Assertions.assertEquals(0, msg.getData().getJsonArray("apis").size());
+                 }))
+                 .onSuccess(msg -> cp.flag())
+                 .onFailure(context::failNow);
+    }
+
+    @Test
     public void test_unregister_many(VertxTestContext context) {
         RequestData req = RequestData.builder()
                                      .filter(new JsonObject().put(ServiceFilterParam.BY, ByPredicateFactory.BY_ENDPOINT)
@@ -178,7 +199,7 @@ public class ServiceLocatorTest extends BaseMicroVerticleTest {
                                         new HttpLocation().setHost("127.0.0.1").setPort(1234).setRoot("/abc"));
         Checkpoint cp = context.checkpoint(2);
         discovery.register(r1, r2, r3)
-                 .flatMap(cf -> invokeThenAssert(context, req, EventAction.REMOVE, expected))
+                 .flatMap(cf -> invokeThenAssert(context, req, EventAction.BATCH_DELETE, expected))
                  .onSuccess(c -> cp.flag())
                  .flatMap(r -> ebClient.request(getGatewayConfig().getIndexAddress(),
                                                 EventMessage.initial(EventAction.GET_LIST, RequestData.empty())))

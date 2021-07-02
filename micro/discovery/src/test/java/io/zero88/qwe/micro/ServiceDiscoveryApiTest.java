@@ -132,7 +132,7 @@ public class ServiceDiscoveryApiTest extends BaseMicroVerticleTest {
     }
 
     @Test
-    public void test_execute_event(VertxTestContext context) {
+    public void test_execute_event_http(VertxTestContext context) {
         ebClient.register("ar1", new MockServiceListener());
         RequestFilter filter = new RequestFilter().put(ServiceFilterParam.BY, ByPredicateFactory.BY_NAME)
                                                   .put(ServiceFilterParam.IDENTIFIER, "g.er1")

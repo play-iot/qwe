@@ -10,6 +10,7 @@ import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.transfomer.RecordTransformer.ViewType;
@@ -26,14 +27,13 @@ public class ServiceLocator implements EventListener {
     private final ServiceDiscoveryApi discovery;
 
     @EBContract(action = "GET_ONE")
-    public Future<JsonObject> get(RequestData reqData) {
-        final RequestFilter filter = parseFilter(reqData);
-        final ViewType view = ViewType.parse((String) filter.remove(ServiceFilterParam.VIEW));
-        filter.put(ServiceFilterParam.IDENTIFIER, Optional.ofNullable(reqData)
-                                                          .flatMap(req -> Optional.ofNullable(req.body()))
-                                                          .map(b -> b.getString(ServiceFilterParam.IDENTIFIER))
-                                                          .orElse(null));
-        return discovery.findOne(filter).map(r -> transform(r, view));
+    public Future<JsonObject> get(@EBParam("filter") JsonObject reqFilter, @EBParam("body") JsonObject body) {
+        final RequestFilter filter = new RequestFilter(reqFilter);
+        final ViewType view = ViewType.parse(filter.getString(ServiceFilterParam.VIEW));
+        final String identifier = Optional.ofNullable(body)
+                                          .map(b -> b.getString(ServiceFilterParam.IDENTIFIER))
+                                          .orElse(null);
+        return discovery.findOne(filter.put(ServiceFilterParam.IDENTIFIER, identifier)).map(r -> transform(r, view));
     }
 
     @EBContract(action = "GET_LIST")
@@ -72,7 +72,15 @@ public class ServiceLocator implements EventListener {
     }
 
     @EBContract(action = "REMOVE")
-    public Future<JsonObject> remove(RequestData reqData) {
+    public Future<JsonObject> remove(@EBParam("body") JsonObject body) {
+        final String identifier = Optional.ofNullable(body)
+                                          .map(b -> b.getString(ServiceFilterParam.IDENTIFIER))
+                                          .orElse(null);
+        return discovery.unregister(new RequestFilter().put(ServiceFilterParam.IDENTIFIER, identifier));
+    }
+
+    @EBContract(action = "BATCH_DELETE")
+    public Future<JsonObject> batchRemove(RequestData reqData) {
         return discovery.unregister(parseFilter(reqData));
     }
 
