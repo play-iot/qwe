@@ -2,7 +2,7 @@ package io.zero88.qwe.rpc;
 
 import io.vertx.core.Future;
 import io.zero88.qwe.HasSharedData;
-import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
+import io.zero88.qwe.micro.GatewayHeadersBuilder;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;

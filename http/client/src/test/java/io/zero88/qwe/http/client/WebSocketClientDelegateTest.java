@@ -24,7 +24,7 @@ import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.event.Status;
+import io.zero88.qwe.event.EventStatus;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
@@ -72,7 +72,7 @@ public class WebSocketClientDelegateTest {
         client.open(WebSocketClientEventMetadata.create("/xxx", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
             String error
                 = "WebSocket connection attempt returned HTTP status code 404 | Cause:  - Error Code: NOT_FOUND";
-            final JsonObject expected = new JsonObject().put("status", Status.FAILED)
+            final JsonObject expected = new JsonObject().put("status", EventStatus.FAILED)
                                                         .put("action", "OPEN")
                                                         .put("error", new JsonObject().put("code", "HTTP_ERROR")
                                                                                       .put("message", error));
@@ -88,7 +88,7 @@ public class WebSocketClientDelegateTest {
         client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
             String error = "Failed when open WebSocket connection | Cause: failed to resolve 'echo.websocket.test'. " +
                            "Exceeded max queries per resolve 4 ";
-            final JsonObject expected = new JsonObject().put("status", Status.FAILED)
+            final JsonObject expected = new JsonObject().put("status", EventStatus.FAILED)
                                                         .put("action", "OPEN")
                                                         .put("error", new JsonObject().put("code", "HTTP_ERROR")
                                                                                       .put("message", error));

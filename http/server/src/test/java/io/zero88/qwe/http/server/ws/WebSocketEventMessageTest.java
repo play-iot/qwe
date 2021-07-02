@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.Status;
-import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.exceptions.InitializerError;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.BridgeEventType;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.event.EventStatus;
+import io.zero88.qwe.exceptions.InitializerError;
+import io.zero88.qwe.exceptions.QWEException;
 
 public class WebSocketEventMessageTest {
 
@@ -89,7 +89,7 @@ public class WebSocketEventMessageTest {
         Assertions.assertEquals(BridgeEventType.RECEIVE, message.getType());
         Assertions.assertNotNull(message.getBody());
         Assertions.assertEquals(EventAction.CREATE, message.getBody().getAction());
-        Assertions.assertEquals(Status.INITIAL, message.getBody().getStatus());
+        Assertions.assertEquals(EventStatus.INITIAL, message.getBody().getStatus());
         JSONAssert.assertEquals("{\"hello\":\"world\"}", message.getBody().getData().encode(), JSONCompareMode.STRICT);
         Assertions.assertNull(message.getBody().getError());
     }

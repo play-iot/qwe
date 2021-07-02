@@ -1,10 +1,15 @@
 package io.zero88.qwe.event.refl;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import io.zero88.qwe.event.EBContext;
 import io.zero88.qwe.event.EBContract;
@@ -23,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class SimpleAnnotationProcessor implements EventAnnotationProcessor {
 
     private final String[] ignorePackages;
+    private final Set<Class<? extends Annotation>> supportedAnnotations;
 
     @Override
     public MethodMeta lookup(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action) {
@@ -63,7 +69,7 @@ public class SimpleAnnotationProcessor implements EventAnnotationProcessor {
             return new MethodParam[] {};
         }
         return Arrays.stream(params)
-                     .map(param -> new MethodParam(lookupParamName(param), param.getType(),
+                     .map(param -> new MethodParam(lookupParamName(param), buildParamAnnotation(param), param.getType(),
                                                    param.isAnnotationPresent(EBContext.class)))
                      .toArray(MethodParam[]::new);
     }
@@ -72,6 +78,13 @@ public class SimpleAnnotationProcessor implements EventAnnotationProcessor {
         return Optional.ofNullable(param.getAnnotation(EBParam.class))
                        .map(EBParam::value)
                        .orElseGet(() -> Optional.ofNullable(param.getName()).orElse(""));
+    }
+
+    protected Map<Class<? extends Annotation>, Annotation> buildParamAnnotation(Parameter param) {
+        return this.supportedAnnotations.stream()
+                                        .map(param::getAnnotation)
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toMap(Annotation::annotationType, Function.identity()));
     }
 
 }

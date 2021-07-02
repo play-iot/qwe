@@ -16,7 +16,7 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.Status;
+import io.zero88.qwe.event.EventStatus;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.filter.ByPredicateFactory;
@@ -244,18 +244,18 @@ public class ServiceLocatorTest extends BaseDiscoveryPluginTest {
 
     protected Future<EventMessage> invokeThenAssert(VertxTestContext context, RequestData reqData, EventAction action,
                                                     JsonObject expected) {
-        return test(context, reqData, action, expected, Status.SUCCESS);
+        return test(context, reqData, action, expected, EventStatus.SUCCESS);
     }
 
     protected Future<EventMessage> queryOneButFailed(VertxTestContext context, RequestData reqData,
                                                      JsonObject expected) {
-        return test(context, reqData, EventAction.GET_ONE, expected, Status.FAILED);
+        return test(context, reqData, EventAction.GET_ONE, expected, EventStatus.FAILED);
     }
 
     protected Future<EventMessage> test(VertxTestContext ctx, RequestData reqData, EventAction action,
-                                        JsonObject expected, Status status) {
+                                        JsonObject expected, EventStatus status) {
         final Checkpoint async = ctx.checkpoint();
-        final String dataKey = status == Status.FAILED ? "error" : "data";
+        final String dataKey = status == EventStatus.FAILED ? "error" : "data";
         final JsonObject resp = new JsonObject().put("status", status)
                                                 .put("action", EventAction.REPLY.action())
                                                 .put("prevAction", action.action())

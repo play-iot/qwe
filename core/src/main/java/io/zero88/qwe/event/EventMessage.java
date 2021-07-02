@@ -9,6 +9,8 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.dto.msg.DataTransferObject.StandardKey;
+import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.exceptions.QWEException;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -24,16 +26,17 @@ import lombok.ToString;
 /**
  * Represents for data transfer object in event bus system.
  *
- * @see Status
+ * @see EventStatus
  * @see EventAction
  * @see ErrorMessage
+ * @since 1.0.0
  */
 @ToString
 @JsonInclude(Include.NON_NULL)
 public final class EventMessage implements Serializable, JsonData {
 
     @Getter
-    private final Status status;
+    private final EventStatus status;
     @Getter
     private final EventAction action;
     @Getter
@@ -46,13 +49,13 @@ public final class EventMessage implements Serializable, JsonData {
     private final ErrorMessage error;
 
     @JsonCreator
-    private EventMessage(@JsonProperty(value = "status", defaultValue = "INITIAL") Status status,
+    private EventMessage(@JsonProperty(value = "status", defaultValue = "INITIAL") EventStatus status,
                          @NonNull @JsonProperty(value = "action", required = true) EventAction action,
                          @JsonProperty(value = "prevAction") EventAction prevAction,
                          @JsonProperty(value = "data") Map<String, Object> data,
                          @JsonProperty(value = "dataClass") Class<? extends JsonData> dataClass,
                          @JsonProperty(value = "error") ErrorMessage error) {
-        this.status = Objects.isNull(status) ? Status.INITIAL : status;
+        this.status = Objects.isNull(status) ? EventStatus.INITIAL : status;
         this.action = action;
         this.prevAction = prevAction;
         this.data = data;
@@ -60,88 +63,88 @@ public final class EventMessage implements Serializable, JsonData {
         this.error = error;
     }
 
-    private EventMessage(Status status, EventAction action) {
+    private EventMessage(EventStatus status, EventAction action) {
         this(status, action, null, null, null, null);
     }
 
-    private EventMessage(Status status, EventAction action, @NonNull ErrorMessage error) {
+    private EventMessage(EventStatus status, EventAction action, @NonNull ErrorMessage error) {
         this(status, action, null, error);
     }
 
-    private EventMessage(Status status, EventAction action, EventAction prevAction, @NonNull ErrorMessage error) {
+    private EventMessage(EventStatus status, EventAction action, EventAction prevAction, @NonNull ErrorMessage error) {
         this(status, action, prevAction, null, null, error);
     }
 
-    private EventMessage(Status status, EventAction action, @NonNull JsonData data) {
+    private EventMessage(EventStatus status, EventAction action, @NonNull JsonData data) {
         this(status, action, null, data.toJson().getMap(), data.getClass(), null);
     }
 
-    private EventMessage(Status status, EventAction action, JsonObject data) {
+    private EventMessage(EventStatus status, EventAction action, JsonObject data) {
         this(status, action, null, data);
     }
 
-    private EventMessage(Status status, EventAction action, EventAction prevAction, JsonObject data) {
+    private EventMessage(EventStatus status, EventAction action, EventAction prevAction, JsonObject data) {
         this(status, action, prevAction, Objects.isNull(data) ? null : data.getMap(), null, null);
     }
 
     public static EventMessage error(EventAction action, @NonNull Throwable throwable) {
-        return new EventMessage(Status.FAILED, action, ErrorMessage.parse(throwable));
+        return new EventMessage(EventStatus.FAILED, action, ErrorMessage.parse(throwable));
     }
 
     public static EventMessage error(@NonNull EventAction action, @NonNull ErrorCode code, String message) {
-        return new EventMessage(Status.FAILED, action, ErrorMessage.parse(code, message));
+        return new EventMessage(EventStatus.FAILED, action, ErrorMessage.parse(code, message));
     }
 
     public static EventMessage error(@NonNull EventAction action, @NonNull ErrorMessage message) {
-        return new EventMessage(Status.FAILED, action, message);
+        return new EventMessage(EventStatus.FAILED, action, message);
     }
 
     public static EventMessage error(@NonNull EventAction action, EventAction prevAction,
                                      @NonNull ErrorMessage message) {
-        return new EventMessage(Status.FAILED, action, prevAction, message);
+        return new EventMessage(EventStatus.FAILED, action, prevAction, message);
     }
 
     public static EventMessage replyError(EventAction action, @NonNull Throwable throwable) {
-        return new EventMessage(Status.FAILED, EventAction.REPLY, action, ErrorMessage.parse(throwable));
+        return new EventMessage(EventStatus.FAILED, EventAction.REPLY, action, ErrorMessage.parse(throwable));
     }
 
     public static EventMessage initial(EventAction action) {
-        return new EventMessage(Status.INITIAL, action);
+        return new EventMessage(EventStatus.INITIAL, action);
     }
 
     public static EventMessage initial(EventAction action, JsonObject data) {
-        return new EventMessage(Status.INITIAL, action, data);
+        return new EventMessage(EventStatus.INITIAL, action, data);
     }
 
     public static EventMessage initial(EventAction action, JsonData data) {
-        return new EventMessage(Status.INITIAL, action, data);
+        return new EventMessage(EventStatus.INITIAL, action, data);
     }
 
     public static EventMessage success(EventAction action) {
-        return new EventMessage(Status.SUCCESS, action);
+        return new EventMessage(EventStatus.SUCCESS, action);
     }
 
     public static EventMessage success(EventAction action, JsonObject data) {
-        return new EventMessage(Status.SUCCESS, action, data);
+        return new EventMessage(EventStatus.SUCCESS, action, data);
     }
 
     public static EventMessage success(EventAction action, EventAction prevAction, JsonObject data) {
-        return from(Status.SUCCESS, action, prevAction, data);
+        return from(EventStatus.SUCCESS, action, prevAction, data);
     }
 
     public static EventMessage replySuccess(EventAction action, JsonObject data) {
-        return from(Status.SUCCESS, EventAction.REPLY, action, data);
+        return from(EventStatus.SUCCESS, EventAction.REPLY, action, data);
     }
 
     public static EventMessage success(EventAction action, JsonData data) {
-        return new EventMessage(Status.SUCCESS, action, data);
+        return new EventMessage(EventStatus.SUCCESS, action, data);
     }
 
-    public static EventMessage from(@NonNull Status status, @NonNull EventAction action, EventAction prevAction) {
+    public static EventMessage from(@NonNull EventStatus status, @NonNull EventAction action, EventAction prevAction) {
         return new EventMessage(status, action, prevAction, (JsonObject) null);
     }
 
-    public static EventMessage from(@NonNull Status status, @NonNull EventAction action, EventAction prevAction,
+    public static EventMessage from(@NonNull EventStatus status, @NonNull EventAction action, EventAction prevAction,
                                     JsonObject data) {
         return new EventMessage(status, action, prevAction, data);
     }
@@ -193,6 +196,14 @@ public final class EventMessage implements Serializable, JsonData {
                : msg;
     }
 
+    /**
+     * Event message data
+     *
+     * @return event message data in json
+     * @apiNote If {@link EventMessage} is used in request mode, then as {@code QWE} standard message, the json data
+     *     will be {@link RequestData} with one of known key data in {@link StandardKey}
+     * @see RequestData
+     */
     @JsonInclude(Include.NON_EMPTY)
     @JsonProperty
     public JsonObject getData() {
@@ -206,12 +217,12 @@ public final class EventMessage implements Serializable, JsonData {
 
     @JsonIgnore
     public boolean isSuccess() {
-        return this.status == Status.SUCCESS;
+        return this.status == EventStatus.SUCCESS;
     }
 
     @JsonIgnore
     public boolean isError() {
-        return this.status == Status.FAILED;
+        return this.status == EventStatus.FAILED;
     }
 
 }

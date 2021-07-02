@@ -13,6 +13,7 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
+import io.zero88.qwe.event.EBBody;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListenerTest;
@@ -101,6 +102,45 @@ class EventParameterParserTest {
         Assertions.assertEquals(2, inputs2.length);
         Assertions.assertEquals(EventAction.UPDATE, inputs2[0]);
         Assertions.assertEquals(222, inputs2[1]);
+    }
+
+    @Test
+    void test_extract_body_and_headers() {
+        final RequestData reqData = RequestData.builder()
+                                               .body(new JsonObject().put("id", 1))
+                                               .headers(new JsonObject().put("hello", "world"))
+                                               .build();
+        final EventMessage msg = EventMessage.initial(EventAction.parse("BODY"), reqData);
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, meta.params());
+        Assertions.assertEquals(2, inputs.length);
+
+        final EBBody annotation = meta.params()[0].lookupAnnotation(EBBody.class);
+        Assertions.assertNotNull(annotation);
+        Assertions.assertEquals("id", annotation.value());
+        Assertions.assertEquals(Integer.class, meta.params()[0].getParamClass());
+        Assertions.assertEquals(1, inputs[0]);
+
+        Assertions.assertEquals("headers", meta.params()[1].getParamName());
+        Assertions.assertEquals(JsonObject.class, meta.params()[1].getParamClass());
+        Assertions.assertEquals(new JsonObject().put("hello", "world"), inputs[1]);
+    }
+
+    @Test
+    void test_use_EBBody_but_non_standard_message() {
+        final EventMessage msg = EventMessage.initial(EventAction.parse("BODY"), new JsonObject().put("id", 2));
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, meta.params());
+        Assertions.assertEquals(2, inputs.length);
+
+        final EBBody annotation = meta.params()[0].lookupAnnotation(EBBody.class);
+        Assertions.assertNotNull(annotation);
+        Assertions.assertEquals(Integer.class, meta.params()[0].getParamClass());
+        Assertions.assertEquals(2, inputs[0]);
+
+        Assertions.assertEquals("headers", meta.params()[1].getParamName());
+        Assertions.assertEquals(JsonObject.class, meta.params()[1].getParamClass());
+        Assertions.assertNull(inputs[1]);
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EBBody;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EBParam;
 
@@ -43,4 +44,8 @@ public class MockWithVariousParamsListener extends MockEventListener {
         return result;
     }
 
+    @EBContract(action = "BODY")
+    public JsonObject useBodyAndHeader(@EBBody("id") Integer id, @EBParam("headers") JsonObject headers) {
+        return new JsonObject().put("id", id).put("headers", headers);
+    }
 }

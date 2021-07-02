@@ -9,8 +9,9 @@ import io.vertx.core.Vertx;
 import io.zero88.qwe.SharedDataLocalProxy;
 
 /**
- * Define EventBus context that is one of {@code EventAction}, {@code Vert.x}, {@code SharedDataLocalProxy}, or {@code
- * EventBusClient}
+ * This annotation is used to inject {@code EventBus context} into method parameter.
+ * <p>
+ * The context is one of {@code EventAction}, {@code Vert.x}, {@code SharedDataLocalProxy}, or {@code EventBusClient}
  *
  * @see Vertx
  * @see SharedDataLocalProxy

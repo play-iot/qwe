@@ -4,15 +4,15 @@ import java.util.Objects;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.dto.msg.DataTransferObject.AbstractDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//TODO refactor it
 @NoArgsConstructor
-public final class ResponseData extends AbstractDTO {
+public final class ResponseData extends AbstractDTO<ResponseData> {
 
     @Getter
     private HttpResponseStatus status = HttpResponseStatus.OK;

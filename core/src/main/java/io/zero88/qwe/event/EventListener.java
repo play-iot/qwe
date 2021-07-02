@@ -1,9 +1,7 @@
 package io.zero88.qwe.event;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.vertx.core.eventbus.Message;
+import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData;
 
@@ -19,11 +17,7 @@ import lombok.NonNull;
  * @see EventAction
  * @see EventPattern#REQUEST_RESPONSE
  */
-public interface EventListener {
-
-    default Logger logger() {
-        return LoggerFactory.getLogger(this.getClass());
-    }
+public interface EventListener extends HasLogger {
 
     /**
      * Jackson Object mapper for serialize/deserialize data
