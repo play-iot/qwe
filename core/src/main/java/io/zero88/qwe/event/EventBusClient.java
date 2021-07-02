@@ -21,7 +21,7 @@ import lombok.NonNull;
  *
  * @see EventListener
  * @see EventMessage
- * @see EventReplyHandlerImpl
+ * @see EventReplyHandler
  */
 @VertxGen
 public interface EventBusClient extends Transporter, HasSharedData {
@@ -130,7 +130,6 @@ public interface EventBusClient extends Transporter, HasSharedData {
     @Fluent
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
     EventBusClient publish(@NonNull String address, @NonNull EventMessage message, DeliveryOptions options);
-
 
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
     default Future<EventMessage> fire(@NonNull String address, @NonNull EventPattern pattern,
