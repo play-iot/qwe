@@ -7,11 +7,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.github.zero88.exceptions.HiddenException;
+import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.ErrorMessage;
+import io.zero88.qwe.dto.msg.DataTransferObject.StandardKey;
+import io.zero88.qwe.event.EBBody;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
@@ -73,7 +76,7 @@ public class EventParameterParserImpl implements EventParameterParser {
         if (Objects.isNull(data)) {
             return null;
         }
-        Object d = data.getValue(param.getParamName());
+        Object d = lookupParamValue(param, data);
         if (Objects.isNull(d)) {
             if (param.getParamClass().isPrimitive()) {
                 throw new IllegalArgumentException(
@@ -82,6 +85,16 @@ public class EventParameterParserImpl implements EventParameterParser {
             return oneParam ? tryDeserialize(data.getMap(), param.getParamClass()) : null;
         }
         return tryParseParamValue(param.getParamClass(), d);
+    }
+
+    protected Object lookupParamValue(MethodParam param, JsonObject data) {
+        EBBody a = param.lookupAnnotation(EBBody.class);
+        if (Objects.nonNull(a) && data.containsKey(StandardKey.BODY)) {
+            return Functions.getIfThrow(() -> JsonObject.mapFrom(data.getValue(StandardKey.BODY)))
+                            .map(json -> json.getValue(a.value()))
+                            .orElse(null);
+        }
+        return data.getValue(Optional.ofNullable(a).map(EBBody::value).orElseGet(param::getParamName));
     }
 
     protected Object tryParseParamValue(Class<?> paramClass, Object d) {

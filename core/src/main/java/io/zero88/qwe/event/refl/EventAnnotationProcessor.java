@@ -1,5 +1,12 @@
 package io.zero88.qwe.event.refl;
 
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+
+import io.zero88.qwe.event.EBBody;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.exceptions.ImplementationError;
@@ -10,8 +17,8 @@ import lombok.NonNull;
 public interface EventAnnotationProcessor {
 
     String[] IGNORE_PACKAGES = {
-        "java", "jdk", "sun", "com.fasterxml", "ch.qos.logback", "org.apache", "org.junit", "org.gradle", "io.vertx",
-        "io.reactivex", "io.netty"
+        "java", "jdk", "sun", "com.fasterxml", "com.hazelcast", "ch.qos.logback", "org.apache", "org.junit",
+        "org.gradle", "io.vertx", "io.reactivex", "io.netty"
     };
 
     static EventAnnotationProcessor create() {
@@ -19,7 +26,14 @@ public interface EventAnnotationProcessor {
     }
 
     static EventAnnotationProcessor create(String[] ignorePackages) {
-        return new SimpleAnnotationProcessor(ignorePackages);
+        return create(ignorePackages, Collections.singleton(EBBody.class));
+    }
+
+    static EventAnnotationProcessor create(String[] ignorePackages,
+                                           Collection<Class<? extends Annotation>> supportedParamAnnotations) {
+        return new SimpleAnnotationProcessor(ignorePackages, Optional.ofNullable(supportedParamAnnotations)
+                                                                     .map(HashSet::new)
+                                                                     .orElseGet(HashSet::new));
     }
 
     /**

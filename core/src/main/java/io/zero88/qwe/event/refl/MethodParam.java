@@ -1,5 +1,8 @@
 package io.zero88.qwe.event.refl;
 
+import java.lang.annotation.Annotation;
+import java.util.Map;
+
 import io.zero88.qwe.event.EBContext;
 
 import lombok.Getter;
@@ -10,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 public final class MethodParam {
 
     private final String paramName;
+    private final Map<Class<? extends Annotation>, Annotation> annotations;
     private final Class<?> paramClass;
     /**
      * Check whether method param is EBContext or not
@@ -17,5 +21,10 @@ public final class MethodParam {
      * @see EBContext
      */
     private final boolean isContext;
+
+    @SuppressWarnings("unchecked")
+    public <T extends Annotation> T lookupAnnotation(Class<T> annotationClass) {
+        return (T) annotations.get(annotationClass);
+    }
 
 }

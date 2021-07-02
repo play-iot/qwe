@@ -6,7 +6,6 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.jpa.Sort;
-import io.zero88.qwe.dto.msg.DataTransferObject.AbstractDTO;
 import io.zero88.qwe.event.EventMessage;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,22 +19,25 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(fluent = true)
-public final class RequestData extends AbstractDTO {
+public final class RequestData extends AbstractDTO<RequestData> {
 
+    /**
+     * @see RequestFilter
+     */
     @NonNull
-    @JsonProperty(value = "filter")
+    @JsonProperty(value = StandardKey.FILTER)
     private RequestFilter filter;
-    @JsonProperty(value = "pagination")
+    @JsonProperty(value = StandardKey.PAGINATION)
     private Pagination pagination;
-    @JsonProperty(value = "sort")
+    @JsonProperty(value = StandardKey.SORT)
     private Sort sort;
 
     @JsonCreator
-    private RequestData(@JsonProperty(value = "headers") JsonObject headers,
-                        @JsonProperty(value = "body") JsonObject body,
-                        @JsonProperty(value = "filter") JsonObject filter,
-                        @JsonProperty(value = "pagination") Pagination pagination,
-                        @JsonProperty(value = "sort") Sort sort) {
+    private RequestData(@JsonProperty(value = StandardKey.HEADERS) JsonObject headers,
+                        @JsonProperty(value = StandardKey.BODY) JsonObject body,
+                        @JsonProperty(value = StandardKey.FILTER) JsonObject filter,
+                        @JsonProperty(value = StandardKey.PAGINATION) Pagination pagination,
+                        @JsonProperty(value = StandardKey.SORT) Sort sort) {
         super(headers, body);
         this.filter = new RequestFilter(Objects.nonNull(filter) ? filter : new JsonObject());
         this.pagination = pagination;
@@ -44,12 +46,13 @@ public final class RequestData extends AbstractDTO {
 
     public static Builder builder() { return new Builder(); }
 
+    //FIXME must be all properties
     public static RequestData from(@NonNull EventMessage msg) {
         return builder().body(msg.getData()).build();
     }
 
     public static RequestData empty() {
-        return RequestData.builder().build();
+        return builder().build();
     }
 
     @Override

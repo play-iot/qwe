@@ -9,6 +9,8 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.dto.msg.DataTransferObject.StandardKey;
+import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.exceptions.QWEException;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -27,6 +29,7 @@ import lombok.ToString;
  * @see Status
  * @see EventAction
  * @see ErrorMessage
+ * @since 1.0.0
  */
 @ToString
 @JsonInclude(Include.NON_NULL)
@@ -193,6 +196,14 @@ public final class EventMessage implements Serializable, JsonData {
                : msg;
     }
 
+    /**
+     * Event message data
+     *
+     * @return event message data in json
+     * @apiNote If {@link EventMessage} is used in request mode, then as {@code QWE} standard message, the json data
+     *     will be {@link RequestData} with one of known key data in {@link StandardKey}
+     * @see RequestData
+     */
     @JsonInclude(Include.NON_EMPTY)
     @JsonProperty
     public JsonObject getData() {
