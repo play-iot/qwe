@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
+import io.zero88.qwe.event.EBBody;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventListener;
@@ -27,12 +28,10 @@ public class ServiceLocator implements EventListener {
     private final ServiceDiscoveryApi discovery;
 
     @EBContract(action = "GET_ONE")
-    public Future<JsonObject> get(@EBParam("filter") JsonObject reqFilter, @EBParam("body") JsonObject body) {
+    public Future<JsonObject> get(@EBParam("filter") JsonObject reqFilter,
+                                  @EBBody(ServiceFilterParam.IDENTIFIER) String identifier) {
         final RequestFilter filter = new RequestFilter(reqFilter);
         final ViewType view = ViewType.parse(filter.getString(ServiceFilterParam.VIEW));
-        final String identifier = Optional.ofNullable(body)
-                                          .map(b -> b.getString(ServiceFilterParam.IDENTIFIER))
-                                          .orElse(null);
         return discovery.findOne(filter.put(ServiceFilterParam.IDENTIFIER, identifier)).map(r -> transform(r, view));
     }
 
@@ -72,10 +71,7 @@ public class ServiceLocator implements EventListener {
     }
 
     @EBContract(action = "REMOVE")
-    public Future<JsonObject> remove(@EBParam("body") JsonObject body) {
-        final String identifier = Optional.ofNullable(body)
-                                          .map(b -> b.getString(ServiceFilterParam.IDENTIFIER))
-                                          .orElse(null);
+    public Future<JsonObject> remove(@EBBody(ServiceFilterParam.IDENTIFIER) String identifier) {
         return discovery.unregister(new RequestFilter().put(ServiceFilterParam.IDENTIFIER, identifier));
     }
 
