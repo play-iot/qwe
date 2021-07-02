@@ -12,7 +12,6 @@ import io.vertx.servicediscovery.Status;
 import io.vertx.servicediscovery.types.EventBusService;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.event.EventAction;

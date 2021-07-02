@@ -1,4 +1,4 @@
-package io.zero88.qwe.dto.msg;
+package io.zero88.qwe.micro;
 
 import java.util.Optional;
 

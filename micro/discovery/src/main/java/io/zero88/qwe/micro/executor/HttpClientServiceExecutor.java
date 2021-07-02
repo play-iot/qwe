@@ -10,11 +10,11 @@ import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.dto.msg.GatewayHeadersBuilder;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.client.HttpClientDelegate;
+import io.zero88.qwe.micro.GatewayHeadersBuilder;
 
 public final class HttpClientServiceExecutor implements ServiceExecutor {
 
