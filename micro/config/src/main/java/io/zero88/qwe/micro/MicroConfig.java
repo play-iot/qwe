@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import io.zero88.qwe.ComponentConfig.DynamicComponentConfig;
+import io.zero88.qwe.PluginConfig.DynamicPluginConfig;
 import io.zero88.qwe.IOtherConfig.HasOtherConfig;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public final class MicroConfig extends HasOtherConfig<MicroConfig> implements DynamicComponentConfig<MicroConfig> {
+public final class MicroConfig extends HasOtherConfig<MicroConfig> implements DynamicPluginConfig<MicroConfig> {
 
     public static final String NAME = "__micro__";
 

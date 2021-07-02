@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.HttpServerRouter;
-import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.mock.MockEventBusErrorListener;
 import io.zero88.qwe.http.server.mock.MockEventBusSuccessListener;
 import io.zero88.qwe.http.server.mock.MockApiDefinition.MockRestEventApi;
@@ -19,7 +19,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class RestEventServerTest extends HttpServerTestBase {
+public class RestEventServerTest extends HttpServerPluginTestBase {
 
     @Rule
     public Timeout timeout = Timeout.seconds(60);

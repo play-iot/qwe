@@ -41,7 +41,7 @@ public class ApplicationVerticleTest {
     }
 
     @Test
-    public void test_compute_deployment_option_per_component(TestContext context) {
+    public void test_compute_deployment_option_per_plugin(TestContext context) {
         Async async = context.async(2);
         addDummyUnit();
         addMockUnit();
@@ -55,7 +55,7 @@ public class ApplicationVerticleTest {
                  .map(Deployment::deploymentOptions)
                  .forEach(opt -> {
                      Assert.assertEquals(7, opt.getWorkerPoolSize());
-                     Assert.assertTrue(opt.getWorkerPoolName().startsWith(Application.DEFAULT_COMPONENT_THREAD_PREFIX));
+                     Assert.assertTrue(opt.getWorkerPoolName().startsWith(Application.DEFAULT_PLUGIN_THREAD_PREFIX));
                  });
         };
         VertxHelper.deploy(vertx, context, DeployContext.builder()
@@ -66,7 +66,7 @@ public class ApplicationVerticleTest {
     }
 
     @Test
-    public void test_use_deployment_option_from_component(TestContext context) {
+    public void test_use_deployment_option_from_plugin(TestContext context) {
         Async async = context.async(2);
         addDummyUnit();
         QWEAppConfig config = new QWEAppConfig().put(new MockConfig().deploymentKey(),
@@ -97,7 +97,7 @@ public class ApplicationVerticleTest {
     }
 
     @Test
-    public void test_contain_two_component_vertical_having_same_type_should_deploy_only_one(TestContext context) {
+    public void test_contain_two_plugin_vertical_having_same_type_should_deploy_only_one(TestContext context) {
         Async async = context.async(2);
         addDummyUnit();
         addDummyUnit();
@@ -111,7 +111,7 @@ public class ApplicationVerticleTest {
     }
 
     @Test
-    public void test_contain_two_component_vertical_having_different_type_should_deploy_both(TestContext context) {
+    public void test_contain_two_plugin_vertical_having_different_type_should_deploy_both(TestContext context) {
         Async async = context.async(2);
         addDummyUnit();
         addMockUnit();
@@ -135,7 +135,7 @@ public class ApplicationVerticleTest {
     public void test_cannot_start_coz_install_comp_that_throw_exception(TestContext context) {
         addDummyUnit();
         addMockUnitHavingException();
-        assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting Component Verticle"));
+        assertDeployError(context, new QWEException("UNKNOWN_ERROR | Cause: Error when starting plugin Verticle"));
     }
 
     @Test

@@ -12,16 +12,14 @@ import org.junit.jupiter.api.io.TempDir;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.ComponentTestHelper;
+import io.zero88.qwe.PluginTestHelper;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.event.EventBusClient;
 
 @ExtendWith(VertxExtension.class)
-public abstract class BaseMicroVerticleTest implements ComponentTestHelper {
+public abstract class BaseDiscoveryPluginTest implements PluginTestHelper {
 
-    public static final String EVENT_RECORD_1 = "event.record.1";
-    public static final String EVENT_ADDRESS_1 = "event.address.1";
     protected MicroConfig config;
     protected EventBusClient ebClient;
     protected ServiceDiscoveryApi discovery;
@@ -41,7 +39,7 @@ public abstract class BaseMicroVerticleTest implements ComponentTestHelper {
     @BeforeEach
     public void setup(Vertx vertx, VertxTestContext ctx) {
         config = initMicroConfig();
-        discovery = deploy(vertx, ctx, config.toJson(), new MicroVerticleProvider()).componentContext().getDiscovery();
+        discovery = deploy(vertx, ctx, config.toJson(), new DiscoveryPluginProvider()).pluginContext().getDiscovery();
         ebClient = EventBusClient.create(createSharedData(vertx));
     }
 

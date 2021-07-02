@@ -34,7 +34,7 @@ import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.ComponentTestHelper;
+import io.zero88.qwe.PluginTestHelper;
 import io.zero88.qwe.EventBusHelper;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.TestHelper;
@@ -48,7 +48,7 @@ import io.zero88.qwe.http.server.ws.WebSocketEventMessage;
 import lombok.NonNull;
 
 @RunWith(VertxUnitRunner.class)
-public abstract class HttpServerTestBase implements ComponentTestHelper {
+public abstract class HttpServerPluginTestBase implements PluginTestHelper {
 
     protected static final String DEFAULT_HOST = "127.0.0.1";
 
@@ -144,12 +144,12 @@ public abstract class HttpServerTestBase implements ComponentTestHelper {
                                  });
     }
 
-    protected HttpServer startServer(TestContext context, HttpServerRouter httpRouter) {
-        return deploy(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter));
+    protected HttpServerPlugin startServer(TestContext context, HttpServerRouter httpRouter) {
+        return deploy(vertx, context, httpConfig.toJson(), new HttpServerPluginProvider(httpRouter));
     }
 
     protected void startServer(TestContext context, HttpServerRouter httpRouter, Consumer<Throwable> consumer) {
-        deployFailed(vertx, context, httpConfig.toJson(), new HttpServerProvider(httpRouter), consumer);
+        deployFailed(vertx, context, httpConfig.toJson(), new HttpServerPluginProvider(httpRouter), consumer);
     }
 
     protected JsonObject notFoundResponse(int port, String path) {

@@ -7,35 +7,35 @@ import javax.ws.rs.Produces;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.ApplicationVerticle;
-import io.zero88.qwe.ContextLookup;
+import io.zero88.qwe.PluginContextLookup;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.http.server.HttpServerContext;
-import io.zero88.qwe.http.server.HttpServerProvider;
+import io.zero88.qwe.http.server.HttpServerPluginContext;
+import io.zero88.qwe.http.server.HttpServerPluginProvider;
 import io.zero88.qwe.http.server.HttpServerRouter;
 import io.zero88.qwe.http.server.ServerInfo;
 import io.zero88.qwe.http.server.rest.api.RestApi;
-import io.zero88.qwe.micro.MicroContext;
-import io.zero88.qwe.micro.MicroVerticleProvider;
+import io.zero88.qwe.micro.DiscoveryContext;
+import io.zero88.qwe.micro.DiscoveryPluginProvider;
 import io.zero88.qwe.micro.RecordHelper;
 
 public class MockHttpServiceServer extends ApplicationVerticle {
 
     @Override
     public void onStart() {
-        this.addProvider(new HttpServerProvider(new HttpServerRouter().registerApi(MockAPI.class)))
-            .addProvider(new MicroVerticleProvider());
+        this.addProvider(new HttpServerPluginProvider(new HttpServerRouter().registerApi(MockAPI.class)))
+            .addProvider(new DiscoveryPluginProvider());
     }
 
     public String configFile() { return "httpService.json"; }
 
     @Override
-    public void onInstallCompleted(ContextLookup lookup) {
-        final HttpServerContext httpContext = lookup.query(HttpServerContext.class);
-        final MicroContext microContext = lookup.query(MicroContext.class);
+    public void onInstallCompleted(PluginContextLookup lookup) {
+        final HttpServerPluginContext httpContext = lookup.query(HttpServerPluginContext.class);
+        final DiscoveryContext discoveryContext = lookup.query(DiscoveryContext.class);
         final ServerInfo info = httpContext.getServerInfo();
         final HttpLocation location = new HttpLocation(info.toJson()).setRoot(info.getApiPath());
-        microContext.getDiscovery().register(RecordHelper.create("httpService", location));
+        discoveryContext.getDiscovery().register(RecordHelper.create("httpService", location));
     }
 
     @Path("/test")

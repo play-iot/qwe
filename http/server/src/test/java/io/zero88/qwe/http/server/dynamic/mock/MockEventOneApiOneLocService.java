@@ -7,10 +7,10 @@ import java.util.stream.Stream;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.ApplicationVerticle;
-import io.zero88.qwe.ContextLookup;
+import io.zero88.qwe.PluginContextLookup;
 import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.micro.MicroContext;
-import io.zero88.qwe.micro.MicroVerticleProvider;
+import io.zero88.qwe.micro.DiscoveryContext;
+import io.zero88.qwe.micro.DiscoveryPluginProvider;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
@@ -20,7 +20,7 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
 
     @Override
     public void onStart() {
-        addProvider(new MicroVerticleProvider());
+        addProvider(new DiscoveryPluginProvider());
         getEventBus().register(MockEventServiceListener.TEST_EVENT_1.getAddress(),
                                MockEventServiceListener.TEST_EVENT_LISTENER_1)
                      .register(MockEventServiceListener.TEST_EVENT_2.getAddress(),
@@ -30,12 +30,12 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     }
 
     @Override
-    public void onInstallCompleted(ContextLookup lookup) {
-        publishService(Objects.requireNonNull(lookup.query(MicroContext.class)));
+    public void onInstallCompleted(PluginContextLookup lookup) {
+        publishService(Objects.requireNonNull(lookup.query(DiscoveryContext.class)));
     }
 
-    protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryApi discovery = microContext.getDiscovery();
+    protected void publishService(DiscoveryContext discoveryContext) {
+        final ServiceDiscoveryApi discovery = discoveryContext.getDiscovery();
         CompositeFuture.all(Stream.of(RecordHelper.create("ems-1", MockEventServiceListener.TEST_EVENT_1.getAddress(),
                                                           EventMethodDefinition.createDefault("/hey", "/:id")),
                                       RecordHelper.create("ems-2", MockEventServiceListener.TEST_EVENT_2.getAddress(),

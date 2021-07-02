@@ -13,7 +13,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
-import io.zero88.qwe.ComponentConfig;
+import io.zero88.qwe.PluginConfig;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.http.HttpUtils;
@@ -37,7 +37,7 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Setter(value = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public final class HttpConfig implements ComponentConfig {
+public final class HttpConfig implements PluginConfig {
 
     public static final String NAME = "__http__";
     private String host = "0.0.0.0";

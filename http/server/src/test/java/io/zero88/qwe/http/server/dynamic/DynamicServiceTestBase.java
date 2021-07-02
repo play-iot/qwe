@@ -15,10 +15,10 @@ import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.VertxHelper;
 import io.zero88.qwe.DeployContext;
-import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 
-public abstract class DynamicServiceTestBase extends HttpServerTestBase {
+public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase {
 
     static final Customization IGNORE_URI = new Customization("message.uri", (o1, o2) -> true);
 

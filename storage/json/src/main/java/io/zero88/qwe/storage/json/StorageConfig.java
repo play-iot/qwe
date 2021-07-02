@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.github.zero88.utils.Strings;
-import io.zero88.qwe.ComponentConfig;
+import io.zero88.qwe.PluginConfig;
 import io.zero88.qwe.file.FileOption;
 import io.zero88.qwe.storage.json.service.JsonStorageService;
 
@@ -25,7 +25,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder(builderClassName = "Builder")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class StorageConfig implements ComponentConfig {
+public final class StorageConfig implements PluginConfig {
 
     @Accessors(fluent = true)
     private Path fullPath;

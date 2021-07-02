@@ -11,12 +11,12 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;
-import io.zero88.qwe.http.server.HttpServer;
+import io.zero88.qwe.http.server.HttpServerPlugin;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 import io.zero88.qwe.http.server.rest.api.RestApi;
 import io.zero88.qwe.http.server.rest.api.RestEventApi;
-import io.zero88.qwe.micro.MicroContext;
+import io.zero88.qwe.micro.DiscoveryContext;
 import io.github.zero88.utils.Reflections;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
@@ -85,7 +85,7 @@ public final class RestApisRouterCreator implements ApisCreator {
         this.addSubRouter(this::initRestApiRouter)
             .addSubRouter(this::initEventBusApiRouter)
             .addSubRouter(this::initDynamicRouter);
-        HttpServer.restrictJsonRoute(
+        HttpServerPlugin.restrictJsonRoute(
             mainRouter.route(BasePaths.addWildcards(rootApi)).handler(new EventMessageResponseHandler()));
         return mainRouter;
     }
@@ -121,7 +121,7 @@ public final class RestApisRouterCreator implements ApisCreator {
             return null;
         }
         try {
-            Class.forName(MicroContext.class.getName(), false, Reflections.contextClassLoader());
+            Class.forName(DiscoveryContext.class.getName(), false, Reflections.contextClassLoader());
         } catch (ClassNotFoundException e) {
             throw new InitializerError("To enabled dynamic route, you have to put on qwe-core-micro.jar in classpath",
                                        e);

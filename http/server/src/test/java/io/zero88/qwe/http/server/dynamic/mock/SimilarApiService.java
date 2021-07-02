@@ -13,7 +13,7 @@ import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.event.EventModel;
-import io.zero88.qwe.micro.MicroContext;
+import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
 
@@ -34,8 +34,8 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
     }
 
     @Override
-    protected void publishService(MicroContext microContext) {
-        final ServiceDiscoveryApi discovery = microContext.getDiscovery();
+    protected void publishService(DiscoveryContext discoveryContext) {
+        final ServiceDiscoveryApi discovery = discoveryContext.getDiscovery();
         CompositeFuture.all(Stream.of(RecordHelper.create("ems-5", EVENT_1.getAddress(),
                                                           EventMethodDefinition.createDefault("/client/:cId/site",
                                                                                               "/:sId")),

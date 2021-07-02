@@ -11,21 +11,21 @@ import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ComponentVerticle<C extends ComponentConfig, T extends ComponentContext> extends AbstractVerticle
-    implements Component<C, T>, DeployHook<T>, VerticleLifecycleHooks {
+public abstract class PluginVerticle<C extends PluginConfig, T extends PluginContext> extends AbstractVerticle
+    implements Plugin<C, T>, PluginDeployHook<T>, VerticleLifecycleHooks {
 
     @Getter
     @NonNull
     private final SharedDataLocalProxy sharedData;
     @Getter
-    protected C componentConfig;
+    protected C pluginConfig;
     @Getter
-    private T componentContext;
+    private T pluginContext;
 
     @Override
     public final void start() {
-        logger().debug("Start Component [{}]...", appName());
-        this.componentConfig = computeConfig(config());
+        logger().debug("Start plugin [{}]...", appName());
+        this.pluginConfig = computeConfig(config());
         this.onStart();
     }
 
@@ -36,7 +36,7 @@ public abstract class ComponentVerticle<C extends ComponentConfig, T extends Com
 
     @Override
     public final void stop() {
-        logger().debug("Stop Component [{}]...", appName());
+        logger().debug("Stop plugin [{}]...", appName());
         this.onStop();
     }
 
@@ -46,13 +46,13 @@ public abstract class ComponentVerticle<C extends ComponentConfig, T extends Com
     }
 
     @Override
-    public @NonNull DeployHook<T> hook() {
+    public @NonNull PluginDeployHook<T> hook() {
         return this;
     }
 
     @Override
     public final T setup(T context) {
-        return this.componentContext = context;
+        return this.pluginContext = context;
     }
 
 }

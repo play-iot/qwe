@@ -1,30 +1,30 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.MockProvider.MockComponentVerticle;
+import io.zero88.qwe.MockProvider.MockPluginVerticle;
 
 import lombok.Getter;
 import lombok.NonNull;
 
-public class MockProvider implements ComponentProvider<MockComponentVerticle> {
+public class MockProvider implements PluginProvider<MockPluginVerticle> {
 
     private final boolean error;
 
     public MockProvider(boolean error) {this.error = error;}
 
     @Override
-    public Class<MockComponentVerticle> componentClass() { return MockComponentVerticle.class; }
+    public Class<MockPluginVerticle> pluginClass() { return MockPluginVerticle.class; }
 
     @Override
-    public MockComponentVerticle provide(SharedDataLocalProxy proxy) {
-        return new MockComponentVerticle(proxy, error);
+    public MockPluginVerticle provide(SharedDataLocalProxy proxy) {
+        return new MockPluginVerticle(proxy, error);
     }
 
-    static final class MockComponentVerticle extends ComponentVerticle<MockConfig, ComponentContext> {
+    static final class MockPluginVerticle extends PluginVerticle<MockConfig, PluginContext> {
 
         @Getter
         private final boolean error;
 
-        public MockComponentVerticle(SharedDataLocalProxy sharedData) {
+        public MockPluginVerticle(SharedDataLocalProxy sharedData) {
             this(sharedData, false);
         }
 
@@ -33,7 +33,7 @@ public class MockProvider implements ComponentProvider<MockComponentVerticle> {
             return "mock";
         }
 
-        public MockComponentVerticle(SharedDataLocalProxy sharedData, boolean error) {
+        public MockPluginVerticle(SharedDataLocalProxy sharedData, boolean error) {
             super(sharedData);
             this.error = error;
         }
@@ -51,7 +51,7 @@ public class MockProvider implements ComponentProvider<MockComponentVerticle> {
         @Override
         public void onStart() {
             if (error) {
-                throw new RuntimeException("Error when starting Component Verticle");
+                throw new RuntimeException("Error when starting plugin Verticle");
             }
         }
 

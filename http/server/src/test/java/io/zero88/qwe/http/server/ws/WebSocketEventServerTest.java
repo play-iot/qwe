@@ -30,12 +30,12 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.server.HttpServerRouter;
-import io.zero88.qwe.http.server.HttpServerTestBase;
+import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.mock.MockWebSocketEvent;
 import io.zero88.qwe.http.server.mock.MockWebSocketEvent.MockWebSocketEventServerListener;
 
 @RunWith(VertxUnitRunner.class)
-public class WebSocketEventServerTest extends HttpServerTestBase {
+public class WebSocketEventServerTest extends HttpServerPluginTestBase {
 
     @Rule
     public Timeout timeout = Timeout.seconds(TestHelper.TEST_TIMEOUT_SEC);

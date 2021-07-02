@@ -10,17 +10,17 @@ import io.zero88.qwe.launcher.VersionCommand;
 import lombok.NonNull;
 
 /**
- * Represents an {@code Application} contains a list of micro {@code Components} function.
+ * Represents an {@code Application} contains a list of micro {@code plugins} function.
  * <p>
  * It's mostly deployed as a standalone application by {@code java -jar Application.jar}
  *
- * @see Component
+ * @see Plugin
  * @see HasConfig
  * @see ApplicationVerticle
  */
 public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
 
-    String DEFAULT_COMPONENT_THREAD_PREFIX = "qwe-worker-thread-";
+    String DEFAULT_PLUGIN_THREAD_PREFIX = "qwe-plugin-thread-";
 
     /**
      * Application name
@@ -50,21 +50,21 @@ public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
     }
 
     /**
-     * Add component provider to startup
+     * Add plugin provider to startup
      *
-     * @param <T>      Type of component
+     * @param <T>      Type of plugin
      * @param provider Unit provider
      * @return a reference to this, so the API can be used fluently
      */
-    <T extends Component> Application addProvider(ComponentProvider<T> provider);
+    <T extends Plugin> Application addProvider(PluginProvider<T> provider);
 
     /**
-     * Compute default component pool size
+     * Compute default plugin pool size
      *
-     * @param nbOfComponents Number of components will be installed under this {@code Application}
-     * @return default component pool size
+     * @param nbOfPlugins Number of plugins will be installed under this {@code Application}
+     * @return default plugin pool size
      */
-    default int defaultComponentPoolSize(int nbOfComponents) {
+    default int defaultPluginThreadPoolSize(int nbOfPlugins) {
         int poolSize = VertxOptions.DEFAULT_WORKER_POOL_SIZE;
         if (getVertx() instanceof VertxImpl) {
             poolSize = ((VertxImpl) getVertx()).getOrCreateContext()
@@ -72,33 +72,33 @@ public interface Application extends HasSharedKey, QWEVerticle<QWEAppConfig> {
                                                .deploymentOptions()
                                                .getWorkerPoolSize();
         }
-        return Math.max(poolSize / Math.max(nbOfComponents, 2), 1);
+        return Math.max(poolSize / Math.max(nbOfPlugins, 2), 1);
     }
 
     /**
-     * Install a list of register component verticle based on the order of given providers of {@link
-     * #addProvider(ComponentProvider)}
+     * Install the registered {@code plugins} based on the order of given providers of {@link
+     * #addProvider(PluginProvider)}
      * <p>
-     * If any component verticle starts failed, future will catch and report it to {@code Vertx}
+     * If any plugin verticle starts failed, future will catch and report it to {@code Vertx}
      *
      * @return void future
-     * @apiNote You can override {@code DeploymentOptions} per {@code Component} by declared options with key {@link
-     *     ComponentConfig#deploymentKey()} under {@link QWEAppConfig}
+     * @apiNote You can override {@code DeploymentOptions} per {@code plugin} by declared options with key {@link
+     *     PluginConfig#deploymentKey()} under {@link QWEAppConfig}
      */
-    Future<Void> installComponents();
+    Future<Void> installPlugins();
 
     /**
-     * Uninstall a list of register components when application is stopped
+     * Uninstall a list of register plugins when application is stopped
      *
      * @return void future
      */
-    Future<Void> uninstallComponents();
+    Future<Void> uninstallPlugins();
 
     /**
-     * Raise event after all component are installed completely
+     * Raise event after all plugin are installed completely
      *
      * @param lookup Context lookup
      */
-    void onInstallCompleted(@NonNull ContextLookup lookup);
+    void onInstallCompleted(@NonNull PluginContextLookup lookup);
 
 }

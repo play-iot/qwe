@@ -27,8 +27,8 @@ import lombok.experimental.Accessors;
 public abstract class ApplicationVerticle extends AbstractVerticle
     implements Application, SharedDataLocalProxy, VerticleLifecycleHooks {
 
-    private final Map<Class<? extends Component>, ComponentProvider<? extends Component>> providers = new HashMap<>();
-    private final ContextLookupInternal contexts = ContextLookupInternal.create();
+    private final Map<Class<? extends Plugin>, PluginProvider<? extends Plugin>> providers = new HashMap<>();
+    private final PluginContextLookupInternal contexts = PluginContextLookupInternal.create();
     @Getter
     @Accessors(fluent = true)
     protected QWEAppConfig appConfig;
@@ -49,7 +49,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final void start(Promise<Void> promise) {
-        QWEVerticle.asyncRun(vertx, promise, this::start, () -> onAsyncStart().flatMap(ignore -> installComponents())
+        QWEVerticle.asyncRun(vertx, promise, this::start, () -> onAsyncStart().flatMap(ignore -> installPlugins())
                                                                               .onFailure(e -> logError(e, "start"))
                                                                               .mapEmpty());
     }
@@ -61,13 +61,13 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final void stop(Promise<Void> promise) {
-        QWEVerticle.asyncRun(vertx, promise, this::stop, () -> onAsyncStop().eventually(ignore -> uninstallComponents())
+        QWEVerticle.asyncRun(vertx, promise, this::stop, () -> onAsyncStop().eventually(ignore -> uninstallPlugins())
                                                                             .onFailure(e -> logError(e, "stop")));
     }
 
     @Override
-    public final <T extends Component> Application addProvider(ComponentProvider<T> provider) {
-        this.providers.put(provider.componentClass(), provider);
+    public final <T extends Plugin> Application addProvider(PluginProvider<T> provider) {
+        this.providers.put(provider.pluginClass(), provider);
         return this;
     }
 
@@ -77,61 +77,60 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     }
 
     @Override
-    public final Future<Void> installComponents() {
-        final int defaultPoolSize = defaultComponentPoolSize(providers.size());
+    public final Future<Void> installPlugins() {
+        final int defaultPoolSize = defaultPluginThreadPoolSize(providers.size());
         return CompositeFuture.all(providers.values()
                                             .stream()
-                                            .map(provider -> deployComponent(provider, defaultPoolSize))
+                                            .map(provider -> deployPlugin(provider, defaultPoolSize))
                                             .collect(Collectors.toList())).onSuccess(this::deployAllSuccess).mapEmpty();
     }
 
     @Override
-    public final Future<Void> uninstallComponents() {
-        return CompositeFuture.join(contexts.list().stream().map(this::undeployComponent).collect(Collectors.toList()))
-                              .onSuccess(ar -> logger().info("Uninstall {} component(s) successfully", ar.size()))
+    public final Future<Void> uninstallPlugins() {
+        return CompositeFuture.join(contexts.list().stream().map(this::undeployPlugin).collect(Collectors.toList()))
+                              .onSuccess(ar -> logger().info("Uninstall {} plugin(s) successfully", ar.size()))
                               .mapEmpty();
     }
 
     @Override
-    public void onInstallCompleted(ContextLookup lookup) { }
+    public void onInstallCompleted(PluginContextLookup lookup) { }
 
-    Future<Void> undeployComponent(ComponentContext context) {
+    Future<Void> undeployPlugin(PluginContext context) {
         return vertx.undeploy(context.deployId())
-                    .onSuccess(unused -> logger().info("Component [{}][{}] is uninstalled", context.deployId(),
+                    .onSuccess(unused -> logger().info("plugin [{}][{}] is uninstalled", context.deployId(),
                                                        context.appName()));
     }
 
-    Future<String> deployComponent(ComponentProvider<? extends Component> provider, int defaultPoolSize) {
-        final Component component = provider.provide(this);
-        logger().info("Deploying Component [{}]...", component.appName());
-        return vertx.deployVerticle(component, getComponentDeploymentOptions(defaultPoolSize, component))
-                    .onSuccess(id -> deployComponentSuccess(component, id))
+    Future<String> deployPlugin(PluginProvider<? extends Plugin> provider, int defaultPoolSize) {
+        final Plugin plugin = provider.provide(this);
+        logger().info("Deploying plugin [{}]...", plugin.appName());
+        return vertx.deployVerticle(plugin, getPluginDeploymentOptions(defaultPoolSize, plugin))
+                    .onSuccess(id -> deployPluginSuccess(plugin, id))
                     .recover(t -> Future.failedFuture(QWEExceptionConverter.friendlyOrKeep(t)));
     }
 
     @SuppressWarnings("unchecked")
-    void deployComponentSuccess(Component component, String deployId) {
-        logger().info("Succeed deploying Component [{}][{}]", component.appName(), deployId);
-        ComponentContext def = ComponentContext.create(component.appName(), appConfig.dataDir(), getSharedKey(),
-                                                       deployId);
-        contexts.add(component.setup(component.hook().onSuccess(def)));
+    void deployPluginSuccess(Plugin plugin, String deployId) {
+        logger().info("Succeed deploying plugin [{}][{}]", plugin.appName(), deployId);
+        PluginContext def = PluginContext.create(plugin.appName(), appConfig.dataDir(), getSharedKey(), deployId);
+        contexts.add(plugin.setup(plugin.hook().onSuccess(def)));
     }
 
     void deployAllSuccess(CompositeFuture r) {
-        logger().info("Deployed {}/{} Component(s)...", r.size(), this.providers.size());
+        logger().info("Deployed {}/{} plugin(s)...", r.size(), this.providers.size());
         this.providers.clear();
         try {
             //TODO: add liveness event then readiness event
             this.onInstallCompleted(this.contexts);
         } catch (Exception e) {
             //TODO: add failure readiness event
-            logger().warn("Failed after completed Component deployment", QWEExceptionConverter.friendlyOrKeep(e));
+            logger().warn("Failed after completed plugin deployment", QWEExceptionConverter.friendlyOrKeep(e));
         }
     }
 
     @SuppressWarnings("unchecked")
-    DeploymentOptions getComponentDeploymentOptions(int defaultPoolSize, Component component) {
-        final ComponentConfig compConfig = IConfig.<ComponentConfig>from(appConfig, component.configClass());
+    DeploymentOptions getPluginDeploymentOptions(int defaultPoolSize, Plugin plugin) {
+        final PluginConfig compConfig = IConfig.<PluginConfig>from(appConfig, plugin.configClass());
         DeploymentOptions options = Optional.ofNullable(appConfig.lookup(compConfig.deploymentKey()))
                                             .map(s -> new DeploymentOptions(JsonObject.mapFrom(s)))
                                             .orElseGet(DeploymentOptions::new);
@@ -139,10 +138,10 @@ public abstract class ApplicationVerticle extends AbstractVerticle
                              ? defaultPoolSize
                              : options.getWorkerPoolSize();
         String workerPool = Optional.ofNullable(options.getWorkerPoolName())
-                                    .orElseGet(() -> DEFAULT_COMPONENT_THREAD_PREFIX + component.appName());
+                                    .orElseGet(() -> DEFAULT_PLUGIN_THREAD_PREFIX + plugin.appName());
         options.setWorkerPoolName(workerPool).setWorkerPoolSize(workerPoolSize).setConfig(compConfig.toJson());
         if (logger().isDebugEnabled()) {
-            logger().debug("Deployment Options Component [{}][{}]", component.appName(), options.toJson());
+            logger().debug("Deployment Options plugin [{}][{}]", plugin.appName(), options.toJson());
         }
         return options;
     }
