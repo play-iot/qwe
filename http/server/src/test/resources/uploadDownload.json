@@ -3,24 +3,21 @@
     "__http__": {
       "host": "0.0.0.0",
       "port": 9999,
-      "__rest__": {
+      "fileDir": "files",
+      "__api__": {
         "enabled": false
       },
-      "__files__": {
+      "__upload__": {
         "enabled": true,
-        "dir": "files",
-        "__upload__": {
-          "enabled": true,
-          "path": "/u",
-          "maxBodySizeMB": 1,
-          "handlerClass": "io.zero88.qwe.http.server.handler.UploadFileHandler",
-          "listenerAddress": "blank.mean.using.container.class.name.upload",
-          "listenerClass": "io.zero88.qwe.http.server.handler.UploadListener"
-        },
-        "__download__": {
-          "enabled": true,
-          "path": "/f"
-        }
+        "path": "/u",
+        "maxBodySizeMB": 1,
+        "handlerClass": "io.zero88.qwe.http.server.handler.UploadFileHandler",
+        "listenerAddress": "blank.mean.using.container.class.name.upload",
+        "listenerClass": "io.zero88.qwe.http.server.handler.UploadListener"
+      },
+      "__download__": {
+        "enabled": true,
+        "path": "/f"
       }
     }
   }

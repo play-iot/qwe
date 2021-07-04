@@ -22,14 +22,14 @@ public class HttpConfigTest {
     @Test
     public void deserialize() {
         String jsonStr = "{\"__app__\":{\"__http__\":{\"publicHost\":\"1.1.1.1\",\"publicScheme\":\"HTTPS\"," +
-                         "\"host\":\"1.1.1.1\",\"port\":9090,\"__rest__\":{\"enabled\":true,\"rootApi\":\"/xyz\"}}}}";
+                         "\"host\":\"1.1.1.1\",\"port\":9090,\"__api__\":{\"enabled\":true,\"path\":\"/xyz\"}}}}";
         HttpConfig from = IConfig.from(jsonStr, HttpConfig.class);
         Assertions.assertNotNull(from);
         Assertions.assertEquals("1.1.1.1", from.getHost());
         Assertions.assertEquals(9090, from.getPort());
-        Assertions.assertEquals("/xyz", from.getRestConfig().getRootApi());
+        Assertions.assertEquals("/xyz", from.getApiConfig().getPath());
         Assertions.assertEquals("https://1.1.1.1", from.publicServerUrl());
-        Assertions.assertTrue(from.getRestConfig().isEnabled());
+        Assertions.assertTrue(from.getApiConfig().isEnabled());
         Assertions.assertNotNull(from.getOptions());
         Assertions.assertTrue(from.getOptions().isCompressionSupported());
         Assertions.assertTrue(from.getOptions().isDecompressionSupported());

@@ -25,15 +25,9 @@ import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.http.server.HttpConfig.ApiGatewayConfig;
-import io.zero88.qwe.http.server.HttpConfig.CorsOptions;
-import io.zero88.qwe.http.server.HttpConfig.FileStorageConfig;
-import io.zero88.qwe.http.server.HttpConfig.FileStorageConfig.DownloadConfig;
-import io.zero88.qwe.http.server.HttpConfig.FileStorageConfig.UploadConfig;
-import io.zero88.qwe.http.server.HttpConfig.RestConfig;
-import io.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;
-import io.zero88.qwe.http.server.HttpConfig.StaticWebConfig;
-import io.zero88.qwe.http.server.HttpConfig.WebSocketConfig;
+import io.zero88.qwe.http.server.config.ApiConfig;
+import io.zero88.qwe.http.server.config.ApiGatewayConfig;
+import io.zero88.qwe.http.server.config.CorsOptions;
 import io.zero88.qwe.http.server.download.DownloadRouterCreator;
 import io.zero88.qwe.http.server.gateway.GatewayIndexApi;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
@@ -52,12 +46,10 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
 
     public final static String SERVER_INFO_DATA_KEY = "SERVER_INFO";
     public final static String SERVER_GATEWAY_ADDRESS_DATA_KEY = "SERVER_GATEWAY_ADDRESS";
-    private static final long MB = 1024L * 1024L;
-    @NonNull
     private final HttpServerRouter httpRouter;
     private HttpServer httpServer;
 
-    HttpServerPlugin(SharedDataLocalProxy sharedData, HttpServerRouter router) {
+    HttpServerPlugin(SharedDataLocalProxy sharedData, @NonNull HttpServerRouter router) {
         super(sharedData);
         this.httpRouter = router;
     }
@@ -67,30 +59,35 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
         return "http-server";
     }
 
-    /**
-     * Decorator route with produce and consume
-     * <p>
-     * TODO: Need to check again Route#consumes(String)
-     *
-     * @param route route
-     * @see Route#produces(String)
-     * @see Route#consumes(String)
-     */
-    public static void restrictJsonRoute(Route route) {
-        route.produces(HttpUtils.JSON_CONTENT_TYPE).produces(HttpUtils.JSON_UTF8_CONTENT_TYPE);
+    @Override
+    public Class<HttpConfig> configClass() { return HttpConfig.class; }
+
+    @Override
+    public String configFile() { return "httpServer.json"; }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!this.pluginConfig.getApiConfig().isEnabled()) {
+            this.pluginConfig.getApiConfig().getDynamicConfig().setEnabled(false);
+        }
     }
 
     @Override
     public Future<Void> onAsyncStart() {
         logger().info("Starting HTTP Server...");
-        final HttpServerOptions options = new HttpServerOptions(pluginConfig.getOptions()).setHost(
-            pluginConfig.getHost()).setPort(pluginConfig.getPort());
-        final Router router = initRouter();
-        return vertx.createHttpServer(options).requestHandler(router).listen().onSuccess(server -> {
-            this.httpServer = server;
-            logger().info("Web Server started at {}", this.httpServer.actualPort());
-            this.sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(router, this.httpServer.actualPort()));
-        }).recover(t -> Future.failedFuture(QWEExceptionConverter.from(t))).mapEmpty();
+        return vertx.createHttpServer(new HttpServerOptions(pluginConfig.getOptions()).setHost(pluginConfig.getHost())
+                                                                                      .setPort(pluginConfig.getPort()))
+                    .requestHandler(initRouter())
+                    .listen()
+                    .onSuccess(server -> {
+                        this.httpServer = server;
+                        logger().info("HTTP Server started at [{}:{}]", this.pluginConfig.getHost(),
+                                      httpServer.actualPort());
+                        this.sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(httpServer.actualPort()));
+                    })
+                    .recover(t -> Future.failedFuture(QWEExceptionConverter.from(t)))
+                    .mapEmpty();
     }
 
     @Override
@@ -103,35 +100,21 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
         return new HttpServerPluginContext(postContext, sharedData().getData(SERVER_INFO_DATA_KEY));
     }
 
-    private ServerInfo createServerInfo(Router handler, int port) {
-        final RestConfig restCfg = pluginConfig.getRestConfig();
-        final DynamicRouteConfig dynamicCfg = restCfg.getDynamicConfig();
-        final WebSocketConfig wsCfg = pluginConfig.getWebSocketConfig();
-        final FileStorageConfig storageCfg = pluginConfig.getFileStorageConfig();
-        final DownloadConfig downCfg = storageCfg.getDownloadConfig();
-        final UploadConfig uploadCfg = storageCfg.getUploadConfig();
-        final StaticWebConfig staticWebConfig = pluginConfig.getStaticWebConfig();
-        final ApiGatewayConfig gatewayConfig = pluginConfig.getApiGatewayConfig();
+    private ServerInfo createServerInfo(int port) {
         return ServerInfo.siBuilder()
                          .host(pluginConfig.getHost())
                          .port(port)
                          .publicHost(pluginConfig.publicServerUrl())
-                         .apiPath(restCfg.isEnabled() ? restCfg.getRootApi() : null)
-                         .wsPath(wsCfg.isEnabled() ? wsCfg.getRootWs() : null)
-                         .servicePath(restCfg.isEnabled() && dynamicCfg.isEnabled() ? dynamicCfg.getPath() : null)
-                         .downloadPath(storageCfg.isEnabled() && downCfg.isEnabled() ? downCfg.getPath() : null)
-                         .uploadPath(storageCfg.isEnabled() && uploadCfg.isEnabled() ? uploadCfg.getPath() : null)
-                         .webPath(staticWebConfig.isEnabled() ? staticWebConfig.getWebPath() : null)
-                         .gatewayPath(gatewayConfig.isEnabled() ? gatewayConfig.getPath() : null)
-                         .router(handler)
+                         .apiPath(pluginConfig.getApiConfig().path())
+                         .wsPath(pluginConfig.getWebSocketConfig().path())
+                         .gatewayPath(pluginConfig.getApiGatewayConfig().path())
+                         .servicePath(pluginConfig.getApiConfig().getDynamicConfig().path())
+                         .downloadPath(pluginConfig.getFileDownloadConfig().path())
+                         .uploadPath(pluginConfig.getFileUploadConfig().path())
+                         .webPath(pluginConfig.getStaticWebConfig().path())
+                         .router((Router) httpServer.requestHandler())
                          .build();
     }
-
-    @Override
-    public Class<HttpConfig> configClass() { return HttpConfig.class; }
-
-    @Override
-    public String configFile() { return "httpServer.json"; }
 
     private Router initRouter() {
         try {
@@ -149,29 +132,27 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
                 .handler(ResponseTimeHandler.create())
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
-            final FileStorageConfig storageCfg = pluginConfig.getFileStorageConfig();
-            final String pathNoUpload = "(?!" + storageCfg.getUploadConfig().getPath() + ").+";
-            initFileStorageRouter(root, storageCfg, pluginConfig.publicServerUrl());
-            root.routeWithRegex(pathNoUpload)
-                .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.getMaxBodySizeMB() * MB));
+            root.routeWithRegex("(?!" + pluginConfig.getFileUploadConfig().getPath() + ").+")
+                .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.getMaxBodySizeMB() * HttpConfig.MB));
+            initFileStorageRouter(root, pluginConfig.publicServerUrl());
             initHttp2Router(root);
             new WebSocketRouterCreator(httpRouter.getWebSocketEvents()).mount(root, pluginConfig.getWebSocketConfig(),
                                                                               sharedData());
-            initRestRouter(root, pluginConfig.getRestConfig());
+            initRestRouter(root, pluginConfig.getApiConfig());
             initGatewayRouter(root, pluginConfig.getApiGatewayConfig());
             new StaticWebRouterCreator().mount(root, pluginConfig.getStaticWebConfig(), sharedData());
             root.route().last().handler(new NotFoundContextHandler());
             return root;
         } catch (QWEException e) {
-            throw new InitializerError("Error when initializing http server route", e);
+            throw new InitializerError("Error when initializing HTTP Server route", e);
         }
     }
 
-    private Router initRestRouter(Router mainRouter, RestConfig restConfig) {
+    private Router initRestRouter(Router mainRouter, ApiConfig restConfig) {
         if (!restConfig.isEnabled()) {
             return mainRouter;
         }
-        return new RestApisRouterCreator(vertx, mainRouter).rootApi(restConfig.getRootApi())
+        return new RestApisRouterCreator(vertx, mainRouter).rootApi(restConfig.getPath())
                                                            .registerApi(httpRouter.getRestApiClasses())
                                                            .registerEventBusApi(httpRouter.getRestEventApiClasses())
                                                            .dynamicRouteConfig(restConfig.getDynamicConfig())
@@ -179,13 +160,12 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
                                                            .build();
     }
 
-    private Router initFileStorageRouter(Router router, FileStorageConfig storageCfg, String publicUrl) {
-        if (!storageCfg.isEnabled()) {
-            return router;
-        }
-        final Path storageDir = Paths.get(FileUtils.createFolder(pluginContext().dataDir(), storageCfg.getDir()));
-        new UploadRouterCreator(storageDir, publicUrl).mount(router, storageCfg.getUploadConfig(), sharedData());
-        new DownloadRouterCreator(storageDir).mount(router, storageCfg.getDownloadConfig(), sharedData());
+    private Router initFileStorageRouter(Router router, String publicUrl) {
+        final Path storageDir = Paths.get(
+            FileUtils.createFolder(Paths.get((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR_KEY)),
+                                   pluginConfig.getFileDir()));
+        new UploadRouterCreator(storageDir, publicUrl).mount(router, pluginConfig.getFileUploadConfig(), sharedData());
+        new DownloadRouterCreator(storageDir).mount(router, pluginConfig.getFileDownloadConfig(), sharedData());
         return router;
     }
 
@@ -209,5 +189,18 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
     }
 
     private Router initHttp2Router(Router router) { return router; }
+
+    /**
+     * Decorator route with produce and consume
+     * <p>
+     * TODO: Need to check again Route#consumes(String)
+     *
+     * @param route route
+     * @see Route#produces(String)
+     * @see Route#consumes(String)
+     */
+    public static void restrictJsonRoute(Route route) {
+        route.produces(HttpUtils.JSON_CONTENT_TYPE).produces(HttpUtils.JSON_UTF8_CONTENT_TYPE);
+    }
 
 }

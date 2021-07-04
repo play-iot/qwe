@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.zero88.qwe.http.server.HttpConfig.WebSocketConfig;
+import io.zero88.qwe.http.server.config.WebSocketConfig;
 import io.zero88.qwe.http.server.mock.MockWebSocketEvent;
 
 public class WebSocketRouterCreatorTest {
@@ -22,7 +22,7 @@ public class WebSocketRouterCreatorTest {
     @Test
     public void test_customize_root() {
         final WebSocketRouterCreator creator = new WebSocketRouterCreator(Collections.emptySet());
-        final String s = creator.mountPoint(WebSocketConfig.builder().build());
+        final String s = creator.mountPoint(new WebSocketConfig());
         Assertions.assertEquals("/ws", s);
     }
 

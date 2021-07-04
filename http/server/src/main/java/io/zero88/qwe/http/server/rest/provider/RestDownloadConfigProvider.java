@@ -1,6 +1,6 @@
 package io.zero88.qwe.http.server.rest.provider;
 
-import io.zero88.qwe.http.server.HttpConfig.FileStorageConfig.DownloadConfig;
+import io.zero88.qwe.http.server.config.FileDownloadConfig;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,6 @@ import lombok.RequiredArgsConstructor;
 public class RestDownloadConfigProvider {
 
     @Getter
-    private final DownloadConfig downloadConfig;
+    private final FileDownloadConfig downloadConfig;
 
 }

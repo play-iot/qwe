@@ -1,13 +1,13 @@
 package io.zero88.qwe.http.server.web;
 
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpConfig.StaticWebConfig;
-import io.zero88.qwe.http.server.HttpLogSystem.WebLogSystem;
-import io.zero88.qwe.http.server.RouterCreator;
 import io.github.zero88.utils.FileUtils;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.http.server.HttpLogSystem.WebLogSystem;
+import io.zero88.qwe.http.server.RouterCreator;
+import io.zero88.qwe.http.server.config.StaticWebConfig;
 
 import lombok.NonNull;
 
@@ -21,7 +21,7 @@ public class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, W
         } else {
             String webDir = FileUtils.createFolder(sharedData.getData(SharedDataLocalProxy.APP_DATADIR_KEY),
                                                    config.getWebRoot());
-            log().info(decor("Registering route '{}' with web dir '{}'"), config.getWebPath(), webDir);
+            logger().info(decor("Registering route '{}' with web dir '{}'"), config.getPath(), webDir);
             staticHandler.setEnableRangeSupport(true)
                          .setSendVaryHeader(true)
                          .setFilesReadOnly(false)

@@ -10,7 +10,7 @@ import io.github.zero88.exceptions.InvalidUrlException;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpConfig.RestConfig.DynamicRouteConfig;
+import io.zero88.qwe.http.server.config.ApiDynamicRouteConfig;
 import io.zero88.qwe.http.server.HttpServerPlugin;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
@@ -44,7 +44,7 @@ public final class RestApisRouterCreator implements ApisCreator {
     private final Set<Class<? extends RestEventApi>> restEventApiClass = new HashSet<>();
     private String rootApi = BasePaths.ROOT_API_PATH;
     private SharedDataLocalProxy proxy;
-    private DynamicRouteConfig dynamicRouteConfig;
+    private ApiDynamicRouteConfig dynamicRouteConfig;
 
     public RestApisRouterCreator registerApi(Collection<Class<? extends RestApi>> apiClass) {
         restApiClass.addAll(apiClass);
@@ -72,7 +72,7 @@ public final class RestApisRouterCreator implements ApisCreator {
         return this;
     }
 
-    public RestApisRouterCreator dynamicRouteConfig(DynamicRouteConfig dynamicRouteConfig) {
+    public RestApisRouterCreator dynamicRouteConfig(ApiDynamicRouteConfig dynamicRouteConfig) {
         this.dynamicRouteConfig = dynamicRouteConfig;
         return this;
     }

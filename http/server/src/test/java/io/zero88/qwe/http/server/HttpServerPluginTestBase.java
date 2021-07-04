@@ -87,7 +87,7 @@ public abstract class HttpServerPluginTestBase implements PluginTestHelper {
     }
 
     protected void enableWebsocket() {
-        this.httpConfig.getRestConfig().setEnabled(false);
+        this.httpConfig.getApiConfig().setEnabled(false);
         this.httpConfig.getWebSocketConfig().setEnabled(true);
     }
 

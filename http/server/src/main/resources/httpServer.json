@@ -5,6 +5,7 @@
   "publicPort": -1,
   "publicScheme": "HTTP",
   "maxBodySizeMB": 2,
+  "fileDir": "files",
   "__options__": {
     "logActivity": false,
     "receiveBufferSize": -1,
@@ -71,17 +72,38 @@
     "webSocketCompressionLevel": 6,
     "webSocketPreferredClientNoContext": false
   },
-  "__rest__": {
+  "__cors__": {
+    "allowedOriginPattern": "*",
+    "allowedMethods": [
+      "HEAD",
+      "GET",
+      "PATCH",
+      "POST",
+      "OPTIONS",
+      "DELETE",
+      "PUT"
+    ],
+    "allowedHeaders": [],
+    "exposedHeaders": [],
+    "allowCredentials": false,
+    "maxAgeSeconds": 3600
+  },
+  "__api__": {
     "enabled": true,
-    "rootApi": "/api",
+    "path": "/api",
     "__dynamic__": {
       "enabled": false,
       "path": "/s"
     }
   },
+  "__api_gateway__": {
+    "enabled": false,
+    "path": "/gw",
+    "address": null
+  },
   "__websocket__": {
     "enabled": false,
-    "rootWs": "/ws",
+    "path": "/ws",
     "__sockjs__": {
       "sessionTimeout": 5000,
       "insertJSESSIONID": true,
@@ -99,50 +121,25 @@
       "replyTimeout": 30000
     }
   },
-  "__http2__": {
-    "enabled": false
-  },
-  "__cors__": {
-    "allowedOriginPattern": "*",
-    "allowedMethods": [
-      "HEAD",
-      "GET",
-      "PATCH",
-      "POST",
-      "OPTIONS",
-      "DELETE",
-      "PUT"
-    ],
-    "allowedHeaders": [],
-    "exposedHeaders": [],
-    "allowCredentials": false,
-    "maxAgeSeconds": 3600
-  },
-  "__api_gateway__": {
+  "__upload__": {
     "enabled": false,
-    "path": "/gw",
-    "address": null
+    "path": "/u",
+    "maxBodySizeMB": 10,
+    "handlerClass": "io.zero88.qwe.http.server.upload.UploadFileHandler",
+    "listenerClass": "io.zero88.qwe.http.server.upload.UploadListener"
   },
-  "__files__": {
+  "__download__": {
     "enabled": false,
-    "dir": "files",
-    "__upload__": {
-      "enabled": false,
-      "path": "/u",
-      "maxBodySizeMB": 10,
-      "handlerClass": "io.zero88.qwe.http.server.upload.UploadFileHandler",
-      "listenerClass": "io.zero88.qwe.http.server.upload.UploadListener"
-    },
-    "__download__": {
-      "enabled": false,
-      "path": "/f",
-      "handlerClass": "io.zero88.qwe.http.server.download.DownloadFileHandler"
-    }
+    "path": "/f",
+    "handlerClass": "io.zero88.qwe.http.server.download.DownloadFileHandler"
   },
   "__static__": {
     "enabled": false,
     "inResource": true,
-    "webPath": "/web",
+    "path": "/web",
     "webRoot": "webroot"
+  },
+  "__http2__": {
+    "enabled": false
   }
 }

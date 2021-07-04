@@ -14,8 +14,8 @@ import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpConfig.WebSocketConfig;
-import io.zero88.qwe.http.server.HttpConfig.WebSocketConfig.SocketBridgeConfig;
+import io.zero88.qwe.http.server.config.WebSocketConfig;
+import io.zero88.qwe.http.server.config.WebSocketConfig.SocketBridgeConfig;
 import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.github.zero88.utils.Reflections.ReflectionClass;
@@ -41,7 +41,7 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
 
     @Override
     public @NonNull String mountPoint(@NonNull WebSocketConfig config) {
-        String root = Urls.combinePath(config.basePath());
+        String root = Urls.combinePath(config.getPath());
         if (!Urls.validatePath(root)) {
             throw new InvalidUrlException("Root Websocket is not valid");
         }
@@ -77,12 +77,12 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
             EventModel listener = m.getListener();
             EventModel publisher = m.getPublisher();
             if (Objects.nonNull(listener)) {
-                log().info(decor("Init Inbound WebSocket: " + msgFormat), fullPath, listener.getPattern(),
-                           listener.getAddress());
+                logger().info(decor("Init Inbound WebSocket: " + msgFormat), fullPath, listener.getPattern(),
+                              listener.getAddress());
                 opts.addInboundPermitted(new PermittedOptions().setAddress(listener.getAddress()));
             } else if (Objects.nonNull(publisher)) {
-                log().info(decor("Init Outbound WebSocket: " + msgFormat), fullPath, publisher.getPattern(),
-                           publisher.getAddress());
+                logger().info(decor("Init Outbound WebSocket: " + msgFormat), fullPath, publisher.getPattern(),
+                              publisher.getAddress());
                 opts.addOutboundPermitted(new PermittedOptions().setAddress(publisher.getAddress()));
             }
         });

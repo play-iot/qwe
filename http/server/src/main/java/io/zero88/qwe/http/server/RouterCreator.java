@@ -3,14 +3,15 @@ package io.zero88.qwe.http.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.SharedDataLocalProxy;
 import io.vertx.ext.web.Router;
+import io.zero88.qwe.HasLogger;
+import io.zero88.qwe.SharedDataLocalProxy;
 
 import lombok.NonNull;
 
-public interface RouterCreator<T extends RouterConfig> {
+public interface RouterCreator<T extends RouterConfig> extends HasLogger {
 
-    default Logger log() {
+    default Logger logger() {
         return LoggerFactory.getLogger(RouterCreator.class);
     }
 
@@ -32,7 +33,7 @@ public interface RouterCreator<T extends RouterConfig> {
     }
 
     default @NonNull String mountPoint(@NonNull T config) {
-        return config.basePath();
+        return config.getPath();
     }
 
     /**
