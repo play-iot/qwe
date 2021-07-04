@@ -1,17 +1,14 @@
-package io.zero88.qwe.http;
+package io.zero88.qwe.micro.httpevent;
 
 import java.util.Arrays;
 import java.util.List;
 
-import io.zero88.qwe.event.EventAction;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpMethod;
+import io.zero88.qwe.event.EventAction;
 
 /**
  * HTTP Path rule to create capture path
- *
- * @see EventMethodMapping
- * @see EventMethodDefinition
  */
 public class HttpPathRule {
 

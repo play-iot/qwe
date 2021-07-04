@@ -8,7 +8,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.PluginContextLookup;
-import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.DiscoveryPluginProvider;
 import io.zero88.qwe.micro.RecordHelper;

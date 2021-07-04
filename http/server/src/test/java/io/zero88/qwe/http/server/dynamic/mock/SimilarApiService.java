@@ -11,7 +11,7 @@ import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;

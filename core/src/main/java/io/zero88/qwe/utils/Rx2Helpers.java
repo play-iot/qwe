@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ExecutorHelpers {
+public final class Rx2Helpers {
 
     public static <T> Single<T> blocking(@NonNull Vertx vertx, @NonNull Callable<T> callable) {
         return Single.fromCallable(callable).subscribeOn(RxHelper.blockingScheduler(vertx));

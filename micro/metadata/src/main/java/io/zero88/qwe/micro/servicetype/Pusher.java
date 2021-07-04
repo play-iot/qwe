@@ -7,7 +7,6 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.EventMethodDefinition;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -25,14 +24,6 @@ class Pusher implements EventMessagePusher {
 
     @Override
     public Future<EventMessage> execute(EventAction action, RequestData requestData) {
-        //        EventReplyHandler handler = EventReplyHandler.builder()
-        //                                                     .system("SERVICE_DISCOVERY")
-        //                                                     .address(address)
-        //                                                     .action(EventAction.RETURN)
-        //                                                     .success(msg -> dataConsumer.accept(ResponseData.from
-        //                                                    (msg)))
-        //                                                     .exception(errorConsumer)
-        //                                                     .build();
         return EventBusClient.create(sharedData).request(address, EventMessage.initial(action, requestData), options);
     }
 

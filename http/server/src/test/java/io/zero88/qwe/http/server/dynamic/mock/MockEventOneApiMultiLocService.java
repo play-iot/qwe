@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
-import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;

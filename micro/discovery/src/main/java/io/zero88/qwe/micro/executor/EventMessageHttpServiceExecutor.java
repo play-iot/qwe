@@ -13,7 +13,7 @@ import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.micro.GatewayHeadersBuilder;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;

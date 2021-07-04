@@ -1,4 +1,4 @@
-package io.zero88.qwe.http.event;
+package io.zero88.qwe.micro.httpevent;
 
 import java.util.Collections;
 import java.util.Map;
@@ -6,25 +6,23 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.http.ActionMethodMapping;
-import io.zero88.qwe.http.EventMethodDefinition;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpMethod;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.micro.httpevent.RestEventApiMetadata.Builder;
 
 public class RestEventApiMetadataTest {
 
-    private RestEventApiMetadata.Builder createBuilder(EventAction event, HttpMethod method) {
+    private Builder createBuilder(EventAction event, HttpMethod method) {
         return createBuilder(event, method, "/api/golds", "/:gold_id");
     }
 
-    private RestEventApiMetadata.Builder createBuilder(String path, String... params) {
+    private Builder createBuilder(String path, String... params) {
         return createBuilder(EventAction.GET_ONE, HttpMethod.GET, path, params);
     }
 
-    private RestEventApiMetadata.Builder createBuilder(EventAction action, HttpMethod method, String path,
-                                                       String... params) {
+    private Builder createBuilder(EventAction action, HttpMethod method, String path, String... params) {
 
         final ActionMethodMapping mapping = createMapping(action, method);
         return RestEventApiMetadata.builder()

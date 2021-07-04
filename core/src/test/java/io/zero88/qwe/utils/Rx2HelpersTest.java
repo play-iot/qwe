@@ -11,7 +11,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 
 @ExtendWith(VertxExtension.class)
-public class ExecutorHelpersTest {
+public class Rx2HelpersTest {
 
     public static String block() {
         try {
@@ -27,7 +27,7 @@ public class ExecutorHelpersTest {
         vertx.deployVerticle(new AbstractVerticle() {
             @Override
             public void start() {
-                ExecutorHelpers.blocking(vertx, ExecutorHelpersTest::block).subscribe(thread -> {
+                Rx2Helpers.blocking(vertx, Rx2HelpersTest::block).subscribe(thread -> {
                     System.out.println("Thread: " + thread);
                     Assertions.assertEquals("vert.x-worker-thread-0", thread);
                     testContext.completeNow();
@@ -41,7 +41,7 @@ public class ExecutorHelpersTest {
         vertx.deployVerticle(new AbstractVerticle() {
             @Override
             public void start() {
-                Single.fromCallable(ExecutorHelpersTest::block).subscribe(thread -> {
+                Single.fromCallable(Rx2HelpersTest::block).subscribe(thread -> {
                     System.out.println("Thread: " + thread);
                     Assertions.assertEquals("vert.x-eventloop-thread-0", thread);
                     testContext.completeNow();
