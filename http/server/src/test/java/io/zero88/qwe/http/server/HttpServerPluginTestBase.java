@@ -55,7 +55,7 @@ public abstract class HttpServerPluginTestBase implements PluginTestHelper {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     protected Vertx vertx;
-    protected HttpConfig httpConfig;
+    protected HttpServerConfig httpConfig;
     protected HttpClient client;
     protected RequestOptions requestOptions;
 
@@ -70,7 +70,7 @@ public abstract class HttpServerPluginTestBase implements PluginTestHelper {
     @Before
     public void before(TestContext context) throws IOException {
         vertx = Vertx.vertx();
-        httpConfig = IConfig.fromClasspath(httpConfigFile(), HttpConfig.class);
+        httpConfig = IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class);
         httpConfig.setHost(DEFAULT_HOST);
         httpConfig.setPort(TestHelper.getRandomPort());
         client = vertx.createHttpClient(createClientOptions());

@@ -17,7 +17,6 @@ public interface SharedDataLocalProxy extends HasSharedKey {
      * @see EventBusClient
      */
     String EVENTBUS_DELIVERY_OPTION_KEY = "EVENTBUS_OPTION";
-    String APP_DATADIR_KEY = "APP_DATADIR";
     String PUBLIC_IPV4_KEY = "PUBLIC_IPV4";
 
     Vertx getVertx();

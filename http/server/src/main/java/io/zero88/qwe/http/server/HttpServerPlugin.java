@@ -1,13 +1,10 @@
 package io.zero88.qwe.http.server;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
@@ -42,7 +39,7 @@ import io.zero88.qwe.http.server.ws.WebSocketRouterCreator;
 
 import lombok.NonNull;
 
-public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServerPluginContext> {
+public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServerPluginContext> {
 
     public final static String SERVER_INFO_DATA_KEY = "SERVER_INFO";
     public final static String SERVER_GATEWAY_ADDRESS_DATA_KEY = "SERVER_GATEWAY_ADDRESS";
@@ -60,7 +57,7 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
     }
 
     @Override
-    public Class<HttpConfig> configClass() { return HttpConfig.class; }
+    public Class<HttpServerConfig> configClass() { return HttpServerConfig.class; }
 
     @Override
     public String configFile() { return "httpServer.json"; }
@@ -81,10 +78,9 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
                     .requestHandler(initRouter())
                     .listen()
                     .onSuccess(server -> {
-                        this.httpServer = server;
-                        logger().info("HTTP Server started at [{}:{}]", this.pluginConfig.getHost(),
-                                      httpServer.actualPort());
-                        this.sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(httpServer.actualPort()));
+                        httpServer = server;
+                        logger().info("HTTP Server started [{}:{}]", pluginConfig.getHost(), httpServer.actualPort());
+                        sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(httpServer.actualPort()));
                     })
                     .recover(t -> Future.failedFuture(QWEExceptionConverter.from(t)))
                     .mapEmpty();
@@ -133,14 +129,18 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
             root.routeWithRegex("(?!" + pluginConfig.getFileUploadConfig().getPath() + ").+")
-                .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.getMaxBodySizeMB() * HttpConfig.MB));
-            initFileStorageRouter(root, pluginConfig.publicServerUrl());
+                .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.getMaxBodySizeMB() * HttpServerConfig.MB));
+            new UploadRouterCreator(pluginContext().dataDir()).mount(root, pluginConfig.getFileUploadConfig(),
+                                                                     sharedData());
+            new DownloadRouterCreator(pluginContext().dataDir()).mount(root, pluginConfig.getFileDownloadConfig(),
+                                                                       sharedData());
             initHttp2Router(root);
             new WebSocketRouterCreator(httpRouter.getWebSocketEvents()).mount(root, pluginConfig.getWebSocketConfig(),
                                                                               sharedData());
             initRestRouter(root, pluginConfig.getApiConfig());
             initGatewayRouter(root, pluginConfig.getApiGatewayConfig());
-            new StaticWebRouterCreator().mount(root, pluginConfig.getStaticWebConfig(), sharedData());
+            new StaticWebRouterCreator(pluginContext().dataDir()).mount(root, pluginConfig.getStaticWebConfig(),
+                                                                        sharedData());
             root.route().last().handler(new NotFoundContextHandler());
             return root;
         } catch (QWEException e) {
@@ -156,35 +156,26 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
                                                            .registerApi(httpRouter.getRestApiClasses())
                                                            .registerEventBusApi(httpRouter.getRestEventApiClasses())
                                                            .dynamicRouteConfig(restConfig.getDynamicConfig())
-                                                           .addSharedDataProxy(this.sharedData())
+                                                           .addSharedData(sharedData())
                                                            .build();
     }
 
-    private Router initFileStorageRouter(Router router, String publicUrl) {
-        final Path storageDir = Paths.get(
-            FileUtils.createFolder(Paths.get((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR_KEY)),
-                                   pluginConfig.getFileDir()));
-        new UploadRouterCreator(storageDir, publicUrl).mount(router, pluginConfig.getFileUploadConfig(), sharedData());
-        new DownloadRouterCreator(storageDir).mount(router, pluginConfig.getFileDownloadConfig(), sharedData());
-        return router;
-    }
-
-    private void initGatewayRouter(Router mainRouter, ApiGatewayConfig apiGatewayConfig) {
-        if (!apiGatewayConfig.isEnabled()) {
+    private void initGatewayRouter(Router mainRouter, ApiGatewayConfig gatewayConfig) {
+        if (!gatewayConfig.isEnabled()) {
             return;
         }
         this.sharedData()
             .addData(SERVER_GATEWAY_ADDRESS_DATA_KEY,
-                     Strings.requireNotBlank(apiGatewayConfig.getAddress(), "Gateway address cannot be blank"));
+                     Strings.requireNotBlank(gatewayConfig.getAddress(), "Gateway address cannot be blank"));
         final Set<Class<? extends RestEventApi>> gatewayApis = Stream.concat(httpRouter.getGatewayApiClasses().stream(),
                                                                              Stream.of(GatewayIndexApi.class))
                                                                      .collect(Collectors.toSet());
-        logger().info("GATEWAY::Registering sub routers in Gateway API: '{}'...", apiGatewayConfig.getPath());
+        logger().info("GATEWAY::Registering sub routers in Gateway API: '{}'...", gatewayConfig.getPath());
         final Router gatewayRouter = new RestEventApisCreator(vertx).register(gatewayApis)
-                                                                    .addSharedDataProxy(this.sharedData())
+                                                                    .addSharedData(this.sharedData())
                                                                     .build();
-        mainRouter.mountSubRouter(apiGatewayConfig.getPath(), gatewayRouter);
-        restrictJsonRoute(mainRouter.route(BasePaths.addWildcards(apiGatewayConfig.getPath()))
+        mainRouter.mountSubRouter(gatewayConfig.getPath(), gatewayRouter);
+        restrictJsonRoute(mainRouter.route(BasePaths.addWildcards(gatewayConfig.getPath()))
                                     .handler(new EventMessageResponseHandler()));
     }
 

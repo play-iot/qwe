@@ -14,10 +14,10 @@ import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.http.server.HttpLogSystem.ApisLogSystem;
 import io.zero88.qwe.micro.httpevent.ActionMethodMapping;
 import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.micro.httpevent.RestEventApiMetadata;
-import io.zero88.qwe.http.server.HttpLogSystem.ApisLogSystem;
 
 import lombok.NonNull;
 
@@ -43,7 +43,7 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisLogSyste
 
     protected void addRouter(@NonNull String address, @NonNull EventMethodDefinition definition) {
         if (restMetadata.containsKey(definition.getServicePath())) {
-            logger.warn(decor("HTTP path '{}' is already registered, but might different Event address '{}'"),
+            logger.warn(decor("HTTP path [{}] is already registered, but might different Event address [{}]"),
                         definition.getServicePath(), restMetadata.get(definition.getServicePath()).getAddress());
         }
         RestEventApiMetadata metadata = RestEventApiMetadata.builder()
@@ -60,7 +60,7 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisLogSyste
     }
 
     @Override
-    public AbstractRestEventApi registerProxy(SharedDataLocalProxy proxy) {
+    public AbstractRestEventApi registerSharedData(SharedDataLocalProxy proxy) {
         this.proxy = proxy;
         return this;
     }

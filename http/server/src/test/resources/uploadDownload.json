@@ -1,9 +1,9 @@
 {
   "__app__": {
     "__http__": {
+      "pluginDir": "files",
       "host": "0.0.0.0",
       "port": 9999,
-      "fileDir": "files",
       "__api__": {
         "enabled": false
       },

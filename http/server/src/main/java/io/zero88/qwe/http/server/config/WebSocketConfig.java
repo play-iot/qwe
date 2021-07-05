@@ -7,7 +7,7 @@ import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpConfig;
+import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.ws.WebSocketBridgeEventHandler;
 
@@ -33,7 +33,7 @@ public final class WebSocketConfig extends AbstractRouterConfig implements IConf
     private final SocketBridgeConfig bridgeOptions = new SocketBridgeConfig();
 
     public WebSocketConfig() {
-        super(NAME, HttpConfig.class, false, BasePaths.ROOT_WS_PATH);
+        super(NAME, HttpServerConfig.class, false, BasePaths.ROOT_WS_PATH);
     }
 
     public Class<? extends WebSocketBridgeEventHandler> bridgeHandlerClass() {

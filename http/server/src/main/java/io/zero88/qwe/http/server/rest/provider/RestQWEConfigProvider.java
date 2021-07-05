@@ -9,6 +9,6 @@ import lombok.RequiredArgsConstructor;
 public class RestQWEConfigProvider {
 
     @Getter
-    private final QWEConfig bpConfig;
+    private final QWEConfig qweConfig;
 
 }

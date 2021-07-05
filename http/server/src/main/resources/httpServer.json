@@ -5,7 +5,7 @@
   "publicPort": -1,
   "publicScheme": "HTTP",
   "maxBodySizeMB": 2,
-  "fileDir": "files",
+  "pluginDir": "httpserver",
   "__options__": {
     "logActivity": false,
     "receiveBufferSize": -1,
@@ -124,6 +124,7 @@
   "__upload__": {
     "enabled": false,
     "path": "/u",
+    "uploadDir": "files",
     "maxBodySizeMB": 10,
     "handlerClass": "io.zero88.qwe.http.server.upload.UploadFileHandler",
     "listenerClass": "io.zero88.qwe.http.server.upload.UploadListener"
@@ -131,6 +132,7 @@
   "__download__": {
     "enabled": false,
     "path": "/f",
+    "downloadDir": "files",
     "handlerClass": "io.zero88.qwe.http.server.download.DownloadFileHandler"
   },
   "__static__": {

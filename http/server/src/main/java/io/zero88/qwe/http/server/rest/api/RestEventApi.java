@@ -16,7 +16,7 @@ public interface RestEventApi extends ActionMethodMapping {
 
     Collection<RestEventApiMetadata> getRestMetadata();
 
-    RestEventApi registerProxy(SharedDataLocalProxy proxy);
+    RestEventApi registerSharedData(SharedDataLocalProxy proxy);
 
     @SuppressWarnings("unchecked")
     default <T extends RestEventApiDispatcher> Class<T> dispatcher() {

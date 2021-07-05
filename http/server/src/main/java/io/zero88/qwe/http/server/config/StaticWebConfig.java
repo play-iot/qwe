@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server.config;
 
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpConfig;
+import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.RouterConfig;
 
 import lombok.AccessLevel;
@@ -19,7 +19,7 @@ public final class StaticWebConfig extends AbstractRouterConfig implements IConf
     private String webRoot = "webroot";
 
     public StaticWebConfig() {
-        super(NAME, HttpConfig.class);
+        super(NAME, HttpServerConfig.class);
     }
 
     @Override

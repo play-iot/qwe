@@ -7,21 +7,21 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import io.github.zero88.exceptions.InvalidUrlException;
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.config.ApiDynamicRouteConfig;
-import io.zero88.qwe.http.server.HttpServerPlugin;
-import io.zero88.qwe.http.server.RouterCreator;
-import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
-import io.zero88.qwe.http.server.rest.api.RestApi;
-import io.zero88.qwe.http.server.rest.api.RestEventApi;
-import io.zero88.qwe.micro.DiscoveryContext;
 import io.github.zero88.utils.Reflections;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.exceptions.InitializerError;
+import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.http.server.HttpServerPlugin;
+import io.zero88.qwe.http.server.RouterCreator;
+import io.zero88.qwe.http.server.config.ApiDynamicRouteConfig;
+import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
+import io.zero88.qwe.http.server.rest.api.RestApi;
+import io.zero88.qwe.http.server.rest.api.RestEventApi;
+import io.zero88.qwe.micro.DiscoveryContext;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public final class RestApisRouterCreator implements ApisCreator {
     @NonNull
     private final Set<Class<? extends RestEventApi>> restEventApiClass = new HashSet<>();
     private String rootApi = BasePaths.ROOT_API_PATH;
-    private SharedDataLocalProxy proxy;
+    private SharedDataLocalProxy sharedData;
     private ApiDynamicRouteConfig dynamicRouteConfig;
 
     public RestApisRouterCreator registerApi(Collection<Class<? extends RestApi>> apiClass) {
@@ -67,8 +67,8 @@ public final class RestApisRouterCreator implements ApisCreator {
         return this;
     }
 
-    public RestApisRouterCreator addSharedDataProxy(@NonNull SharedDataLocalProxy proxy) {
-        this.proxy = proxy;
+    public RestApisRouterCreator addSharedData(@NonNull SharedDataLocalProxy proxy) {
+        this.sharedData = proxy;
         return this;
     }
 
@@ -81,7 +81,7 @@ public final class RestApisRouterCreator implements ApisCreator {
         if (restApiClass.isEmpty() && restEventApiClass.isEmpty() && !dynamicRouteConfig.isEnabled()) {
             throw new InitializerError("No REST API given, register at least one.");
         }
-        log().info(decor("Registering sub routers in root API: '{}'..."), rootApi);
+        log().info(decor("Register {} API routers [{}]"), function(), rootApi);
         this.addSubRouter(this::initRestApiRouter)
             .addSubRouter(this::initEventBusApiRouter)
             .addSubRouter(this::initDynamicRouter);
@@ -113,7 +113,7 @@ public final class RestApisRouterCreator implements ApisCreator {
             return null;
         }
         log().info(decor("Registering sub router REST Event API..."));
-        return new RestEventApisCreator(vertx).addSharedDataProxy(proxy).register(restEventApiClass).build();
+        return new RestEventApisCreator(vertx).addSharedData(sharedData).register(restEventApiClass).build();
     }
 
     private Router initDynamicRouter() {

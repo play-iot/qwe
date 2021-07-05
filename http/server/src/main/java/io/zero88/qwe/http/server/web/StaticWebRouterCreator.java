@@ -1,5 +1,7 @@
 package io.zero88.qwe.http.server.web;
 
+import java.nio.file.Path;
+
 import io.github.zero88.utils.FileUtils;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
@@ -10,8 +12,12 @@ import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.config.StaticWebConfig;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-public class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, WebLogSystem {
+@RequiredArgsConstructor
+public final class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, WebLogSystem {
+
+    private final Path pluginDir;
 
     @Override
     public @NonNull Router router(@NonNull StaticWebConfig config, @NonNull SharedDataLocalProxy sharedData) {
@@ -19,9 +25,8 @@ public class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, W
         if (config.isInResource()) {
             staticHandler.setWebRoot(config.getWebRoot());
         } else {
-            String webDir = FileUtils.createFolder(sharedData.getData(SharedDataLocalProxy.APP_DATADIR_KEY),
-                                                   config.getWebRoot());
-            logger().info(decor("Registering route '{}' with web dir '{}'"), config.getPath(), webDir);
+            String webDir = FileUtils.createFolder(pluginDir, config.getWebRoot());
+            logger().info(decor("Register {} route [{}][{}]"), function(), config.getPath(), webDir);
             staticHandler.setEnableRangeSupport(true)
                          .setSendVaryHeader(true)
                          .setFilesReadOnly(false)

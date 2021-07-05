@@ -2,12 +2,10 @@ package io.zero88.qwe.http.server.config;
 
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.download.DownloadFileHandler;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,9 +17,10 @@ public final class FileDownloadConfig extends AbstractRouterConfig implements IC
     public static final String NAME = "__download__";
 
     private String handlerClass = DownloadFileHandler.class.getName();
+    private String downloadDir = "files";
 
     public FileDownloadConfig() {
-        super(NAME, FileStorageConfig.class);
+        super(NAME, HttpServerConfig.class);
     }
 
     @Override

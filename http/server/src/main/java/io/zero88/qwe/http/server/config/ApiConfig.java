@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server.config;
 
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpConfig;
+import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.RouterConfig;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,7 +20,7 @@ public final class ApiConfig extends AbstractRouterConfig implements IConfig, Ro
     private ApiDynamicRouteConfig dynamicConfig = new ApiDynamicRouteConfig();
 
     public ApiConfig() {
-        super(NAME, HttpConfig.class);
+        super(NAME, HttpServerConfig.class);
     }
 
     @Override

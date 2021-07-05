@@ -4,7 +4,7 @@ import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpServerOptions;
 import io.zero88.qwe.IConfig;
-import io.zero88.qwe.PluginConfig;
+import io.zero88.qwe.PluginConfig.PluginDirConfig;
 import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.http.server.config.ApiConfig;
 import io.zero88.qwe.http.server.config.ApiGatewayConfig;
@@ -15,7 +15,6 @@ import io.zero88.qwe.http.server.config.Http2Config;
 import io.zero88.qwe.http.server.config.StaticWebConfig;
 import io.zero88.qwe.http.server.config.WebSocketConfig;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
@@ -26,7 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter(value = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public final class HttpConfig implements PluginConfig {
+public final class HttpServerConfig implements PluginDirConfig {
 
     public static final long MB = 1024L * 1024L;
 
@@ -39,7 +38,7 @@ public final class HttpConfig implements PluginConfig {
     private int publicPort = -1;
     private HttpScheme publicScheme = HttpScheme.HTTP;
     private int maxBodySizeMB = 2;
-    private String fileDir = "http";
+    private String pluginDir = "httpserver";
 
     @JsonProperty(value = ServerOptions.NAME)
     private ServerOptions options = (ServerOptions) new ServerOptions().setCompressionSupported(true)
@@ -80,7 +79,7 @@ public final class HttpConfig implements PluginConfig {
         public String key() { return NAME; }
 
         @Override
-        public Class<? extends IConfig> parent() { return HttpConfig.class; }
+        public Class<? extends IConfig> parent() { return HttpServerConfig.class; }
 
     }
 

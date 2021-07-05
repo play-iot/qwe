@@ -1,7 +1,7 @@
 package io.zero88.qwe.http.server.config;
 
 import io.zero88.qwe.IConfig;
-import io.zero88.qwe.http.server.HttpConfig;
+import io.zero88.qwe.http.server.HttpServerConfig;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,6 +21,6 @@ public final class Http2Config implements IConfig {
     public String key() { return NAME; }
 
     @Override
-    public Class<? extends IConfig> parent() { return HttpConfig.class; }
+    public Class<? extends IConfig> parent() { return HttpServerConfig.class; }
 
 }

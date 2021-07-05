@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.http.server.HttpConfig;
+import io.zero88.qwe.http.server.HttpServerConfig;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public final class CorsOptions implements IConfig {
     public String key() { return NAME; }
 
     @Override
-    public Class<? extends IConfig> parent() { return HttpConfig.class; }
+    public Class<? extends IConfig> parent() { return HttpServerConfig.class; }
 
     public Set<HttpMethod> allowedMethods() {
         return this.allowedMethods.stream().map(HttpMethod::valueOf).collect(Collectors.toSet());

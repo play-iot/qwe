@@ -9,13 +9,13 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.utils.JsonUtils;
 
-public class HttpConfigTest {
+public class HttpServerConfigTest {
 
     @Test
     public void test_default() throws JSONException {
-        HttpConfig config = new HttpConfig();
+        HttpServerConfig config = new HttpServerConfig();
         System.out.println(config.toJson().encode());
-        HttpConfig fromFile = IConfig.from(JsonUtils.loadJsonInClasspath("httpServer.json"), HttpConfig.class);
+        HttpServerConfig fromFile = IConfig.from(JsonUtils.loadJsonInClasspath("httpServer.json"), HttpServerConfig.class);
         JSONAssert.assertEquals(fromFile.toJson().encode(), config.toJson().encode(), JSONCompareMode.LENIENT);
     }
 
@@ -23,7 +23,7 @@ public class HttpConfigTest {
     public void deserialize() {
         String jsonStr = "{\"__app__\":{\"__http__\":{\"publicHost\":\"1.1.1.1\",\"publicScheme\":\"HTTPS\"," +
                          "\"host\":\"1.1.1.1\",\"port\":9090,\"__api__\":{\"enabled\":true,\"path\":\"/xyz\"}}}}";
-        HttpConfig from = IConfig.from(jsonStr, HttpConfig.class);
+        HttpServerConfig from = IConfig.from(jsonStr, HttpServerConfig.class);
         Assertions.assertNotNull(from);
         Assertions.assertEquals("1.1.1.1", from.getHost());
         Assertions.assertEquals(9090, from.getPort());

@@ -32,7 +32,7 @@ public final class RestEventApisCreator implements ApisCreator {
     private final Vertx vertx;
     private final Router router;
     private final Set<Class<? extends RestEventApi>> apis = new HashSet<>();
-    private SharedDataLocalProxy proxy;
+    private SharedDataLocalProxy sharedData;
 
     /**
      * For test
@@ -47,8 +47,8 @@ public final class RestEventApisCreator implements ApisCreator {
         this.router = Router.router(vertx);
     }
 
-    public RestEventApisCreator addSharedDataProxy(@NonNull SharedDataLocalProxy proxy) {
-        this.proxy = proxy;
+    public RestEventApisCreator addSharedData(@NonNull SharedDataLocalProxy sharedData) {
+        this.sharedData = sharedData;
         return this;
     }
 
@@ -80,7 +80,7 @@ public final class RestEventApisCreator implements ApisCreator {
     }
 
     private void createRouter(RestEventApi restApi) {
-        restApi.registerProxy(proxy)
+        restApi.registerSharedData(sharedData)
                .initRouter()
                .getRestMetadata()
                .forEach(metadata -> this.createRouter(metadata, restApi));
@@ -88,7 +88,7 @@ public final class RestEventApisCreator implements ApisCreator {
 
     private void createRouter(RestEventApiMetadata metadata, RestEventApi api) {
         final EventMethodDefinition definition = metadata.getDefinition();
-        final EventBusClient eventbus = EventBusClient.create(proxy);
+        final EventBusClient eventbus = EventBusClient.create(sharedData);
         for (EventMethodMapping mapping : definition.getMapping()) {
             RestEventApiDispatcher restHandler = RestEventApiDispatcher.create(api.dispatcher(), eventbus,
                                                                                metadata.getAddress(),
