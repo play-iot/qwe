@@ -1,5 +1,7 @@
 package io.zero88.qwe.storage.json;
 
+import java.util.Objects;
+
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -8,15 +10,15 @@ import io.zero88.qwe.storage.json.service.JsonStorageService;
 
 import lombok.NonNull;
 
-public final class JsonStoragePlugin extends PluginVerticle<StorageConfig, PluginContext> {
+public final class JsonStoragePlugin extends PluginVerticle<JsonStorageConfig, PluginContext> {
 
     JsonStoragePlugin(@NonNull SharedDataLocalProxy sharedData) {
         super(sharedData);
     }
 
     @Override
-    public @NonNull Class<StorageConfig> configClass() {
-        return StorageConfig.class;
+    public @NonNull Class<JsonStorageConfig> configClass() {
+        return JsonStorageConfig.class;
     }
 
     @Override
@@ -26,10 +28,10 @@ public final class JsonStoragePlugin extends PluginVerticle<StorageConfig, Plugi
 
     @Override
     public void onStart() {
-        pluginConfig.makeFullPath((String) sharedData().getData(SharedDataLocalProxy.APP_DATADIR_KEY));
         EventBusClient.create(sharedData())
                       .register(pluginConfig.getServiceAddress(),
-                                JsonStorageService.create(pluginConfig, pluginConfig.serviceHandlerClass()));
+                                JsonStorageService.create(Objects.requireNonNull(pluginContext().dataDir()),
+                                                          pluginConfig, pluginConfig.serviceHandlerClass()));
     }
 
 }

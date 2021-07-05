@@ -11,8 +11,8 @@ public final class JsonStorageProvider implements PluginProvider<JsonStoragePlug
     }
 
     @Override
-    public JsonStoragePlugin provide(SharedDataLocalProxy proxy) {
-        return new JsonStoragePlugin(proxy);
+    public JsonStoragePlugin provide(SharedDataLocalProxy sharedData) {
+        return new JsonStoragePlugin(sharedData);
     }
 
 }

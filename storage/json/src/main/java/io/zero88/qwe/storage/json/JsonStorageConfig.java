@@ -1,12 +1,9 @@
 package io.zero88.qwe.storage.json;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.github.zero88.utils.Strings;
-import io.zero88.qwe.PluginConfig;
+import io.zero88.qwe.PluginConfig.PluginDirConfig;
 import io.zero88.qwe.file.FileOption;
 import io.zero88.qwe.storage.json.service.JsonStorageService;
 
@@ -16,8 +13,6 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import lombok.extern.jackson.Jacksonized;
 
 @Getter
@@ -25,12 +20,10 @@ import lombok.extern.jackson.Jacksonized;
 @Builder(builderClassName = "Builder")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class StorageConfig implements PluginConfig {
+public final class JsonStorageConfig implements PluginDirConfig {
 
-    @Accessors(fluent = true)
-    private Path fullPath;
     @Default
-    private final String subDir = "storage";
+    private final String pluginDir = "storage";
     @Default
     private final int maxSizeInMB = 10;
     @Default
@@ -55,23 +48,8 @@ public final class StorageConfig implements PluginConfig {
         return "__json__";
     }
 
-    public StorageConfig makeFullPath(@NonNull String rootDir) {
-        return makeFullPath(Paths.get(rootDir));
-    }
-
-    public StorageConfig makeFullPath(@NonNull Path rootDir) {
-        fullPath = (Strings.isBlank(subDir) ? rootDir : rootDir.resolve(subDir)).toAbsolutePath();
-        return this;
-    }
-
-    static StorageConfig create() {
-        return StorageConfig.builder().build();
-    }
-
-    public static class Builder {
-
-        private Builder fullPath(Path fullPath) { return this; }
-
+    public static JsonStorageConfig create() {
+        return JsonStorageConfig.builder().build();
     }
 
 }

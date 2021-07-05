@@ -22,17 +22,18 @@ import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.file.FileOption;
 import io.zero88.qwe.file.TextFileOperatorImpl;
+import io.zero88.qwe.storage.json.JsonStorageConfig;
 import io.zero88.qwe.storage.json.JsonStorageProvider;
-import io.zero88.qwe.storage.json.StorageConfig;
 import io.zero88.qwe.utils.JsonUtils;
 
 @ExtendWith(VertxExtension.class)
 class JsonStorageServiceTest implements PluginTestHelper {
 
-    StorageConfig config;
+    JsonStorageConfig config;
     EventBusClient client;
     @TempDir
     Path tmp;
+    private Path pluginDir;
 
     @Override
     public Path testDir() {
@@ -41,8 +42,8 @@ class JsonStorageServiceTest implements PluginTestHelper {
 
     @BeforeEach
     void before(Vertx vertx, VertxTestContext context) {
-        config = StorageConfig.builder().build().makeFullPath(tmp);
-        deploy(vertx, context, config.toJson(), new JsonStorageProvider());
+        config = JsonStorageConfig.create();
+        pluginDir = deploy(vertx, context, config.toJson(), new JsonStorageProvider()).pluginContext().dataDir();
         client = EventBusClient.create(SharedDataLocalProxy.create(vertx, JsonStorageServiceTest.class.getName()));
     }
 
@@ -56,8 +57,8 @@ class JsonStorageServiceTest implements PluginTestHelper {
                                       .build();
         final EventMessage msg = EventMessage.initial(EventAction.CREATE_OR_UPDATE,
                                                       RequestData.builder().body(ji.toJson()).build());
-        final String file = config.fullPath().resolve(ji.getFile()).toString();
-        FileUtils.createFolder(config.fullPath().toAbsolutePath(), null);
+        final String file = pluginDir.resolve(ji.getFile()).toString();
+        FileUtils.createFolder(pluginDir.toAbsolutePath(), null);
         client.request(config.getServiceAddress(), msg)
               .onFailure(context::failNow)
               .onSuccess(result -> context.verify(() -> {
@@ -76,7 +77,7 @@ class JsonStorageServiceTest implements PluginTestHelper {
         final JsonObject toInsert = new JsonObject().put("k", 3);
         final JsonInput ji = JsonInput.builder().file("test").pointer("/hh").dataToInsert(toInsert).build();
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
-        final Path file = config.fullPath().resolve(ji.getFile());
+        final Path file = pluginDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.CREATE_OR_UPDATE,
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
@@ -102,7 +103,7 @@ class JsonStorageServiceTest implements PluginTestHelper {
         final String toInsert = "z";
         final JsonInput ji = JsonInput.builder().file("test").pointer("/cd/1").dataToInsert(toInsert).build();
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
-        final Path file = config.fullPath().resolve(ji.getFile());
+        final Path file = pluginDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.CREATE_OR_UPDATE,
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
@@ -126,7 +127,7 @@ class JsonStorageServiceTest implements PluginTestHelper {
     void test_query(Vertx vertx, VertxTestContext context) {
         final JsonInput ji = JsonInput.builder().file("test").pointer("/cd/3").build();
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
-        final Path file = config.fullPath().resolve(ji.getFile());
+        final Path file = pluginDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.parse("QUERY"),
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
@@ -147,7 +148,7 @@ class JsonStorageServiceTest implements PluginTestHelper {
     void test_remove_json(Vertx vertx, VertxTestContext context) {
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
         final JsonInput ji = JsonInput.builder().file("test").pointer("/cd").keyToRemove("3").build();
-        final Path file = config.fullPath().resolve(ji.getFile());
+        final Path file = pluginDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.REMOVE,
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
