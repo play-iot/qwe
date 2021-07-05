@@ -27,7 +27,7 @@ public class UploadRouterCreator implements RouterCreator<UploadConfig>, UploadL
     public Router router(@NonNull UploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
         log().info(decor("Registering route: '{}' in storage '{}'..."), config.getPath(), storageDir);
         final EventBusClient eventbus = EventBusClient.create(sharedData);
-        final String address = Strings.fallback(config.getListenerAddress(), sharedData.getSharedKey() + ".upload");
+        final String address = Strings.fallback(config.getListenerAddress(), sharedData.sharedKey() + ".upload");
         final UploadListener listener = UploadListener.create(sharedData, config.getListenerClass());
         final UploadFileHandler handler = UploadFileHandler.create(config.getHandlerClass(), eventbus, address,
                                                                    storageDir, publicUrl);

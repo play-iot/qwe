@@ -97,7 +97,7 @@ public final class NetworkUtils {
                 logger.warn("There are more than one net address: {}", usableINetAddresses);
             }
             final InetAddress inetAddress = usableINetAddresses.get(0);
-            logger.info("Picked address: {}", inetAddress.getHostAddress());
+            logger.info("Picked IPv4 address[{}]", inetAddress.getHostAddress());
             return inetAddress.getHostAddress();
         }
         logger.warn("Not found usable INet address, fallback to loopback");

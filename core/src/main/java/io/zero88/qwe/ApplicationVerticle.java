@@ -1,10 +1,13 @@
 package io.zero88.qwe;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.github.zero88.utils.FileUtils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.DeploymentOptions;
@@ -12,6 +15,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.PluginConfig.PluginDirConfig;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventBusDeliveryOption;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
@@ -41,7 +45,6 @@ public abstract class ApplicationVerticle extends AbstractVerticle
         this.appConfig = computeConfig(config());
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION_KEY,
                      new EventBusDeliveryOption(this.appConfig.getDeliveryOptions()));
-        this.addData(SharedDataLocalProxy.APP_DATADIR_KEY, this.appConfig.getDataDir());
         this.addData(SharedDataLocalProxy.PUBLIC_IPV4_KEY, NetworkUtils.getPublicIpv4());
         this.eventBus = EventBusClient.create(sharedData());
         this.onStart();
@@ -100,24 +103,30 @@ public abstract class ApplicationVerticle extends AbstractVerticle
                     .onSuccess(unused -> logger().info("Uninstalled Plugin[{}][{}]", ctx.deployId(), ctx.pluginName()));
     }
 
+    @SuppressWarnings("unchecked")
     Future<String> deployPlugin(PluginProvider<? extends Plugin> provider, int defaultPoolSize) {
-        final Plugin plugin = provider.provide(this);
+        Plugin plugin = provider.provide(this);
         logger().info("Deploying Plugin[{}]...", plugin.pluginName());
-        return vertx.deployVerticle(plugin, getPluginDeploymentOptions(defaultPoolSize, plugin))
-                    .onSuccess(id -> deployPluginSuccess(plugin, id))
+        PluginConfig pluginCfg = IConfig.<PluginConfig>from(appConfig, plugin.configClass());
+        Path pp = null;
+        if (pluginCfg instanceof PluginDirConfig) {
+            pp = Paths.get(FileUtils.createFolder(appConfig.dataDir(), ((PluginDirConfig) pluginCfg).getPluginDir()));
+        }
+        return vertx.deployVerticle(plugin.deployHook()
+                                          .onPreDeploy(plugin,
+                                                       PluginContext.createPreContext(appName(), plugin.pluginName(),
+                                                                                      sharedKey(), pp)),
+                                    createPluginDeploymentOptions(plugin, pluginCfg, defaultPoolSize))
+                    .onSuccess(id -> logger().info("Setting-up Plugin[{}][{}]...", plugin.pluginName(), id))
+                    .onSuccess(id -> contexts.add(plugin.deployHook()
+                                                        .onPostDeploy(plugin, PluginContext.createPostContext(
+                                                            plugin.pluginContext(), id))
+                                                        .pluginContext()))
                     .recover(t -> Future.failedFuture(QWEExceptionConverter.friendlyOrKeep(t)));
     }
 
-    @SuppressWarnings("unchecked")
-    void deployPluginSuccess(Plugin plugin, String deployId) {
-        logger().info("Setting-up Plugin[{}][{}]...", plugin.pluginName(), deployId);
-        PluginContext def = PluginContext.create(appName(), plugin.pluginName(), appConfig.dataDir(), getSharedKey(),
-                                                 deployId);
-        contexts.add(plugin.setup(plugin.hook().onDeploySuccess(def)));
-    }
-
     void deployAllSuccess(CompositeFuture r) {
-        logger().info("Deployed {}/{} plugin(s)...", r.size(), this.providers.size());
+        logger().info("Deployed {}/{} plugin(s)", r.size(), this.providers.size());
         this.providers.clear();
         try {
             //TODO: add liveness event then readiness event
@@ -128,10 +137,8 @@ public abstract class ApplicationVerticle extends AbstractVerticle
         }
     }
 
-    @SuppressWarnings("unchecked")
-    DeploymentOptions getPluginDeploymentOptions(int defaultPoolSize, Plugin plugin) {
-        final PluginConfig compConfig = IConfig.<PluginConfig>from(appConfig, plugin.configClass());
-        DeploymentOptions options = Optional.ofNullable(appConfig.lookup(compConfig.deploymentKey()))
+    DeploymentOptions createPluginDeploymentOptions(Plugin plugin, PluginConfig pluginConfig, int defaultPoolSize) {
+        DeploymentOptions options = Optional.ofNullable(appConfig.lookup(pluginConfig.deploymentKey()))
                                             .map(s -> new DeploymentOptions(JsonObject.mapFrom(s)))
                                             .orElseGet(DeploymentOptions::new);
         int workerPoolSize = options.getWorkerPoolSize() == VertxOptions.DEFAULT_WORKER_POOL_SIZE
@@ -139,7 +146,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
                              : options.getWorkerPoolSize();
         String workerPool = Optional.ofNullable(options.getWorkerPoolName())
                                     .orElseGet(() -> DEFAULT_PLUGIN_THREAD_PREFIX + plugin.pluginName());
-        options.setWorkerPoolName(workerPool).setWorkerPoolSize(workerPoolSize).setConfig(compConfig.toJson());
+        options.setWorkerPoolName(workerPool).setWorkerPoolSize(workerPoolSize).setConfig(pluginConfig.toJson());
         if (logger().isDebugEnabled()) {
             logger().debug("Plugin deployment options [{}][{}]", plugin.pluginName(), options.toJson());
         }

@@ -99,8 +99,8 @@ public final class HttpServerPlugin extends PluginVerticle<HttpConfig, HttpServe
     }
 
     @Override
-    public HttpServerPluginContext onDeploySuccess(@NonNull PluginContext context) {
-        return new HttpServerPluginContext(context, sharedData().getData(SERVER_INFO_DATA_KEY));
+    public HttpServerPluginContext enrichPostContext(@NonNull PluginContext postContext) {
+        return new HttpServerPluginContext(postContext, sharedData().getData(SERVER_INFO_DATA_KEY));
     }
 
     private ServerInfo createServerInfo(Router handler, int port) {

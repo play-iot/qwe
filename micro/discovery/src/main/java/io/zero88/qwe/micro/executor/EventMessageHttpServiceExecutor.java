@@ -29,8 +29,8 @@ public final class EventMessageHttpServiceExecutor implements ServiceExecutor {
     }
 
     @Override
-    public JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedDataLocalProxy) {
-        return new JsonObject().put(EventMessageHttpService.SHARED_KEY_CONFIG, sharedDataLocalProxy.getSharedKey())
+    public JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedData) {
+        return new JsonObject().put(EventMessageHttpService.SHARED_KEY_CONFIG, sharedData.sharedKey())
                                .put(EventMessageHttpService.DELIVERY_OPTIONS_CONFIG, null);
     }
 

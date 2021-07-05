@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PluginVerticle<C extends PluginConfig, T extends PluginContext> extends AbstractVerticle
-    implements Plugin<C, T>, PluginDeployHook<T>, VerticleLifecycleHooks {
+    implements Plugin<C, T>, PluginDeployHook, VerticleLifecycleHooks {
 
     @Getter
     @NonNull
@@ -46,13 +46,14 @@ public abstract class PluginVerticle<C extends PluginConfig, T extends PluginCon
     }
 
     @Override
-    public @NonNull PluginDeployHook<T> hook() {
+    public @NonNull PluginDeployHook deployHook() {
         return this;
     }
 
     @Override
-    public final T setup(T context) {
-        return this.pluginContext = context;
+    public final Plugin<C, T> setup(T context) {
+        this.pluginContext = context;
+        return this;
     }
 
 }

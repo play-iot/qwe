@@ -1,7 +1,7 @@
 package io.zero88.qwe;
 
 /**
- * Plugin Provider
+ * A plugin provider
  *
  * @param <T> Plugin type
  */
@@ -9,6 +9,6 @@ public interface PluginProvider<T extends Plugin> {
 
     Class<T> pluginClass();
 
-    T provide(SharedDataLocalProxy proxy);
+    T provide(SharedDataLocalProxy sharedData);
 
 }

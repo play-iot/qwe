@@ -14,7 +14,7 @@ import io.zero88.qwe.micro.HasServiceType;
 
 public interface ServiceExecutor extends HasServiceType {
 
-    @Nullable JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedDataLocalProxy);
+    @Nullable JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedData);
 
     Future<ResponseData> execute(ServiceReference serviceReference, RequestData requestData, RequestFilter filter);
 

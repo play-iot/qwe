@@ -24,7 +24,7 @@ public final class HttpClientServiceExecutor implements ServiceExecutor {
     }
 
     @Override
-    public JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedDataLocalProxy) {
+    public JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedData) {
         return null;
     }
 
