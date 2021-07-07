@@ -7,7 +7,6 @@ dependencies {
     api(JacksonLibs.databind)
     api(JacksonLibs.datetime)
     api(LogLibs.slf4j)
-    api(UtilLibs.classgraph)
     api(UtilLibs.jetbrainsAnnotations)
     api(VertxLibs.core)
     api(ZeroLibs.utils)

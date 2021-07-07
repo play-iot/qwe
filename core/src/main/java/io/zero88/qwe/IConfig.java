@@ -9,11 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.HiddenException;
+import io.github.zero88.repl.ReflectionClass;
+import io.github.zero88.repl.ReflectionField;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Functions.Provider;
 import io.github.zero88.utils.Functions.Silencer;
-import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.github.zero88.utils.Reflections.ReflectionField;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -150,7 +150,7 @@ public interface IConfig extends JsonData, Shareable {
         private final static Logger log = LoggerFactory.getLogger(IConfig.class);
 
         static <T extends IConfig> T create(Class<T> clazz, JsonObject data, ObjectMapper mapper) {
-            final Provider<T> p = () -> ReflectionClass.createObject(clazz, new Class[] {}, new Object[] {});
+            final Provider<T> p = () -> ReflectionClass.createObject(clazz);
             final T temp = Functions.getIfThrow(t -> log.trace("Cannot init " + clazz, t), p)
                                     .orElseGet(() -> mapper.convertValue(data, clazz));
             final CreateConfig<T> creator = new CreateConfig<>(clazz, data, mapper);

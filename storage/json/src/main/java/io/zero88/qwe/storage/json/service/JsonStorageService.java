@@ -1,13 +1,12 @@
 package io.zero88.qwe.storage.json.service;
 
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Functions;
-import io.github.zero88.utils.Reflections.ReflectionClass;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -38,10 +37,8 @@ public class JsonStorageService implements EventListener {
 
     public static <T extends JsonStorageService> T create(@NonNull Path rootDir, @NonNull JsonStorageConfig config,
                                                           @NonNull Class<T> clazz) {
-        Map<Class, Object> params = new LinkedHashMap<>();
-        params.put(Path.class, rootDir);
-        params.put(JsonStorageConfig.class, config);
-        return ReflectionClass.createObject(clazz, params);
+        return ReflectionClass.createObject(clazz, new Arguments().put(Path.class, rootDir)
+                                                                  .put(JsonStorageConfig.class, config));
     }
 
     private final Path rootDir;

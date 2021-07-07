@@ -1,18 +1,18 @@
 package io.zero88.qwe.http.client.handler;
 
 import java.net.UnknownHostException;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.netty.resolver.dns.DnsNameResolverException;
 import io.netty.resolver.dns.DnsNameResolverTimeoutException;
 import io.vertx.core.Future;
 import io.vertx.core.VertxException;
 import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.exceptions.TimeoutException;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
+import io.zero88.qwe.exceptions.TimeoutException;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.client.HttpClientRegistry;
 
@@ -30,7 +30,7 @@ public abstract class HttpErrorHandler implements Function<Throwable, Future<Res
         if (Objects.isNull(errorHandlerClass) || HttpErrorHandler.class.equals(errorHandlerClass)) {
             return (T) new HttpErrorHandler(hostInfo) {};
         }
-        return ReflectionClass.createObject(errorHandlerClass, Collections.singletonMap(HostInfo.class, hostInfo));
+        return ReflectionClass.createObject(errorHandlerClass, new Arguments().put(HostInfo.class, hostInfo));
     }
 
     @Override

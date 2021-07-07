@@ -1,11 +1,10 @@
 package io.zero88.qwe.http.client.handler;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.VertxException;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.UpgradeRejectedException;
@@ -32,15 +31,13 @@ public abstract class WebSocketConnectErrorHandler implements Function<Throwable
 
     @SuppressWarnings("unchecked")
     public static <T extends WebSocketConnectErrorHandler> T create(@NonNull HostInfo hostInfo,
-                                                                    @NonNull EventBusClient controller,
+                                                                    @NonNull EventBusClient ebClient,
                                                                     @NonNull Class<T> connErrorHandlerClass) {
         if (Objects.isNull(connErrorHandlerClass) || WebSocketConnectErrorHandler.class.equals(connErrorHandlerClass)) {
-            return (T) new WebSocketConnectErrorHandler(hostInfo, controller) {};
+            return (T) new WebSocketConnectErrorHandler(hostInfo, ebClient) {};
         }
-        Map<Class, Object> params = new LinkedHashMap<>();
-        params.put(HostInfo.class, hostInfo);
-        params.put(EventBusClient.class, controller);
-        return ReflectionClass.createObject(connErrorHandlerClass, params);
+        return ReflectionClass.createObject(connErrorHandlerClass, new Arguments().put(HostInfo.class, hostInfo)
+                                                                                  .put(EventBusClient.class, ebClient));
     }
 
     @Override

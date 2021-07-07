@@ -3,27 +3,27 @@ package io.zero88.qwe.http.server.ws;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import io.github.zero88.exceptions.InvalidUrlException;
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.http.event.EventModel;
-import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.config.WebSocketConfig;
-import io.zero88.qwe.http.server.config.WebSocketConfig.SocketBridgeConfig;
-import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
-import io.zero88.qwe.http.server.RouterCreator;
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Urls;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.exceptions.InitializerError;
+import io.zero88.qwe.http.event.EventModel;
+import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
+import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
+import io.zero88.qwe.http.server.RouterCreator;
+import io.zero88.qwe.http.server.config.WebSocketConfig;
+import io.zero88.qwe.http.server.config.WebSocketConfig.SocketBridgeConfig;
 
 import lombok.NonNull;
 
@@ -92,10 +92,8 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
     private WebSocketBridgeEventHandler createHandler(@NonNull SharedDataLocalProxy sharedData,
                                                       @NonNull List<WebSocketServerEventMetadata> socketMapping,
                                                       @NonNull Class<? extends WebSocketBridgeEventHandler> clazz) {
-        Map<Class, Object> map = new LinkedHashMap<>();
-        map.put(SharedDataLocalProxy.class, sharedData);
-        map.put(List.class, socketMapping);
-        WebSocketBridgeEventHandler handler = ReflectionClass.createObject(clazz, map);
+        WebSocketBridgeEventHandler handler = ReflectionClass.createObject(clazz, new Arguments().put(
+            SharedDataLocalProxy.class, sharedData).put(List.class, socketMapping));
         return Objects.isNull(handler) ? new WebSocketBridgeEventHandler(sharedData, socketMapping) : handler;
     }
 

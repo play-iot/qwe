@@ -3,7 +3,7 @@ package io.zero88.qwe.http.client.handler;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpHeaders;
 import io.zero88.qwe.dto.msg.RequestData;

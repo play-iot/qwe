@@ -1,19 +1,18 @@
 package io.zero88.qwe.http.server.download;
 
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.zero88.qwe.exceptions.DataNotFoundException;
-import io.zero88.qwe.http.server.HttpLogSystem.DownloadLogSystem;
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
+import io.zero88.qwe.exceptions.DataNotFoundException;
+import io.zero88.qwe.http.server.HttpLogSystem.DownloadLogSystem;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,10 +38,8 @@ public abstract class DownloadFileHandler implements Handler<RoutingContext>, Do
                 }
             };
         }
-        Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(String.class, downloadPath);
-        inputs.put(Path.class, downloadDir);
-        return ReflectionClass.createObject(handlerClass, inputs);
+        return ReflectionClass.createObject(handlerClass, new Arguments().put(String.class, downloadPath)
+                                                                         .put(Path.class, downloadDir));
     }
 
     @Override

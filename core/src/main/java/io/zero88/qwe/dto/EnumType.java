@@ -3,13 +3,13 @@ package io.zero88.qwe.dto;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.github.zero88.utils.Reflections.ReflectionField;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
+import io.github.zero88.repl.ReflectionField;
 import io.github.zero88.utils.Strings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -90,9 +90,8 @@ public interface EnumType extends JsonData, Serializable {
                               .filter(et -> et.type().equals(st) ||
                                             Objects.nonNull(et.alternatives()) && et.alternatives().contains(st))
                               .findAny()
-                              .orElseGet(() -> ReflectionClass.createObject(clazz,
-                                                                            Collections.singletonMap(String.class,
-                                                                                                     st)));
+                              .orElseGet(
+                                  () -> ReflectionClass.createObject(clazz, new Arguments().put(String.class, st)));
     }
 
     @JsonProperty(value = "type")

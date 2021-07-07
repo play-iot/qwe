@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.exceptions.ErrorCodeException;
 import io.github.zero88.exceptions.HiddenException;
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.zero88.qwe.dto.ErrorMessage;
 

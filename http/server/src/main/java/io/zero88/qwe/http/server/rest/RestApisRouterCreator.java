@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import io.github.zero88.exceptions.InvalidUrlException;
-import io.github.zero88.utils.Reflections;
+import io.github.zero88.repl.Reflections;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Vertx;

@@ -1,6 +1,6 @@
 package io.zero88.qwe.event.output;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Future;
 import io.zero88.qwe.event.refl.MethodMeta;
 

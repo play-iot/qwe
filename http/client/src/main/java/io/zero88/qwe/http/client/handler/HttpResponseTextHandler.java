@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.client.handler;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -8,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -45,7 +45,7 @@ public abstract class HttpResponseTextHandler implements Function<HttpClientResp
         if (Objects.isNull(bodyHandlerClass) || HttpResponseTextHandler.class.equals(bodyHandlerClass)) {
             return (T) new HttpResponseTextHandler(swallowError) {};
         }
-        return ReflectionClass.createObject(bodyHandlerClass, Collections.singletonMap(boolean.class, swallowError));
+        return ReflectionClass.createObject(bodyHandlerClass, new Arguments().put(boolean.class, swallowError));
     }
 
     @Override

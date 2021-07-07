@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.QWEConverter;

@@ -1,12 +1,12 @@
 package io.zero88.qwe.http.server.rest.handler;
 
-import java.util.LinkedHashMap;
 import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.event.EventAction;
@@ -50,13 +50,12 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher {
                                                                                    EventPattern pattern,
                                                                                    boolean useRequestData) {
         Class<T> handlerClass = Objects.isNull(handler) ? (Class<T>) RestEventApiDispatcher.class : handler;
-        LinkedHashMap<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(EventBusClient.class, eventbus);
-        inputs.put(String.class, Strings.requireNotBlank(address));
-        inputs.put(EventAction.class, action);
-        inputs.put(EventPattern.class, pattern);
-        inputs.put(boolean.class, useRequestData);
-        return ReflectionClass.createObject(handlerClass, inputs);
+        return ReflectionClass.createObject(handlerClass, new Arguments().put(EventBusClient.class, eventbus)
+                                                                         .put(String.class,
+                                                                              Strings.requireNotBlank(address))
+                                                                         .put(EventAction.class, action)
+                                                                         .put(EventPattern.class, pattern)
+                                                                         .put(boolean.class, useRequestData));
     }
 
     @Override

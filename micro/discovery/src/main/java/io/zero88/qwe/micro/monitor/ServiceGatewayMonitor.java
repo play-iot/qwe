@@ -1,13 +1,12 @@
 package io.zero88.qwe.micro.monitor;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
@@ -25,14 +24,13 @@ public interface ServiceGatewayMonitor extends Handler<Message<Object>>, HasShar
 
     static <T extends ServiceGatewayMonitor> T create(@NonNull SharedDataLocalProxy proxy, ServiceDiscoveryApi wrapper,
                                                       String className, @NonNull Class<T> fallback) {
-        Map<Class, Object> inputs = new LinkedHashMap<>();
-        inputs.put(SharedDataLocalProxy.class, proxy);
-        inputs.put(ServiceDiscoveryApi.class, wrapper);
+        final Arguments args = new Arguments().put(SharedDataLocalProxy.class, proxy)
+                                              .put(ServiceDiscoveryApi.class, wrapper);
         if (fallback.getName().equals(className) || Strings.isBlank(className)) {
-            return ReflectionClass.createObject(fallback, inputs);
+            return ReflectionClass.createObject(fallback, args);
         }
-        T monitor = ReflectionClass.createObject(className, inputs);
-        return Objects.isNull(monitor) ? ReflectionClass.createObject(fallback, inputs) : monitor;
+        T monitor = ReflectionClass.createObject(className, args);
+        return Objects.isNull(monitor) ? ReflectionClass.createObject(fallback, args) : monitor;
     }
 
     @NonNull ServiceDiscoveryApi getDiscovery();

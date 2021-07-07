@@ -14,7 +14,7 @@ import io.zero88.qwe.http.client.handler.HttpResponseTextHandler;
 import io.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler;
 import io.zero88.qwe.http.client.handler.WebSocketResponseDispatcher;
 import io.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler;
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.json.JsonObject;

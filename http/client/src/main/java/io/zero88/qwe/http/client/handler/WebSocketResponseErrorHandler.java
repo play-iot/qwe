@@ -1,13 +1,12 @@
 package io.zero88.qwe.http.client.handler;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Handler;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.http.event.EventModel;
@@ -34,10 +33,8 @@ public abstract class WebSocketResponseErrorHandler implements Handler<Throwable
         if (Objects.isNull(errorHandlerClass) || WebSocketResponseErrorHandler.class.equals(errorHandlerClass)) {
             return (T) new IgnoreWebSocketResponseError(controller, listener) {};
         }
-        Map<Class, Object> params = new LinkedHashMap<>();
-        params.put(EventBusClient.class, controller);
-        params.put(EventModel.class, listener);
-        return ReflectionClass.createObject(errorHandlerClass, params);
+        return ReflectionClass.createObject(errorHandlerClass, new Arguments().put(EventBusClient.class, controller)
+                                                                              .put(EventModel.class, listener));
     }
 
     public static class IgnoreWebSocketResponseError extends WebSocketResponseErrorHandler {

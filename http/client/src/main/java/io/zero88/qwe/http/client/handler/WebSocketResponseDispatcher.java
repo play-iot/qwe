@@ -1,13 +1,12 @@
 package io.zero88.qwe.http.client.handler;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.zero88.qwe.dto.JsonData;
@@ -41,10 +40,8 @@ public abstract class WebSocketResponseDispatcher implements Handler<Buffer> {
         if (Objects.isNull(bodyHandlerClass) || WebSocketResponseDispatcher.class.equals(bodyHandlerClass)) {
             return (T) new WebSocketResponseDispatcher(client, listener) {};
         }
-        Map<Class, Object> params = new LinkedHashMap<>();
-        params.put(EventBusClient.class, client);
-        params.put(EventModel.class, listener);
-        return ReflectionClass.createObject(bodyHandlerClass, params);
+        return ReflectionClass.createObject(bodyHandlerClass, new Arguments().put(EventBusClient.class, client)
+                                                                             .put(EventModel.class, listener));
     }
 
     @Override
