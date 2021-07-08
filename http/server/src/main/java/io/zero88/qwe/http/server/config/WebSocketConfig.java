@@ -8,6 +8,7 @@ import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerConfig;
+import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
 import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.ws.WebSocketBridgeEventHandler;
 
@@ -16,21 +17,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 
 @Getter
+@Setter
 @Jacksonized
-public final class WebSocketConfig extends AbstractRouterConfig implements IConfig, RouterConfig {
+public final class WebSocketConfig extends AbstractRouterConfig implements IConfig, RouterConfig, WebSocketSystem {
 
     public static final String NAME = "__websocket__";
-    @Default
-    private final String bridgeHandlerClass = WebSocketBridgeEventHandler.class.getName();
+    private String bridgeHandlerClass = WebSocketBridgeEventHandler.class.getName();
     @Default
     @JsonProperty(value = SockJSConfig.NAME)
-    private final SockJSConfig sockjsOptions = new SockJSConfig();
+    private SockJSConfig sockjsOptions = new SockJSConfig();
     @Default
     @JsonProperty(value = SocketBridgeConfig.NAME)
-    private final SocketBridgeConfig bridgeOptions = new SocketBridgeConfig();
+    private SocketBridgeConfig bridgeOptions = new SocketBridgeConfig();
 
     public WebSocketConfig() {
         super(NAME, HttpServerConfig.class, false, BasePaths.ROOT_WS_PATH);

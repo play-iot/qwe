@@ -34,7 +34,7 @@ public class UploadFileHandler implements RestEventRequestDispatcher {
 
     @NonNull
     @Accessors(fluent = true)
-    private final EventBusClient eventbus;
+    private final EventBusClient transporter;
     private final String address;
     private final Path uploadDir;
     private final String publicUrl;
@@ -62,7 +62,7 @@ public class UploadFileHandler implements RestEventRequestDispatcher {
         context.fileUploads().forEach(fileUpload -> data.put(fileUpload.name(), extractFileInfo(link, fileUpload)));
         data.put("attributes", HttpHeaderUtils.serializeHeaders(context.request().formAttributes()));
         EventMessage message = EventMessage.initial(EventAction.CREATE, data);
-        dispatch(context, "UPLOAD", address, EventPattern.REQUEST_RESPONSE, message);
+        dispatch(context, address, EventPattern.REQUEST_RESPONSE, message);
     }
 
     private JsonObject extractFileInfo(String link, FileUpload fileUpload) {

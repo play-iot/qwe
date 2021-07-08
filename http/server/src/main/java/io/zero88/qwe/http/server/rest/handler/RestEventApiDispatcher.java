@@ -2,9 +2,6 @@ package io.zero88.qwe.http.server.rest.handler;
 
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
@@ -22,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * Represents for pushing data via {@code Eventbus} then listen {@code reply message}. After receiving {@code reply
+ * Represents for pushing data via {@code EventBus} then listen {@code reply message}. After receiving {@code reply
  * message}, redirect it to {@code next Context handler}
  *
  * @see EventMessageResponseHandler
@@ -30,11 +27,10 @@ import lombok.experimental.Accessors;
 @RequiredArgsConstructor
 public class RestEventApiDispatcher implements RestEventRequestDispatcher {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter
     @NonNull
     @Accessors(fluent = true)
-    private final EventBusClient eventbus;
+    private final EventBusClient transporter;
     @NonNull
     private final String address;
     @NonNull
@@ -63,8 +59,8 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher {
         EventMessage msg = useRequestData
                            ? EventMessage.initial(action, RequestDataConverter.convert(context))
                            : EventMessage.initial(action, RequestDataConverter.body(context));
-        logger.info("REST::Dispatch data to Event Address {}", address);
-        dispatch(context, "REST", address, pattern, msg);
+        logger().info("REST::Dispatch data to Event Address {}", address);
+        dispatch(context, address, pattern, msg);
     }
 
 }

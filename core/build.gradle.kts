@@ -28,6 +28,7 @@ dependencies {
     testImplementation(VertxLibs.junit5)
     testImplementation(VertxLibs.rx2)
 
+    testFixturesApi(testFixtures(ZeroLibs.utils))
     testFixturesApi(LogLibs.logback)
     testFixturesApi(TestLibs.junit5Api)
     testFixturesApi(TestLibs.junit5Engine)

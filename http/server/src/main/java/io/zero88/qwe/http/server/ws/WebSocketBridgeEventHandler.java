@@ -12,7 +12,7 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
+import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
 import io.vertx.ext.bridge.BridgeEventType;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 //TODO handle auth with socket header
 @Slf4j
-public class WebSocketBridgeEventHandler implements Handler<BridgeEvent>, WebSocketLogSystem {
+public class WebSocketBridgeEventHandler implements Handler<BridgeEvent>, WebSocketSystem {
 
     private final Map<String, WebSocketServerEventMetadata> metadataByListener = new HashMap<>();
     private final WebSocketEventExecutor executor;

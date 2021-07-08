@@ -7,7 +7,6 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpLogSystem.WebLogSystem;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.config.StaticWebConfig;
 
@@ -15,7 +14,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, WebLogSystem {
+public final class StaticWebRouterCreator implements RouterCreator<StaticWebConfig> {
 
     private final Path pluginDir;
 
@@ -26,7 +25,6 @@ public final class StaticWebRouterCreator implements RouterCreator<StaticWebConf
             staticHandler.setWebRoot(config.getWebRoot());
         } else {
             String webDir = FileUtils.createFolder(pluginDir, config.getWebRoot());
-            logger().info(decor("Register {} route [{}][{}]"), function(), config.getPath(), webDir);
             staticHandler.setEnableRangeSupport(true)
                          .setSendVaryHeader(true)
                          .setFilesReadOnly(false)

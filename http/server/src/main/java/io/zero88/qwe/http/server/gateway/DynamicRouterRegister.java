@@ -13,7 +13,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
 import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.http.server.HttpLogSystem.GatewayLogSystem;
+import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
 import io.zero88.qwe.http.server.HttpServerPlugin;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.ServerInfo;
@@ -23,7 +23,7 @@ import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor;
 
 import lombok.NonNull;
 
-public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLogSystem {
+public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewaySystem {
 
     default @NonNull Logger log() {
         return LoggerFactory.getLogger(RouterCreator.class);

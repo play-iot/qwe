@@ -19,7 +19,7 @@ public final class HttpServerRouter {
     private final Set<Class<? extends RestApi>> restApiClasses = new HashSet<>();
     private final Set<Class<? extends RestEventApi>> restEventApiClasses = new HashSet<>();
     private final Set<WebSocketServerEventMetadata> webSocketEvents = new HashSet<>();
-    private final Set<Class<? extends RestEventApi>> gatewayApiClasses = new HashSet<>();
+    private Class<? extends RestEventApi> gatewayApiClass;
 
     @SafeVarargs
     public final HttpServerRouter registerApi(Class<? extends RestApi>... apiClass) {
@@ -34,14 +34,13 @@ public final class HttpServerRouter {
         return this;
     }
 
-    @SafeVarargs
-    public final HttpServerRouter registerGatewayApi(Class<? extends RestEventApi>... gatewayApiClass) {
-        gatewayApiClasses.addAll(Arrays.stream(gatewayApiClass).filter(Objects::nonNull).collect(Collectors.toList()));
+    public HttpServerRouter registerEventBusSocket(WebSocketServerEventMetadata... eventBusSocket) {
+        webSocketEvents.addAll(Arrays.stream(eventBusSocket).filter(Objects::nonNull).collect(Collectors.toList()));
         return this;
     }
 
-    public HttpServerRouter registerEventBusSocket(WebSocketServerEventMetadata... eventBusSocket) {
-        webSocketEvents.addAll(Arrays.stream(eventBusSocket).filter(Objects::nonNull).collect(Collectors.toList()));
+    public final HttpServerRouter registerGatewayApi(Class<? extends RestEventApi> gatewayApiClass) {
+        this.gatewayApiClass = gatewayApiClass;
         return this;
     }
 

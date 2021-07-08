@@ -1,5 +1,6 @@
 package io.zero88.qwe.micro.httpevent;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -212,6 +213,18 @@ public final class EventMethodDefinition implements JsonData {
                                                  .map(o -> JsonData.from(o, EventMethodMapping.class))
                                                  .collect(Collectors.toSet()))
                                     .build();
+    }
+
+    public Collection<EventMethodMapping> getMapping() {
+        return mapping.stream()
+                      .sorted((o1, o2) -> compare(o1.getMethod().name(), o2.getMethod().name()))
+                      .sorted((o1, o2) -> compare(o1.getCapturePath(), o2.getCapturePath()))
+                      .collect(Collectors.toList());
+    }
+
+    private int compare(String n1, String n2) {
+        final int c = n1.length() - n2.length();
+        return c == 0 ? n1.compareTo(n2) : c;
     }
 
     public EventAction search(String actualPath, @NonNull HttpMethod method) {

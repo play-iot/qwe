@@ -2,7 +2,7 @@ package io.zero88.qwe.http.server;
 
 import lombok.NonNull;
 
-public interface HttpLogSystem {
+public interface HttpSystem {
 
     /**
      * Defines HTTP function name
@@ -14,14 +14,14 @@ public interface HttpLogSystem {
     /**
      * Decor log with prefix system
      *
-     * @param template log template
+     * @param log log
      * @return a decorator log
      */
-    default @NonNull String decor(String template) {
-        return function() + "::" + template;
+    default @NonNull String decor(String log) {
+        return function() + "::" + log;
     }
 
-    interface ApisLogSystem extends HttpLogSystem {
+    interface ApisSystem extends HttpSystem {
 
         @Override
         default String function() {
@@ -31,7 +31,7 @@ public interface HttpLogSystem {
     }
 
 
-    interface WebSocketLogSystem extends HttpLogSystem {
+    interface WebSocketSystem extends HttpSystem {
 
         @Override
         default String function() {
@@ -41,7 +41,7 @@ public interface HttpLogSystem {
     }
 
 
-    interface WebLogSystem extends HttpLogSystem {
+    interface WebSystem extends HttpSystem {
 
         @Override
         default String function() {
@@ -51,7 +51,7 @@ public interface HttpLogSystem {
     }
 
 
-    interface UploadLogSystem extends HttpLogSystem {
+    interface UploadSystem extends HttpSystem {
 
         @Override
         default String function() {
@@ -61,7 +61,7 @@ public interface HttpLogSystem {
     }
 
 
-    interface DownloadLogSystem extends HttpLogSystem {
+    interface DownloadSystem extends HttpSystem {
 
         @Override
         default String function() {
@@ -71,7 +71,7 @@ public interface HttpLogSystem {
     }
 
 
-    interface GatewayLogSystem extends HttpLogSystem {
+    interface GatewaySystem extends HttpSystem {
 
         @Override
         default String function() {

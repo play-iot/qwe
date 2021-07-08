@@ -2,6 +2,8 @@ package io.zero88.qwe.http.server.config;
 
 import java.util.Objects;
 
+import io.github.zero88.exceptions.InvalidUrlException;
+import io.github.zero88.utils.Urls;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.RouterConfig;
 
@@ -33,7 +35,10 @@ abstract class AbstractRouterConfig implements IConfig, RouterConfig {
         this.key = key;
         this.parent = parent;
         this.enabled = enabled;
-        this.path = Objects.toString(path, defaultPath());
+        this.path = Urls.combinePath(Objects.toString(path, defaultPath()));
+        if (!Urls.validatePath(this.path)) {
+            throw new InvalidUrlException(function() + "[" + this.path + "] is not valid");
+        }
     }
 
 }

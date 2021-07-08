@@ -12,7 +12,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.exceptions.DataNotFoundException;
-import io.zero88.qwe.http.server.HttpLogSystem.DownloadLogSystem;
+import io.zero88.qwe.http.server.HttpSystem.DownloadSystem;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class DownloadFileHandler implements Handler<RoutingContext>, DownloadLogSystem {
+public abstract class DownloadFileHandler implements Handler<RoutingContext>, DownloadSystem {
 
     private final Logger logger = LoggerFactory.getLogger(DownloadFileHandler.class);
     private final String downloadPath;

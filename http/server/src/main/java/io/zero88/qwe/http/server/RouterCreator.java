@@ -28,6 +28,7 @@ public interface RouterCreator<T extends RouterConfig> extends HasLogger {
         if (!config.isEnabled()) {
             return rootRouter;
         }
+        doLogWhenRegister(config);
         rootRouter.mountSubRouter(mountPoint(config), router(config, sharedData));
         return rootRouter;
     }
@@ -40,10 +41,14 @@ public interface RouterCreator<T extends RouterConfig> extends HasLogger {
      * Create new router based on configuration. It will be mounted as sub router in root router
      *
      * @param config     Router config
-     * @param sharedData shared data
+     * @param sharedData Shared data
      * @return router
      * @see #mount(Router, RouterConfig, SharedDataLocalProxy)
      */
     @NonNull Router router(@NonNull T config, @NonNull SharedDataLocalProxy sharedData);
+
+    default void doLogWhenRegister(T config) {
+        logger().info(config.decor("Register route [{}][{}]"), config.function(), config.getPath());
+    }
 
 }

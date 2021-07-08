@@ -12,7 +12,7 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
+import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Accessors(fluent = true)
 @RequiredArgsConstructor
-public class WebSocketEventExecutor implements HasSharedData, WebSocketLogSystem {
+public class WebSocketEventExecutor implements HasSharedData, WebSocketSystem {
 
     private final SharedDataLocalProxy sharedData;
 

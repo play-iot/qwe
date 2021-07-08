@@ -2,7 +2,12 @@ package io.zero88.qwe.http.server;
 
 import org.jetbrains.annotations.Nullable;
 
-public interface RouterConfig {
+import lombok.NonNull;
+
+/**
+ * Represents for router configuration
+ */
+public interface RouterConfig extends HttpSystem {
 
     /**
      * Defines whether router is enabled or not
@@ -16,7 +21,7 @@ public interface RouterConfig {
      *
      * @return configuration path
      */
-    String getPath();
+    @NonNull String getPath();
 
     /**
      * Get actual path

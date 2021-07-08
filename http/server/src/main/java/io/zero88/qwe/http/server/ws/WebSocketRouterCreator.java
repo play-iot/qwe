@@ -20,14 +20,14 @@ import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
+import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.config.WebSocketConfig;
 import io.zero88.qwe.http.server.config.WebSocketConfig.SocketBridgeConfig;
 
 import lombok.NonNull;
 
-public final class WebSocketRouterCreator implements RouterCreator<WebSocketConfig>, WebSocketLogSystem {
+public final class WebSocketRouterCreator implements RouterCreator<WebSocketConfig>, WebSocketSystem {
 
     private final Map<String, List<WebSocketServerEventMetadata>> socketsByPath = new HashMap<>();
 
