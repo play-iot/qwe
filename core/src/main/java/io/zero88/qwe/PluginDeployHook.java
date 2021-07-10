@@ -19,7 +19,7 @@ public interface PluginDeployHook {
      * @return a pre plugin context
      */
     default Plugin onPreDeploy(@NonNull Plugin plugin, @NonNull PluginContext preContext) {
-        return plugin.setup(preContext);
+        return plugin.setup(enrichContext(preContext, false));
     }
 
     /**
@@ -28,26 +28,27 @@ public interface PluginDeployHook {
      * It will be called automatically in a post-deploy {@code plugin} step of {@code Application} deployment workflow
      * <p>
      * Depends on a specified plugin business, you can override the post plugin context by using {@link
-     * #enrichPostContext(PluginContext)}
+     * #enrichContext(PluginContext, boolean)}
      *
      * @param plugin      a current plugin
      * @param postContext an associate post-context of plugin
      * @return a post plugin context
      */
     default Plugin onPostDeploy(@NonNull Plugin plugin, @NonNull PluginContext postContext) {
-        return plugin.setup(enrichPostContext(postContext));
+        return plugin.setup(enrichContext(postContext, true));
     }
 
     /**
      * Each implementation can enrich any useful information in {@code plugin context} then it can be used later on
      * {@code application} after all plugins are deployed successfully
      *
-     * @param postContext an associate post-context of plugin
-     * @return a post plugin context
+     * @param pluginContext an associate post-context of plugin
+     * @param isPostStep    a flag to identifies whether is pre-step or post-step
+     * @return a plugin context
      * @see Application#onInstallCompleted(PluginContextLookup)
      */
-    default PluginContext enrichPostContext(@NonNull PluginContext postContext) {
-        return postContext;
+    default PluginContext enrichContext(@NonNull PluginContext pluginContext, boolean isPostStep) {
+        return pluginContext;
     }
 
 }

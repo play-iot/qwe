@@ -42,7 +42,11 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
     }
 
     @Override
-    public DiscoveryContext enrichPostContext(@NonNull PluginContext postContext) {
+    public DiscoveryContext enrichContext(@NonNull PluginContext pluginContext, boolean isPostStep) {
+        final DiscoveryContext discoveryContext = new DiscoveryContext(pluginContext);
+        if (!isPostStep) {
+            return discoveryContext;
+        }
         logger().info("Setup service discovery...");
         CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx,
                                                                      pluginConfig.lookup(CircuitBreakerConfig.NAME,
@@ -50,7 +54,7 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
         ServiceDiscoveryConfig discoveryConfig = pluginConfig.lookup(ServiceDiscoveryConfig.NAME,
                                                                      ServiceDiscoveryConfig.class);
         ServiceDiscoveryApi discoveryApi = new ServiceDiscoveryApiImpl(sharedData(), discoveryConfig, breaker);
-        return new DiscoveryContext(postContext).setup(setupGateway(discoveryApi, discoveryConfig));
+        return discoveryContext.setup(setupGateway(discoveryApi, discoveryConfig));
     }
 
     private ServiceDiscoveryApi setupGateway(ServiceDiscoveryApi serviceDiscovery,
