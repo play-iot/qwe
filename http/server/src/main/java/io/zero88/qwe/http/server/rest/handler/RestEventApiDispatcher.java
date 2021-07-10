@@ -10,6 +10,7 @@ import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
 import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 
@@ -25,7 +26,7 @@ import lombok.experimental.Accessors;
  * @see EventMessageResponseHandler
  */
 @RequiredArgsConstructor
-public class RestEventApiDispatcher implements RestEventRequestDispatcher {
+public class RestEventApiDispatcher implements RestEventRequestDispatcher, ApisSystem {
 
     @Getter
     @NonNull
@@ -59,7 +60,7 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher {
         EventMessage msg = useRequestData
                            ? EventMessage.initial(action, RequestDataConverter.convert(context))
                            : EventMessage.initial(action, RequestDataConverter.body(context));
-        logger().info("REST::Dispatch data to Event Address {}", address);
+        logger().info(decor("Dispatch request to Event[{}]"), address);
         dispatch(context, address, pattern, msg);
     }
 

@@ -32,7 +32,7 @@ public abstract class WebSocketConnectErrorHandler implements Function<Throwable
     @SuppressWarnings("unchecked")
     public static <T extends WebSocketConnectErrorHandler> T create(@NonNull HostInfo hostInfo,
                                                                     @NonNull EventBusClient ebClient,
-                                                                    @NonNull Class<T> connErrorHandlerClass) {
+                                                                    Class<T> connErrorHandlerClass) {
         if (Objects.isNull(connErrorHandlerClass) || WebSocketConnectErrorHandler.class.equals(connErrorHandlerClass)) {
             return (T) new WebSocketConnectErrorHandler(hostInfo, ebClient) {};
         }

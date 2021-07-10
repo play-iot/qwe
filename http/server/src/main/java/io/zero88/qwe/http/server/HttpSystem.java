@@ -25,7 +25,7 @@ public interface HttpSystem {
 
         @Override
         default String function() {
-            return "APIS";
+            return "API";
         }
 
     }

@@ -5,6 +5,7 @@ import java.util.Objects;
 import io.github.zero88.exceptions.InvalidUrlException;
 import io.github.zero88.utils.Urls;
 import io.zero88.qwe.IConfig;
+import io.zero88.qwe.http.server.HttpSystem;
 import io.zero88.qwe.http.server.RouterConfig;
 
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-abstract class AbstractRouterConfig implements IConfig, RouterConfig {
+abstract class AbstractRouterConfig implements IConfig, RouterConfig, HttpSystem {
 
     @Accessors(fluent = true)
     private final String key;

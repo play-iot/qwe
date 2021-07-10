@@ -34,9 +34,9 @@ import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.PluginTestHelper;
 import io.zero88.qwe.EventBusHelper;
 import io.zero88.qwe.IConfig;
+import io.zero88.qwe.PluginTestHelper;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.ResponseData;
@@ -70,9 +70,9 @@ public abstract class HttpServerPluginTestBase implements PluginTestHelper {
     @Before
     public void before(TestContext context) throws IOException {
         vertx = Vertx.vertx();
-        httpConfig = IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class);
-        httpConfig.setHost(DEFAULT_HOST);
-        httpConfig.setPort(TestHelper.getRandomPort());
+        httpConfig = IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class)
+                            .setHost(DEFAULT_HOST)
+                            .setPort(TestHelper.getRandomPort());
         client = vertx.createHttpClient(createClientOptions());
         requestOptions = new RequestOptions().setHost(DEFAULT_HOST).setPort(httpConfig.getPort());
     }

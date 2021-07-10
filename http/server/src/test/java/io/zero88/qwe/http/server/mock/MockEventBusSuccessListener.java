@@ -4,24 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.vertx.core.Future;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContract;
 
 public class MockEventBusSuccessListener extends MockEventBusListener {
-
-    private MockEventBusSuccessListener(EventBus eventBus, String address) {
-        super(eventBus, address);
-    }
-
-    public static MockEventBusListener create(EventBus eventBus, String address) {
-        return new MockEventBusSuccessListener(eventBus, address);
-    }
-
-    public static MockEventBusListener create(EventBus eventBus) {
-        return new MockEventBusSuccessListener(eventBus, "http.server.test");
-    }
 
     @EBContract(action = "GET_LIST")
     public List<String> list(RequestData data) {

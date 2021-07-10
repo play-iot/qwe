@@ -11,12 +11,12 @@ import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.http.server.HttpServerRouter;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;
-import io.zero88.qwe.http.server.mock.MockApiDefinition;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.zero88.qwe.http.server.mock.MockRestAPI;
 
 @RunWith(VertxUnitRunner.class)
 public class RestServerTest extends HttpServerPluginTestBase {
@@ -33,7 +33,7 @@ public class RestServerTest extends HttpServerPluginTestBase {
     public void test_none_api_not_found(TestContext context) {
         String path = "/abc/";
         JsonObject expected = notFoundResponse(httpConfig.getPort(), path);
-        startServer(context, new HttpServerRouter().registerApi(MockApiDefinition.MockAPI.class));
+        startServer(context, new HttpServerRouter().registerApi(MockRestAPI.class));
         assertRestByClient(context, HttpMethod.GET, path, 404, expected);
     }
 
@@ -41,7 +41,7 @@ public class RestServerTest extends HttpServerPluginTestBase {
     public void test_api_not_found(TestContext context) {
         String path = "/api/xx";
         JsonObject expected = notFoundResponse(httpConfig.getPort(), path);
-        startServer(context, new HttpServerRouter().registerApi(MockApiDefinition.MockAPI.class));
+        startServer(context, new HttpServerRouter().registerApi(MockRestAPI.class));
         assertRestByClient(context, HttpMethod.GET, path, 404, expected);
     }
 
@@ -51,7 +51,7 @@ public class RestServerTest extends HttpServerPluginTestBase {
     public void test_api_throwable(TestContext context) {
         String path = "/api/test/error";
         JsonObject expected = ErrorMessage.parse(ErrorCode.UNKNOWN_ERROR, "error").toJson();
-        startServer(context, new HttpServerRouter().registerApi(MockApiDefinition.MockAPI.class));
+        startServer(context, new HttpServerRouter().registerApi(MockRestAPI.class));
         assertRestByClient(context, HttpMethod.GET, path, 500, expected);
     }
 
@@ -61,7 +61,7 @@ public class RestServerTest extends HttpServerPluginTestBase {
     public void test_api_get_success(TestContext context) {
         String path = "/api/test";
         JsonObject expected = new JsonObject().put("abc", "xxx");
-        startServer(context, new HttpServerRouter().registerApi(MockApiDefinition.MockAPI.class));
+        startServer(context, new HttpServerRouter().registerApi(MockRestAPI.class));
         assertRestByClient(context, HttpMethod.GET, path, 200, expected);
     }
 

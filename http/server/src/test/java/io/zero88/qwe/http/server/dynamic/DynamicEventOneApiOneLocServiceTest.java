@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.dynamic.mock.MockEventOneApiOneLocService;
 import io.vertx.core.http.HttpMethod;
@@ -44,7 +45,7 @@ public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase 
     @Test
     public void test_not_found(TestContext context) {
         assertRestByClient(context, HttpMethod.GET, "/api/s/xxx", 404,
-                           new JsonObject("{\"message\":\"Resource not found\"}"), IGNORE_URI);
+                           new JsonObject("{\"message\":\"Resource not found\"}"), JsonHelper.ignore("message.uri"));
     }
 
     @Test

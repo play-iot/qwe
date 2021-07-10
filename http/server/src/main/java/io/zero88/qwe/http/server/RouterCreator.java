@@ -9,7 +9,7 @@ import io.zero88.qwe.SharedDataLocalProxy;
 
 import lombok.NonNull;
 
-public interface RouterCreator<T extends RouterConfig> extends HasLogger {
+public interface RouterCreator<T extends RouterConfig> extends HasLogger, HttpSystem {
 
     default Logger logger() {
         return LoggerFactory.getLogger(RouterCreator.class);
@@ -25,12 +25,20 @@ public interface RouterCreator<T extends RouterConfig> extends HasLogger {
      */
     default @NonNull Router mount(@NonNull Router rootRouter, @NonNull T config,
                                   @NonNull SharedDataLocalProxy sharedData) {
-        if (!config.isEnabled()) {
+        if (!config.isEnabled() || !validate(config)) {
             return rootRouter;
         }
-        doLogWhenRegister(config);
-        rootRouter.mountSubRouter(mountPoint(config), router(config, sharedData));
+        logger().info(decor("Setup route [{}][{}]"), routerName(), BasePaths.addWildcards(config.getPath()));
+        rootRouter.mountSubRouter(mountPoint(config), subRouter(config, sharedData));
         return rootRouter;
+    }
+
+    default boolean validate(T config) {
+        return true;
+    }
+
+    default String routerName() {
+        return function();
     }
 
     default @NonNull String mountPoint(@NonNull T config) {
@@ -38,17 +46,13 @@ public interface RouterCreator<T extends RouterConfig> extends HasLogger {
     }
 
     /**
-     * Create new router based on configuration. It will be mounted as sub router in root router
+     * Create new sub router based on configuration. It will be mounted as sub router in root router
      *
      * @param config     Router config
      * @param sharedData Shared data
      * @return router
      * @see #mount(Router, RouterConfig, SharedDataLocalProxy)
      */
-    @NonNull Router router(@NonNull T config, @NonNull SharedDataLocalProxy sharedData);
-
-    default void doLogWhenRegister(T config) {
-        logger().info(config.decor("Register route [{}][{}]"), config.function(), config.getPath());
-    }
+    @NonNull Router subRouter(@NonNull T config, @NonNull SharedDataLocalProxy sharedData);
 
 }

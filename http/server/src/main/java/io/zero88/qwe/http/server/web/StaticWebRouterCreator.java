@@ -7,6 +7,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.http.server.HttpSystem.WebSystem;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.config.StaticWebConfig;
 
@@ -14,12 +15,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class StaticWebRouterCreator implements RouterCreator<StaticWebConfig> {
+public final class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, WebSystem {
 
     private final Path pluginDir;
 
     @Override
-    public @NonNull Router router(@NonNull StaticWebConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public @NonNull Router subRouter(@NonNull StaticWebConfig config, @NonNull SharedDataLocalProxy sharedData) {
         final StaticHandler staticHandler = StaticHandler.create();
         if (config.isInResource()) {
             staticHandler.setWebRoot(config.getWebRoot());

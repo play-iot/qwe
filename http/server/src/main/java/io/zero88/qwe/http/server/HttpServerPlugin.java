@@ -19,13 +19,16 @@ import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.http.HttpUtils;
+import io.zero88.qwe.http.server.config.ApiConfig;
 import io.zero88.qwe.http.server.config.CorsOptions;
 import io.zero88.qwe.http.server.download.DownloadRouterCreator;
 import io.zero88.qwe.http.server.gateway.GatewayIndexApi;
 import io.zero88.qwe.http.server.gateway.GatewayRouterCreator;
 import io.zero88.qwe.http.server.handler.FailureContextHandler;
 import io.zero88.qwe.http.server.handler.NotFoundContextHandler;
-import io.zero88.qwe.http.server.rest.RestApisRouterCreator;
+import io.zero88.qwe.http.server.rest.DynamicRouterCreator;
+import io.zero88.qwe.http.server.rest.RestApiCreator;
+import io.zero88.qwe.http.server.rest.RestEventApisCreator;
 import io.zero88.qwe.http.server.upload.UploadRouterCreator;
 import io.zero88.qwe.http.server.web.StaticWebRouterCreator;
 import io.zero88.qwe.http.server.ws.WebSocketRouterCreator;
@@ -65,7 +68,6 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
 
     @Override
     public Future<Void> onAsyncStart() {
-        logger().info("Starting HTTP Server...");
         return vertx.createHttpServer(new HttpServerOptions(pluginConfig.getOptions()).setHost(pluginConfig.getHost())
                                                                                       .setPort(pluginConfig.getPort()))
                     .requestHandler(initRouter())
@@ -126,9 +128,11 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
             initHttp2Router(root);
             new WebSocketRouterCreator(httpRouter.getWebSocketEvents()).mount(root, pluginConfig.getWebSocketConfig(),
                                                                               sharedData());
-            new RestApisRouterCreator().registerApi(httpRouter.getRestApiClasses())
-                                       .registerEventBusApi(httpRouter.getRestEventApiClasses())
-                                       .mount(root, pluginConfig.getApiConfig(), sharedData());
+            new RestApiCreator().register(httpRouter.getRestApiClasses())
+                                .mount(root, pluginConfig.getApiConfig(), sharedData());
+            new RestEventApisCreator<ApiConfig>().register(httpRouter.getRestEventApiClasses())
+                                                 .mount(root, pluginConfig.getApiConfig(), sharedData());
+            new DynamicRouterCreator().mount(root, pluginConfig.getApiConfig().getDynamicConfig(), sharedData());
             new GatewayRouterCreator().register(Objects.isNull(httpRouter.getGatewayApiClass())
                                                 ? GatewayIndexApi.class
                                                 : httpRouter.getGatewayApiClass())
@@ -157,8 +161,8 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
      * @see Route#produces(String)
      * @see Route#consumes(String)
      */
-    public static void restrictJsonRoute(Route route) {
-        route.produces(HttpUtils.JSON_CONTENT_TYPE).produces(HttpUtils.JSON_UTF8_CONTENT_TYPE);
+    public static Route restrictJsonRoute(Route route) {
+        return route.produces(HttpUtils.JSON_CONTENT_TYPE).produces(HttpUtils.JSON_UTF8_CONTENT_TYPE);
     }
 
 }

@@ -9,18 +9,17 @@ import org.junit.Before;
 import org.skyscreamer.jsonassert.Customization;
 
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.zero88.qwe.ApplicationVerticle;
+import io.zero88.qwe.DeployContext;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.VertxHelper;
-import io.zero88.qwe.DeployContext;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 
 public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase {
-
-    static final Customization IGNORE_URI = new Customization("message.uri", (o1, o2) -> true);
 
     @Before
     public void before(TestContext context) throws IOException {

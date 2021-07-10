@@ -37,8 +37,8 @@ public class MockWebSocketEvent {
 
     public static class MockWebSocketEventServerListener extends MockEventBusListener {
 
-        public MockWebSocketEventServerListener(EventBus eventBus) {
-            super(eventBus, SERVER_PROCESSOR);
+        public MockWebSocketEventServerListener() {
+//            super(SERVER_PROCESSOR);
         }
 
         @EBContract(action = "GET_LIST")

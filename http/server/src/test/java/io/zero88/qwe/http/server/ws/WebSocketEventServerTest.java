@@ -45,7 +45,8 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase {
         super.before(context);
         this.enableWebsocket();
         try {
-            new MockWebSocketEventServerListener(vertx.eventBus()).start();
+            //FIXME fix it
+            new MockWebSocketEventServerListener();
         } catch (Exception e) {
             context.fail(e);
         }

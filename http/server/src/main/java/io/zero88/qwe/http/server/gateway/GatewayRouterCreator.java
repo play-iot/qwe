@@ -11,14 +11,14 @@ import lombok.NonNull;
 public class GatewayRouterCreator extends RestEventApisCreator<ApiGatewayConfig> {
 
     @Override
-    public void doLogWhenRegister(ApiGatewayConfig config) {
-        logger().info(config.decor("Register route [{}][{}]"), "Gateway APIs", config.getPath());
+    public String function() {
+        return "Gateway APIs";
     }
 
     @Override
-    public @NonNull Router router(@NonNull ApiGatewayConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public @NonNull Router subRouter(@NonNull ApiGatewayConfig config, @NonNull SharedDataLocalProxy sharedData) {
         sharedData.addData(HttpServerPlugin.SERVER_GATEWAY_ADDRESS_DATA_KEY, config.getAddress());
-        return super.router(config, sharedData);
+        return super.subRouter(config, sharedData);
     }
 
 }

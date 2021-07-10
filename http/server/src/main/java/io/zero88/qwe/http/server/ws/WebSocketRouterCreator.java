@@ -49,7 +49,7 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
     }
 
     @Override
-    public Router router(@NonNull WebSocketConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public Router subRouter(@NonNull WebSocketConfig config, @NonNull SharedDataLocalProxy sharedData) {
         final SockJSHandler sockJSHandler = SockJSHandler.create(sharedData.getVertx(), config.getSockjsOptions());
         final Router router = Router.router(sharedData.getVertx());
         validate().forEach((path, socketMapping) -> {

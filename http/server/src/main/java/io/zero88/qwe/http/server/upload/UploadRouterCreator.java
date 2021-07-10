@@ -12,6 +12,7 @@ import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpServerPlugin;
+import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.ServerInfo;
 import io.zero88.qwe.http.server.config.FileUploadConfig;
@@ -21,12 +22,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class UploadRouterCreator implements RouterCreator<FileUploadConfig> {
+public final class UploadRouterCreator implements RouterCreator<FileUploadConfig>, UploadSystem {
 
     private final Path pluginDir;
 
     @Override
-    public Router router(@NonNull FileUploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public Router subRouter(@NonNull FileUploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
         final String uploadDir = FileUtils.createFolder(pluginDir, config.getUploadDir());
         final EventBusClient eventbus = EventBusClient.create(sharedData);
         final ServerInfo serverInfo = sharedData.getData(HttpServerPlugin.SERVER_INFO_DATA_KEY);

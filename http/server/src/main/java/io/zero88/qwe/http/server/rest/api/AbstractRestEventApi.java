@@ -24,7 +24,7 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisSystem, 
     private final ActionMethodMapping mapping;
     private final SortedMap<String, RestEventApiMetadata> restMetadata = new TreeMap<>(
         Comparator.comparingInt(String::length));
-    protected SharedDataLocalProxy proxy;
+    protected SharedDataLocalProxy sharedData;
 
     protected AbstractRestEventApi() {
         this.mapping = initHttpEventMap();
@@ -58,7 +58,7 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisSystem, 
 
     @Override
     public AbstractRestEventApi registerSharedData(SharedDataLocalProxy proxy) {
-        this.proxy = proxy;
+        this.sharedData = proxy;
         return this;
     }
 
