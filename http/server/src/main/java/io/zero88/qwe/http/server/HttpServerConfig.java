@@ -3,6 +3,7 @@ package io.zero88.qwe.http.server;
 import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.ext.web.AllowForwardHeaders;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
 import io.zero88.qwe.QWEAppConfig;
@@ -21,9 +22,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter(value = AccessLevel.PACKAGE)
+@Accessors(chain = true)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public final class HttpServerConfig implements PluginDirConfig {
 
@@ -37,8 +40,10 @@ public final class HttpServerConfig implements PluginDirConfig {
     @Getter(value = AccessLevel.PRIVATE)
     private int publicPort = -1;
     private HttpScheme publicScheme = HttpScheme.HTTP;
-    private int maxBodySizeMB = 2;
+
     private String pluginDir = "httpserver";
+    private int maxBodySizeMB = 2;
+    private AllowForwardHeaders allowForwardHeaders = AllowForwardHeaders.ALL;
 
     @JsonProperty(value = ServerOptions.NAME)
     private ServerOptions options = (ServerOptions) new ServerOptions().setCompressionSupported(true)

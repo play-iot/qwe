@@ -10,6 +10,7 @@ import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.handler.LoggerHandler;
 import io.vertx.ext.web.handler.ResponseContentTypeHandler;
 import io.vertx.ext.web.handler.ResponseTimeHandler;
 import io.zero88.qwe.PluginContext;
@@ -117,8 +118,10 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
                                                  .allowCredentials(corsOptions.isAllowCredentials())
                                                  .exposedHeaders(corsOptions.getExposedHeaders())
                                                  .maxAgeSeconds(corsOptions.getMaxAgeSeconds());
-            root.route()
+            root.allowForward(pluginConfig.getAllowForwardHeaders())
+                .route()
                 .handler(corsHandler)
+                .handler(LoggerHandler.create())
                 .handler(ResponseContentTypeHandler.create())
                 .handler(ResponseTimeHandler.create())
                 .failureHandler(ResponseTimeHandler.create())

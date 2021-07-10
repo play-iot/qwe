@@ -6,6 +6,7 @@
   "publicScheme": "HTTP",
   "maxBodySizeMB": 2,
   "pluginDir": "httpserver",
+  "allowForwardHeaders": "ALL",
   "__options__": {
     "logActivity": false,
     "receiveBufferSize": -1,
