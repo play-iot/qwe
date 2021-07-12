@@ -28,7 +28,7 @@ public interface RouterCreator<T extends RouterConfig> extends HasLogger, HttpSy
         if (!config.isEnabled() || !validate(config)) {
             return rootRouter;
         }
-        logger().info(decor("Setup route [{}][{}]"), routerName(), BasePaths.addWildcards(config.getPath()));
+        logger().info(decor("Setup route [{}][{}]"), routerName(), BasePaths.addWildcards(routerPath(config)));
         rootRouter.mountSubRouter(mountPoint(config), subRouter(config, sharedData));
         return rootRouter;
     }
@@ -39,6 +39,10 @@ public interface RouterCreator<T extends RouterConfig> extends HasLogger, HttpSy
 
     default String routerName() {
         return function();
+    }
+
+    default String routerPath(@NonNull T config) {
+        return mountPoint(config);
     }
 
     default @NonNull String mountPoint(@NonNull T config) {

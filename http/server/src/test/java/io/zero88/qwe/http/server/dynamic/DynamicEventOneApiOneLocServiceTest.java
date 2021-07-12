@@ -7,13 +7,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.http.server.dynamic.mock.MockEventOneApiOneLocService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.http.server.dynamic.mock.MockEventOneApiOneLocService;
 
 @RunWith(VertxUnitRunner.class)
 public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase {
@@ -26,9 +26,11 @@ public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase 
 
     @Test
     public void test_event_not_found(TestContext context) {
-        assertRestByClient(context, HttpMethod.POST, "/api/s/hey", 409,
-                           new JsonObject().put("code", ErrorCode.UNSUPPORTED.code())
-                                           .put("message", "Unsupported event CREATE"));
+        assertRestByClient(context, HttpMethod.POST, "/api/s/hey", 503,
+                           new JsonObject().put("code", ErrorCode.SERVICE_NOT_FOUND.code())
+                                           .put("message",
+                                                "Service not found | Cause: Unsupported event [CREATE] - Error Code: " +
+                                                "UNSUPPORTED"));
     }
 
     @Test

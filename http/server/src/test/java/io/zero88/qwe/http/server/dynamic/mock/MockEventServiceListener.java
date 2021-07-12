@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.zero88.utils.Strings;
@@ -15,9 +14,9 @@ import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EBParam;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.DataNotFoundException;
+import io.zero88.qwe.http.event.EventModel;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +28,7 @@ class MockEventServiceListener {
                                                .pattern(EventPattern.REQUEST_RESPONSE)
                                                .addEvents(EventAction.GET_ONE, EventAction.GET_LIST)
                                                .build();
-    static final SimpleEventListener TEST_EVENT_LISTENER_1 = new SimpleEventListener(TEST_EVENT_1.getEvents());
+    static final SimpleEventListener TEST_EVENT_LISTENER_1 = new SimpleEventListener();
     static EventModel TEST_EVENT_2 = EventModel.clone(TEST_EVENT_1, "test.MockEventMessageService.2");
     static final MultiParamEventListener TEST_EVENT_LISTENER_2 = new MultiParamEventListener();
     static EventModel TEST_EVENT_3 = EventModel.clone(TEST_EVENT_1, "test.MockEventMessageService.3");
@@ -41,8 +40,6 @@ class MockEventServiceListener {
 
     @RequiredArgsConstructor
     static class SimpleEventListener implements EventListener {
-
-        private final Set<EventAction> actions;
 
         @EBContract(action = "GET_LIST")
         public List<String> list() { return Arrays.asList("1", "2", "3"); }

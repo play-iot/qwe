@@ -11,7 +11,7 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpServerConfig;
-import io.zero88.qwe.http.server.HttpServerPlugin;
+import io.zero88.qwe.http.server.HttpServerPluginContext;
 import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.ServerInfo;
@@ -30,7 +30,7 @@ public final class UploadRouterCreator implements RouterCreator<FileUploadConfig
     public Router subRouter(@NonNull FileUploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
         final String uploadDir = FileUtils.createFolder(pluginDir, config.getUploadDir());
         final EventBusClient eventbus = EventBusClient.create(sharedData);
-        final ServerInfo serverInfo = sharedData.getData(HttpServerPlugin.SERVER_INFO_DATA_KEY);
+        final ServerInfo serverInfo = sharedData.getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY);
         final UploadListener listener = UploadListener.create(sharedData, config.getListenerClass());
         final String address = Strings.fallback(config.getListenerAddress(), listener.getClass().getName());
         final UploadFileHandler handler = UploadFileHandler.create(config.getHandlerClass(), eventbus, address,

@@ -2,14 +2,11 @@ package io.zero88.qwe.http.server.dynamic;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.junit.Before;
-import org.skyscreamer.jsonassert.Customization;
 
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.zero88.qwe.ApplicationVerticle;
@@ -27,30 +24,26 @@ public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase {
         startGatewayAndService(context, service(), getServiceOptions());
     }
 
-    protected void startGatewayAndService(TestContext context, ApplicationVerticle service,
+    protected void startGatewayAndService(TestContext context, ApplicationVerticle app,
                                           DeploymentOptions serviceOptions) {
-        CountDownLatch latch = new CountDownLatch(2);
+        CountDownLatch c1 = new CountDownLatch(1);
         DeploymentOptions options = new DeploymentOptions().setConfig(deployConfig(httpConfig.getPort()));
-        VertxHelper.deploy(vertx, context,
-                           DeployContext.builder().options(options).verticle(gateway().get()).successAsserter(id -> {
-                               System.out.println("Gateway Deploy Id: " + id);
-                               latch.countDown();
-                               VertxHelper.deploy(vertx, context, DeployContext.builder()
-                                                                               .options(serviceOptions)
-                                                                               .verticle(service)
-                                                                               .successAsserter(d -> latch.countDown())
-                                                                               .build());
-                           }).build());
-        long start = System.nanoTime();
-        try {
-            context.assertTrue(latch.await(timeoutInSecond(), TimeUnit.SECONDS),
-                               "Timeout when deploying gateway and service verticle");
-        } catch (InterruptedException e) {
-            context.fail("Failed to start Gateway and HTTP Service");
-        }
+        ApplicationVerticle gateway = gateway().get();
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .options(options)
+                                                        .verticle(gateway)
+                                                        .successAsserter(id -> c1.countDown())
+                                                        .build());
+        TestHelper.waitTimeout(timeoutInSecond(), c1);
+        CountDownLatch c2 = new CountDownLatch(1);
+        VertxHelper.deploy(vertx, context, DeployContext.builder()
+                                                        .options(serviceOptions)
+                                                        .verticle(app)
+                                                        .successAsserter(d -> c2.countDown())
+                                                        .build());
         //small delay for enable dynamic api
         TestHelper.sleep(500);
-        System.out.println("FINISHED AFTER: " + (System.nanoTime() - start) / 1e9);
+        TestHelper.waitTimeout(timeoutInSecond(), c2);
     }
 
     protected JsonObject deployConfig(int port) {

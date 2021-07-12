@@ -62,6 +62,7 @@ public class RestEventServerTest extends HttpServerPluginTestBase {
     }
 
     @Test
+    //FIXME eventbus timeout vs httpclient timeout
     public void test_api_eventbus_no_reply(TestContext context) {
         String path = "/api/test/events/:event_id";
         JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_ERROR.code())

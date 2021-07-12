@@ -38,8 +38,6 @@ import lombok.NonNull;
 
 public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServerPluginContext> {
 
-    public final static String SERVER_INFO_DATA_KEY = "SERVER_INFO";
-    public final static String SERVER_GATEWAY_ADDRESS_DATA_KEY = "SERVER_GATEWAY_ADDRESS";
     private final HttpServerRouter httpRouter;
     private HttpServer httpServer;
 
@@ -62,8 +60,8 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
     @Override
     public void onStart() {
         super.onStart();
-        if (!this.pluginConfig.getApiConfig().isEnabled()) {
-            this.pluginConfig.getApiConfig().getDynamicConfig().setEnabled(false);
+        if (this.pluginConfig.getApiConfig().getDynamicConfig().isEnabled()) {
+            this.pluginConfig.getApiConfig().setEnabled(true);
         }
     }
 
@@ -76,7 +74,8 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
                     .onSuccess(server -> {
                         httpServer = server;
                         logger().info("HTTP Server started [{}:{}]", pluginConfig.getHost(), httpServer.actualPort());
-                        sharedData().addData(SERVER_INFO_DATA_KEY, createServerInfo(httpServer.actualPort()));
+                        sharedData().addData(HttpServerPluginContext.SERVER_INFO_DATA_KEY,
+                                             createServerInfo(httpServer.actualPort()));
                     })
                     .recover(t -> Future.failedFuture(QWEExceptionConverter.from(t)))
                     .mapEmpty();
@@ -89,7 +88,8 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
 
     @Override
     public HttpServerPluginContext enrichContext(@NonNull PluginContext pluginContext, boolean isPostStep) {
-        return new HttpServerPluginContext(pluginContext, sharedData().getData(SERVER_INFO_DATA_KEY));
+        return new HttpServerPluginContext(pluginContext,
+                                           sharedData().getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY));
     }
 
     private ServerInfo createServerInfo(int port) {
@@ -135,7 +135,7 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
                                 .mount(root, pluginConfig.getApiConfig(), sharedData());
             new RestEventApisCreator<ApiConfig>().register(httpRouter.getRestEventApiClasses())
                                                  .mount(root, pluginConfig.getApiConfig(), sharedData());
-            new DynamicRouterCreator().mount(root, pluginConfig.getApiConfig().getDynamicConfig(), sharedData());
+            new DynamicRouterCreator().mount(root, pluginConfig.getApiConfig(), sharedData());
             new GatewayRouterCreator().register(Objects.isNull(httpRouter.getGatewayApiClass())
                                                 ? GatewayIndexApi.class
                                                 : httpRouter.getGatewayApiClass())

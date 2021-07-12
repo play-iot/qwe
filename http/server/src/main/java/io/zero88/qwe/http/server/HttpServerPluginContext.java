@@ -8,6 +8,8 @@ import lombok.Getter;
 @Getter
 public final class HttpServerPluginContext extends DefaultPluginContext {
 
+    public final static String SERVER_INFO_DATA_KEY = "SERVER_INFO";
+    public final static String SERVER_GATEWAY_ADDRESS_DATA_KEY = "SERVER_GATEWAY_ADDRESS";
     private final ServerInfo serverInfo;
 
     protected HttpServerPluginContext(PluginContext context, ServerInfo serverInfo) {
