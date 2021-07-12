@@ -16,7 +16,6 @@ import io.vertx.core.Promise;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
-import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventBusDeliveryOption;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.utils.NetworkUtils;
@@ -35,9 +34,7 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     private final PluginContextLookupInternal contexts = PluginContextLookupInternal.create();
     @Getter
     @Accessors(fluent = true)
-    protected QWEAppConfig appConfig;
-    @Getter
-    private EventBusClient eventBus;
+    private QWEAppConfig appConfig;
 
     @Override
     public final void start() {
@@ -46,7 +43,6 @@ public abstract class ApplicationVerticle extends AbstractVerticle
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION_KEY,
                      new EventBusDeliveryOption(this.appConfig.getDeliveryOptions()));
         this.addData(SharedDataLocalProxy.PUBLIC_IPV4_KEY, NetworkUtils.getPublicIpv4());
-        this.eventBus = EventBusClient.create(sharedData());
         this.onStart();
     }
 

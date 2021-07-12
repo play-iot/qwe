@@ -11,7 +11,6 @@ import io.zero88.qwe.event.output.AnyToFuture;
 import io.zero88.qwe.event.output.OutputToFutureServiceLoader;
 import io.zero88.qwe.event.refl.MethodMeta;
 import io.zero88.qwe.exceptions.ImplementationError;
-import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
 import io.zero88.qwe.exceptions.UnsupportedException;
@@ -65,10 +64,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
         } catch (IllegalArgumentException e) {
             future = Future.failedFuture(e);
         }
-        return future.otherwise(t -> {
-            debugError(action, address, t);
-            return EventMessage.replyError(action, QWEExceptionConverter.friendly(t));
-        });
+        return future.onFailure(t -> debugError(action, address, t)).otherwise(t -> EventMessage.replyError(action, t));
     }
 
     private Future<Object> executeMethod(MethodMeta methodMeta, Object[] inputs) {

@@ -3,6 +3,9 @@ package io.zero88.qwe;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
@@ -83,6 +86,20 @@ public interface TestHelper {
         ex.printStackTrace(System.out);
         Assertions.assertTrue(causeClass.isInstance(ex.getCause()));
         return ex.getCause();
+    }
+
+    static void waitTimeout(int timeout, CountDownLatch latch) {
+        waitTimeout(timeout, latch, null);
+    }
+
+    static void waitTimeout(int timeout, CountDownLatch latch, Handler<Throwable> ifFailed) {
+        try {
+            Assertions.assertTrue(latch.await(timeout, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            Optional.ofNullable(ifFailed)
+                    .orElseGet(() -> t -> Assertions.fail("Test timeout after " + timeout + "(s)", t))
+                    .handle(e);
+        }
     }
 
 }

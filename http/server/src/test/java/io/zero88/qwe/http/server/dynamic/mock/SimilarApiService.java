@@ -9,13 +9,14 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContract;
 import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 
 public class SimilarApiService extends MockEventOneApiOneLocService {
 
@@ -29,8 +30,9 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
 
     @Override
     public void onStart() {
-        getEventBus().register(EVENT_1.getAddress(), new MockSiteListener())
-                     .register(EVENT_2.getAddress(), new MockProductListener());
+        EventBusClient.create(sharedData())
+                      .register(EVENT_1.getAddress(), new MockSiteListener())
+                      .register(EVENT_2.getAddress(), new MockProductListener());
     }
 
     @Override

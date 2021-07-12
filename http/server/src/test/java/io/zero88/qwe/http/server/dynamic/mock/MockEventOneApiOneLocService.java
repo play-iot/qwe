@@ -8,11 +8,12 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.PluginContextLookup;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.DiscoveryPluginProvider;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 
 public class MockEventOneApiOneLocService extends ApplicationVerticle {
 
@@ -21,12 +22,13 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     @Override
     public void onStart() {
         addProvider(new DiscoveryPluginProvider());
-        getEventBus().register(MockEventServiceListener.TEST_EVENT_1.getAddress(),
-                               MockEventServiceListener.TEST_EVENT_LISTENER_1)
-                     .register(MockEventServiceListener.TEST_EVENT_2.getAddress(),
-                               MockEventServiceListener.TEST_EVENT_LISTENER_2)
-                     .register(MockEventServiceListener.TEST_EVENT_3.getAddress(),
-                               MockEventServiceListener.TEST_EVENT_LISTENER_3);
+        EventBusClient.create(sharedData())
+                      .register(MockEventServiceListener.TEST_EVENT_1.getAddress(),
+                                MockEventServiceListener.TEST_EVENT_LISTENER_1)
+                      .register(MockEventServiceListener.TEST_EVENT_2.getAddress(),
+                                MockEventServiceListener.TEST_EVENT_LISTENER_2)
+                      .register(MockEventServiceListener.TEST_EVENT_3.getAddress(),
+                                MockEventServiceListener.TEST_EVENT_LISTENER_3);
     }
 
     @Override

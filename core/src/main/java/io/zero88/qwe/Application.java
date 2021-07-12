@@ -35,6 +35,8 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
                        .orElse(getClass().getName());
     }
 
+    QWEAppConfig appConfig();
+
     @Override
     default Class<QWEAppConfig> configClass() {
         return QWEAppConfig.class;
