@@ -84,7 +84,10 @@ public final class NetworkUtils {
             Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress address = addresses.nextElement();
-                logger.debug("Found INetAddress[{}] on interface[{}]", address.toString(), networkInterface.getName());
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Found INetAddress[{}] on interface[{}]", address.toString(),
+                                 networkInterface.getName());
+                }
                 if (predicate.test(address)) {
                     usableINetAddresses.add(address);
                 }

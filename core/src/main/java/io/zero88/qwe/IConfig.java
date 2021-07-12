@@ -3,6 +3,7 @@ package io.zero88.qwe;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -43,7 +44,11 @@ public interface IConfig extends JsonData, Shareable {
     }
 
     static <T extends IConfig> T from(Object data, Class<T> clazz) {
-        return from(data, clazz, null, null);
+        return from(MAPPER, data, clazz);
+    }
+
+    static <T extends IConfig> T from(ObjectMapper mapper, Object data, Class<T> clazz) {
+        return from(mapper, data, clazz, null, null);
     }
 
     static <T extends IConfig> T from(Object data, Class<T> clazz, String errorMsg) {
@@ -55,6 +60,11 @@ public interface IConfig extends JsonData, Shareable {
     }
 
     static <T extends IConfig> T from(Object data, @NonNull Class<T> clazz, String errorMsg, HiddenException cause) {
+        return from(MAPPER, data, clazz, errorMsg, cause);
+    }
+
+    static <T extends IConfig> T from(ObjectMapper mapper, Object data, @NonNull Class<T> clazz, String errorMsg,
+                                      HiddenException cause) {
         try {
             JsonObject cfg;
             if (data instanceof String) {
@@ -66,7 +76,7 @@ public interface IConfig extends JsonData, Shareable {
             } else {
                 cfg = JsonObject.mapFrom(Objects.requireNonNull(data, "Config data is null"));
             }
-            return CreateConfig.create(clazz, cfg, MAPPER);
+            return CreateConfig.create(clazz, cfg, Optional.ofNullable(mapper).orElse(MAPPER));
         } catch (IllegalArgumentException | NullPointerException | DecodeException | HiddenException ex) {
             Throwable c = ex instanceof HiddenException ? ex.getCause() : ex;
             if (Objects.nonNull(cause)) {
@@ -76,28 +86,26 @@ public interface IConfig extends JsonData, Shareable {
         }
     }
 
-    static <T extends IConfig> T merge(@NonNull JsonObject from, @NonNull JsonObject to, @NonNull Class<T> clazz) {
-        return from(from.mergeIn(to, true), clazz);
+    static <T extends IConfig> T merge(@NonNull Object from, @NonNull Object to, @NonNull Class<T> clazz) {
+        return merge(MAPPER, from, to, clazz);
     }
 
     @SuppressWarnings("unchecked")
-    static <T extends IConfig> T merge(@NonNull Object from, @NonNull Object to, @NonNull Class<T> clazz) {
+    static <T extends IConfig> T merge(ObjectMapper mapper, @NonNull Object from, @NonNull Object to,
+                                       @NonNull Class<T> clazz) {
         if (from instanceof JsonObject && to instanceof JsonObject) {
-            return merge((JsonObject) from, (JsonObject) to, clazz);
+            return from(mapper, ((JsonObject) from).mergeIn((JsonObject) to, true), clazz);
         }
         if (clazz.isInstance(from) && clazz.isInstance(to)) {
             return ((T) from).merge((T) to);
         }
-        if (clazz.isInstance(from) && to instanceof JsonObject) {
-            return merge(((T) from).toJson(), to, clazz);
-        }
         if (clazz.isInstance(from)) {
-            return ((T) from).merge(from(to, clazz));
+            return ((T) from).merge(from(mapper, to, clazz));
         }
         if (clazz.isInstance(to)) {
-            return from(from, clazz).merge((T) to);
+            return from(mapper, from, clazz).merge((T) to);
         }
-        return from(from, clazz).merge(from(to, clazz));
+        return from(mapper, from, clazz).merge(from(mapper, to, clazz));
     }
 
     static <C extends IConfig> C parseConfig(JsonObject config, Class<C> clazz, Supplier<C> fallback) {
@@ -121,7 +129,7 @@ public interface IConfig extends JsonData, Shareable {
 
     @SuppressWarnings("unchecked")
     default <T extends IConfig> T merge(@NonNull T to) {
-        return (T) merge(toJson(), to.toJson(), getClass());
+        return (T) merge(getMapper(), toJson(), to.toJson(), getClass());
     }
 
     @Override
@@ -138,7 +146,7 @@ public interface IConfig extends JsonData, Shareable {
 
     @Override
     default IConfig copy() {
-        return IConfig.from(toJson().getMap(), this.getClass());
+        return IConfig.from(getMapper(), toJson().getMap(), this.getClass());
     }
 
     @RequiredArgsConstructor

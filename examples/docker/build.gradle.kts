@@ -7,7 +7,6 @@ plugins {
 
 dependencies {
     api(project(":examples:shared"))
-    api(VertxLibs.ignite)
 }
 
 oss {

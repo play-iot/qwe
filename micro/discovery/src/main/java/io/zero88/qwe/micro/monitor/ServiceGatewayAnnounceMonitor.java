@@ -5,7 +5,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
-import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -13,8 +12,8 @@ import lombok.NonNull;
 @Getter
 public class ServiceGatewayAnnounceMonitor extends AbstractServiceGatewayMonitor<Record> {
 
-    protected ServiceGatewayAnnounceMonitor(@NonNull SharedDataLocalProxy proxy, @NonNull ServiceDiscoveryApi invoker) {
-        super(proxy, invoker);
+    protected ServiceGatewayAnnounceMonitor(@NonNull SharedDataLocalProxy proxy, @NonNull ServiceDiscoveryApi api) {
+        super(proxy, api);
     }
 
     @SuppressWarnings("unchecked")
@@ -29,11 +28,11 @@ public class ServiceGatewayAnnounceMonitor extends AbstractServiceGatewayMonitor
     }
 
     @Override
-    String function() {
-        return "SERVICE ANNOUNCEMENT GATEWAY";
+    public String monitorName() {
+        return "service-announcement-gateway";
     }
 
     @Override
-    protected void process(Record record) { }
+    protected void process(Record monitorObject) { }
 
 }

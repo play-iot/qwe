@@ -22,14 +22,14 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
 
     @Override
     public String pluginName() {
-        return "micro-discovery";
+        return "service-discovery";
     }
 
     @Override
     public Class<MicroConfig> configClass() { return MicroConfig.class; }
 
     @Override
-    public String configFile() { return "micro.json"; }
+    public String configFile() { return "discovery.json"; }
 
     @Override
     public Future<Void> onAsyncStop() {
@@ -47,7 +47,6 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
         if (!isPostStep) {
             return discoveryContext;
         }
-        logger().info("Setup service discovery...");
         CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx,
                                                                      pluginConfig.lookup(CircuitBreakerConfig.NAME,
                                                                                          CircuitBreakerConfig.class));
