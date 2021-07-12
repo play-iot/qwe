@@ -38,7 +38,7 @@ final class WebSocketClientDelegateImpl extends ClientDelegate implements WebSoc
     }
 
     private EventMessage onSuccess(WebSocket webSocket, WebSocketClientEventMetadata metadata) {
-        logger.info("Websocket to {} is connected", getHostInfo().toJson());
+        logger().info("Websocket to {} is connected", getHostInfo().toJson());
         eventbus.register(metadata.getPublisher().getAddress(), new WebSocketClientWriter(webSocket));
         EventModel listener = metadata.getListener();
         webSocket.handler(WebSocketResponseDispatcher.create(eventbus, listener,

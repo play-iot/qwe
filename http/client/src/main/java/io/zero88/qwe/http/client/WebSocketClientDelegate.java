@@ -1,5 +1,8 @@
 package io.zero88.qwe.http.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -14,6 +17,11 @@ import lombok.NonNull;
  * Due cache mechanism, before closing {@code Vertx}, it is mandatory to call {@link HttpClientRegistry#clear()}
  */
 public interface WebSocketClientDelegate extends IClientDelegate {
+
+    @Override
+    default Logger logger() {
+        return LoggerFactory.getLogger(WebSocketClientDelegate.class);
+    }
 
     /**
      * Create new {@code Websocket client} with {@code idle timeout} is {@link HttpClientConfig#WS_IDLE_TIMEOUT_SECOND}

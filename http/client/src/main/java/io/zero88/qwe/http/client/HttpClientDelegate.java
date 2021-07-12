@@ -1,5 +1,8 @@
 package io.zero88.qwe.http.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
@@ -19,6 +22,11 @@ import lombok.NonNull;
  * Due cache mechanism, before closing {@code Vertx}, it is mandatory to call {@link HttpClientRegistry#clear()}
  */
 public interface HttpClientDelegate extends IClientDelegate {
+
+    @Override
+    default Logger logger() {
+        return LoggerFactory.getLogger(HttpClientDelegate.class);
+    }
 
     /**
      * Create new {@code HTTP client} by wrapping another {@code HTTP client}. It is used by {@code Service Discovery}
