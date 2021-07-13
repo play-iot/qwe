@@ -15,7 +15,7 @@ public interface EventMessageHttpService extends ServiceType {
     /**
      * Name of the type.
      */
-    String TYPE = "eventbus-message-http";
+    String TYPE = "eventbus-2-http";
     String SHARED_KEY_CONFIG = "sharedKey";
     String DELIVERY_OPTIONS_CONFIG = "options";
 

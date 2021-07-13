@@ -9,9 +9,9 @@ import io.vertx.core.json.JsonObject;
 import lombok.Getter;
 
 /**
- * Gateway headers builder
+ * An object contains gateway headers
  */
-public final class GatewayHeadersBuilder {
+public final class GatewayHeaders {
 
     /**
      * For tracking created/modified by user
@@ -64,44 +64,48 @@ public final class GatewayHeadersBuilder {
     @Getter
     private final JsonObject headers;
 
-    public GatewayHeadersBuilder(JsonObject headers) {
+    public GatewayHeaders(JsonObject headers) {
         this.headers = Optional.ofNullable(headers).orElseGet(JsonObject::new);
     }
 
-    public GatewayHeadersBuilder addCorrelationId() {
+    public GatewayHeaders addCorrelationId() {
         return put(X_CORRELATION_ID, genCorrelationId());
     }
 
-    public GatewayHeadersBuilder addRequestUser(String user) {
+    public GatewayHeaders addRequestUser(String user) {
         return put(X_REQUEST_USER, user);
     }
 
-    public GatewayHeadersBuilder addRequestBy(String service) {
+    public GatewayHeaders addRequestBy(String service) {
         return put(X_REQUEST_BY, service);
     }
 
-    public GatewayHeadersBuilder addRequestURI(String path) {
+    public GatewayHeaders addRequestURI(String path) {
         return put(X_REQUEST_URI, path);
     }
 
-    public GatewayHeadersBuilder addForwardedURI(String path) {
+    public GatewayHeaders addForwardedURI(String path) {
         return put(X_FORWARDED_URI, path);
     }
 
-    public GatewayHeadersBuilder addForwardedMethod(HttpMethod httpMethod) {
+    public GatewayHeaders addForwardedMethod(HttpMethod httpMethod) {
         return put(X_FORWARDED_METHOD, httpMethod.name());
     }
 
-    public GatewayHeadersBuilder addForwardedProto(String proto) {
+    public GatewayHeaders addForwardedProto(String proto) {
         return put(X_FORWARDED_PROTO, proto);
     }
 
-    public GatewayHeadersBuilder addForwardedHost(String host) {
+    public GatewayHeaders addForwardedHost(String host) {
         return put(X_FORWARDED_HOST, host);
     }
 
-    public GatewayHeadersBuilder addForwardedFor(String host) {
+    public GatewayHeaders addForwardedFor(String host) {
         return put(X_FORWARDED_FOR, host);
+    }
+
+    public String getCorrelationId() {
+        return headers.getString(X_CORRELATION_ID);
     }
 
     public HttpMethod getForwardedMethod() {
@@ -116,7 +120,7 @@ public final class GatewayHeadersBuilder {
         return UUID64.random();
     }
 
-    private GatewayHeadersBuilder put(String key, String value) {
+    private GatewayHeaders put(String key, String value) {
         headers.put(key, value);
         return this;
     }

@@ -1,11 +1,14 @@
 package io.zero88.qwe.http.server.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
@@ -13,18 +16,16 @@ import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.HttpException;
 import io.zero88.qwe.http.HttpStatusMapping;
 import io.zero88.qwe.http.HttpUtils;
+import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
 import io.zero88.qwe.http.server.converter.RequestDataConverter;
 import io.zero88.qwe.http.server.rest.api.DynamicRestApi;
-import io.zero88.qwe.micro.GatewayHeadersBuilder;
+import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
 import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.RecordPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * Represents for {@code HTTP request} dispatcher in {@code Gateway} that forward request from a {@code client} to a
@@ -36,11 +37,16 @@ import lombok.experimental.Accessors;
  *
  * @see DynamicRestApi
  */
-public interface DynamicContextDispatcher extends Handler<RoutingContext> {
+public interface DynamicContextDispatcher extends Handler<RoutingContext>, HasLogger, GatewaySystem {
 
     static DynamicContextDispatcher create(@NonNull DynamicRestApi api, ServiceDiscoveryApi dispatcher,
                                            String gatewayPath) {
         return new DynamicContextDispatcherImpl(api, gatewayPath, dispatcher);
+    }
+
+    @Override
+    default Logger logger() {
+        return LoggerFactory.getLogger(DynamicContextDispatcher.class);
     }
 
     /**
@@ -73,16 +79,19 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext> {
      */
     @Override
     default void handle(RoutingContext context) {
-        final RequestData reqData = normalizeHeader(context, createRequestData(context));
+        final RequestData reqData = createRequestData(context);
+        final GatewayHeaders headers = normalizeHeader(context, reqData);
+        logger().info(decor("Dispatch dynamic request [{}][{}::{}]"), headers.getCorrelationId(),
+                      headers.getForwardedMethod(), headers.getRequestURI());
         dispatcher().execute(createFilter(reqData), reqData)
                     .map(r -> handleSuccess(context, r))
                     .otherwise(t -> handleError(context, ErrorMessage.parse(t)));
     }
 
     /**
-     * Convert request data from request context
+     * Convert request data from routing context
      *
-     * @param context request context
+     * @param context routing context
      * @return request data
      */
     default RequestData createRequestData(RoutingContext context) {
@@ -98,17 +107,15 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext> {
      * @param reqData request data
      * @return request data
      */
-    default RequestData normalizeHeader(RoutingContext context, RequestData reqData) {
+    default GatewayHeaders normalizeHeader(RoutingContext context, RequestData reqData) {
         final String originPath = context.request().path();
         final String servicePath = Urls.normalize(originPath.replaceAll("^" + gatewayPath(), ""));
-        final JsonObject headers = reqData.headers();
-        return reqData.setHeaders(new GatewayHeadersBuilder(headers).addCorrelationId()
-                                                                    .addForwardedProto(context.request().scheme())
-                                                                    .addForwardedHost(context.request().host())
-                                                                    .addForwardedMethod(getMethod(context))
-                                                                    .addForwardedURI(originPath)
-                                                                    .addRequestURI(servicePath)
-                                                                    .getHeaders());
+        return new GatewayHeaders(reqData.headers()).addCorrelationId()
+                                                    .addForwardedProto(context.request().scheme())
+                                                    .addForwardedHost(context.request().host())
+                                                    .addForwardedMethod(getMethod(context))
+                                                    .addForwardedURI(originPath)
+                                                    .addRequestURI(servicePath);
     }
 
     /**
@@ -123,8 +130,7 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext> {
         return filter.put(ServiceFilterParam.TYPE, api().serviceType())
                      .put(ServiceFilterParam.NAME, api().name())
                      .put(ServiceFilterParam.BY, ByPredicateFactory.BY_PATH)
-                     .put(ServiceFilterParam.IDENTIFIER,
-                          reqData.headers().getString(GatewayHeadersBuilder.X_REQUEST_URI));
+                     .put(ServiceFilterParam.IDENTIFIER, reqData.headers().getString(GatewayHeaders.X_REQUEST_URI));
     }
 
     /**
@@ -159,19 +165,6 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext> {
             return method;
         }
         throw new HttpException("Not support HTTP Method " + method);
-    }
-
-    @Accessors(fluent = true)
-    @RequiredArgsConstructor
-    class DynamicContextDispatcherImpl implements DynamicContextDispatcher {
-
-        @Getter
-        private final DynamicRestApi api;
-        @Getter
-        private final String gatewayPath;
-        @Getter
-        private final ServiceDiscoveryApi dispatcher;
-
     }
 
 }

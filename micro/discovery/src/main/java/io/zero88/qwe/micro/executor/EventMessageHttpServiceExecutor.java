@@ -14,7 +14,7 @@ import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
-import io.zero88.qwe.micro.GatewayHeadersBuilder;
+import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
@@ -45,7 +45,7 @@ public final class EventMessageHttpServiceExecutor implements ServiceExecutor {
     }
 
     private EventAction findActionInHeader(ServiceReference serviceReference, RequestData reqData) {
-        GatewayHeadersBuilder headers = new GatewayHeadersBuilder(reqData.headers());
+        GatewayHeaders headers = new GatewayHeaders(reqData.headers());
         return EventMethodDefinition.from(serviceReference.record().getLocation())
                                     .search(headers.getRequestURI(), headers.getForwardedMethod());
     }

@@ -22,7 +22,7 @@ public class MicroConfigTest {
 
     @Test
     public void test_parse_from_classpath() {
-        MicroConfig from = IConfig.fromClasspath("micro.json", MicroConfig.class);
+        MicroConfig from = IConfig.fromClasspath("discovery.json", MicroConfig.class);
 
         ServiceDiscoveryConfig discoveryCfg = from.lookup(ServiceDiscoveryConfig.NAME, ServiceDiscoveryConfig.class);
         Assertions.assertNotNull(discoveryCfg);
@@ -41,15 +41,15 @@ public class MicroConfigTest {
 
     @Test
     public void test_parse_from_root() {
-        MicroConfig fromRoot = IConfig.from(IConfig.fromClasspath("micro.json", QWEConfig.class), MicroConfig.class);
-        MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
+        MicroConfig fromRoot = IConfig.from(IConfig.fromClasspath("discovery.json", QWEConfig.class), MicroConfig.class);
+        MicroConfig fromMicro = IConfig.fromClasspath("discovery.json", MicroConfig.class);
         JsonHelper.assertJson(fromRoot.toJson(), fromMicro.toJson());
     }
 
     @Test
     public void test_parse_from_appConfig() {
-        MicroConfig fromApp = IConfig.from(IConfig.fromClasspath("micro.json", QWEAppConfig.class), MicroConfig.class);
-        MicroConfig fromMicro = IConfig.fromClasspath("micro.json", MicroConfig.class);
+        MicroConfig fromApp = IConfig.from(IConfig.fromClasspath("discovery.json", QWEAppConfig.class), MicroConfig.class);
+        MicroConfig fromMicro = IConfig.fromClasspath("discovery.json", MicroConfig.class);
         JsonHelper.assertJson(fromMicro.toJson(), fromApp.toJson());
     }
 
@@ -69,7 +69,7 @@ public class MicroConfigTest {
 
     @Test
     public void test_merge() {
-        MicroConfig config = IConfig.fromClasspath("micro.json", MicroConfig.class)
+        MicroConfig config = IConfig.fromClasspath("discovery.json", MicroConfig.class)
                                     .merge(IConfig.from("{\"__serviceDiscovery__\":{\"announceAddress\":\"x\"," +
                                                         "\"backendConfiguration\":{\"backend-name\":\"a\"," +
                                                         "\"local\":false,\"more\":\"test\"},\"usageAddress\":\"y\"}}",
