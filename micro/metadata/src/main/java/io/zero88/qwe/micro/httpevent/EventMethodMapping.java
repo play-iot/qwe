@@ -2,20 +2,19 @@ package io.zero88.qwe.micro.httpevent;
 
 import java.util.Objects;
 
+import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.event.EventAction;
-import io.vertx.core.http.HttpMethod;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * Represents for a relationship between {@code EventAction}, {@code HttpMethod} and {@code url capture path}
@@ -24,10 +23,10 @@ import lombok.NonNull;
  * @see HttpMethod
  */
 @Getter
+@Jacksonized
 @Builder(builderClassName = "Builder")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonDeserialize(builder = EventMethodMapping.Builder.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 // FIXME Why dont include capturePath and regexPath in equals
 public final class EventMethodMapping implements JsonData {
 
@@ -48,7 +47,6 @@ public final class EventMethodMapping implements JsonData {
         return this.getMethod().name();
     }
 
-    @JsonPOJOBuilder(withPrefix = "")
     public static class Builder {
 
         private String servicePath;

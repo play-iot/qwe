@@ -35,7 +35,7 @@ public class HttpPathRule {
     }
 
     public String createRegexPathForSearch(String servicePath) {
-        return servicePath + (servicePath.endsWith("/") ? "(.+)?" : "(/.+)?");
+        return servicePath + (servicePath.endsWith("/") ? "([^/]+)?" : "(/[^/]+)?");
     }
 
 }

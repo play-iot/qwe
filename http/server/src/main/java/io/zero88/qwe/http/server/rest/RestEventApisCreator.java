@@ -57,7 +57,7 @@ public class RestEventApisCreator<T extends RouterConfig> extends ApisCreator<Re
             String path = Strings.isBlank(mapping.getCapturePath())
                           ? definition.getServicePath()
                           : mapping.getCapturePath();
-            logger().info(decor("Bind Path [{}::{}] to [{}::{}]"), Strings.padLeft(mapping.getMethod().name(), 6),
+            logger().info(decor("Bind Path [{}::{}] to [{}::{}]"), Strings.padLeft(mapping.method(), 6),
                           Urls.combinePath(config.getPath(), path), metadata.getAddress(), mapping.getAction());
             HttpServerPlugin.restrictJsonRoute(router.route(mapping.getMethod(), path))
                             .order(definition.getOrder())

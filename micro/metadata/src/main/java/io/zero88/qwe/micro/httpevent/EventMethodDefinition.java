@@ -18,14 +18,13 @@ import io.zero88.qwe.utils.PriorityUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldNameConstants;
+import lombok.extern.jackson.Jacksonized;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,11 +35,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Getter
-@Builder(builderClassName = "Builder")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonDeserialize(builder = EventMethodDefinition.Builder.class)
 @FieldNameConstants
+@Jacksonized
+@Builder(builderClassName = "Builder")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventMethodDefinition implements JsonData {
 
     @EqualsAndHashCode.Include
@@ -61,8 +60,7 @@ public final class EventMethodDefinition implements JsonData {
     @JsonIgnore
     private final HttpPathRule rule;
 
-    private EventMethodDefinition(String servicePath, boolean useRequestData,
-                                  @NonNull Set<EventMethodMapping> mapping) {
+    private EventMethodDefinition(String servicePath, boolean useRequestData, Set<EventMethodMapping> mapping) {
         this.rule = new HttpPathRule();
         this.servicePath = this.rule.createRegex(servicePath);
         if (this.servicePath.endsWith("/.+")) {
@@ -70,7 +68,7 @@ public final class EventMethodDefinition implements JsonData {
         }
         this.useRequestData = useRequestData;
         if (!useRequestData) {
-            log.warn("HTTP Path '{}' is not using `RequestData` that will omit data in `HTTP Request Query` and " +
+            log.warn("HTTP Path [{}] is not using `RequestData` that will omit data in `HTTP Request Query` and " +
                      "`HTTP Request Header`", this.servicePath);
         }
         this.order = PriorityUtils.priorityOrder(this.servicePath.length());
@@ -217,8 +215,9 @@ public final class EventMethodDefinition implements JsonData {
 
     public Collection<EventMethodMapping> getMapping() {
         return mapping.stream()
-                      .sorted((o1, o2) -> compare(o1.getMethod().name(), o2.getMethod().name()))
-                      .sorted((o1, o2) -> compare(o1.getCapturePath(), o2.getCapturePath()))
+                      .sorted((o1, o2) -> compare(o1.method(), o2.method()))
+                      .sorted((o1, o2) -> compare(Strings.fallback(o1.getCapturePath(), servicePath),
+                                                  Strings.fallback(o2.getCapturePath(), servicePath)))
                       .collect(Collectors.toList());
     }
 
@@ -261,7 +260,6 @@ public final class EventMethodDefinition implements JsonData {
         return Strings.isNotBlank(actualPath) && actualPath.matches(rule.createRegexPathForSearch(servicePath));
     }
 
-    @JsonPOJOBuilder(withPrefix = "")
     public static class Builder {
 
         Boolean useRequestData = true;

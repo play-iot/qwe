@@ -179,7 +179,7 @@ public class EventMethodDefinitionTest {
     @Test
     public void test_from_json() {
         EventMethodDefinition definition = JsonData.from(
-            "{\"servicePath\":\"/abc\", \"mapping\":[{\"action\":\"GET_LIST\"," +
+            "{\"servicePath\":\"/abc\",\"mapping\":[{\"action\":\"GET_LIST\"," +
             "\"method\":\"GET\"},{\"action\":\"CREATE\",\"method\":\"POST\"},{\"action\":\"UPDATE\"," +
             "\"method\":\"PUT\",\"capturePath\":\"/abc/:id\"},{\"action\":\"GET_ONE\",\"method\":\"GET\"," +
             "\"capturePath\":\"/abc/:id\"},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +

@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.event.EventAction;
-import io.vertx.core.http.HttpMethod;
 
 class EventMethodMappingTest {
 
@@ -20,14 +20,14 @@ class EventMethodMappingTest {
                                                              .capturePath("/abc")
                                                              .build();
         JSONAssert.assertEquals(
-            "{\"action\":\"CREATE\",\"capturePath\":\"/abc\",\"regexPath\":\"/abc\"," + "\"method\":\"CONNECT\"}",
+            "{\"action\":\"CREATE\",\"capturePath\":\"/abc\",\"regexPath\":\"/abc\",\"method\":\"CONNECT\"}",
             mapping.toJson().encode(), JSONCompareMode.STRICT);
     }
 
     @Test
     public void deserialize() throws JSONException {
         final EventMethodMapping from = JsonData.from(
-            "{\"action\":\"REMOVE\",\"capturePath\":\"/xyz\",\"regexPath\":\"/xyz\"," + ("\"method" + "\":\"DELETE\"}"),
+            "{\"action\":\"REMOVE\",\"capturePath\":\"/xyz\",\"regexPath\":\"/xyz\",\"method\":\"DELETE\"}",
             EventMethodMapping.class);
         final EventMethodMapping expected = EventMethodMapping.builder()
                                                               .method(HttpMethod.DELETE)
