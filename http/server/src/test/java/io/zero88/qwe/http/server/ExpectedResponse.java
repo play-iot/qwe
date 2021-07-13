@@ -10,14 +10,15 @@ import java.util.function.Consumer;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.JsonHelper.Junit4;
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.http.HttpUtils;
+import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.zero88.qwe.JsonHelper.Junit4;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.dto.msg.ResponseData;
+import io.zero88.qwe.http.HttpUtils;
 
 import lombok.Builder;
 import lombok.NonNull;
@@ -32,7 +33,7 @@ public class ExpectedResponse {
     private final List<Customization> customizations;
     @NonNull
     private final JSONCompareMode mode;
-    private Consumer<ResponseData> after;
+    private final Consumer<ResponseData> after;
 
     ExpectedResponse(JsonObject expected, int code, List<Customization> customizations, JSONCompareMode mode,
                      Consumer<ResponseData> after) {
@@ -48,13 +49,8 @@ public class ExpectedResponse {
     }
 
     public void _assert(@NonNull TestContext context, Async async, @NonNull ResponseData actual) {
-        System.out.println("Response asserting...");
-        System.out.println(actual.getStatus());
         try {
-            context.assertEquals(HttpUtils.JSON_UTF8_CONTENT_TYPE,
-                                 actual.headers().getString(HttpHeaders.CONTENT_TYPE.toString()));
-            context.assertNotNull(actual.headers().getString("x-response-time"));
-            context.assertEquals(code, actual.getStatus().code());
+            assertHeaders(context, actual);
             if (customizations.isEmpty()) {
                 Junit4.assertJson(context, async, expected, actual.body(), mode);
             } else {
@@ -63,6 +59,18 @@ public class ExpectedResponse {
             Optional.ofNullable(after).ifPresent(c -> c.accept(actual));
         } finally {
             TestHelper.testComplete(async);
+        }
+    }
+
+    private void assertHeaders(@NonNull TestContext context, ResponseData actual) {
+        try {
+            context.assertEquals(HttpUtils.JSON_UTF8_CONTENT_TYPE,
+                                 actual.headers().getString(HttpHeaders.CONTENT_TYPE.toString()));
+            context.assertNotNull(actual.headers().getString("x-response-time"));
+            context.assertEquals(code, actual.getStatus().code());
+        } catch (AssertionError err) {
+            TestHelper.LOGGER.error("[{}] {}", Strings.padLeft("BODY", 8), actual.body());
+            throw err;
         }
     }
 

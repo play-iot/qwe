@@ -20,7 +20,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class RestEventServerTest extends HttpServerPluginTestBase {
+public class RestEventApiTest extends HttpServerPluginTestBase {
 
     @Rule
     public Timeout timeout = Timeout.seconds(60);

@@ -19,7 +19,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.zero88.qwe.http.server.mock.MockRestAPI;
 
 @RunWith(VertxUnitRunner.class)
-public class RestServerTest extends HttpServerPluginTestBase {
+public class RestApiTest extends HttpServerPluginTestBase {
 
     @Rule
     public Timeout timeout = Timeout.seconds(TestHelper.TEST_TIMEOUT_SEC);

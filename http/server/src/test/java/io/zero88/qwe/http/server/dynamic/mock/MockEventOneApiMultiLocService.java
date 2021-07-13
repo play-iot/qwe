@@ -13,10 +13,11 @@ import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 
 public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService {
 
-    private final String address = MockEventServiceListener.TEST_EVENT_4.getAddress();
+    private final String address = MockEventServiceListener.TEST_EVENT_4_ADDR;
 
     @Override
     public void onStart() {
+        super.onStart();
         EventBusClient.create(sharedData()).register(address, MockEventServiceListener.TEST_EVENT_LISTENER_4);
     }
 

@@ -83,9 +83,10 @@ public interface DynamicRestApi extends HasServiceType {
     JsonObject byMetadata();
 
     /**
-     * Supported {@code HTTP methods} by service. {@code Default: all http methods}
+     * Supported {@code HTTP methods} by service. {@code Default: all default CORS HTTP Methods}
      *
      * @return set of {@code HTTP methods}
+     * @see HttpUtils#DEFAULT_CORS_HTTP_METHOD
      */
     default Set<HttpMethod> availableMethods() {
         return HttpUtils.DEFAULT_CORS_HTTP_METHOD;

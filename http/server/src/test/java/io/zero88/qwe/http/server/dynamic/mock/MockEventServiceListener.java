@@ -10,32 +10,23 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EBBody;
 import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EBParam;
-import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.exceptions.DataNotFoundException;
-import io.zero88.qwe.http.event.EventModel;
 
 import lombok.RequiredArgsConstructor;
 
 class MockEventServiceListener {
 
-    static EventModel TEST_EVENT_1 = EventModel.builder()
-                                               .address("test.MockEventMessageService.1")
-                                               .local(true)
-                                               .pattern(EventPattern.REQUEST_RESPONSE)
-                                               .addEvents(EventAction.GET_ONE, EventAction.GET_LIST)
-                                               .build();
-    static final SimpleEventListener TEST_EVENT_LISTENER_1 = new SimpleEventListener();
-    static EventModel TEST_EVENT_2 = EventModel.clone(TEST_EVENT_1, "test.MockEventMessageService.2");
-    static final MultiParamEventListener TEST_EVENT_LISTENER_2 = new MultiParamEventListener();
-    static EventModel TEST_EVENT_3 = EventModel.clone(TEST_EVENT_1, "test.MockEventMessageService.3");
-    static final MultiParamNotUseRequestDataEventListener TEST_EVENT_LISTENER_3
-        = new MultiParamNotUseRequestDataEventListener();
-    static EventModel TEST_EVENT_4 = EventModel.clone(TEST_EVENT_1, "test.MockEventMessageService.4");
-    static final MultiApiPathEventListener TEST_EVENT_LISTENER_4 = new MultiApiPathEventListener();
+    static String TEST_EVENT_1_ADDR = "test.MockEventMessageService.1";
+    static String TEST_EVENT_2_ADDR = "test.MockEventMessageService.2";
+    static String TEST_EVENT_3_ADDR = "test.MockEventMessageService.3";
+    static String TEST_EVENT_4_ADDR = "test.MockEventMessageService.4";
+    static final EventListener TEST_EVENT_LISTENER_1 = new SimpleEventListener();
+    static final EventListener TEST_EVENT_LISTENER_2 = new MultiParamEventListener();
+    static final EventListener TEST_EVENT_LISTENER_3 = new MultiParamNotUseRequestDataEventListener();
+    static final EventListener TEST_EVENT_LISTENER_4 = new MultiApiPathEventListener();
 
 
     @RequiredArgsConstructor
@@ -110,12 +101,12 @@ class MockEventServiceListener {
     static class MultiParamNotUseRequestDataEventListener implements EventListener {
 
         @EBContract(action = "GET_LIST")
-        public List<String> list(@EBParam("xId") String xId) {
+        public List<String> list(@EBBody("xId") String xId) {
             return Collections.singletonList(xId);
         }
 
         @EBContract(action = "GET_ONE")
-        public JsonObject get(@EBParam("xId") String xId, @EBParam("yId") String yId) {
+        public JsonObject get(@EBBody("xId") String xId, @EBBody("yId") String yId) {
             return new JsonObject().put("xId", xId).put("yId", yId);
         }
 

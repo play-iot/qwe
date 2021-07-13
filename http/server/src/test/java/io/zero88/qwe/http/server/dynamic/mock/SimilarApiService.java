@@ -1,18 +1,12 @@
 package io.zero88.qwe.http.server.dynamic.mock;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.event.EBBody;
 import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventListener;
-import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.http.event.EventModel;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
@@ -20,39 +14,33 @@ import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 
 public class SimilarApiService extends MockEventOneApiOneLocService {
 
-    static EventModel EVENT_1 = EventModel.builder()
-                                          .address("test.SimilarApiService.1")
-                                          .local(true)
-                                          .pattern(EventPattern.REQUEST_RESPONSE)
-                                          .addEvents(EventAction.GET_ONE, EventAction.GET_LIST)
-                                          .build();
-    static EventModel EVENT_2 = EventModel.clone(EVENT_1, "test.SimilarApiService.2");
+    static String EVENT_1_ADDR = "test.SimilarApiService.1";
+    static String EVENT_2_ADDR = "test.SimilarApiService.2";
 
     @Override
     public void onStart() {
+        super.onStart();
         EventBusClient.create(sharedData())
-                      .register(EVENT_1.getAddress(), new MockSiteListener())
-                      .register(EVENT_2.getAddress(), new MockProductListener());
+                      .register(EVENT_1_ADDR, new MockSiteListener())
+                      .register(EVENT_2_ADDR, new MockProductListener());
     }
 
     @Override
     protected void publishService(DiscoveryContext discoveryContext) {
         final ServiceDiscoveryApi discovery = discoveryContext.getDiscovery();
-        CompositeFuture.all(Stream.of(RecordHelper.create("ems-5", EVENT_1.getAddress(),
-                                                          EventMethodDefinition.createDefault("/client/:cId/site",
-                                                                                              "/:sId")),
-                                      RecordHelper.create("ems-5", EVENT_2.getAddress(),
-                                                          EventMethodDefinition.createDefault(
-                                                              "/client/:cId/site/:sId/product", "/:pId")))
-                                  .map(discovery::register)
-                                  .collect(Collectors.toList())).onComplete(AsyncResult::succeeded);
+        discovery.register(RecordHelper.create("ems-5", EVENT_1_ADDR,
+                                               EventMethodDefinition.createDefault("/client/:cId/site", "/:sId")),
+                           RecordHelper.create("ems-5", EVENT_2_ADDR,
+                                               EventMethodDefinition.createDefault("/client/:cId/site/:sId/product",
+                                                                                   "/:pId")))
+                 .onComplete(AsyncResult::succeeded);
     }
 
     static class MockSiteListener implements EventListener {
 
         @EBContract(action = "GET_LIST")
-        public JsonObject list(RequestData data) {
-            return new JsonObject().put("from", "GET_LIST From site");
+        public JsonObject list(@EBBody(value = "cId") String clientId) {
+            return new JsonObject().put("from", "GET_LIST From site [" + clientId + "]");
         }
 
         @EBContract(action = "GET_ONE")

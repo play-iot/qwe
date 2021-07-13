@@ -28,8 +28,8 @@ public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
     }
 
     @Override
-    protected <T extends ApplicationVerticle> T service() {
-        return (T) new MockHttpServiceServer();
+    protected MockHttpServiceServer service() {
+        return new MockHttpServiceServer();
     }
 
     @Test

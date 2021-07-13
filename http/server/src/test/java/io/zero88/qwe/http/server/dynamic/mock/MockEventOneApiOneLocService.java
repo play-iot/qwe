@@ -23,11 +23,11 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     public void onStart() {
         addProvider(new DiscoveryPluginProvider());
         EventBusClient.create(sharedData())
-                      .register(MockEventServiceListener.TEST_EVENT_1.getAddress(),
+                      .register(MockEventServiceListener.TEST_EVENT_1_ADDR,
                                 MockEventServiceListener.TEST_EVENT_LISTENER_1)
-                      .register(MockEventServiceListener.TEST_EVENT_2.getAddress(),
+                      .register(MockEventServiceListener.TEST_EVENT_2_ADDR,
                                 MockEventServiceListener.TEST_EVENT_LISTENER_2)
-                      .register(MockEventServiceListener.TEST_EVENT_3.getAddress(),
+                      .register(MockEventServiceListener.TEST_EVENT_3_ADDR,
                                 MockEventServiceListener.TEST_EVENT_LISTENER_3);
     }
 
@@ -38,11 +38,11 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
 
     protected void publishService(DiscoveryContext discoveryContext) {
         final ServiceDiscoveryApi discovery = discoveryContext.getDiscovery();
-        CompositeFuture.all(Stream.of(RecordHelper.create("ems-1", MockEventServiceListener.TEST_EVENT_1.getAddress(),
+        CompositeFuture.all(Stream.of(RecordHelper.create("ems-1", MockEventServiceListener.TEST_EVENT_1_ADDR,
                                                           EventMethodDefinition.createDefault("/hey", "/:id")),
-                                      RecordHelper.create("ems-2", MockEventServiceListener.TEST_EVENT_2.getAddress(),
+                                      RecordHelper.create("ems-2", MockEventServiceListener.TEST_EVENT_2_ADDR,
                                                           EventMethodDefinition.createDefault("/c/:cId/p", "/:pId")),
-                                      RecordHelper.create("ems-3", MockEventServiceListener.TEST_EVENT_3.getAddress(),
+                                      RecordHelper.create("ems-3", MockEventServiceListener.TEST_EVENT_3_ADDR,
                                                           EventMethodDefinition.createDefault("/x/:xId/y", "/:yId",
                                                                                               false)))
                                   .map(discovery::register)

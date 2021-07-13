@@ -8,9 +8,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -99,8 +96,6 @@ public final class HttpClientRegistry {
     @RequiredArgsConstructor
     static final class ClientStorage<T extends IClientDelegate> implements Supplier<T> {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(ClientStorage.class);
-
         @NonNull
         private final HostInfo hostInfo;
         @NonNull
@@ -114,16 +109,16 @@ public final class HttpClientRegistry {
 
         T tickAndGet() {
             final int i = counter.incrementAndGet();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Increase connection to {} to {}", hostInfo.toJson(), i);
+            if (client.logger().isDebugEnabled()) {
+                client.logger().debug("Increase connection to {} to {}", hostInfo.toJson(), i);
             }
             return client;
         }
 
         boolean shouldClose() {
             final int i = counter.decrementAndGet();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Decrease connection to {} to {}", hostInfo.toJson(), i);
+            if (client.logger().isDebugEnabled()) {
+                client.logger().debug("Decrease connection to {} to {}", hostInfo.toJson(), i);
             }
             return i == 0;
         }

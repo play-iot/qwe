@@ -26,7 +26,7 @@ import lombok.experimental.Accessors;
  * @see EventMessageResponseHandler
  */
 @RequiredArgsConstructor
-public class RestEventApiDispatcher implements RestEventRequestDispatcher, ApisSystem {
+public class RestEventApiDispatcher implements RestEventRequestDispatcher {
 
     @Getter
     @NonNull
@@ -60,7 +60,6 @@ public class RestEventApiDispatcher implements RestEventRequestDispatcher, ApisS
         EventMessage msg = useRequestData
                            ? EventMessage.initial(action, RequestDataConverter.convert(context))
                            : EventMessage.initial(action, RequestDataConverter.body(context));
-        logger().info(decor("Dispatch request to Event[{}]"), address);
         dispatch(context, address, pattern, msg);
     }
 
