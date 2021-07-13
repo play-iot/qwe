@@ -12,6 +12,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 
+import io.github.zero88.utils.Strings;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -156,8 +157,8 @@ public interface JsonHelper {
     }
 
     static Throwable logError(JsonObject expected, JsonObject actual, Throwable e) {
-        TestHelper.LOGGER.error("Actual: " + actual.encode());
-        TestHelper.LOGGER.error("Expected: " + expected.encode());
+        TestHelper.LOGGER.error("[{}] {}", Strings.padLeft("ACTUAL", 8), actual);
+        TestHelper.LOGGER.error("[{}] {}", Strings.padLeft("EXPECTED", 8), expected);
         return e;
     }
 

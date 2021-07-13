@@ -57,9 +57,9 @@ public interface PluginTestHelper {
 
     default <T extends Plugin> T preDeploy(T plugin) {
         return (T) plugin.deployHook()
-                         .onPostDeploy(plugin,
-                                       PluginContext.createPreContext("PluginTest", plugin.pluginName(), sharedKey(),
-                                                                      testDir()));
+                         .onPreDeploy(plugin,
+                                      PluginContext.createPreContext("PluginTest", plugin.pluginName(), sharedKey(),
+                                                                     testDir()));
     }
 
     default <T extends Plugin> T postDeploy(T plugin, String deploymentId) {

@@ -97,10 +97,10 @@ public final class NetworkUtils {
         if (usableINetAddresses.size() >= 1) {
             // TODO: switch case between Docker environment and Bare-metal server | device
             if (usableINetAddresses.size() != 1) {
-                logger.warn("There are more than one net address: {}", usableINetAddresses);
+                logger.warn("There are more than one NAT addresses: {}", usableINetAddresses);
             }
             final InetAddress inetAddress = usableINetAddresses.get(0);
-            logger.info("Picked IPv4 address[{}]", inetAddress.getHostAddress());
+            logger.info("Pick IPv4 address[{}]", inetAddress.getHostAddress());
             return inetAddress.getHostAddress();
         }
         logger.warn("Not found usable INet address, fallback to loopback");
