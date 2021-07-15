@@ -1,25 +1,8 @@
 package io.zero88.qwe.http.server;
 
-import lombok.NonNull;
+import io.zero88.qwe.LogSystem;
 
-public interface HttpSystem {
-
-    /**
-     * Defines HTTP function name
-     *
-     * @return function name
-     */
-    @NonNull String function();
-
-    /**
-     * Decor log with prefix system
-     *
-     * @param log log
-     * @return a decorator log
-     */
-    default @NonNull String decor(String log) {
-        return function() + "::" + log;
-    }
+public interface HttpSystem extends LogSystem {
 
     interface ApisSystem extends HttpSystem {
 
@@ -35,7 +18,7 @@ public interface HttpSystem {
 
         @Override
         default String function() {
-            return "WS";
+            return "WebSocket";
         }
 
     }
@@ -45,7 +28,7 @@ public interface HttpSystem {
 
         @Override
         default String function() {
-            return "WEB";
+            return "Web";
         }
 
     }

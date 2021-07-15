@@ -4,10 +4,11 @@ import io.github.zero88.exceptions.ErrorCode;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.exceptions.EngineException;
 import io.zero88.qwe.exceptions.QWEException;
 
-public class MockEventBusErrorListener extends MockEventBusListener {
+public class MockEventBusErrorListener implements EventListener {
 
     @EBContract(action = "GET_LIST")
     public JsonObject list(RequestData data) {

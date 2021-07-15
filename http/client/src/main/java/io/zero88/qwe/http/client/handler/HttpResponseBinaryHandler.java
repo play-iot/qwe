@@ -9,6 +9,7 @@ import io.vertx.core.http.HttpClientResponse;
  * <p>
  * It is suite for downloading data
  */
+//TODO Implement it
 public class HttpResponseBinaryHandler implements Handler<HttpClientResponse> {
 
     @Override

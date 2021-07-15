@@ -6,9 +6,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
 import io.zero88.qwe.http.server.rest.api.RestApi;
 import io.zero88.qwe.http.server.rest.api.RestEventApi;
+import io.zero88.qwe.http.server.ws.WebSocketServerPlan;
 
 import lombok.Getter;
 
@@ -18,7 +18,7 @@ public final class HttpServerRouter {
 
     private final Set<Class<? extends RestApi>> restApiClasses = new HashSet<>();
     private final Set<Class<? extends RestEventApi>> restEventApiClasses = new HashSet<>();
-    private final Set<WebSocketServerEventMetadata> webSocketEvents = new HashSet<>();
+    private final Set<WebSocketServerPlan> webSocketEvents = new HashSet<>();
     private Class<? extends RestEventApi> gatewayApiClass;
 
     @SafeVarargs
@@ -34,7 +34,7 @@ public final class HttpServerRouter {
         return this;
     }
 
-    public HttpServerRouter registerEventBusSocket(WebSocketServerEventMetadata... eventBusSocket) {
+    public HttpServerRouter registerEventBusSocket(WebSocketServerPlan... eventBusSocket) {
         webSocketEvents.addAll(Arrays.stream(eventBusSocket).filter(Objects::nonNull).collect(Collectors.toList()));
         return this;
     }

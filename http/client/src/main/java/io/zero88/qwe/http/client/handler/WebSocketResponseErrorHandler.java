@@ -9,7 +9,7 @@ import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Handler;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.http.event.EventModel;
+import io.zero88.qwe.event.EventDirection;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,22 +24,22 @@ public abstract class WebSocketResponseErrorHandler implements Handler<Throwable
     @NonNull
     private final EventBusClient eventbus;
     @NonNull
-    private final EventModel listener;
+    private final EventDirection listener;
 
     @SuppressWarnings("unchecked")
     public static <T extends WebSocketResponseErrorHandler> T create(@NonNull EventBusClient controller,
-                                                                     @NonNull EventModel listener,
+                                                                     @NonNull EventDirection listener,
                                                                      @NonNull Class<T> errorHandlerClass) {
         if (Objects.isNull(errorHandlerClass) || WebSocketResponseErrorHandler.class.equals(errorHandlerClass)) {
-            return (T) new IgnoreWebSocketResponseError(controller, listener) {};
+            return (T) new IgnoreWebSocketResponseError(controller, listener);
         }
         return ReflectionClass.createObject(errorHandlerClass, new Arguments().put(EventBusClient.class, controller)
-                                                                              .put(EventModel.class, listener));
+                                                                              .put(EventDirection.class, listener));
     }
 
     public static class IgnoreWebSocketResponseError extends WebSocketResponseErrorHandler {
 
-        IgnoreWebSocketResponseError(@NonNull EventBusClient controller, @NonNull EventModel listener) {
+        IgnoreWebSocketResponseError(@NonNull EventBusClient controller, @NonNull EventDirection listener) {
             super(controller, listener);
         }
 

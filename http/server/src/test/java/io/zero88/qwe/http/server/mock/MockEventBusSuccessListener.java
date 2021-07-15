@@ -7,8 +7,9 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContract;
+import io.zero88.qwe.event.EventListener;
 
-public class MockEventBusSuccessListener extends MockEventBusListener {
+public class MockEventBusSuccessListener implements EventListener {
 
     @EBContract(action = "GET_LIST")
     public List<String> list(RequestData data) {

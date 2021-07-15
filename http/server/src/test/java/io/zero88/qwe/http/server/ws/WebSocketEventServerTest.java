@@ -2,19 +2,20 @@ package io.zero88.qwe.http.server.ws;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.utils.Urls;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.UpgradeRejectedException;
-import io.vertx.core.http.WebSocket;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.unit.Async;
@@ -22,20 +23,20 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.zero88.qwe.JsonHelper.Junit4;
-import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.event.EventModel;
-import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.http.server.HttpServerRouter;
+import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;
+import io.zero88.qwe.http.server.HttpServerRouter;
+import io.zero88.qwe.http.server.WebSocketTestHelper;
 import io.zero88.qwe.http.server.mock.MockWebSocketEvent;
-import io.zero88.qwe.http.server.mock.MockWebSocketEvent.MockWebSocketEventServerListener;
+import io.zero88.qwe.http.server.mock.MockWebSocketEventListener;
 
 @RunWith(VertxUnitRunner.class)
-public class WebSocketEventServerTest extends HttpServerPluginTestBase {
+public class WebSocketEventServerTest extends HttpServerPluginTestBase implements WebSocketTestHelper {
 
     @Rule
     public Timeout timeout = Timeout.seconds(TestHelper.TEST_TIMEOUT_SEC);
@@ -43,23 +44,15 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase {
     @Before
     public void before(TestContext context) throws IOException {
         super.before(context);
-        this.enableWebsocket();
-        try {
-            //FIXME fix it
-            new MockWebSocketEventServerListener();
-        } catch (Exception e) {
-            context.fail(e);
-        }
-    }
-
-    @Test
-    public void test_not_register(TestContext context) {
-        startServer(context, new HttpServerRouter(), t -> context.assertTrue(t instanceof InitializerError));
+        this.httpConfig.getApiConfig().setEnabled(false);
+        this.httpConfig.getWebSocketConfig().setEnabled(true);
+        EventBusClient.create(createSharedData(vertx))
+                      .register(MockWebSocketEvent.PROCESSOR.getAddress(), new MockWebSocketEventListener());
     }
 
     @Test
     public void test_greeting(TestContext context) {
-        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ALL_EVENTS));
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.GREETING));
         Async async = context.async(2);
         assertGreeting(context, async, "/ws/");
         assertGreeting(context, async, "/ws");
@@ -68,91 +61,147 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase {
     @Test
     public void test_not_found(TestContext context) {
         Async async = context.async(3);
-        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ALL_EVENTS));
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.GREETING));
         assertNotFound(context, async, "/socket1");
         assertNotFound(context, async, "/ws//");
         assertNotFound(context, async, "/ws/xyz");
     }
 
     @Test
-    public void test_send_with_publisher(TestContext context) throws InterruptedException {
-        JsonObject expected = EventMessage.success(EventAction.GET_LIST,
-                                                   new JsonObject().put("data", Arrays.asList("1", "2", "3"))).toJson();
-        JsonObject responseExpected = EventMessage.success(EventAction.RETURN).toJson();
-        String pushAddress = MockWebSocketEvent.ALL_EVENTS.getListener().getAddress();
-        EventMessage message = EventMessage.success(EventAction.GET_LIST, new JsonObject().put("echo", 1));
-        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ALL_EVENTS));
-        Async async = context.async(2);
-        assertJsonData(async, MockWebSocketEvent.ALL_EVENTS.getPublisher().getAddress(),
-                       Junit4.asserter(context, async, expected));
-        WebSocket ws = setupSockJsClient(context, async, context::fail);
-        clientSend(pushAddress, message).accept(
-            ws.handler(buffer -> Junit4.assertJson(context, async, responseExpected, buffer)));
+    public void test_wsClient_send_invalid_json(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
+        final Async async = context.async(1);
+        final JsonObject expected = new JsonObject("{\"type\":\"err\",\"body\":\"invalid_json\"}");
+        final Buffer req = Buffer.buffer("xx");
+        setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND),
+                      ws -> wsWrite(ws, req).handler(b -> Junit4.assertJson(context, async, expected, b)));
     }
 
     @Test
-    public void test_send_with_no_publisher(TestContext context) throws InterruptedException {
-        JsonObject responseExpected = new JsonObject(
-            "{\"status\":\"SUCCESS\",\"action\":\"GET_ONE\",\"data\":{\"data\":\"1\"}}");
-        String pushAddress = MockWebSocketEvent.NO_PUBLISHER.getListener().getAddress();
-        EventMessage message = EventMessage.success(EventAction.GET_ONE, new JsonObject().put("echo", 1));
-        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_PUBLISHER));
-        Async async = context.async(1);
-        WebSocket ws = setupSockJsClient(context, async, context::fail);
-        clientSend(pushAddress, message).accept(
-            ws.handler(buffer -> Junit4.assertJson(context, async, responseExpected, buffer)));
-    }
-
-    @Test
-    public void test_client_listen_only_publisher(TestContext context) {
-        EventMessage echo = EventMessage.success(EventAction.GET_ONE, new JsonObject().put("echo", 1));
-        EventModel publisher = MockWebSocketEvent.ONLY_PUBLISHER.getPublisher();
-        EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, this.getClass().getName()));
-        vertx.setPeriodic(1000, t -> client.fire(publisher.getAddress(), publisher.getPattern(), echo));
-        Async async = context.async(1);
-        assertJsonData(async, publisher.getAddress(), Junit4.asserter(context, async, echo.toJson()));
-    }
-
-    @Test
-    public void test_web_listen_only_publisher(TestContext context) throws InterruptedException {
-        EventModel publisher = MockWebSocketEvent.ONLY_PUBLISHER.getPublisher();
-        EventMessage echo = EventMessage.success(EventAction.GET_ONE, new JsonObject().put("echo", 1));
-        JsonObject expected = createWebsocketMsg(publisher.getAddress(), echo, BridgeEventType.RECEIVE);
-        EventBusClient client = EventBusClient.create(SharedDataLocalProxy.create(vertx, this.getClass().getName()));
-        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ONLY_PUBLISHER));
-        vertx.setPeriodic(1000, t -> client.fire(publisher.getAddress(), publisher.getPattern(), echo));
-        Async async = context.async(1);
-        WebSocket ws = setupSockJsClient(context, async,
-                                         Urls.combinePath("/ws", MockWebSocketEvent.ONLY_PUBLISHER.getPath()),
-                                         clientRegister(publisher.getAddress()), context::fail);
-        ws.handler(buffer -> Junit4.assertJson(context, async, expected, buffer));
-    }
-
-    @Test
-    public void test_send_error_json_format(TestContext context) throws InterruptedException {
-        JsonObject expected = new JsonObject("{\"type\":\"err\",\"body\":\"invalid_json\"}");
-        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_PUBLISHER));
-        Async async = context.async(1);
-        WebSocket ws = setupSockJsClient(context, async, context::fail);
-        ws.handler(buffer -> Junit4.assertJson(context, async, expected, buffer));
-        ws.writeTextMessage("xx");
-    }
-
-    @Test
-    public void test_send_error_websocketMessage_format(TestContext context) throws InterruptedException {
-        EventMessage body = EventMessage.error(EventAction.RETURN, ErrorCode.INVALID_ARGUMENT,
-                                               "Invalid websocket event body format");
-        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_PUBLISHER));
-        String pushAddress = MockWebSocketEvent.ALL_EVENTS.getListener().getAddress();
-        JsonObject socketMsg = createWebsocketMsg(pushAddress, null, BridgeEventType.SEND);
+    public void test_wsClient_send_invalid_wsMessage(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
+        final Async async = context.async(1);
+        final JsonObject expected = EventMessage.error(EventAction.ACK, ErrorCode.INVALID_ARGUMENT,
+                                                       "Invalid WebSocket message").toJson();
+        JsonObject socketMsg = createWsMsg(MockWebSocketEvent.NO_OUTBOUND.inboundAddress(), null, BridgeEventType.SEND);
         JsonObject msg = socketMsg.put("body", new JsonObject("{\"type\":\"err\"}"));
-        Async async = context.async(1);
-        WebSocket ws = setupSockJsClient(context, async, context::fail);
-        clientWrite(msg).accept(ws.handler(buffer -> Junit4.assertJson(context, async, body.toJson(), buffer)));
+        setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND),
+                      ws -> wsWrite(ws, msg).handler(b -> Junit4.assertJson(context, async, expected, b)));
+    }
+
+    @Test
+    public void test_wsClient_send_to_unknown_address(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
+        final Async async = context.async(1);
+        final JsonObject expected = new JsonObject("{\"type\":\"err\",\"body\":\"access_denied\"}");
+        setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND),
+                      ws -> this.wsSend(ws, "123", EventMessage.initial(EventAction.GET_ONE))
+                                .handler(b -> Junit4.assertJson(context, async, expected, b)));
+    }
+
+    @Test
+    public void test_wsClient_request_then_server_response(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
+        final Async async = context.async(1);
+        final JsonObject response = EventMessage.replySuccess(EventAction.GET_ONE, new JsonObject().put("data", "1"))
+                                                .toJson();
+        setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND),
+                      ws -> this.wsSend(ws, MockWebSocketEvent.NO_OUTBOUND.inboundAddress(),
+                                        EventMessage.initial(EventAction.GET_ONE))
+                                .handler(b -> Junit4.assertJson(context, async, response, b)));
+    }
+
+    @Test
+    public void test_wsClient_send_then_server_publish(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.FULL_PLAN));
+        final Async async = context.async(2);
+        final JsonObject outbound = EventMessage.success(EventAction.REPLY, EventAction.GET_LIST,
+                                                         new JsonObject().put("data", Arrays.asList("1", "2", "3")))
+                                                .toJson();
+        final JsonObject ackExpected = EventMessage.success(EventAction.ACK).toJson();
+        final String path = wsPath(MockWebSocketEvent.FULL_PLAN);
+        setupWSClient(context, path, ws -> this.wsRegister(ws, MockWebSocketEvent.FULL_PLAN.outboundAddress())
+                                               .handler(b -> Junit4.assertJson(context, async, outbound, b)));
+        setupWSClient(context, path, ws -> this.wsSend(ws, MockWebSocketEvent.FULL_PLAN.inboundAddress(),
+                                                       EventMessage.initial(EventAction.GET_LIST))
+                                               .handler(b -> Junit4.assertJson(context, async, ackExpected, b)));
+    }
+
+    @Test
+    public void test_wsClient_send_p2p_then_server_ack(TestContext context) {
+    }
+
+    @Test
+    public void test_wsClient_request_then_server_error(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
+        final Async async = context.async(1);
+        final JsonObject expected = EventMessage.replyError(EventAction.DISCOVER,
+                                                            ErrorMessage.parse(ErrorCode.INVALID_ARGUMENT, "Error"))
+                                                .toJson();
+        final EventMessage req = EventMessage.initial(EventAction.DISCOVER);
+        setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND),
+                      ws -> this.wsSend(ws, MockWebSocketEvent.NO_OUTBOUND.inboundAddress(), req)
+                                .handler(b -> Junit4.assertJson(context, async, expected, b)));
+    }
+
+    @Test
+    public void test_wsClient_request_unsupported_server_event(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
+        final Async async = context.async(1);
+        final JsonObject expected = EventMessage.replyError(EventAction.REMOVE,
+                                                            ErrorMessage.parse(ErrorCode.SERVICE_NOT_FOUND,
+                                                                               "Service not found | Cause: " +
+                                                                               "Unsupported event [REMOVE] - Error " +
+                                                                               "Code: UNSUPPORTED")).toJson();
+        final EventMessage req = EventMessage.initial(EventAction.REMOVE);
+        setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND),
+                      ws -> this.wsSend(ws, MockWebSocketEvent.NO_OUTBOUND.inboundAddress(), req)
+                                .handler(b -> Junit4.assertJson(context, async, expected, b)));
+    }
+
+    @Test
+    public void test_wsClient_send_unsupported_server_event(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.FULL_PLAN));
+        final Async async = context.async(2);
+        final JsonObject ackExpected = EventMessage.replyError(EventAction.CREATE,
+                                                               ErrorMessage.parse(ErrorCode.SERVICE_NOT_FOUND,
+                                                                                  "Service not found | Cause: " +
+                                                                                  "Unsupported event [CREATE] - Error" +
+                                                                                  " Code: UNSUPPORTED")).toJson();
+        final String path = wsPath(MockWebSocketEvent.FULL_PLAN);
+        setupWSClient(context, path, ws -> this.wsRegister(ws, MockWebSocketEvent.FULL_PLAN.outboundAddress())
+                                               .handler(b -> context.fail("Must not have data")));
+        setupWSClient(context, path, ws -> this.wsSend(ws, MockWebSocketEvent.FULL_PLAN.inboundAddress(),
+                                                       EventMessage.initial(EventAction.CREATE))
+                                               .handler(b -> Junit4.assertJson(context, async, ackExpected, b)));
+        TestHelper.LOGGER.info("SLEEP 2s to ensure no publish if error");
+        TestHelper.sleep(2000);
+        TestHelper.testComplete(async);
+    }
+
+    @Test
+    public void test_wsServer_publish(TestContext context) {
+        startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.ONLY_OUTBOUND));
+        final Async async = context.async(4);
+        final AtomicInteger c = new AtomicInteger();
+        Supplier<JsonObject> expected = () -> EventMessage.initial(EventAction.parse("TICK"),
+                                                                   new JsonObject().put("c", c.get())).toJson();
+        Supplier<EventMessage> req = () -> EventMessage.initial(EventAction.parse("TICK"),
+                                                                new JsonObject().put("c", c.incrementAndGet()));
+        setupWSClient(context, wsPath(MockWebSocketEvent.ONLY_OUTBOUND),
+                      ws -> this.wsRegister(ws, MockWebSocketEvent.ONLY_OUTBOUND.outboundAddress())
+                                .handler(b -> Junit4.assertJson(context, async, expected.get(), b)));
+        setupWSClient(context, wsPath(MockWebSocketEvent.ONLY_OUTBOUND),
+                      ws -> this.wsRegister(ws, MockWebSocketEvent.ONLY_OUTBOUND.outboundAddress())
+                                .handler(b -> Junit4.assertJson(context, async, expected.get(), b)));
+        vertx().setPeriodic(1000, t -> EventBusClient.create(createSharedData(vertx()))
+                                                     .fire(MockWebSocketEvent.ONLY_OUTBOUND.outboundAddress(),
+                                                           MockWebSocketEvent.ONLY_OUTBOUND.outbound().getPattern(),
+                                                           req.get()));
     }
 
     private void assertGreeting(TestContext context, Async async, String uri) {
-        client.request(requestOptions.setURI(uri).setMethod(HttpMethod.GET), ar -> {
+        client().request(requestOptions().setURI(uri).setMethod(HttpMethod.GET), ar -> {
             if (!ar.succeeded()) {
                 context.fail(ar.cause());
                 return;
@@ -175,7 +224,7 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase {
     }
 
     private void assertNotFound(TestContext context, Async async, String uri) {
-        client.webSocket(wsOpt(requestOptions.setURI(uri)), ar -> {
+        client().webSocket(wsOpt(requestOptions().setURI(uri)), ar -> {
             if (ar.succeeded()) {
                 testComplete(async);
                 return;
@@ -189,6 +238,10 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase {
                 testComplete(async);
             }
         });
+    }
+
+    private String wsPath(WebSocketServerPlan fullPlan) {
+        return Urls.combinePath(httpConfig.getWebSocketConfig().getPath(), fullPlan.getPath());
     }
 
 }

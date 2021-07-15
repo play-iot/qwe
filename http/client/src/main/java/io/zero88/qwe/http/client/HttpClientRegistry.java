@@ -81,7 +81,7 @@ public final class HttpClientRegistry {
                                    .map(ClientStorage::get)
                                    .map(IClientDelegate::close)
                                    .collect(Collectors.toList()))
-                       .onSuccess(c -> log.debug("Closed {} HTTP client(s)", c))
+                       .onSuccess(c -> log.debug("Closed {} HTTP client(s)", c.size()))
                        .onComplete(ar -> {
                            if (ar.succeeded()) {
                                promise.complete();

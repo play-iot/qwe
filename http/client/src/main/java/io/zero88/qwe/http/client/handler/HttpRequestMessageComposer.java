@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 
 import io.github.zero88.repl.ReflectionClass;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpHeaders;
 import io.zero88.qwe.dto.msg.RequestData;
@@ -44,7 +45,7 @@ public interface HttpRequestMessageComposer extends BiFunction<HttpClientRequest
                    .remove(HttpHeaders.CONTENT_LENGTH);
         }
         if (Objects.nonNull(reqData.body()) && !reqData.body().isEmpty()) {
-            final io.vertx.core.buffer.Buffer buffer = reqData.body().toBuffer();
+            final Buffer buffer = reqData.body().toBuffer();
             request.putHeader(HttpHeaders.CONTENT_LENGTH, Integer.toString(buffer.length()));
             request.write(buffer);
         }

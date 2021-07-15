@@ -31,19 +31,19 @@ public class DynamicSimilarApiTest extends DynamicServiceTestBase {
             "\"path\":\"/client/:cId/site/:sId/product\"},{\"method\":\"PATCH\"," +
             "\"path\":\"/client/:cId/site/:sId/product/:pId\"}," +
             "{\"method\":\"PUT\",\"path\":\"/client/:cId/site/:sId/product/:pId\"}]}]}");
-        assertRestByClient(context, HttpMethod.GET, "/gw/index", 200, expected, JSONCompareMode.NON_EXTENSIBLE);
+        sendToApiThenAssert(context, HttpMethod.GET, "/gw/index", 200, expected, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
     public void test_get_list_from_site(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/client/123/site", 200,
-                           new JsonObject().put("from", "GET_LIST From site [123]"));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/client/123/site", 200,
+                            new JsonObject().put("from", "GET_LIST From site [123]"));
     }
 
     @Test
     public void test_get_list_from_product(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/client/123/site/abc/product", 200,
-                           new JsonObject().put("from", "GET_LIST From product"));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/client/123/site/abc/product", 200,
+                            new JsonObject().put("from", "GET_LIST From product"));
     }
 
 }

@@ -15,11 +15,12 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.HttpServerRouter;
+import io.zero88.qwe.http.server.RestApiTestHelper;
 import io.zero88.qwe.http.server.mock.MockRestAPI;
 
 @RunWith(VertxUnitRunner.class)
 //TODO FIX `javax.ws.rs`
-public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
+public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase implements RestApiTestHelper {
 
     private static final JsonObject SUCCESS_EXPECTED = new JsonObject("{\"abc\":\"xxx\"}");
     private static final String PATH = "/api/test";
@@ -37,7 +38,7 @@ public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
                                                .headers(new JsonObject().put(HttpHeaders.ACCEPT.toString(),
                                                                              HttpUtils.JSON_CONTENT_TYPE))
                                                .build();
-        assertRestByClient(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
+        sendToApiThenAssert(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
     }
 
     @Test
@@ -46,7 +47,7 @@ public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
                                                .headers(new JsonObject().put(HttpHeaders.ACCEPT.toString(),
                                                                              HttpUtils.JSON_UTF8_CONTENT_TYPE))
                                                .build();
-        assertRestByClient(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
+        sendToApiThenAssert(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
     }
 
     @Test
@@ -56,12 +57,12 @@ public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
                                                .headers(new JsonObject().put(HttpHeaders.ACCEPT.toString(),
                                                                              XML_CONTENT_TYPE))
                                                .build();
-        assertRestByClient(context, HttpMethod.GET, PATH, reqData, 404, expected);
+        sendToApiThenAssert(context, HttpMethod.GET, PATH, reqData, 404, expected);
     }
 
     @Test
     public void test_accept_none(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, PATH, 200, SUCCESS_EXPECTED);
+        sendToApiThenAssert(context, HttpMethod.GET, PATH, 200, SUCCESS_EXPECTED);
     }
 
     @Test
@@ -69,7 +70,7 @@ public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
         final RequestData reqData = RequestData.builder()
                                                .headers(new JsonObject().put(HttpUtils.NONE_CONTENT_TYPE, true))
                                                .build();
-        assertRestByClient(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
+        sendToApiThenAssert(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
     }
 
     @Test
@@ -78,7 +79,7 @@ public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
                                                .headers(new JsonObject().put(HttpHeaders.CONTENT_TYPE.toString(),
                                                                              HttpUtils.JSON_UTF8_CONTENT_TYPE))
                                                .build();
-        assertRestByClient(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
+        sendToApiThenAssert(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
     }
 
     @Test
@@ -87,7 +88,7 @@ public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase {
                                                .headers(new JsonObject().put(HttpHeaders.CONTENT_TYPE.toString(),
                                                                              XML_CONTENT_TYPE))
                                                .build();
-        assertRestByClient(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
+        sendToApiThenAssert(context, HttpMethod.GET, PATH, reqData, 200, SUCCESS_EXPECTED);
     }
 
 }

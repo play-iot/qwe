@@ -10,6 +10,7 @@ import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.HttpServerRouter;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;
+import io.zero88.qwe.http.server.RestApiTestHelper;
 import io.zero88.qwe.http.server.mock.MockEventBusErrorListener;
 import io.zero88.qwe.http.server.mock.MockEventBusSuccessListener;
 import io.zero88.qwe.http.server.mock.MockRestEventApi;
@@ -20,7 +21,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class RestEventApiTest extends HttpServerPluginTestBase {
+public class RestEventApiTest extends HttpServerPluginTestBase implements RestApiTestHelper {
 
     @Rule
     public Timeout timeout = Timeout.seconds(60);
@@ -30,7 +31,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/event";
         JsonObject expected = notFoundResponse(httpConfig.getPort(), path);
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.GET, path, 404, expected);
+        sendToApiThenAssert(context, HttpMethod.GET, path, 404, expected);
     }
 
     @Test
@@ -40,7 +41,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         JsonObject expected = new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
                                               .put("message", "UNKNOWN_ERROR | Cause: xxx");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.GET, path, 500, expected);
+        sendToApiThenAssert(context, HttpMethod.GET, path, 500, expected);
     }
 
     @Test
@@ -49,7 +50,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/events";
         JsonObject expected = new JsonObject().put("code", ErrorCode.ENGINE_ERROR.code()).put("message", "Engine error");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.POST, path, 500, expected);
+        sendToApiThenAssert(context, HttpMethod.POST, path, 500, expected);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/events/:event_id";
         JsonObject expected = new JsonObject().put("code", ErrorCode.INVALID_ARGUMENT.code()).put("message", "invalid");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.PUT, path, 400, expected);
+        sendToApiThenAssert(context, HttpMethod.PUT, path, 400, expected);
     }
 
     @Test
@@ -68,7 +69,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_ERROR.code())
                                               .put("message", "Service unavailable");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.GET, path, 503, expected);
+        sendToApiThenAssert(context, HttpMethod.GET, path, 503, expected);
     }
 
     @Test
@@ -77,7 +78,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/events";
         JsonObject expected = new JsonObject().put("data", Arrays.asList("1", "2", "3"));
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.GET, path, 200, expected);
+        sendToApiThenAssert(context, HttpMethod.GET, path, 200, expected);
     }
 
     @Test
@@ -86,7 +87,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/events/1";
         JsonObject expected = new JsonObject().put("data", 1);
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.GET, path, 200, expected);
+        sendToApiThenAssert(context, HttpMethod.GET, path, 200, expected);
     }
 
     @Test
@@ -95,7 +96,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/events";
         JsonObject expected = new JsonObject().put("create", "success");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.POST, path, 201, expected);
+        sendToApiThenAssert(context, HttpMethod.POST, path, 201, expected);
     }
 
     @Test
@@ -104,7 +105,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/events/1";
         JsonObject expected = new JsonObject().put("data", "success");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.PUT, path, 200, expected);
+        sendToApiThenAssert(context, HttpMethod.PUT, path, 200, expected);
     }
 
     @Test
@@ -113,7 +114,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase {
         String path = "/api/test/events/1";
         JsonObject expected = new JsonObject().put("patch", "success").put("event_id", 1);
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
-        assertRestByClient(context, HttpMethod.PATCH, path, 200, expected);
+        sendToApiThenAssert(context, HttpMethod.PATCH, path, 200, expected);
     }
 
 }

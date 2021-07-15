@@ -26,8 +26,8 @@ public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase 
 
     @Test
     public void test_event_not_found(TestContext context) {
-        assertRestByClient(context, HttpMethod.POST, "/api/s/hey", 503,
-                           new JsonObject().put("code", ErrorCode.SERVICE_NOT_FOUND.code())
+        sendToApiThenAssert(context, HttpMethod.POST, "/api/s/hey", 503,
+                            new JsonObject().put("code", ErrorCode.SERVICE_NOT_FOUND.code())
                                            .put("message",
                                                 "Service not found | Cause: Unsupported event [CREATE] - Error Code: " +
                                                 "UNSUPPORTED"));
@@ -35,43 +35,43 @@ public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase 
 
     @Test
     public void test_get_list_success(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/hey", 200,
-                           new JsonObject().put("data", Arrays.asList("1", "2", "3")));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/hey", 200,
+                            new JsonObject().put("data", Arrays.asList("1", "2", "3")));
     }
 
     @Test
     public void test_get_one_success(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/hey/123", 200, new JsonObject().put("data", 123));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/hey/123", 200, new JsonObject().put("data", 123));
     }
 
     @Test
     public void test_not_found(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/xxx", 404,
-                           new JsonObject("{\"message\":\"Resource not found\"}"), JsonHelper.ignore("message.uri"));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/xxx", 404,
+                            new JsonObject("{\"message\":\"Resource not found\"}"), JsonHelper.ignore("message.uri"));
     }
 
     @Test
     public void test_get_list_multiple_success(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/c/123/p", 200,
-                           new JsonObject().put("data", Collections.singletonList("123")));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/c/123/p", 200,
+                            new JsonObject().put("data", Collections.singletonList("123")));
     }
 
     @Test
     public void test_get_one_multiple_success(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/c/123/p/456", 200,
-                           new JsonObject("{\"cId\":\"123\",\"pId\":\"456\"}"));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/c/123/p/456", 200,
+                            new JsonObject("{\"cId\":\"123\",\"pId\":\"456\"}"));
     }
 
     @Test
     public void test_get_list_not_use_request_data(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/x/123/y", 200,
-                           new JsonObject().put("data", Collections.singletonList("123")));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/x/123/y", 200,
+                            new JsonObject().put("data", Collections.singletonList("123")));
     }
 
     @Test
     public void test_get_one_not_use_request_data(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/x/123/y/456", 200,
-                           new JsonObject("{\"xId\":\"123\",\"yId\":\"456\"}"));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/x/123/y/456", 200,
+                            new JsonObject("{\"xId\":\"123\",\"yId\":\"456\"}"));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase 
             "{\"method\":\"GET\",\"path\":\"/c/:cId/p/:pId\"},{\"method\":\"POST\",\"path\":\"/c/:cId/p\"}," +
             "{\"method\":\"DELETE\",\"path\":\"/c/:cId/p/:pId\"},{\"method\":\"PUT\",\"path\":\"/c/:cId/p/:pId\"}," +
             "{\"method\":\"GET\",\"path\":\"/c/:cId/p\"}]}]}");
-        assertRestByClient(context, HttpMethod.GET, "/gw/index", 200, expected, JSONCompareMode.LENIENT);
+        sendToApiThenAssert(context, HttpMethod.GET, "/gw/index", 200, expected, JSONCompareMode.LENIENT);
     }
 
 }

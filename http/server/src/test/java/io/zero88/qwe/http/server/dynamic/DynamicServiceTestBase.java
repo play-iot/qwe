@@ -14,9 +14,10 @@ import io.zero88.qwe.DeployContext;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.VertxHelper;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;
+import io.zero88.qwe.http.server.RestApiTestHelper;
 import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 
-public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase {
+public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase implements RestApiTestHelper {
 
     @Before
     public void before(TestContext context) throws IOException {

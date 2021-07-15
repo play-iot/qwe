@@ -6,17 +6,17 @@ import org.slf4j.LoggerFactory;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
-import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventBusProxy;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.HostInfo;
-import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
+import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
 
 import lombok.NonNull;
 
 /**
  * Due cache mechanism, before closing {@code Vertx}, it is mandatory to call {@link HttpClientRegistry#clear()}
  */
-public interface WebSocketClientDelegate extends IClientDelegate {
+public interface WebSocketClientDelegate extends IClientDelegate, EventBusProxy {
 
     @Override
     default Logger logger() {
@@ -82,7 +82,7 @@ public interface WebSocketClientDelegate extends IClientDelegate {
      * @param metadata Websocket metadata for {@code listener} and {@code publisher}
      * @return eventMessage for websocket status
      */
-    default Future<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata) {
+    default Future<EventMessage> open(@NonNull WebSocketClientPlan metadata) {
         return open(metadata, null);
     }
 
@@ -93,8 +93,6 @@ public interface WebSocketClientDelegate extends IClientDelegate {
      * @param headers  Websocket headers
      * @return eventMessage for websocket status
      */
-    Future<EventMessage> open(@NonNull WebSocketClientEventMetadata metadata, MultiMap headers);
-
-    EventBusClient getEventbus();
+    Future<EventMessage> open(@NonNull WebSocketClientPlan metadata, MultiMap headers);
 
 }

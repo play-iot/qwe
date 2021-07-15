@@ -12,16 +12,13 @@ import io.vertx.core.buffer.Buffer;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.event.EventModel;
-import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
+import io.zero88.qwe.event.EventDirection;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Handle light Websocket response then dispatch based on Event Listener
- *
- * @see WebSocketServerEventMetadata
  */
 @RequiredArgsConstructor
 public abstract class WebSocketResponseDispatcher implements Handler<Buffer> {
@@ -31,22 +28,22 @@ public abstract class WebSocketResponseDispatcher implements Handler<Buffer> {
     @NonNull
     private final EventBusClient eventbus;
     @NonNull
-    private final EventModel listener;
+    private final EventDirection listener;
 
     @SuppressWarnings("unchecked")
     public static <T extends WebSocketResponseDispatcher> T create(@NonNull EventBusClient client,
-                                                                   @NonNull EventModel listener,
+                                                                   @NonNull EventDirection listener,
                                                                    Class<T> bodyHandlerClass) {
         if (Objects.isNull(bodyHandlerClass) || WebSocketResponseDispatcher.class.equals(bodyHandlerClass)) {
             return (T) new WebSocketResponseDispatcher(client, listener) {};
         }
         return ReflectionClass.createObject(bodyHandlerClass, new Arguments().put(EventBusClient.class, client)
-                                                                             .put(EventModel.class, listener));
+                                                                             .put(EventDirection.class, listener));
     }
 
     @Override
     public void handle(Buffer data) {
-        logger.info("Websocket Client received message then dispatch data to '{}'", listener.getAddress());
+        logger.info("WebSocket Client received message then dispatch data to [{}]", listener.getAddress());
         eventbus.fire(listener.getAddress(), listener.getPattern(),
                       EventMessage.tryParse(JsonData.tryParse(data), true));
     }

@@ -6,7 +6,6 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.jpa.Sort;
-import io.zero88.qwe.event.EventMessage;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,11 +44,6 @@ public final class RequestData extends AbstractDTO<RequestData> {
     }
 
     public static Builder builder() { return new Builder(); }
-
-    //FIXME must be all properties
-    public static RequestData from(@NonNull EventMessage msg) {
-        return builder().body(msg.getData()).build();
-    }
 
     public static RequestData empty() {
         return builder().build();
