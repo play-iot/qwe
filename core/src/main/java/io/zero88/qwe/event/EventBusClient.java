@@ -139,11 +139,11 @@ public interface EventBusClient extends Transporter, HasSharedData {
         }
         if (pattern == EventPattern.POINT_2_POINT) {
             send(address, message);
-            return Future.succeededFuture();
+            return Future.succeededFuture(EventMessage.success(EventAction.ACK));
         }
         if (pattern == EventPattern.PUBLISH_SUBSCRIBE) {
             publish(address, message);
-            return Future.succeededFuture();
+            return Future.succeededFuture(EventMessage.success(EventAction.ACK));
         }
         throw new IllegalArgumentException("Unknown EventBus pattern [" + pattern + "]");
     }

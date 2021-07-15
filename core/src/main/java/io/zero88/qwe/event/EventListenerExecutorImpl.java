@@ -94,7 +94,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     }
 
     private void debug(String lifecycleMsg, EventAction action, String address, String suffix, Throwable t) {
-        listener.logger().debug("{} [{}][{}]{}", lifecycleMsg, address, action, suffix, t);
+        listener.logger().debug(listener.decor("{} [{}][{}]{}"), lifecycleMsg, address, action, suffix, t);
     }
 
 }

@@ -45,7 +45,7 @@ public interface EventBusHelper {
                                            Handler<Void> testCompleted) {
         MessageConsumer<Object> consumer = vertx.eventBus().consumer(address);
         consumer.handler(event -> {
-            TestHelper.LOGGER.info("Received message from address [{}]", address);
+            TestHelper.LOGGER.info("EventBusHelper::Received message from address [{}]", address);
             assertData.accept(event.body());
             consumer.unregister(v -> TestHelper.testComplete(async, "CONSUMER END", testCompleted));
         });

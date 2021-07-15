@@ -60,18 +60,11 @@ public final class JsonUtils {
     }
 
     public static JsonObject loadJsonInClasspath(String file) {
-        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
-                       .map(JsonUtils::readAsJson)
-                       .orElseGet(() -> {
-                           log.warn("Resource file '" + file + "' not found");
-                           return new JsonObject();
-                       });
+        return loadJsonInCp(file, true);
     }
 
     public static JsonObject silentLoadJsonInClasspath(String file) {
-        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
-                       .map(JsonUtils::readAsJson)
-                       .orElseGet(JsonObject::new);
+        return loadJsonInCp(file, false);
     }
 
     public static JsonObject readAsJson(@NonNull InputStream resourceAsStream) {
@@ -92,6 +85,17 @@ public final class JsonUtils {
 
     public static Optional<String> findString(JsonObject filter, String attribute) {
         return Optional.ofNullable(filter).flatMap(f -> Optional.ofNullable(f.getString(attribute)));
+    }
+
+    private static JsonObject loadJsonInCp(String file, boolean logIt) {
+        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
+                       .map(JsonUtils::readAsJson)
+                       .orElseGet(() -> {
+                           if (logIt) {
+                               log.warn("Resource file '" + file + "' not found");
+                           }
+                           return new JsonObject();
+                       });
     }
 
 }

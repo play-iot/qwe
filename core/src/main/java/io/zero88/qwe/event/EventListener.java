@@ -4,6 +4,7 @@ import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.event.EventLogSystem.EventListenerLogSystem;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -17,7 +18,7 @@ import lombok.NonNull;
  * @see EventAction
  * @see EventPattern#REQUEST_RESPONSE
  */
-public interface EventListener extends HasLogger {
+public interface EventListener extends HasLogger, EventListenerLogSystem {
 
     /**
      * Jackson Object mapper for serialize/deserialize data
@@ -37,9 +38,9 @@ public interface EventListener extends HasLogger {
         new EventListenerExecutorImpl(this, sharedData).execute(msg).onComplete(ar -> {
             if (ar.succeeded()) {
                 msg.reply(ar.result().toJson());
-                return;
+            } else {
+                msg.reply(EventMessage.replyError(EventAction.UNKNOWN, ar.cause()).toJson());
             }
-            msg.reply(EventMessage.replyError(EventAction.UNKNOWN, ar.cause()).toJson());
         });
     }
 

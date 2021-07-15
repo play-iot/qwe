@@ -9,26 +9,15 @@ import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.QWEConverter;
+import io.zero88.qwe.event.EventLogSystem.EventReplyLogSystem;
 
 import lombok.NonNull;
 
 @SuppressWarnings("rawtypes")
-public interface EventReplyHandler extends QWEConverter<EventMessage, Message>, HasLogger {
-
-    String DEFAULT_SYSTEM = "Backend Service";
+public interface EventReplyHandler extends QWEConverter<EventMessage, Message>, HasLogger, EventReplyLogSystem {
 
     static EventReplyHandler create() {
         return new EventReplyHandlerImpl();
-    }
-
-    /**
-     * Create {@link EventReplyHandler} instance
-     *
-     * @param backendFunction backend function name for logging
-     * @return new instance
-     */
-    static EventReplyHandler create(String backendFunction) {
-        return new EventReplyHandlerImpl(backendFunction);
     }
 
     static EventReplyHandler create(Class<EventReplyHandler> clazz) {
@@ -50,10 +39,6 @@ public interface EventReplyHandler extends QWEConverter<EventMessage, Message>, 
     @Override
     default Message from(EventMessage eventMessage) {
         return null;
-    }
-
-    default String replySystem() {
-        return DEFAULT_SYSTEM;
     }
 
     @Override

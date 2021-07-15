@@ -1,13 +1,10 @@
-package io.zero88.qwe.http.event;
+package io.zero88.qwe.event;
 
 import java.util.Optional;
 
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
-import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventPattern;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -57,28 +54,15 @@ public final class Waybill implements JsonData {
         return Optional.ofNullable(data).map(d -> JsonData.convert(d, Waybill.class)).orElse(null);
     }
 
-    public static Waybill from(@NonNull EventModel model, @NonNull EventAction action) {
-        if (!model.getEvents().contains(action)) {
-            throw new IllegalArgumentException("Action must match one of EventModel Actions");
-        }
+    public static Waybill from(@NonNull EventDirection model, @NonNull EventAction action) {
         return Waybill.builder().address(model.getAddress()).pattern(model.getPattern()).action(action).build();
     }
 
-    public static Waybill from(@NonNull EventModel model, @NonNull EventAction action, @NonNull RequestData payload) {
+    public static Waybill from(@NonNull EventDirection model, @NonNull EventAction action, @NonNull RequestData payload) {
         return from(model, action, payload.toJson());
     }
 
-    public static Waybill from(@NonNull EventModel model, JsonObject payload) {
-        return from(model, model.getEvents()
-                                .stream()
-                                .findFirst()
-                                .orElseThrow(() -> new IllegalArgumentException("Not found any action")), payload);
-    }
-
-    public static Waybill from(@NonNull EventModel model, @NonNull EventAction action, JsonObject payload) {
-        if (!model.getEvents().contains(action)) {
-            throw new IllegalArgumentException("Action must match one of EventModel Actions");
-        }
+    public static Waybill from(@NonNull EventDirection model, @NonNull EventAction action, JsonObject payload) {
         return from(model.getAddress(), model.getPattern(), action, payload);
     }
 
