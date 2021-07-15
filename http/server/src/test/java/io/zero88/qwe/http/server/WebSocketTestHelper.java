@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import io.github.zero88.utils.Urls;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketConnectOptions;
@@ -17,7 +18,6 @@ import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.unit.TestContext;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.server.ws.WebSocketEventMessage;
 
 import lombok.NonNull;
 
@@ -67,11 +67,13 @@ public interface WebSocketTestHelper extends HttpServerTestHelper {
     }
 
     default JsonObject createWsMsg(String address, EventMessage body, BridgeEventType type) {
-        return WebSocketEventMessage.builder().type(type).address(address).body(body).build().toJson();
+        return new JsonObject().put("type", type == BridgeEventType.RECEIVE ? "rec" : type.name().toLowerCase())
+                               .put("address", address)
+                               .put("body", body);
     }
 
     default WebSocketConnectOptions wsOpt(@NonNull RequestOptions opt) {
-        return new WebSocketConnectOptions(opt.setMethod(null).toJson());
+        return new WebSocketConnectOptions(opt.setMethod(HttpMethod.GET).toJson());
     }
 
 }

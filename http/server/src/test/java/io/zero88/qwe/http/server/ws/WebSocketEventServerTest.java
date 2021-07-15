@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.UpgradeRejectedException;
 import io.vertx.core.json.JsonObject;
@@ -103,12 +102,12 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
     public void test_wsClient_request_then_server_response(TestContext context) {
         startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
         final Async async = context.async(1);
-        final JsonObject response = EventMessage.replySuccess(EventAction.GET_ONE, new JsonObject().put("data", "1"))
+        final JsonObject expected = EventMessage.replySuccess(EventAction.GET_ONE, new JsonObject().put("data", "1"))
                                                 .toJson();
         setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND),
                       ws -> this.wsSend(ws, MockWebSocketEvent.NO_OUTBOUND.inboundAddress(),
                                         EventMessage.initial(EventAction.GET_ONE))
-                                .handler(b -> Junit4.assertJson(context, async, response, b)));
+                                .handler(b -> Junit4.assertJson(context, async, expected, b)));
     }
 
     @Test
@@ -125,10 +124,6 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
         setupWSClient(context, path, ws -> this.wsSend(ws, MockWebSocketEvent.FULL_PLAN.inboundAddress(),
                                                        EventMessage.initial(EventAction.GET_LIST))
                                                .handler(b -> Junit4.assertJson(context, async, ackExpected, b)));
-    }
-
-    @Test
-    public void test_wsClient_send_p2p_then_server_ack(TestContext context) {
     }
 
     @Test
@@ -201,26 +196,18 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
     }
 
     private void assertGreeting(TestContext context, Async async, String uri) {
-        client().request(requestOptions().setURI(uri).setMethod(HttpMethod.GET), ar -> {
-            if (!ar.succeeded()) {
-                context.fail(ar.cause());
-                return;
-            }
-            final HttpClientRequest request = ar.result();
-            request.send(ar2 -> {
-                if (!ar2.succeeded()) {
-                    context.fail(ar2.cause());
-                    return;
-                }
-                final HttpClientResponse resp = ar2.result();
-                context.assertEquals(200, resp.statusCode());
-                context.assertEquals("text/plain; charset=UTF-8", resp.getHeader("content-type"));
-                resp.bodyHandler(buff -> {
-                    context.assertEquals("Welcome to SockJS!\n", buff.toString());
-                    testComplete(async);
+        client().request(requestOptions().setURI(uri).setMethod(HttpMethod.GET))
+                .onFailure(context::fail)
+                .flatMap(HttpClientRequest::send)
+                .onFailure(context::fail)
+                .onSuccess(resp -> {
+                    context.assertEquals(200, resp.statusCode());
+                    context.assertEquals("text/plain; charset=UTF-8", resp.getHeader("content-type"));
+                    resp.bodyHandler(buff -> {
+                        context.assertEquals("Welcome to SockJS!\n", buff.toString());
+                        testComplete(async);
+                    });
                 });
-            });
-        });
     }
 
     private void assertNotFound(TestContext context, Async async, String uri) {

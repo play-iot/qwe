@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -14,6 +15,8 @@ import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.bridge.EventBridgeExecutor;
@@ -81,11 +84,9 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent>, WebSoc
             return;
         }
         try {
-            WebSocketEventMessage msg = WebSocketEventMessage.from(
-                raw.copy().put("headers", HttpHeaderUtils.serializeHeaders(socket.headers())));
-            log.info(decor("Forward the bridge message [{}=>{}][{}]"), address, plan.processAddress(),
-                     msg.getBody().getAction());
-            executor.execute(plan, msg.toEventMessage(), handleMessage(socket));
+            EventMessage msg = parseMessage(HttpHeaderUtils.serializeHeaders(socket.headers()), raw);
+            log.info(decor("Forward the bridge message [{}=>{}][{}]"), address, plan.processAddress(), msg.getAction());
+            executor.execute(plan, msg, handleMessage(socket));
         } catch (QWEException e) {
             handleMessage(socket).accept(EventMessage.error(EventAction.ACK, e));
         }
@@ -102,10 +103,11 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent>, WebSoc
             return;
         }
         try {
-            WebSocketEventMessage msg = WebSocketEventMessage.from(raw);
-            log.info(decor("Publish the bridge message on [{}][{}=>{}]"), address, msg.getBody().getAction(),
-                     msg.getBody().getPrevAction());
-            event.setRawMessage(msg.getBody().toJson());
+            EventMessage msg = JsonData.from(raw.getJsonObject("body"), EventMessage.class,
+                                             "Invalid WebSocket message");
+            log.info(decor("Publish the bridge message on [{}][{}=>{}]"), address, msg.getAction(),
+                     msg.getPrevAction());
+            event.setRawMessage(msg.toJson());
         } catch (QWEException e) {
             event.setRawMessage(EventMessage.error(EventAction.ACK, e).toJson());
         }
@@ -114,6 +116,15 @@ public class WebSocketBridgeEventHandler implements Handler<BridgeEvent>, WebSoc
     //TODO May override consumer for message
     protected Consumer<EventMessage> handleMessage(SockJSSocket socket) {
         return message -> socket.write(message.toJson().toBuffer());
+    }
+
+    private EventMessage parseMessage(JsonObject headers, JsonObject raw) {
+        final EventMessage body = JsonData.from(raw.getJsonObject("body"), EventMessage.class,
+                                                "Invalid WebSocket message");
+        return EventMessage.initial(body.getAction(), Functions.getOrDefault(() -> {
+            final RequestData req = JsonData.from(body.getData(), RequestData.class);
+            return req.setHeaders(headers.mergeIn(req.headers()));
+        }, () -> RequestData.builder().body(body.getData()).headers(headers).build()));
     }
 
 }
