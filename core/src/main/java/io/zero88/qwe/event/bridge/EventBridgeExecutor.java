@@ -1,7 +1,5 @@
 package io.zero88.qwe.event.bridge;
 
-import java.util.function.Consumer;
-
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.zero88.qwe.HasSharedData;
@@ -17,24 +15,18 @@ public interface EventBridgeExecutor extends EventBusProxy, HasSharedData {
         return EventBusClient.create(sharedData());
     }
 
-    default Future<EventMessage> execute(EventBridgePlan plan, EventMessage request,
-                                         Consumer<EventMessage> resultCallback) {
+    default Future<EventMessage> execute(EventBridgePlan plan, EventMessage request) {
         if (plan.processPattern() == EventPattern.REQUEST_RESPONSE) {
-            return transporter().request(plan.processAddress(), request)
-                                .flatMap(r -> callback(r, plan.outboundAddress(), resultCallback));
+            return transporter().request(plan.processAddress(), request).flatMap(r -> redirectResponse(r, plan));
         }
-        return transporter().fire(plan.processAddress(), plan.processPattern(), request)
-                            .onSuccess(resultCallback::accept);
+        return transporter().fire(plan.processAddress(), plan.processPattern(), request);
     }
 
-    default Future<EventMessage> callback(EventMessage result, String outboundAddr,
-                                          Consumer<EventMessage> resultCallback) {
-        if (result.isError() || Strings.isBlank(outboundAddr)) {
-            resultCallback.accept(result);
+    default Future<EventMessage> redirectResponse(EventMessage result, EventBridgePlan plan) {
+        if (result.isError() || Strings.isBlank(plan.outboundAddress())) {
             return Future.succeededFuture(result);
         }
-        return transporter().fire(outboundAddr, EventPattern.PUBLISH_SUBSCRIBE, result)
-                            .onSuccess(resultCallback::accept);
+        return transporter().fire(plan.outboundAddress(), EventPattern.PUBLISH_SUBSCRIBE, result);
     }
 
 }

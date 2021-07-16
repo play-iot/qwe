@@ -6,14 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
-import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.LoggerHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -45,6 +44,7 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
     public Router subRouter(@NonNull WebSocketConfig config, @NonNull SharedDataLocalProxy sharedData) {
         final SockJSHandler sockJSHandler = SockJSHandler.create(sharedData.getVertx(), config.getSockjsOptions());
         final Router router = Router.router(sharedData.getVertx());
+        //TODO add auth
         socketsByPath.forEach((path, mapping) -> router.mountSubRouter(path, sockJSHandler.bridge(
             createBridgeOptions(config.getBridgeOptions(), mapping,
                                 BasePaths.addWildcards(Urls.combinePath(config.getPath(), path))),
@@ -75,11 +75,13 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
     }
 
     private WebSocketBridgeEventHandler createHandler(@NonNull SharedDataLocalProxy sharedData,
-                                                      @NonNull List<WebSocketServerPlan> socketMapping,
-                                                      @NonNull Class<? extends WebSocketBridgeEventHandler> clazz) {
-        WebSocketBridgeEventHandler handler = ReflectionClass.createObject(clazz, new Arguments().put(
-            SharedDataLocalProxy.class, sharedData).put(List.class, socketMapping));
-        return Objects.isNull(handler) ? new WebSocketBridgeEventHandler(sharedData, socketMapping) : handler;
+                                                      @NonNull List<WebSocketServerPlan> socketPlans,
+                                                      Class<? extends WebSocketBridgeEventHandler> clazz) {
+        return Optional.ofNullable(clazz)
+                       .map(ReflectionClass::createObject)
+                       .map(WebSocketBridgeEventHandler.class::cast)
+                       .orElseGet(DefaultWebSocketBridgeEventHandler::new)
+                       .setup(sharedData, socketPlans);
     }
 
 }

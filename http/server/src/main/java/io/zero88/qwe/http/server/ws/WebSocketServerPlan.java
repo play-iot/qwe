@@ -19,7 +19,7 @@ import lombok.Getter;
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class WebSocketServerPlan extends AbstractEventBridgePlan<WebSocketServerPlan> implements EventBridgePlan {
+public final class WebSocketServerPlan extends AbstractEventBridgePlan<WebSocketServerPlan> implements EventBridgePlan {
 
     /**
      * WebSocket path. {@code Nullable} if using root {@code WebSocket} path

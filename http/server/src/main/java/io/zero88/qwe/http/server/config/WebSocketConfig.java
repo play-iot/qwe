@@ -1,6 +1,6 @@
 package io.zero88.qwe.http.server.config;
 
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
@@ -10,6 +10,7 @@ import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
 import io.zero88.qwe.http.server.RouterConfig;
+import io.zero88.qwe.http.server.ws.DefaultWebSocketBridgeEventHandler;
 import io.zero88.qwe.http.server.ws.WebSocketBridgeEventHandler;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +24,7 @@ import lombok.Setter;
 public final class WebSocketConfig extends AbstractRouterConfig implements IConfig, RouterConfig, WebSocketSystem {
 
     public static final String NAME = "__websocket__";
-    private String bridgeHandlerClass = WebSocketBridgeEventHandler.class.getName();
+    private String bridgeHandlerClass = DefaultWebSocketBridgeEventHandler.class.getName();
     @JsonProperty(value = SockJSConfig.NAME)
     private SockJSConfig sockjsOptions = new SockJSConfig();
     @JsonProperty(value = SocketBridgeConfig.NAME)
@@ -33,9 +34,8 @@ public final class WebSocketConfig extends AbstractRouterConfig implements IConf
         super(NAME, HttpServerConfig.class, false, BasePaths.ROOT_WS_PATH);
     }
 
-    public Class<? extends WebSocketBridgeEventHandler> bridgeHandlerClass() {
-        return Optional.ofNullable(ReflectionClass.<WebSocketBridgeEventHandler>findClass(bridgeHandlerClass))
-                       .orElse(WebSocketBridgeEventHandler.class);
+    public @Nullable Class<? extends WebSocketBridgeEventHandler> bridgeHandlerClass() {
+        return ReflectionClass.findClass(bridgeHandlerClass);
     }
 
     @Override
