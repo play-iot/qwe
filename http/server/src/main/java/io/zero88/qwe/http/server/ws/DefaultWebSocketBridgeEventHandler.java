@@ -47,14 +47,21 @@ public class DefaultWebSocketBridgeEventHandler implements WebSocketBridgeEventH
         return this;
     }
 
+    @Override
+    public Future<Void> opened(BridgeEvent event, SockJSSocket socket) {
+        return socket.write(EventMessage.success(EventAction.INIT,
+                                                 new JsonObject().put(SEND_ADDRESSES, c2sAddresses.keySet())
+                                                                 .put(LISTEN_ADDRESSES, s2cAddresses.keySet()))
+                                        .toJson()
+                                        .toBuffer());
+    }
+
     public Future<Void> clientToServer(BridgeEvent event, SockJSSocket socket) {
         final JsonObject raw = event.getRawMessage();
         final String address = raw.getString("address");
         final WebSocketServerPlan plan = c2sAddresses.get(address);
         if (Objects.isNull(plan)) {
             return Future.succeededFuture();
-            //            return handleMessage(socket).accept(
-            //                EventMessage.initial(EventAction.ACK, new JsonObject().put("msg", "oh!!no")));
         }
         try {
             EventMessage msg = parseMessage(HttpHeaderUtils.serializeHeaders(socket.headers()), raw);
@@ -71,9 +78,6 @@ public class DefaultWebSocketBridgeEventHandler implements WebSocketBridgeEventH
         final String address = raw.getString("address");
         final WebSocketServerPlan plan = s2cAddresses.get(address);
         if (Objects.isNull(plan)) {
-            //            event.setRawMessage(EventMessage.error(EventAction.ACK, ErrorCode.SERVICE_NOT_FOUND,
-            //                                                   "Not found bridge to address [" + address + "]")
-            //                                                  .toJson());
             return Future.succeededFuture();
         }
         try {
@@ -87,11 +91,6 @@ public class DefaultWebSocketBridgeEventHandler implements WebSocketBridgeEventH
             event.setRawMessage(EventMessage.error(EventAction.ACK, e).toJson());
             return Future.succeededFuture();
         }
-    }
-
-    @Override
-    public Future<Void> anotherEvent(BridgeEvent event, SockJSSocket socket) {
-        return WebSocketBridgeEventHandler.super.anotherEvent(event, socket);
     }
 
     private EventMessage parseMessage(JsonObject headers, JsonObject raw) {

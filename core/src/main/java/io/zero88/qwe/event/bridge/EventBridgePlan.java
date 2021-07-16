@@ -21,7 +21,7 @@ public interface EventBridgePlan {
      * @see EventDirection
      */
     default String inboundAddress() {
-        return inbound().getAddress();
+        return Optional.ofNullable(inbound()).map(EventDirection::getAddress).orElse(null);
     }
 
     EventDirection processor();
