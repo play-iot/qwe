@@ -26,11 +26,6 @@ public class RestApiTest extends HttpServerPluginTestBase implements RestApiTest
     public Timeout timeout = Timeout.seconds(TestHelper.TEST_TIMEOUT_SEC);
 
     @Test
-    public void test_not_yet_register(TestContext context) {
-        startServer(context, new HttpServerRouter(), t -> context.assertTrue(t instanceof InitializerError));
-    }
-
-    @Test
     public void test_none_api_not_found(TestContext context) {
         String path = "/abc/";
         JsonObject expected = notFoundResponse(httpConfig.getPort(), path);

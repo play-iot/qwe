@@ -1,9 +1,8 @@
-package io.zero88.qwe.http.server.helper;
+package io.zero88.qwe.http.server.handler;
 
-import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.http.server.handler.ResponseDataWriter;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.dto.msg.ResponseData;
 
 @Deprecated
 public class ResponseDataHelper {
