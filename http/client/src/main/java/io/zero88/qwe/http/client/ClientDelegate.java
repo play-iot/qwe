@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 abstract class ClientDelegate implements IClientDelegate {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Getter
     private final Vertx vertx;
     @NonNull

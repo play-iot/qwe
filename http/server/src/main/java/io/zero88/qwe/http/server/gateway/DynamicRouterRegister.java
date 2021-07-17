@@ -13,8 +13,8 @@ import io.vertx.ext.web.Router;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
 import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.http.server.HttpLogSystem.GatewayLogSystem;
-import io.zero88.qwe.http.server.HttpServerPlugin;
+import io.zero88.qwe.http.server.HttpServerPluginContext;
+import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.ServerInfo;
 import io.zero88.qwe.http.server.handler.DynamicContextDispatcher;
@@ -23,16 +23,16 @@ import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor;
 
 import lombok.NonNull;
 
-public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLogSystem {
+public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewaySystem {
 
-    default @NonNull Logger log() {
+    default @NonNull Logger logger() {
         return LoggerFactory.getLogger(RouterCreator.class);
     }
 
     default boolean registerRouter(Record record) {
         try {
             DynamicRestApi api = DynamicRestApi.create(record);
-            ServerInfo serverInfo = sharedData().getData(HttpServerPlugin.SERVER_INFO_DATA_KEY);
+            ServerInfo serverInfo = sharedData().getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY);
             Router router = serverInfo.getRouter();
             String gatewayPath = Urls.combinePath(serverInfo.getApiPath(), serverInfo.getServicePath());
             List<String> paths = api.alternativePaths()
@@ -44,19 +44,19 @@ public interface DynamicRouterRegister extends ServiceGatewayMonitor, GatewayLog
             if (record.getStatus() == Status.UP) {
                 DynamicContextDispatcher handler = DynamicContextDispatcher.create(api, getDiscovery(), gatewayPath);
                 paths.forEach(path -> {
-                    log().info(decor("Enable dynamic route | API: {} | Order: {} | Path: {}"), api.name(), api.order(),
-                               path);
+                    logger().info(decor("Enable dynamic route | API[{}] | Order[{}] | Path[{}]"), api.name(),
+                                  api.order(), path);
                     router.route(path).order(api.order()).handler(handler).enable();
                 });
             } else {
                 paths.forEach(path -> {
-                    log().info(decor("Disable dynamic route | API: {} | Path: {}"), api.name(), path);
+                    logger().info(decor("Disable dynamic route | API: {} | Path: {}"), api.name(), path);
                     router.route(path).disable();
                 });
             }
             return true;
         } catch (QWEException e) {
-            log().warn(decor("Cannot register Dynamic service"), e);
+            logger().warn(decor("Cannot register Dynamic service"), e);
             return false;
         }
     }

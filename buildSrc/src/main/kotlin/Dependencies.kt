@@ -8,7 +8,6 @@ object UtilLibs {
     }
 
     const val lombok = "org.projectlombok:lombok:${Version.lombok}"
-    const val classgraph = "io.github.classgraph:classgraph:${Version.classgraph}"
     const val jetbrainsAnnotations = "org.jetbrains:annotations:${Version.jetbrainsAnnotations}"
 }
 
@@ -21,7 +20,6 @@ object PluginLibs {
         const val plugin = "2.0.0"
     }
 
-//    const val playioPlugin = "io.github.zero88:gradle-plugin:${Version.plugin}"
     const val jvm = "jvm"
     const val nexusPublish = "io.github.gradle-nexus.publish-plugin"
     const val oss = "io.github.zero88.gradle.oss"
@@ -109,7 +107,7 @@ object LogLibs {
 object ZeroLibs {
     object Version {
 
-        const val utils = "1.0.2-SNAPSHOT"
+        const val utils = "2.0.0-SNAPSHOT"
         const val jpaExt = "0.9.0"
     }
 

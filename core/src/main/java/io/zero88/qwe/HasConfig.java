@@ -36,7 +36,7 @@ interface HasConfig<C extends IConfig> extends HasLogger {
      * @see IConfig
      */
     default C computeConfig(JsonObject config) {
-        logger().debug("Computing configuration [{}][{}]", configClass().getName(), configFile());
+        logger().debug("Computing configuration [{}][{}]...", configClass().getName(), configFile());
         C cfg = IConfig.merge(IConfig.from(JsonUtils.silentLoadJsonInClasspath(configFile()), configClass()), config,
                               configClass());
         if (logger().isDebugEnabled()) {

@@ -4,7 +4,6 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
-import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor.AbstractServiceGatewayMonitor;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,20 +11,19 @@ import lombok.NonNull;
 @Getter
 public class ServiceGatewayUsageMonitor extends AbstractServiceGatewayMonitor<UsageInfo> {
 
-    protected ServiceGatewayUsageMonitor(@NonNull SharedDataLocalProxy sharedData,
-                                         @NonNull ServiceDiscoveryApi controller) {
-        super(sharedData, controller);
+    protected ServiceGatewayUsageMonitor(@NonNull SharedDataLocalProxy sharedData, @NonNull ServiceDiscoveryApi api) {
+        super(sharedData, api);
     }
 
     @SuppressWarnings("unchecked")
     public static <T extends ServiceGatewayUsageMonitor> T create(SharedDataLocalProxy sharedData,
-                                                                  ServiceDiscoveryApi controller, String className) {
-        return (T) ServiceGatewayMonitor.create(sharedData, controller, className, ServiceGatewayUsageMonitor.class);
+                                                                  ServiceDiscoveryApi api, String className) {
+        return (T) ServiceGatewayMonitor.create(sharedData, api, className, ServiceGatewayUsageMonitor.class);
     }
 
     @Override
-    String function() {
-        return "SERVICE USAGE GATEWAY";
+    public String monitorName() {
+        return "service-usage-gateway";
     }
 
     @Override
@@ -34,7 +32,7 @@ public class ServiceGatewayUsageMonitor extends AbstractServiceGatewayMonitor<Us
     }
 
     @Override
-    protected void process(UsageInfo record) {
+    protected void process(UsageInfo monitorObject) {
 
     }
 

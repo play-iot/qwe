@@ -25,12 +25,12 @@ public interface PluginTestHelper {
 
     default <T extends Plugin> T deploy(Vertx vertx, VertxTestContext context, JsonObject config,
                                         PluginProvider<T> provider) {
-        final T verticle = initPlugin(vertx, provider);
+        final T plugin = provider.provide(createSharedData(vertx));
         return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
-                                                               .verticle(verticle)
+                                                               .verticle(preDeploy(plugin))
                                                                .options(new DeploymentOptions().setConfig(config))
                                                                .successAsserter(id -> {
-                                                                   setup(verticle, id);
+                                                                   postDeploy(plugin, id);
                                                                    context.completeNow();
                                                                })
                                                                .build());
@@ -38,18 +38,12 @@ public interface PluginTestHelper {
 
     default <T extends Plugin> T deploy(Vertx vertx, TestContext context, JsonObject config,
                                         PluginProvider<T> provider) {
-        final T verticle = initPlugin(vertx, provider);
+        final T plugin = provider.provide(createSharedData(vertx));
         return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
-                                                               .verticle(verticle)
+                                                               .verticle(preDeploy(plugin))
                                                                .options(new DeploymentOptions().setConfig(config))
-                                                               .successAsserter(id -> setup(verticle, id))
+                                                               .successAsserter(id -> postDeploy(plugin, id))
                                                                .build());
-    }
-
-    default <T extends Plugin> T initPlugin(Vertx vertx, PluginProvider<T> provider) {
-        final SharedDataLocalProxy proxy = createSharedData(vertx);
-        proxy.addData(SharedDataLocalProxy.APP_DATADIR_KEY, testDir().toString());
-        return provider.provide(proxy);
     }
 
     default <T extends Plugin> void deployFailed(Vertx vertx, TestContext context, JsonObject config,
@@ -61,10 +55,16 @@ public interface PluginTestHelper {
                                                         .build());
     }
 
-    default <T extends Plugin> void setup(T comp, String result) {
-        comp.setup(comp.hook()
-                       .onDeploySuccess(
-                           PluginContext.create("PluginTest", comp.pluginName(), testDir(), sharedKey(), result)));
+    default <T extends Plugin> T preDeploy(T plugin) {
+        return (T) plugin.deployHook()
+                         .onPreDeploy(plugin,
+                                      PluginContext.createPreContext("PluginTest", plugin.pluginName(), sharedKey(),
+                                                                     testDir()));
+    }
+
+    default <T extends Plugin> T postDeploy(T plugin, String deploymentId) {
+        return (T) plugin.deployHook()
+                         .onPostDeploy(plugin, PluginContext.createPostContext(plugin.pluginContext(), deploymentId));
     }
 
 }

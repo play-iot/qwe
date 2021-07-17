@@ -15,8 +15,8 @@ public class MockProvider implements PluginProvider<MockPlugin> {
     public Class<MockPlugin> pluginClass() { return MockPlugin.class; }
 
     @Override
-    public MockPlugin provide(SharedDataLocalProxy proxy) {
-        return new MockPlugin(proxy, error);
+    public MockPlugin provide(SharedDataLocalProxy sharedData) {
+        return new MockPlugin(sharedData, error);
     }
 
     static final class MockPlugin extends PluginVerticle<MockConfig, PluginContext> {
@@ -51,7 +51,7 @@ public class MockProvider implements PluginProvider<MockPlugin> {
         @Override
         public void onStart() {
             if (error) {
-                throw new RuntimeException("Error when starting plugin[" + pluginName() + "]");
+                throw new RuntimeException("Error when starting Plugin[" + pluginName() + "]");
             }
         }
 

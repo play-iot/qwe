@@ -11,8 +11,8 @@ public final class HttpServerPluginProvider implements PluginProvider<HttpServer
     private final HttpServerRouter httpRouter;
 
     @Override
-    public HttpServerPlugin provide(SharedDataLocalProxy proxy) {
-        return new HttpServerPlugin(proxy, httpRouter);
+    public HttpServerPlugin provide(SharedDataLocalProxy sharedData) {
+        return new HttpServerPlugin(sharedData, httpRouter);
     }
 
     @Override

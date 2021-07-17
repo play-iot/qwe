@@ -10,8 +10,8 @@ final class DummyProvider implements PluginProvider<DummyPlugin> {
     public Class<DummyPlugin> pluginClass() { return DummyPlugin.class; }
 
     @Override
-    public DummyPlugin provide(SharedDataLocalProxy proxy) {
-        return new DummyPlugin(proxy);
+    public DummyPlugin provide(SharedDataLocalProxy sharedData) {
+        return new DummyPlugin(sharedData);
     }
 
     static final class DummyPlugin extends PluginVerticle<MockConfig, PluginContext> {

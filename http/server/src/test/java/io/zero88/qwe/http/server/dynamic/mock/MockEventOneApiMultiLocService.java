@@ -5,18 +5,20 @@ import java.util.stream.Stream;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
-import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 
 public class MockEventOneApiMultiLocService extends MockEventOneApiOneLocService {
 
-    private final String address = MockEventServiceListener.TEST_EVENT_4.getAddress();
+    private final String address = MockEventServiceListener.TEST_EVENT_4_ADDR;
 
     @Override
     public void onStart() {
-        getEventBus().register(address, MockEventServiceListener.TEST_EVENT_LISTENER_4);
+        super.onStart();
+        EventBusClient.create(sharedData()).register(address, MockEventServiceListener.TEST_EVENT_LISTENER_4);
     }
 
     @Override

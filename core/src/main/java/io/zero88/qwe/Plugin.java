@@ -17,7 +17,7 @@ public interface Plugin<C extends PluginConfig, T extends PluginContext> extends
      * Expresses a functional that this plugin bring to. For example: {@code http-server}, {@code sql-mysql}
      *
      * @return the plugin function name
-     * @apiNote To better identify, {@code plugin Function Name} convention is {@code kebab-case}
+     * @apiNote To better identify, {@code plugin name} convention is {@code kebab-case}
      */
     @Override
     default String pluginName() {
@@ -39,23 +39,26 @@ public interface Plugin<C extends PluginConfig, T extends PluginContext> extends
     @NonNull T pluginContext();
 
     /**
-     * Deployment hook when application install plugin
+     * Declares a deployment hook that helps {@code Application} inject a general context information into {@code
+     * Plugin}
      *
-     * @return hook
+     * @return a deployment hook
      * @see PluginDeployHook
      * @see Application#installPlugins()
      */
-    @NonNull PluginDeployHook<T> hook();
+    @NonNull PluginDeployHook deployHook();
 
     /**
-     * Register a plugin context after installed plugin successfully
+     * Register a pre-plugin-context before installing {@code Plugin} and a post-plugin-context after installed {@code
+     * Plugin}
      * <p>
-     * This method will be called automatically by system before deploying verticle.
+     * This method will be called 2 times automatically in application deployment workflow that thanks to {@link
+     * #deployHook()}
      *
      * @param context shared data key
      * @return a reference to this, so the API can be used fluently
      * @see Application
      */
-    T setup(T context);
+    Plugin<C, T> setup(T context);
 
 }

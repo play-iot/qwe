@@ -1,8 +1,8 @@
 package io.zero88.qwe.event;
 
 import io.github.zero88.exceptions.ReflectionException;
+import io.github.zero88.repl.ReflectionMethod;
 import io.github.zero88.utils.Functions;
-import io.github.zero88.utils.Reflections.ReflectionMethod;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -11,7 +11,6 @@ import io.zero88.qwe.event.output.AnyToFuture;
 import io.zero88.qwe.event.output.OutputToFutureServiceLoader;
 import io.zero88.qwe.event.refl.MethodMeta;
 import io.zero88.qwe.exceptions.ImplementationError;
-import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
 import io.zero88.qwe.exceptions.UnsupportedException;
@@ -65,10 +64,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
         } catch (IllegalArgumentException e) {
             future = Future.failedFuture(e);
         }
-        return future.otherwise(t -> {
-            debugError(action, address, t);
-            return EventMessage.replyError(action, QWEExceptionConverter.friendly(t));
-        });
+        return future.onFailure(t -> debugError(action, address, t)).otherwise(t -> EventMessage.replyError(action, t));
     }
 
     private Future<Object> executeMethod(MethodMeta methodMeta, Object[] inputs) {
@@ -98,7 +94,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     }
 
     private void debug(String lifecycleMsg, EventAction action, String address, String suffix, Throwable t) {
-        listener.logger().debug("{} [{}][{}]{}", lifecycleMsg, address, action, suffix, t);
+        listener.logger().debug(listener.decor("{} [{}][{}]{}"), lifecycleMsg, address, action, suffix, t);
     }
 
 }

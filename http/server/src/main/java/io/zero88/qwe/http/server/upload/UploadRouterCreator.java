@@ -1,41 +1,44 @@
 package io.zero88.qwe.http.server.upload;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import io.github.zero88.utils.FileUtils;
 import io.github.zero88.utils.Strings;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.http.server.HttpConfig.FileStorageConfig.UploadConfig;
-import io.zero88.qwe.http.server.HttpLogSystem.UploadLogSystem;
-import io.zero88.qwe.http.server.RouterConfig;
+import io.zero88.qwe.http.server.HttpServerConfig;
+import io.zero88.qwe.http.server.HttpServerPluginContext;
+import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
 import io.zero88.qwe.http.server.RouterCreator;
+import io.zero88.qwe.http.server.ServerInfo;
+import io.zero88.qwe.http.server.config.FileUploadConfig;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class UploadRouterCreator implements RouterCreator<UploadConfig>, UploadLogSystem {
+public final class UploadRouterCreator implements RouterCreator<FileUploadConfig>, UploadSystem {
 
-    private final Path storageDir;
-    private final String publicUrl;
+    private final Path pluginDir;
 
     @Override
-    public Router router(@NonNull UploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
-        log().info(decor("Registering route: '{}' in storage '{}'..."), config.getPath(), storageDir);
+    public Router subRouter(@NonNull FileUploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
+        final String uploadDir = FileUtils.createFolder(pluginDir, config.getUploadDir());
         final EventBusClient eventbus = EventBusClient.create(sharedData);
-        final String address = Strings.fallback(config.getListenerAddress(), sharedData.getSharedKey() + ".upload");
+        final ServerInfo serverInfo = sharedData.getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY);
         final UploadListener listener = UploadListener.create(sharedData, config.getListenerClass());
+        final String address = Strings.fallback(config.getListenerAddress(), listener.getClass().getName());
         final UploadFileHandler handler = UploadFileHandler.create(config.getHandlerClass(), eventbus, address,
-                                                                   storageDir, publicUrl);
+                                                                   Paths.get(uploadDir), serverInfo.getPublicHost());
         eventbus.register(address, listener);
         final Router router = Router.router(sharedData.getVertx());
         router.post(config.getPath())
-              .handler(
-                  BodyHandler.create(storageDir.toString()).setBodyLimit(config.getMaxBodySizeMB() * RouterConfig.MB))
+              .handler(BodyHandler.create(uploadDir).setBodyLimit(config.getMaxBodySizeMB() * HttpServerConfig.MB))
               .handler(handler)
               .handler(new EventMessageResponseHandler())
               .produces(HttpUtils.JSON_CONTENT_TYPE)

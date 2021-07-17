@@ -1,10 +1,15 @@
 package io.zero88.qwe.http.client;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import io.zero88.qwe.QWEAppConfig;
+import io.github.zero88.repl.ReflectionClass;
+import io.github.zero88.utils.Strings;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.IConfig;
+import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.http.HostInfo;
 import io.zero88.qwe.http.client.handler.HttpErrorHandler;
@@ -14,10 +19,6 @@ import io.zero88.qwe.http.client.handler.HttpResponseTextHandler;
 import io.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler;
 import io.zero88.qwe.http.client.handler.WebSocketResponseDispatcher;
 import io.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler;
-import io.github.zero88.utils.Reflections.ReflectionClass;
-import io.github.zero88.utils.Strings;
-import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.json.JsonObject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -69,7 +70,8 @@ public final class HttpClientConfig implements IConfig {
                                    @JsonProperty("options") JsonObject options,
                                    @JsonProperty("handlerConfig") JsonObject handlerConfig) {
         return new HttpClientConfig(userAgent, null, new HttpClientOptions(options),
-                                    JsonData.convert(handlerConfig, HandlerConfig.class));
+                                    JsonData.convert(Optional.ofNullable(handlerConfig).orElseGet(JsonObject::new),
+                                                     HandlerConfig.class));
     }
 
     @Override

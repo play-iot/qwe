@@ -8,17 +8,8 @@ import io.zero88.qwe.exceptions.TimeoutException;
 @SuppressWarnings({"rawtypes", "unchecked"})
 class EventReplyHandlerImpl implements EventReplyHandler {
 
-    private final String system;
     private String address;
     private EventAction action;
-
-    EventReplyHandlerImpl(String system) {
-        this.system = system;
-    }
-
-    EventReplyHandlerImpl() {
-        this(EventReplyHandler.DEFAULT_SYSTEM);
-    }
 
     @Override
     public EventReplyHandler loadContext(String address, EventAction action) {
@@ -30,7 +21,7 @@ class EventReplyHandlerImpl implements EventReplyHandler {
     @Override
     public EventMessage to(Message objectMessage) {
         final EventMessage msg = EventMessage.convert(objectMessage);
-        logger().info("{}::Response [{}][{}=>{}][{}]", replySystem(), address, msg.getAction(), msg.getPrevAction(),
+        logger().info(decor("Response [{}][{}=>{}][{}]"), address, msg.getAction(), msg.getPrevAction(),
                       msg.getStatus());
         return msg;
     }
@@ -38,10 +29,6 @@ class EventReplyHandlerImpl implements EventReplyHandler {
     public EventMessage otherwise(Throwable err) {
         final String msg = Strings.format("No response on EventAction [{0}] from address [{1}]", action, address);
         return EventMessage.replyError(action, new TimeoutException(msg, new HiddenException(err)));
-    }
-
-    public String replySystem() {
-        return system;
     }
 
 }

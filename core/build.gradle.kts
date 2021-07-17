@@ -7,7 +7,6 @@ dependencies {
     api(JacksonLibs.databind)
     api(JacksonLibs.datetime)
     api(LogLibs.slf4j)
-    api(UtilLibs.classgraph)
     api(UtilLibs.jetbrainsAnnotations)
     api(VertxLibs.core)
     api(ZeroLibs.utils)
@@ -29,6 +28,7 @@ dependencies {
     testImplementation(VertxLibs.junit5)
     testImplementation(VertxLibs.rx2)
 
+    testFixturesApi(testFixtures(ZeroLibs.utils))
     testFixturesApi(LogLibs.logback)
     testFixturesApi(TestLibs.junit5Api)
     testFixturesApi(TestLibs.junit5Engine)

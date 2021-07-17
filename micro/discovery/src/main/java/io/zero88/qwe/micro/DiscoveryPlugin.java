@@ -22,14 +22,14 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
 
     @Override
     public String pluginName() {
-        return "micro-discovery";
+        return "service-discovery";
     }
 
     @Override
     public Class<MicroConfig> configClass() { return MicroConfig.class; }
 
     @Override
-    public String configFile() { return "micro.json"; }
+    public String configFile() { return "discovery.json"; }
 
     @Override
     public Future<Void> onAsyncStop() {
@@ -42,15 +42,18 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
     }
 
     @Override
-    public DiscoveryContext onDeploySuccess(@NonNull PluginContext context) {
-        logger().info("Setup service discovery...");
+    public DiscoveryContext enrichContext(@NonNull PluginContext pluginContext, boolean isPostStep) {
+        final DiscoveryContext discoveryContext = new DiscoveryContext(pluginContext);
+        if (!isPostStep) {
+            return discoveryContext;
+        }
         CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx,
                                                                      pluginConfig.lookup(CircuitBreakerConfig.NAME,
                                                                                          CircuitBreakerConfig.class));
         ServiceDiscoveryConfig discoveryConfig = pluginConfig.lookup(ServiceDiscoveryConfig.NAME,
                                                                      ServiceDiscoveryConfig.class);
         ServiceDiscoveryApi discoveryApi = new ServiceDiscoveryApiImpl(sharedData(), discoveryConfig, breaker);
-        return new DiscoveryContext(context).setup(setupGateway(discoveryApi, discoveryConfig));
+        return discoveryContext.setup(setupGateway(discoveryApi, discoveryConfig));
     }
 
     private ServiceDiscoveryApi setupGateway(ServiceDiscoveryApi serviceDiscovery,

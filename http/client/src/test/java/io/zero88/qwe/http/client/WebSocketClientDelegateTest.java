@@ -26,20 +26,19 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.event.EventStatus;
 import io.zero88.qwe.http.HostInfo;
-import io.zero88.qwe.http.event.EventModel;
-import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
+import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
+import io.zero88.qwe.event.EventDirection;
 
 import lombok.RequiredArgsConstructor;
 
 @RunWith(VertxUnitRunner.class)
 public class WebSocketClientDelegateTest {
 
-    private static final EventModel LISTENER = EventModel.builder()
-                                                         .address("ws.listener")
-                                                         .local(true)
-                                                         .pattern(EventPattern.POINT_2_POINT)
-                                                         .addEvents(EventAction.UNKNOWN)
-                                                         .build();
+    private static final EventDirection LISTENER = EventDirection.builder()
+                                                                 .address("ws.listener")
+                                                                 .local(true)
+                                                                 .pattern(EventPattern.POINT_2_POINT)
+                                                                 .build();
     private static final String PUBLISHER_ADDRESS = "ws.publisher";
 
     @Rule
@@ -69,9 +68,9 @@ public class WebSocketClientDelegateTest {
     public void test_not_found(TestContext context) {
         Async async = context.async();
         WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, hostInfo);
-        client.open(WebSocketClientEventMetadata.create("/xxx", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
+        client.open(WebSocketClientPlan.create("/xxx", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
             String error
-                = "WebSocket connection attempt returned HTTP status code 404 | Cause:  - Error Code: NOT_FOUND";
+                = "WebSocket connection attempt returned HTTP status code 404 | Cause:  - Error Code: DATA_NOT_FOUND";
             final JsonObject expected = new JsonObject().put("status", EventStatus.FAILED)
                                                         .put("action", "OPEN")
                                                         .put("error", new JsonObject().put("code", "HTTP_ERROR")
@@ -85,7 +84,7 @@ public class WebSocketClientDelegateTest {
         Async async = context.async();
         HostInfo opt = HostInfo.builder().host("echo.websocket.test").port(443).ssl(true).build();
         WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, opt);
-        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
+        client.open(WebSocketClientPlan.create("/echo", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
             String error = "Failed when open WebSocket connection | Cause: failed to resolve 'echo.websocket.test'. " +
                            "Exceeded max queries per resolve 4 ";
             final JsonObject expected = new JsonObject().put("status", EventStatus.FAILED)
@@ -100,11 +99,11 @@ public class WebSocketClientDelegateTest {
     public void test_connect_and_send(TestContext context) {
         Async async = context.async(2);
         WebSocketClientDelegate client = WebSocketClientDelegate.create(vertx, config, hostInfo);
-        client.getEventbus()
+        client.transporter()
               .register(LISTENER.getAddress(), new EventAsserter(context, async, new JsonObject().put("k", 1)));
-        client.open(WebSocketClientEventMetadata.create("/echo", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
+        client.open(WebSocketClientPlan.create("/echo", LISTENER, PUBLISHER_ADDRESS)).onSuccess(msg -> {
             System.out.println(msg.toJson());
-            client.getEventbus()
+            client.transporter()
                   .publish(PUBLISHER_ADDRESS, EventMessage.initial(EventAction.SEND, new JsonObject().put("k", 1)));
         }).eventually(complete(async));
     }
@@ -129,8 +128,8 @@ public class WebSocketClientDelegateTest {
         context.assertEquals(2, HttpClientRegistry.getInstance().getWsRegistries().size());
         context.assertEquals(1, HttpClientRegistry.getInstance().getWsRegistries().get(host2).current());
 
-        final WebSocketClientEventMetadata metadata = WebSocketClientEventMetadata.create("/echo", LISTENER,
-                                                                                          PUBLISHER_ADDRESS);
+        final WebSocketClientPlan metadata = WebSocketClientPlan.create("/echo", LISTENER,
+                                                                        PUBLISHER_ADDRESS);
         client1.open(metadata)
                .onSuccess(msg -> {
                    System.out.println(msg.toJson());

@@ -84,7 +84,10 @@ public final class NetworkUtils {
             Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress address = addresses.nextElement();
-                logger.debug("Found INetAddress[{}] on interface[{}]", address.toString(), networkInterface.getName());
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Found INetAddress[{}] on interface[{}]", address.toString(),
+                                 networkInterface.getName());
+                }
                 if (predicate.test(address)) {
                     usableINetAddresses.add(address);
                 }
@@ -94,10 +97,10 @@ public final class NetworkUtils {
         if (usableINetAddresses.size() >= 1) {
             // TODO: switch case between Docker environment and Bare-metal server | device
             if (usableINetAddresses.size() != 1) {
-                logger.warn("There are more than one net address: {}", usableINetAddresses);
+                logger.warn("There are more than one NAT addresses: {}", usableINetAddresses);
             }
             final InetAddress inetAddress = usableINetAddresses.get(0);
-            logger.info("Picked address: {}", inetAddress.getHostAddress());
+            logger.info("Pick IPv4 address[{}]", inetAddress.getHostAddress());
             return inetAddress.getHostAddress();
         }
         logger.warn("Not found usable INet address, fallback to loopback");

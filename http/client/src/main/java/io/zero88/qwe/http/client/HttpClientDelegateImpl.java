@@ -84,10 +84,10 @@ final class HttpClientDelegateImpl extends ClientDelegate implements HttpClientD
 
     private Future<ResponseData> onConnectionSuccess(HttpClientRequest req, RequestData reqData,
                                                      HandlerConfig handlerConfig, boolean swallowError) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Send HTTP request {}::{} | <{}>", req.getMethod(), req.absoluteURI(), reqData.toJson());
+        if (logger().isDebugEnabled()) {
+            logger().debug("Send HTTP request {}::{} | <{}>", req.getMethod(), req.absoluteURI(), reqData.toJson());
         } else {
-            logger.info("Send HTTP request {}::{}", req.getMethod(), req.absoluteURI());
+            logger().info("Send HTTP request {}::{}", req.getMethod(), req.absoluteURI());
         }
         return HttpRequestMessageComposer.create(handlerConfig.getReqComposerCls())
                                          .apply(req, reqData)

@@ -35,6 +35,8 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
                        .orElse(getClass().getName());
     }
 
+    QWEAppConfig appConfig();
+
     @Override
     default Class<QWEAppConfig> configClass() {
         return QWEAppConfig.class;
@@ -45,7 +47,7 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
         return "app.json";
     }
 
-    default String getSharedKey() {
+    default String sharedKey() {
         return this.getClass().getName();
     }
 
@@ -95,7 +97,7 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
     Future<Void> uninstallPlugins();
 
     /**
-     * Raise event after all plugin are installed completely
+     * Raise event after all plugins are installed completely
      *
      * @param lookup Context lookup
      */

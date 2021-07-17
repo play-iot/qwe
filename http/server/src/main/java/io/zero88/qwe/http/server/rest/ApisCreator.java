@@ -1,15 +1,44 @@
 package io.zero88.qwe.http.server.rest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
-import io.zero88.qwe.http.server.HttpLogSystem.ApisLogSystem;
+import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
+import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.RouterCreator;
 
-public interface ApisCreator extends ApisLogSystem {
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
 
-    default Logger log() {
-        return LoggerFactory.getLogger(RouterCreator.class);
+public abstract class ApisCreator<X, T extends RouterConfig> implements RouterCreator<T>, ApisSystem {
+
+    @Getter(value = AccessLevel.PROTECTED)
+    private final Set<Class<? extends X>> apis = new HashSet<>();
+
+    @Override
+    public String routerName() {
+        return subFunction();
     }
+
+    @Override
+    public boolean validate(T config) {
+        return !apis.isEmpty();
+    }
+
+    @SafeVarargs
+    public final ApisCreator<X, T> register(Class<? extends X>... apis) {
+        return register(Arrays.asList(apis));
+    }
+
+    public final ApisCreator<X, T> register(@NonNull Collection<Class<? extends X>> restApis) {
+        restApis.stream().filter(Objects::nonNull).forEach(apis::add);
+        return this;
+    }
+
+    protected abstract String subFunction();
 
 }

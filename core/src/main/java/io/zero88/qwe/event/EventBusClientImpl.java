@@ -16,7 +16,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-@Accessors(fluent = true)
 @RequiredArgsConstructor
 final class EventBusClientImpl implements EventBusClient {
 
@@ -24,6 +23,7 @@ final class EventBusClientImpl implements EventBusClient {
 
     @Getter
     @NonNull
+    @Accessors(fluent = true)
     private final SharedDataLocalProxy sharedData;
     private final Class<EventReplyHandler> replyHandlerClass;
 

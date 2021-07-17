@@ -12,6 +12,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 
+import io.github.zero88.utils.Strings;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -46,7 +47,7 @@ public interface JsonHelper {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
         } catch (JSONException | AssertionError e) {
-            throw logError(expected, actual, e);
+            throw logAndRethrowRuntime(expected, actual, e);
         }
     }
 
@@ -54,7 +55,7 @@ public interface JsonHelper {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
         } catch (JSONException | AssertionError e) {
-            throw logError(expected, actual, e);
+            throw logAndRethrowRuntime(expected, actual, e);
         }
     }
 
@@ -155,10 +156,14 @@ public interface JsonHelper {
 
     }
 
-    static RuntimeException logError(JsonObject expected, JsonObject actual, Throwable e) {
-        TestHelper.LOGGER.error("Actual: " + actual.encode());
-        TestHelper.LOGGER.error("Expected: " + expected.encode());
-        return new RuntimeException(e);
+    static Throwable logError(JsonObject expected, JsonObject actual, Throwable e) {
+        TestHelper.LOGGER.error("[{}] {}", Strings.padLeft("ACTUAL", 8), actual);
+        TestHelper.LOGGER.error("[{}] {}", Strings.padLeft("EXPECTED", 8), expected);
+        return e;
+    }
+
+    static RuntimeException logAndRethrowRuntime(JsonObject expected, JsonObject actual, Throwable e) {
+        return new RuntimeException(logError(expected, actual, e));
     }
 
 }

@@ -159,7 +159,7 @@ public final class HttpUtils {
             for (String property : query.split("\\" + SEPARATE)) {
                 String[] keyValues = property.split("\\" + EQUAL);
                 String propKey = Urls.decode(keyValues[0]);
-                if (RequestFilter.AUDIT.equals(propKey) || RequestFilter.PRETTY.equals(propKey)) {
+                if (RequestFilter.BOOLEAN_PARAMS.contains(propKey)) {
                     map.put(propKey, true);
                     continue;
                 }

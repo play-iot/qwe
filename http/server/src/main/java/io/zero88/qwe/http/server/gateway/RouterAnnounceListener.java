@@ -42,8 +42,8 @@ public class RouterAnnounceListener extends ServiceGatewayAnnounceMonitor implem
     }
 
     @Override
-    protected void process(Record record) {
-        registerRouter(record);
+    protected void process(Record monitorObject) {
+        registerRouter(monitorObject);
     }
 
 }

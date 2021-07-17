@@ -1,8 +1,7 @@
 package io.zero88.qwe.http.server.upload;
 
-import java.util.Collections;
-
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.Arguments;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -24,7 +23,7 @@ public class UploadListener implements EventListener {
         if (Strings.isBlank(listenerClass) || UploadListener.class.getName().equals(listenerClass)) {
             return new UploadListener(proxy);
         }
-        return ReflectionClass.createObject(listenerClass, Collections.singletonMap(SharedDataLocalProxy.class, proxy));
+        return ReflectionClass.createObject(listenerClass, new Arguments().put(SharedDataLocalProxy.class, proxy));
     }
 
     @EBContract(action = "CREATE")

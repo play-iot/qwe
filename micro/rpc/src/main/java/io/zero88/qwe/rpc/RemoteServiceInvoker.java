@@ -2,7 +2,7 @@ package io.zero88.qwe.rpc;
 
 import io.vertx.core.Future;
 import io.zero88.qwe.HasSharedData;
-import io.zero88.qwe.micro.GatewayHeadersBuilder;
+import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
@@ -71,7 +71,7 @@ public interface RemoteServiceInvoker extends EventBusProxy, HasSharedData {
      */
     default Future<EventMessage> invoke(@NonNull String address, @NonNull EventAction action,
                                         @NonNull RequestData reqData) {
-        reqData.headers().put(GatewayHeadersBuilder.X_REQUEST_BY, RemoteServiceInvoker.requestBy(requester()));
+        reqData.headers().put(GatewayHeaders.X_REQUEST_BY, RemoteServiceInvoker.requestBy(requester()));
         return invoke(address, EventMessage.initial(action, reqData));
     }
 

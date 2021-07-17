@@ -3,100 +3,85 @@ package io.zero88.qwe.http.server.ws;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
-import io.github.zero88.exceptions.InvalidUrlException;
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.http.event.EventModel;
-import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.http.event.WebSocketServerEventMetadata;
-import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpConfig.WebSocketConfig;
-import io.zero88.qwe.http.server.HttpConfig.WebSocketConfig.SocketBridgeConfig;
-import io.zero88.qwe.http.server.HttpLogSystem.WebSocketLogSystem;
-import io.zero88.qwe.http.server.RouterCreator;
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.ReflectionClass;
+import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
+import io.zero88.qwe.http.server.RouterCreator;
+import io.zero88.qwe.http.server.config.WebSocketConfig;
+import io.zero88.qwe.http.server.config.WebSocketConfig.SocketBridgeConfig;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 
-public final class WebSocketRouterCreator implements RouterCreator<WebSocketConfig>, WebSocketLogSystem {
+public final class WebSocketRouterCreator implements RouterCreator<WebSocketConfig>, WebSocketSystem {
 
-    private final Map<String, List<WebSocketServerEventMetadata>> socketsByPath = new HashMap<>();
+    @Getter(AccessLevel.MODULE)
+    private final Map<String, List<WebSocketServerPlan>> socketsByPath = new HashMap<>();
 
-    public WebSocketRouterCreator(Collection<WebSocketServerEventMetadata> metadataSockets) {
+    public WebSocketRouterCreator(Collection<WebSocketServerPlan> metadataSockets) {
         metadataSockets.stream().filter(Objects::nonNull).forEach(this::register);
     }
 
-    private void register(@NonNull WebSocketServerEventMetadata socketMetadata) {
-        socketsByPath.computeIfAbsent(socketMetadata.getPath(), k -> new ArrayList<>()).add(socketMetadata);
+    @Override
+    public boolean validate(WebSocketConfig config) {
+        return !this.socketsByPath.isEmpty();
     }
 
     @Override
-    public @NonNull String mountPoint(@NonNull WebSocketConfig config) {
-        String root = Urls.combinePath(config.basePath());
-        if (!Urls.validatePath(root)) {
-            throw new InvalidUrlException("Root Websocket is not valid");
-        }
-        return root;
-    }
-
-    @Override
-    public Router router(@NonNull WebSocketConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public Router subRouter(@NonNull WebSocketConfig config, @NonNull SharedDataLocalProxy sharedData) {
         final SockJSHandler sockJSHandler = SockJSHandler.create(sharedData.getVertx(), config.getSockjsOptions());
         final Router router = Router.router(sharedData.getVertx());
-        validate().forEach((path, socketMapping) -> {
-            final SockJSBridgeOptions options = createBridgeOptions(config.getBridgeOptions(), socketMapping,
-                                                                    BasePaths.addWildcards(path));
-            final WebSocketBridgeEventHandler handler = createHandler(sharedData, socketMapping,
-                                                                      config.bridgeHandlerClass());
-            router.mountSubRouter(path, sockJSHandler.bridge(options, handler));
-        });
+        //TODO add auth
+        socketsByPath.forEach((path, mapping) -> router.mountSubRouter(path, sockJSHandler.bridge(
+            createBridgeOptions(config.getBridgeOptions(), mapping,
+                                BasePaths.addWildcards(Urls.combinePath(config.getPath(), path))),
+            createHandler(sharedData, mapping, config.bridgeHandlerClass()))));
         return router;
     }
 
-    Map<String, List<WebSocketServerEventMetadata>> validate() {
-        if (this.socketsByPath.isEmpty()) {
-            throw new InitializerError("Register at least WebSocket handler");
-        }
-        return socketsByPath;
+    private void register(@NonNull WebSocketServerPlan socketMetadata) {
+        socketsByPath.computeIfAbsent(socketMetadata.getPath(), k -> new ArrayList<>()).add(socketMetadata);
     }
 
-    private SockJSBridgeOptions createBridgeOptions(SocketBridgeConfig config,
-                                                    List<WebSocketServerEventMetadata> metadata, String fullPath) {
+    private SockJSBridgeOptions createBridgeOptions(SocketBridgeConfig config, List<WebSocketServerPlan> metadata,
+                                                    String fullPath) {
         SockJSBridgeOptions opts = new SockJSBridgeOptions(config);
-        String msgFormat = "Path:'{}'-Address:'{}'-Pattern:'{}'";
         metadata.forEach(m -> {
-            EventModel listener = m.getListener();
-            EventModel publisher = m.getPublisher();
-            if (Objects.nonNull(listener)) {
-                log().info(decor("Init Inbound WebSocket: " + msgFormat), fullPath, listener.getPattern(),
-                           listener.getAddress());
-                opts.addInboundPermitted(new PermittedOptions().setAddress(listener.getAddress()));
-            } else if (Objects.nonNull(publisher)) {
-                log().info(decor("Init Outbound WebSocket: " + msgFormat), fullPath, publisher.getPattern(),
-                           publisher.getAddress());
-                opts.addOutboundPermitted(new PermittedOptions().setAddress(publisher.getAddress()));
+            if (!m.isOnlyOutbound()) {
+                logger().info(decor("Add Inbound Permitted [{}][{}=>{}]"), fullPath, m.inboundAddress(),
+                              m.processAddress());
+                opts.addInboundPermitted(new PermittedOptions().setAddress(m.inboundAddress()));
+            }
+            if (Strings.isNotBlank(m.outboundAddress())) {
+                logger().info(decor("Add Outbound Permitted [{}][{}][{}]"), fullPath, m.outboundAddress(),
+                              m.outbound().getPattern());
+                opts.addOutboundPermitted(new PermittedOptions().setAddress(m.outboundAddress()));
             }
         });
         return opts;
     }
 
     private WebSocketBridgeEventHandler createHandler(@NonNull SharedDataLocalProxy sharedData,
-                                                      @NonNull List<WebSocketServerEventMetadata> socketMapping,
-                                                      @NonNull Class<? extends WebSocketBridgeEventHandler> clazz) {
-        Map<Class, Object> map = new LinkedHashMap<>();
-        map.put(SharedDataLocalProxy.class, sharedData);
-        map.put(List.class, socketMapping);
-        WebSocketBridgeEventHandler handler = ReflectionClass.createObject(clazz, map);
-        return Objects.isNull(handler) ? new WebSocketBridgeEventHandler(sharedData, socketMapping) : handler;
+                                                      @NonNull List<WebSocketServerPlan> socketPlans,
+                                                      Class<? extends WebSocketBridgeEventHandler> clazz) {
+        return Optional.ofNullable(clazz)
+                       .map(ReflectionClass::createObject)
+                       .map(WebSocketBridgeEventHandler.class::cast)
+                       .orElseGet(DefaultWebSocketBridgeEventHandler::new)
+                       .setup(sharedData, socketPlans);
     }
 
 }

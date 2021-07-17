@@ -4,16 +4,18 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.Counter;
 import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
 
 public abstract class CounterProducer extends ApplicationVerticle implements CounterApp {
 
     @Override
     public void onStart() {
+        EventBusClient client = EventBusClient.create(sharedData());
         vertx.setPeriodic(2000, event -> vertx.sharedData()
                                               .getCounter("Periodic")
                                               .flatMap(Counter::getAndIncrement)
-                                              .onSuccess(c -> getEventBus().publish(address(), msg(c))));
+                                              .onSuccess(c -> client.publish(address(), msg(c))));
     }
 
     protected EventMessage msg(Long c) {

@@ -9,50 +9,50 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.event.EventDirection;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.event.EventModel;
+import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
 import io.zero88.qwe.http.client.handler.WebSocketClientWriter;
 import io.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler;
 import io.zero88.qwe.http.client.handler.WebSocketResponseDispatcher;
 import io.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler;
-import io.zero88.qwe.http.event.WebSocketClientEventMetadata;
+
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 final class WebSocketClientDelegateImpl extends ClientDelegate implements WebSocketClientDelegate {
 
-    private final EventBusClient eventbus;
+    @Getter
+    @Accessors(fluent = true)
+    private final EventBusClient transporter;
 
     WebSocketClientDelegateImpl(Vertx vertx, HttpClientConfig config) {
         super(vertx, config);
-        //FIXME create client
-        this.eventbus = EventBusClient.create(SharedDataLocalProxy.create(vertx, "wtf"));
+        //FIXME: create client
+        this.transporter = EventBusClient.create(SharedDataLocalProxy.create(vertx, "wtf"));
     }
 
     @Override
-    public Future<EventMessage> open(WebSocketClientEventMetadata metadata, MultiMap headers) {
+    public Future<EventMessage> open(WebSocketClientPlan metadata, MultiMap headers) {
         final WebSocketConnectOptions options = new WebSocketConnectOptions().setHeaders(headers)
                                                                              .setURI(metadata.getPath());
         return get().webSocket(options)
                     .map(webSocket -> onSuccess(webSocket, metadata))
-                    .otherwise(WebSocketConnectErrorHandler.create(getHostInfo(), eventbus,
+                    .otherwise(WebSocketConnectErrorHandler.create(getHostInfo(), transporter,
                                                                    getHandlerConfig().getWebSocketConnectErrorHandlerCls()));
     }
 
-    private EventMessage onSuccess(WebSocket webSocket, WebSocketClientEventMetadata metadata) {
-        logger.info("Websocket to {} is connected", getHostInfo().toJson());
-        eventbus.register(metadata.getPublisher().getAddress(), new WebSocketClientWriter(webSocket));
-        EventModel listener = metadata.getListener();
-        webSocket.handler(WebSocketResponseDispatcher.create(eventbus, listener,
+    private EventMessage onSuccess(WebSocket webSocket, WebSocketClientPlan metadata) {
+        logger().info("WebSocket to {} is connected", getHostInfo().toJson());
+        transporter.register(metadata.outbound().getAddress(), new WebSocketClientWriter(webSocket));
+        EventDirection inbound = metadata.inbound();
+        webSocket.handler(WebSocketResponseDispatcher.create(transporter, inbound,
                                                              getHandlerConfig().getWebSocketResponseDispatcherCls()));
-        webSocket.exceptionHandler(
-            WebSocketResponseErrorHandler.create(eventbus, listener, getHandlerConfig().getWebSocketErrorHandlerCls()));
+        webSocket.exceptionHandler(WebSocketResponseErrorHandler.create(transporter, inbound,
+                                                                        getHandlerConfig().getWebSocketErrorHandlerCls()));
         return EventMessage.success(EventAction.parse("OPEN"),
                                     new JsonObject().put("binaryHandlerID", webSocket.binaryHandlerID())
                                                     .put("textHandlerID", webSocket.textHandlerID()));
-    }
-
-    @Override
-    public EventBusClient getEventbus() {
-        return eventbus;
     }
 
 }

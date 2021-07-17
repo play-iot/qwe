@@ -1,7 +1,13 @@
 package io.zero88.qwe;
 
-public interface HasSharedKey {
+interface HasSharedKey {
 
-    String getSharedKey();
+    /**
+     * Application key to help accessing an application local data
+     *
+     * @return an application shared key
+     * @see SharedDataLocalProxy
+     */
+    String sharedKey();
 
 }

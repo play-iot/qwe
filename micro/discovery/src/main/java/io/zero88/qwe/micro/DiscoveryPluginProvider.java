@@ -9,8 +9,8 @@ public final class DiscoveryPluginProvider implements PluginProvider<DiscoveryPl
     public Class<DiscoveryPlugin> pluginClass() { return DiscoveryPlugin.class; }
 
     @Override
-    public DiscoveryPlugin provide(SharedDataLocalProxy proxy) {
-        return new DiscoveryPlugin(proxy);
+    public DiscoveryPlugin provide(SharedDataLocalProxy sharedData) {
+        return new DiscoveryPlugin(sharedData);
     }
 
 }

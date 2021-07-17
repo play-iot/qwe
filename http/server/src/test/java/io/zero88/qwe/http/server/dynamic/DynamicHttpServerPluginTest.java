@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.ApplicationVerticle;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.dynamic.mock.MockHttpServiceServer;
 import io.vertx.core.DeploymentOptions;
@@ -28,23 +27,23 @@ public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
     }
 
     @Override
-    protected <T extends ApplicationVerticle> T service() {
-        return (T) new MockHttpServiceServer();
+    protected MockHttpServiceServer service() {
+        return new MockHttpServiceServer();
     }
 
     @Test
     @Ignore
     //TODO FIX `javax.ws.rs`
     public void test_get_success(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/rest/test", 200, new JsonObject().put("hello", "dynamic"));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/rest/test", 200, new JsonObject().put("hello", "dynamic"));
     }
 
     @Test
     @Ignore
     //TODO: Review `message`: is plain text, not json object
     public void test_error(TestContext context) {
-        assertRestByClient(context, HttpMethod.GET, "/api/s/rest/test/error", 500,
-                           new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/rest/test/error", 500,
+                            new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
                                            .put("message", new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
                                                                            .put("message", "error")));
     }
@@ -54,9 +53,9 @@ public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
     //TODO: Review `message`: is plain text, not json object
     public void test_not_found(TestContext context) {
         JsonObject m = new JsonObject().put("message", "Resource not found");
-        assertRestByClient(context, HttpMethod.GET, "/api/s/rest/xxx", 404,
-                           new JsonObject().put("code", ErrorCode.DATA_NOT_FOUND.code()).put("message", m),
-                           JsonHelper.ignore("message.uri"));
+        sendToApiThenAssert(context, HttpMethod.GET, "/api/s/rest/xxx", 404,
+                            new JsonObject().put("code", ErrorCode.DATA_NOT_FOUND.code()).put("message", m),
+                            JsonHelper.ignore("message.uri"));
     }
 
     @Test
@@ -64,7 +63,7 @@ public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
         final JsonObject expected = new JsonObject(
             "{\"apis\":[{\"name\":\"httpService\",\"type\":\"http-endpoint\",\"status\":\"UP\"," +
             "\"location\":\"http://0.0.0.0:" + port + "/rest\"}]}");
-        assertRestByClient(context, HttpMethod.GET, "/gw/index", 200, expected);
+        sendToApiThenAssert(context, HttpMethod.GET, "/gw/index", 200, expected);
     }
 
 }

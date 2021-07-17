@@ -13,8 +13,8 @@ import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.micro.GatewayHeadersBuilder;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
+import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
@@ -29,8 +29,8 @@ public final class EventMessageHttpServiceExecutor implements ServiceExecutor {
     }
 
     @Override
-    public JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedDataLocalProxy) {
-        return new JsonObject().put(EventMessageHttpService.SHARED_KEY_CONFIG, sharedDataLocalProxy.getSharedKey())
+    public JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedData) {
+        return new JsonObject().put(EventMessageHttpService.SHARED_KEY_CONFIG, sharedData.sharedKey())
                                .put(EventMessageHttpService.DELIVERY_OPTIONS_CONFIG, null);
     }
 
@@ -45,7 +45,7 @@ public final class EventMessageHttpServiceExecutor implements ServiceExecutor {
     }
 
     private EventAction findActionInHeader(ServiceReference serviceReference, RequestData reqData) {
-        GatewayHeadersBuilder headers = new GatewayHeadersBuilder(reqData.headers());
+        GatewayHeaders headers = new GatewayHeaders(reqData.headers());
         return EventMethodDefinition.from(serviceReference.record().getLocation())
                                     .search(headers.getRequestURI(), headers.getForwardedMethod());
     }

@@ -1,108 +1,70 @@
 package io.zero88.qwe.http.server.rest;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import io.github.zero88.utils.Reflections.ReflectionClass;
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
-import io.vertx.core.Vertx;
+import io.github.zero88.utils.Urls;
 import io.vertx.ext.web.Router;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.http.event.RestEventApiMetadata;
+import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerPlugin;
+import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.RouterCreator;
+import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 import io.zero88.qwe.http.server.rest.api.RestEventApi;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
-import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.http.EventMethodMapping;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
+import io.zero88.qwe.micro.httpevent.EventMethodMapping;
+import io.zero88.qwe.micro.httpevent.RestEventApiMetadata;
 
 import lombok.NonNull;
 
 /**
  * @see RouterCreator
  */
-//TODO Refactor it as RouterCreator
-public final class RestEventApisCreator implements ApisCreator {
+public class RestEventApisCreator<T extends RouterConfig> extends ApisCreator<RestEventApi, T> {
 
-    private final Vertx vertx;
-    private final Router router;
-    private final Set<Class<? extends RestEventApi>> apis = new HashSet<>();
-    private SharedDataLocalProxy proxy;
-
-    /**
-     * For test
-     */
-    RestEventApisCreator() {
-        this.vertx = null;
-        this.router = null;
-    }
-
-    public RestEventApisCreator(Vertx vertx) {
-        this.vertx = vertx;
-        this.router = Router.router(vertx);
-    }
-
-    public RestEventApisCreator addSharedDataProxy(@NonNull SharedDataLocalProxy proxy) {
-        this.proxy = proxy;
-        return this;
-    }
-
-    public RestEventApisCreator register(@NonNull Class<? extends RestEventApi> restApi) {
-        apis.add(restApi);
-        return this;
-    }
-
-    @SafeVarargs
-    public final RestEventApisCreator register(Class<? extends RestEventApi>... restApi) {
-        return this.register(Arrays.asList(restApi));
-    }
-
-    public RestEventApisCreator register(@NonNull Collection<Class<? extends RestEventApi>> restApis) {
-        restApis.stream().filter(Objects::nonNull).forEach(apis::add);
-        return this;
-    }
-
-    public Router build() {
-        validate().stream().map(ReflectionClass::createObject).filter(Objects::nonNull).forEach(this::createRouter);
+    @Override
+    public @NonNull Router subRouter(@NonNull T config, @NonNull SharedDataLocalProxy sharedData) {
+        Router router = Router.router(sharedData.getVertx());
+        getApis().stream()
+                 .map(ReflectionClass::createObject)
+                 .filter(Objects::nonNull)
+                 .forEach(api -> createRouter(router, api, config, sharedData));
+        router.route(BasePaths.addWildcards(config.getPath()));
         return router;
     }
 
-    Set<Class<? extends RestEventApi>> validate() {
-        if (apis.isEmpty()) {
-            throw new InitializerError("No REST API given, register at least one.");
-        }
-        return apis;
+    @Override
+    protected String subFunction() {
+        return "EventApi";
     }
 
-    private void createRouter(RestEventApi restApi) {
-        restApi.registerProxy(proxy)
+    protected void createRouter(Router router, RestEventApi restApi, T config, SharedDataLocalProxy sharedData) {
+        restApi.registerSharedData(sharedData)
                .initRouter()
                .getRestMetadata()
-               .forEach(metadata -> this.createRouter(metadata, restApi));
+               .forEach(metadata -> createRouter(router, config, metadata, restApi, sharedData));
     }
 
-    private void createRouter(RestEventApiMetadata metadata, RestEventApi api) {
+    protected void createRouter(Router router, T config, RestEventApiMetadata metadata, RestEventApi api,
+                                SharedDataLocalProxy sharedData) {
         final EventMethodDefinition definition = metadata.getDefinition();
-        final EventBusClient eventbus = EventBusClient.create(proxy);
+        final EventBusClient client = EventBusClient.create(sharedData);
         for (EventMethodMapping mapping : definition.getMapping()) {
-            RestEventApiDispatcher restHandler = RestEventApiDispatcher.create(api.dispatcher(), eventbus,
-                                                                               metadata.getAddress(),
-                                                                               mapping.getAction(),
-                                                                               metadata.getPattern(),
-                                                                               definition.isUseRequestData());
-            final String path = Strings.isBlank(mapping.getCapturePath())
-                                ? definition.getServicePath()
-                                : mapping.getCapturePath();
-            final String format = "Path:{}::{} --- Event:{}::{}::{}";
-            log().info(decor("Registering route: " + format), mapping.getMethod(), path, metadata.getAddress(),
-                       mapping.getAction(), metadata.getPattern());
-            HttpServerPlugin.restrictJsonRoute(
-                router.route(mapping.getMethod(), path).order(definition.getOrder()).handler(restHandler));
+            String path = Strings.isBlank(mapping.getCapturePath())
+                          ? definition.getServicePath()
+                          : mapping.getCapturePath();
+            logger().info(decor("Bind Path [{}::{}] to [{}::{}]"), Strings.padLeft(mapping.method(), 6),
+                          Urls.combinePath(config.getPath(), path), metadata.getAddress(), mapping.getAction());
+            HttpServerPlugin.restrictJsonRoute(router.route(mapping.getMethod(), path))
+                            .order(definition.getOrder())
+                            .handler(RestEventApiDispatcher.create(api.dispatcher(), client, metadata.getAddress(),
+                                                                   mapping.getAction(), metadata.getPattern(),
+                                                                   definition.isUseRequestData()))
+                            .handler(new EventMessageResponseHandler());
         }
     }
 

@@ -7,27 +7,24 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.vertx.core.http.HttpMethod;
+import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventPattern;
-import io.zero88.qwe.http.ActionMethodMapping;
-import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.http.event.RestEventApiMetadata;
-import io.zero88.qwe.http.server.HttpLogSystem.ApisLogSystem;
+import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
+import io.zero88.qwe.micro.httpevent.ActionMethodMapping;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
+import io.zero88.qwe.micro.httpevent.RestEventApiMetadata;
 
 import lombok.NonNull;
 
-public abstract class AbstractRestEventApi implements RestEventApi, ApisLogSystem {
+public abstract class AbstractRestEventApi implements RestEventApi, ApisSystem, HasLogger {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ActionMethodMapping mapping;
     private final SortedMap<String, RestEventApiMetadata> restMetadata = new TreeMap<>(
         Comparator.comparingInt(String::length));
-    protected SharedDataLocalProxy proxy;
+    protected SharedDataLocalProxy sharedData;
 
     protected AbstractRestEventApi() {
         this.mapping = initHttpEventMap();
@@ -43,8 +40,8 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisLogSyste
 
     protected void addRouter(@NonNull String address, @NonNull EventMethodDefinition definition) {
         if (restMetadata.containsKey(definition.getServicePath())) {
-            logger.warn(decor("HTTP path '{}' is already registered, but might different Event address '{}'"),
-                        definition.getServicePath(), restMetadata.get(definition.getServicePath()).getAddress());
+            logger().warn(decor("HTTP path [{}] is already registered, but might be bind to Event address [{}]"),
+                          definition.getServicePath(), restMetadata.get(definition.getServicePath()).getAddress());
         }
         RestEventApiMetadata metadata = RestEventApiMetadata.builder()
                                                             .address(address)
@@ -60,8 +57,8 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisLogSyste
     }
 
     @Override
-    public AbstractRestEventApi registerProxy(SharedDataLocalProxy proxy) {
-        this.proxy = proxy;
+    public AbstractRestEventApi registerSharedData(SharedDataLocalProxy proxy) {
+        this.sharedData = proxy;
         return this;
     }
 

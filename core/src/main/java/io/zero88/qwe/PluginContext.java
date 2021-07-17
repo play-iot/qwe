@@ -2,6 +2,10 @@ package io.zero88.qwe;
 
 import java.nio.file.Path;
 
+import org.jetbrains.annotations.Nullable;
+
+import io.zero88.qwe.PluginConfig.PluginDirConfig;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -13,27 +17,47 @@ import lombok.experimental.Accessors;
  *
  * @see Plugin
  */
-public interface PluginContext extends HasAppName, HasPluginName {
+public interface PluginContext extends HasAppName, HasPluginName, HasSharedKey {
 
     /**
-     * Create default plugin context
+     * Create a plugin pre-context before deploying plugin
      *
      * @param appName    an associate app name
      * @param pluginName an associate plugin name
+     * @param sharedKey  a shared key to access local data in {@code Application}
      * @param dataDir    a current application data dir
-     * @param sharedKey  a key to access shared data from {@code Application}
-     * @param deployId   a deployment id
-     * @return pluginContext
+     * @return a plugin pre-context
      */
-    static PluginContext create(String appName, String pluginName, Path dataDir, String sharedKey, String deployId) {
-        return new DefaultPluginContext(appName, pluginName, dataDir, sharedKey, deployId);
+    static PluginContext createPreContext(String appName, String pluginName, String sharedKey, Path dataDir) {
+        return new DefaultPluginContext(appName, pluginName, dataDir, sharedKey, null);
     }
 
-    @NonNull Path dataDir();
+    /**
+     * Create plugin post-context after deployed plugin
+     *
+     * @param preContext an associate app name
+     * @param deployId   a plugin deployment id
+     * @return a plugin post-context
+     */
+    static PluginContext createPostContext(PluginContext preContext, String deployId) {
+        return new DefaultPluginContext(preContext, deployId);
+    }
 
-    @NonNull String sharedKey();
+    /**
+     * A runtime plugin data dir
+     *
+     * @return an actual plugin data dir. It can be null if a {@code plugin} does not define plugin dir configuration
+     * @see QWEAppConfig#dataDir()
+     * @see PluginDirConfig
+     */
+    @Nullable Path dataDir();
 
-    @NonNull String deployId();
+    /**
+     * A Plugin deployment id
+     *
+     * @return deployment id if plugin is already installed successfully, otherwise it is {@code null}
+     */
+    @Nullable String deployId();
 
     @Getter
     @Accessors(fluent = true)
@@ -45,6 +69,10 @@ public interface PluginContext extends HasAppName, HasPluginName {
         private final Path dataDir;
         private final String sharedKey;
         private final String deployId;
+
+        DefaultPluginContext(@NonNull PluginContext ctx, String deployId) {
+            this(ctx.appName(), ctx.pluginName(), ctx.dataDir(), ctx.sharedKey(), deployId);
+        }
 
         protected DefaultPluginContext(@NonNull PluginContext ctx) {
             this(ctx.appName(), ctx.pluginName(), ctx.dataDir(), ctx.sharedKey(), ctx.deployId());

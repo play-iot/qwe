@@ -5,6 +5,9 @@ import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;
 import io.zero88.qwe.event.EventBusClient;
 
+/**
+ * Represents for shared local data from {@code Application} to {@code Plugin(s)}
+ */
 @SuppressWarnings("unchecked")
 public interface SharedDataLocalProxy extends HasSharedKey {
 
@@ -14,7 +17,6 @@ public interface SharedDataLocalProxy extends HasSharedKey {
      * @see EventBusClient
      */
     String EVENTBUS_DELIVERY_OPTION_KEY = "EVENTBUS_OPTION";
-    String APP_DATADIR_KEY = "APP_DATADIR";
     String PUBLIC_IPV4_KEY = "PUBLIC_IPV4";
 
     Vertx getVertx();
@@ -36,7 +38,7 @@ public interface SharedDataLocalProxy extends HasSharedKey {
     }
 
     default LocalMap<Object, Object> localData() {
-        return getVertx().sharedData().getLocalMap(getSharedKey());
+        return getVertx().sharedData().getLocalMap(sharedKey());
     }
 
     default SharedData unwrap() {
@@ -51,7 +53,7 @@ public interface SharedDataLocalProxy extends HasSharedKey {
             }
 
             @Override
-            public String getSharedKey() {
+            public String sharedKey() {
                 return sharedKey;
             }
         };

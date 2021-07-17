@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
  * An {@code Application} configuration can contains itself configuration and its {@code plugin} configurations
  *
  * @see Application
- * @see Plugin
+ * @see PluginConfig
  */
 public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements IConfig {
 
@@ -32,7 +32,6 @@ public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements 
 
     public static final String DATA_DIR = "dataDir";
     public static final Path DEFAULT_DATADIR = FileUtils.defaultDatadir(".playio");
-
     /**
      * Application data dir
      */
@@ -70,10 +69,15 @@ public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements 
     @Override
     public Class<? extends IConfig> parent() { return QWEConfig.class; }
 
+    /**
+     * Application data dir
+     */
     public String getDataDir() { return dataDir().toAbsolutePath().toString(); }
 
     /**
-     * Other Application configurations or Application plugin configuration
+     * Other {@code Application} configurations or {@code Plugin} configuration
+     *
+     * @see PluginConfig
      */
     @Override
     public JsonObject other() {

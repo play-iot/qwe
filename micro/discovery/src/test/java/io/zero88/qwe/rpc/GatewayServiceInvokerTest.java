@@ -16,7 +16,7 @@ import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.micro.BaseDiscoveryPluginTest;
-import io.zero88.qwe.micro.GatewayHeadersBuilder;
+import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.micro.mock.MockServiceListener;
 import io.zero88.qwe.rpc.mock.MockServiceInvoker;
 
@@ -89,7 +89,7 @@ public class GatewayServiceInvokerTest extends BaseDiscoveryPluginTest {
         Async async = context.async();
         MockServiceInvoker invoker = new MockServiceInvoker(getGatewayConfig().getIndexAddress(), ebClient,
                                                             EVENT_RECORD_1);
-        final JsonObject expected = new JsonObject().put(GatewayHeadersBuilder.X_REQUEST_BY,
+        final JsonObject expected = new JsonObject().put(GatewayHeaders.X_REQUEST_BY,
                                                          "service/" + invoker.requester())
                                                     .put("action", EventAction.CREATE.action());
         invoker.execute(EventAction.CREATE, RequestData.builder().build())
