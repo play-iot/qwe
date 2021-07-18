@@ -12,22 +12,18 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.json.jackson.DatabindCodec;
 import io.vertx.core.spi.json.JsonCodec;
-import io.zero88.qwe.dto.jackson.JsonModule;
+import io.zero88.qwe.dto.jackson.QWEJsonCodec;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.QWEException;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.NonNull;
 
@@ -40,13 +36,8 @@ import lombok.NonNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface JsonData {
 
-    ObjectMapper MAPPER = DatabindCodec.mapper()
-                                       .copy()
-                                       .registerModule(new JavaTimeModule())
-                                       .registerModule(JsonModule.BASIC)
-                                       .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
-                                                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
-    ObjectMapper LENIENT_MAPPER = MAPPER.copy().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    ObjectMapper MAPPER = QWEJsonCodec.mapper();
+    ObjectMapper LENIENT_MAPPER = QWEJsonCodec.lenientMapper();
     String SUCCESS_KEY = "data";
     String ERROR_KEY = "error";
     String FILTER_PROP_BY_NAME = "filter_by_name";

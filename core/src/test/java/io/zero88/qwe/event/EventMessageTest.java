@@ -1,5 +1,6 @@
 package io.zero88.qwe.event;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -128,4 +129,19 @@ public class EventMessageTest {
         Assertions.assertEquals(expected, msg.toJson());
         Assertions.assertEquals(new JsonObject().put("data", "xyz"), msg.getData());
     }
+
+    @Test
+    public void test_deserialize_date() {
+        JsonObject expected = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":\"2021-07-18\"}");
+        EventMessage msg = EventMessage.tryParse(expected);
+        Assertions.assertTrue(msg.isSuccess());
+        Assertions.assertEquals(EventAction.REMOVE, msg.getAction());
+        Assertions.assertNotNull(msg.rawData());
+        Assertions.assertEquals("2021-07-18", msg.rawData().toJson());
+        Assertions.assertEquals("2021-07-18", msg.parseAndGetData());
+        Assertions.assertEquals(expected, msg.toJson());
+        Assertions.assertEquals(new JsonObject().put("data", "2021-07-18"), msg.getData());
+        Assertions.assertEquals(LocalDate.of(2021, 7, 18), msg.parseAndGetData(LocalDate.class));
+    }
+
 }
