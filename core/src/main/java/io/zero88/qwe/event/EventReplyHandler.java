@@ -9,6 +9,7 @@ import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.QWEConverter;
+import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.event.EventLogSystem.EventReplyLogSystem;
 
 import lombok.NonNull;
@@ -24,7 +25,10 @@ public interface EventReplyHandler extends QWEConverter<EventMessage, Message>, 
         return Objects.isNull(clazz) ? create() : ReflectionClass.createObject(clazz);
     }
 
-    EventReplyHandler loadContext(String address, EventAction action);
+    @Override
+    default Logger logger() {
+        return LoggerFactory.getLogger(EventReplyHandler.class);
+    }
 
     @Override
     default Class<EventMessage> fromClass() {
@@ -41,11 +45,23 @@ public interface EventReplyHandler extends QWEConverter<EventMessage, Message>, 
         return null;
     }
 
-    @Override
-    default Logger logger() {
-        return LoggerFactory.getLogger(EventReplyHandler.class);
-    }
+    /**
+     * Load event context to setup an event reply handler
+     *
+     * @param address event listener address
+     * @param action  event listener action
+     * @return a reference to this for fluent API
+     */
+    EventReplyHandler loadContext(String address, EventAction action);
 
-    EventMessage otherwise(@NonNull Throwable err);
+    /**
+     * Convert throwable to Event Reply Message
+     *
+     * @param error an error
+     * @return an event message
+     * @see EventMessage#replyError(EventAction, ErrorMessage)
+     * @see EventMessage#replyError(EventAction, Throwable)
+     */
+    EventMessage otherwise(@NonNull Throwable error);
 
 }

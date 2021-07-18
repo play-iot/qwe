@@ -1,70 +1,63 @@
 package io.zero88.qwe.dto;
 
-import java.io.IOException;
-import java.time.Instant;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.repl.ReflectionClass;
+import io.github.zero88.utils.DateTimes;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.json.jackson.DatabindCodec;
-import io.zero88.qwe.dto.jackson.JsonModule;
+import io.vertx.core.spi.json.JsonCodec;
+import io.zero88.qwe.dto.jackson.QWEJsonCodec;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.QWEException;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+/**
+ * Represents to Json Object data
+ * <p>
+ * If any data that is not {@code JsonObject}, JsonData parser will force parse data to json with {@link #SUCCESS_KEY}
+ * or {@link #ERROR_KEY}
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface JsonData {
 
-    ObjectMapper MAPPER = DatabindCodec.mapper()
-                                       .copy()
-                                       .registerModule(new JavaTimeModule())
-                                       .registerModule(JsonModule.BASIC)
-                                       .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
-                                                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
-    ObjectMapper LENIENT_MAPPER = MAPPER.copy().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    ObjectMapper MAPPER = QWEJsonCodec.mapper();
+    ObjectMapper LENIENT_MAPPER = QWEJsonCodec.lenientMapper();
     String SUCCESS_KEY = "data";
     String ERROR_KEY = "error";
     String FILTER_PROP_BY_NAME = "filter_by_name";
+
+    static boolean isJsonObject(@NonNull Class<?> clazz) {
+        return ReflectionClass.assertDataType(clazz, Map.class) ||
+               ReflectionClass.assertDataType(clazz, JsonObject.class);
+    }
 
     /**
      * Check if given class is able to added in json
      *
      * @param clazz Given class
      * @return {@code true} if able to added
-     * @see Json
+     * @see JsonCodec
      */
     static boolean isAbleHandler(@NonNull Class<?> clazz) {
-        return ReflectionClass.isJavaLangObject(clazz) || ReflectionClass.assertDataType(clazz, Instant.class) ||
-               ReflectionClass.assertDataType(clazz, Map.class) || ReflectionClass.assertDataType(clazz, List.class) ||
+        return ReflectionClass.isJavaLangObject(clazz) || DateTimes.isRelatedToDateTime(clazz) ||
+               ReflectionClass.assertDataType(clazz, Map.class) ||
+               ReflectionClass.assertDataType(clazz, Collection.class) ||
                ReflectionClass.assertDataType(clazz, JsonObject.class) ||
                ReflectionClass.assertDataType(clazz, JsonArray.class);
     }
@@ -84,10 +77,12 @@ public interface JsonData {
             return defValue;
         }
         if (ReflectionClass.assertDataType(value.getClass(), clazz)) {
+            if (value.getClass().isPrimitive() || clazz.isPrimitive()) {
+                return (D) value;
+            }
             return clazz.cast(value);
         }
-        if (ReflectionClass.assertDataType(clazz, JsonObject.class) &&
-            ReflectionClass.assertDataType(value.getClass(), Map.class)) {
+        if (isJsonObject(clazz) && isJsonObject(value.getClass())) {
             return (D) JsonData.tryParse(clazz).toJson();
         }
         return defValue;
@@ -137,7 +132,7 @@ public interface JsonData {
      * @return default {@code json data} instance
      */
     static JsonData tryParse(@NonNull Buffer buffer, boolean isJson, @NonNull String backupKey, boolean isWrapped) {
-        return DefaultJsonData.tryParse(buffer, isJson, backupKey, isWrapped);
+        return JsonDataImpl.tryParse(buffer, isJson, backupKey, isWrapped);
     }
 
     /**
@@ -162,7 +157,7 @@ public interface JsonData {
      * @see JsonData#tryParse(Buffer, boolean, boolean, boolean)
      */
     static JsonData tryParse(@NonNull Buffer buffer) {
-        return tryParse(buffer, false, false, false);
+        return tryParse(buffer, false);
     }
 
     /**
@@ -178,7 +173,7 @@ public interface JsonData {
     }
 
     static JsonData tryParse(@NonNull Object obj) {
-        return DefaultJsonData.tryParse(obj);
+        return JsonDataImpl.tryParse(obj);
     }
 
     static <T extends JsonData> T from(Object object, Class<T> clazz) {
@@ -196,7 +191,7 @@ public interface JsonData {
     static <T extends JsonData> T from(@NonNull Object object, @NonNull Class<T> clazz, @NonNull ObjectMapper mapper,
                                        String errorMsg) {
         try {
-            JsonObject entries = SerializerFunction.builder().mapper(mapper).build().apply(object);
+            JsonObject entries = JsonDataSerializer.builder().mapper(mapper).build().apply(object);
             return mapper.convertValue(entries.getMap(), clazz);
         } catch (IllegalArgumentException | NullPointerException | DecodeException ex) {
             throw new QWEException(ErrorCode.INVALID_ARGUMENT, errorMsg, new HiddenException(ex));
@@ -239,117 +234,6 @@ public interface JsonData {
 
     @JsonFilter(FILTER_PROP_BY_NAME)
     class PropertyFilterMixIn {}
-
-
-    @NoArgsConstructor
-    class DefaultJsonData extends HashMap<String, Object> implements JsonData {
-
-        private static final Logger logger = LoggerFactory.getLogger(DefaultJsonData.class);
-
-        DefaultJsonData(@NonNull Map<String, Object> map) { this.putAll(map); }
-
-        DefaultJsonData(@NonNull JsonObject json)         { this(json.getMap()); }
-
-        static JsonData tryParse(@NonNull Buffer buffer, boolean isJson, String backupKey, boolean isWrapper) {
-            if (buffer.length() == 0) {
-                return new DefaultJsonData();
-            }
-            try {
-                if (isWrapper) {
-                    return new DefaultJsonData(new JsonObject().put(backupKey, buffer.toJsonObject()));
-                }
-                return new DefaultJsonData(buffer.toJsonObject());
-            } catch (DecodeException e) {
-                logger.trace("Failed to parse json. Try json array", e);
-                JsonObject data = new JsonObject();
-                try {
-                    data.put(backupKey, buffer.toJsonArray());
-                } catch (DecodeException ex) {
-                    if (isJson) {
-                        throw new QWEException(ErrorCode.INVALID_ARGUMENT,
-                                               "Cannot parse json data. Received data: " + buffer, ex);
-                    }
-                    logger.trace("Failed to parse json array. Use text", ex);
-                    //TODO check length, check encode
-                    data.put(backupKey, buffer.toString());
-                }
-                return new DefaultJsonData(data);
-            }
-        }
-
-        static JsonData tryParse(@NonNull Object obj) {
-            if (obj instanceof JsonData) {
-                return (JsonData) obj;
-            }
-            if (obj instanceof Buffer) {
-                return tryParse((Buffer) obj, true, SUCCESS_KEY, false);
-            }
-            return new DefaultJsonData(
-                SerializerFunction.builder().backupKey(SUCCESS_KEY).lenient(true).mapper(MAPPER).build().apply(obj));
-        }
-
-    }
-
-
-    @Builder(builderClassName = "Builder")
-    class SerializerFunction implements Function<Object, JsonObject> {
-
-        private static final Logger logger = LoggerFactory.getLogger(SerializerFunction.class);
-
-        @NonNull
-        @Default
-        private final String backupKey = "data";
-        @Default
-        private final boolean lenient = false;
-        @NonNull
-        private final ObjectMapper mapper;
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public JsonObject apply(Object obj) {
-            if (Objects.isNull(obj)) {
-                return null;
-            }
-            if (obj instanceof String) {
-                try {
-                    return new JsonObject(mapper.readValue((String) obj, Map.class));
-                } catch (IOException e) {
-                    logger.trace("Failed mapping to json. Fallback to construct Json from plain string", e);
-                    return decode(obj, e);
-                }
-            }
-            if (obj instanceof JsonData) {
-                return ((JsonData) obj).toJson(mapper);
-            }
-            if (obj instanceof JsonObject) {
-                return (JsonObject) obj;
-            }
-            if (obj instanceof JsonArray) {
-                return decode(obj, "Failed to decode from JsonArray");
-            }
-            if (obj instanceof Collection) {
-                return decode(obj, "Failed to decode from Collection");
-            }
-            try {
-                return new JsonObject((Map<String, Object>) mapper.convertValue(obj, Map.class));
-            } catch (IllegalArgumentException e) {
-                logger.trace("Failed mapping to json. Fallback to construct Json from plain object", e);
-                return decode(obj, e);
-            }
-        }
-
-        private JsonObject decode(Object obj, Exception e) {
-            return decode(obj, "Failed to decode " + e.getMessage());
-        }
-
-        private JsonObject decode(Object obj, String msg) {
-            if (lenient) {
-                return new JsonObject().put(backupKey, obj);
-            }
-            throw new DecodeException(msg);
-        }
-
-    }
 
 }
 

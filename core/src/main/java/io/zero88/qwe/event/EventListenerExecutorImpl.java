@@ -6,7 +6,7 @@ import io.github.zero88.utils.Functions;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.dto.JsonData.SerializerFunction;
+import io.zero88.qwe.dto.JsonDataSerializer;
 import io.zero88.qwe.event.output.AnyToFuture;
 import io.zero88.qwe.event.output.OutputToFutureServiceLoader;
 import io.zero88.qwe.event.refl.MethodMeta;
@@ -27,12 +27,12 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     private final EventListener listener;
     @Getter
     private final SharedDataLocalProxy sharedData;
-    private final SerializerFunction serializer;
+    private final JsonDataSerializer serializer;
 
     EventListenerExecutorImpl(EventListener listener, SharedDataLocalProxy sharedData) {
         this.listener = listener;
         this.sharedData = sharedData;
-        this.serializer = SerializerFunction.builder()
+        this.serializer = JsonDataSerializer.builder()
                                             .mapper(listener.mapper())
                                             .backupKey(listener.fallback())
                                             .lenient(true)
@@ -43,7 +43,7 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     public Future<EventMessage> execute(Message message) {
         final EventMessage msg = EventMessage.convert(message);
         final String addr = message.address();
-        debug("Received", msg.getAction(), addr);
+        debug("Received message", msg.getAction(), addr);
         return sharedData.getVertx().executeBlocking(promise -> execute(msg, addr).onComplete(promise));
     }
 

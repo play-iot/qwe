@@ -1,5 +1,9 @@
 package io.zero88.qwe.event;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Map;
+
 import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -7,8 +11,10 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.QWEException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.exceptions.QWEException;
 
 public class EventMessageTest {
 
@@ -48,7 +54,7 @@ public class EventMessageTest {
     public void test_deserialize_success() {
         JsonObject jsonObject = new JsonObject("{\"action\":\"CREATE\",\"data\":{\"groupId\":\"io.qwespark\"," +
                                                "\"artifactId\":\"qwe-edge-ditto-driver\"}}");
-        EventMessage message = EventMessage.tryParse(jsonObject.getMap());
+        EventMessage message = EventMessage.tryParse(jsonObject);
         Assertions.assertFalse(message.isError());
         Assertions.assertFalse(message.isSuccess());
         Assertions.assertEquals(EventAction.CREATE, message.getAction());
@@ -81,6 +87,61 @@ public class EventMessageTest {
         Assertions.assertEquals(ErrorCode.UNKNOWN_ERROR, message.getError().getCode());
         Assertions.assertEquals("UNKNOWN_ERROR | Cause: xxx", message.getError().getMessage());
         Assertions.assertNull(message.getError().getThrowable());
+    }
+
+    @Test
+    public void test_serialize_deserialize_requestData() {
+        final JsonObject expected = new JsonObject("{\"status\":\"INITIAL\",\"action\":\"INIT\",\"data\":" +
+                                                   "{\"headers\":{},\"body\":{\"1\":\"a\"},\"filter\":{}}}");
+        final RequestData reqData = RequestData.builder().body(new JsonObject().put("1", "a")).build();
+        final EventMessage msg = EventMessage.initial(EventAction.INIT, reqData);
+        Assertions.assertEquals(expected, msg.toJson());
+        Assertions.assertEquals(reqData.toJson(), msg.getData());
+        Assertions.assertEquals(reqData, msg.parseAndGetData());
+        final EventMessage deserialize = EventMessage.tryParse(msg.toJson());
+        Assertions.assertTrue(deserialize.parseAndGetData() instanceof Map);
+        Assertions.assertEquals(reqData, msg.parseAndGetData(RequestData.class));
+        Assertions.assertEquals(msg.toJson(), deserialize.toJson());
+    }
+
+    @Test
+    public void test_deserialize_array() {
+        JsonObject expected = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":[1,2,3]}");
+        EventMessage msg = EventMessage.tryParse(expected);
+        Assertions.assertTrue(msg.isSuccess());
+        Assertions.assertEquals(EventAction.REMOVE, msg.getAction());
+        Assertions.assertNotNull(msg.rawData());
+        Assertions.assertEquals(new JsonArray().add(1).add(2).add(3), msg.rawData().toJson());
+        Assertions.assertEquals(Arrays.asList(1, 2, 3), msg.parseAndGetData());
+        Assertions.assertEquals(new JsonObject().put("data", Arrays.asList(1, 2, 3)), msg.getData());
+        Assertions.assertEquals(expected, msg.toJson());
+    }
+
+    @Test
+    public void test_deserialize_string() {
+        JsonObject expected = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":\"xyz\"}");
+        EventMessage msg = EventMessage.tryParse(expected);
+        Assertions.assertTrue(msg.isSuccess());
+        Assertions.assertEquals(EventAction.REMOVE, msg.getAction());
+        Assertions.assertNotNull(msg.rawData());
+        Assertions.assertEquals("xyz", msg.rawData().toJson());
+        Assertions.assertEquals("xyz", msg.parseAndGetData());
+        Assertions.assertEquals(expected, msg.toJson());
+        Assertions.assertEquals(new JsonObject().put("data", "xyz"), msg.getData());
+    }
+
+    @Test
+    public void test_deserialize_date() {
+        JsonObject expected = new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"REMOVE\",\"data\":\"2021-07-18\"}");
+        EventMessage msg = EventMessage.tryParse(expected);
+        Assertions.assertTrue(msg.isSuccess());
+        Assertions.assertEquals(EventAction.REMOVE, msg.getAction());
+        Assertions.assertNotNull(msg.rawData());
+        Assertions.assertEquals("2021-07-18", msg.rawData().toJson());
+        Assertions.assertEquals("2021-07-18", msg.parseAndGetData());
+        Assertions.assertEquals(expected, msg.toJson());
+        Assertions.assertEquals(new JsonObject().put("data", "2021-07-18"), msg.getData());
+        Assertions.assertEquals(LocalDate.of(2021, 7, 18), msg.parseAndGetData(LocalDate.class));
     }
 
 }

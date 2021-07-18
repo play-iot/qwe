@@ -26,9 +26,9 @@ class EventReplyHandlerImpl implements EventReplyHandler {
         return msg;
     }
 
-    public EventMessage otherwise(Throwable err) {
-        final String msg = Strings.format("No response on EventAction [{0}] from address [{1}]", action, address);
-        return EventMessage.replyError(action, new TimeoutException(msg, new HiddenException(err)));
+    public EventMessage otherwise(Throwable error) {
+        final String msg = Strings.format("No response [{0}][{1}]", address, action);
+        return EventMessage.replyError(action, new TimeoutException(msg, new HiddenException(error)));
     }
 
 }
