@@ -107,11 +107,11 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
     public void test_wsClient_request_then_server_response(TestContext context) {
         startServer(context, new HttpServerRouter().registerEventBusSocket(MockWebSocketEvent.NO_OUTBOUND));
         final Async async = context.async(1);
-        final EventMessage expected = EventMessage.success(EventAction.REPLY, EventAction.GET_LIST,
-                                                           new JsonObject().put("data", Arrays.asList("1", "2", "3")));
+        final EventMessage resp = EventMessage.replySuccess(EventAction.GET_LIST,
+                                                            new JsonObject().put("data", Arrays.asList("1", "2", "3")));
         final EventMessage openedMsg = createOpenedMessage(MockWebSocketEvent.NO_OUTBOUND);
         this.setupWSClient(context, wsPath(MockWebSocketEvent.NO_OUTBOUND))
-            .map(ws -> ws.handler(b -> doAssert(context, async, openedMsg, expected.toJson(), b)))
+            .map(ws -> ws.handler(b -> doAssert(context, async, openedMsg, resp.toJson(), b)))
             .onSuccess(ws -> wsSend(ws, MockWebSocketEvent.NO_OUTBOUND.inboundAddress(),
                                     EventMessage.initial(EventAction.GET_LIST)));
     }
@@ -232,8 +232,9 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
         //TODO why flashback a request data in publish address???
         final List<EventMessage> expected = Arrays.asList(createOpenedMessage(plan),
                                                           EventMessage.success(EventAction.ACK),
-                                                          EventMessage.success(EventAction.REPLY, EventAction.GET_ONE,
-                                                                               new JsonObject().put("data", "1")), req);
+                                                          EventMessage.replySuccess(EventAction.GET_ONE,
+                                                                                    new JsonObject().put("data", "1")),
+                                                          req);
         final AtomicInteger c = new AtomicInteger(0);
         this.setupWSClient(context, wsPath(plan))
             .map(ws -> wsRegister(ws, plan.outboundAddress()))

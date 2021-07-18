@@ -11,7 +11,7 @@ import io.vertx.core.json.JsonObject;
 public class SortTest {
 
     @Test
-    public void test_encode_decode() throws JSONException {
+    public void test_encode_decode() {
         final Sort sort = Sort.from("abc,-def,+xyz,g1.abc,g2.def,-g2.xy");
         Assertions.assertNotNull(sort);
         final JsonObject expected = sort.toJson();
@@ -21,7 +21,7 @@ public class SortTest {
     }
 
     @Test
-    public void test_alternative_decode() throws JSONException {
+    public void test_alternative_decode() {
         final Sort sort = Sort.from("abc,-def,+xyz,g1.abc,g2.def,-g2.xy");
         Assertions.assertNotNull(sort);
         System.out.println(sort.toJson());

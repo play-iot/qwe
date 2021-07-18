@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Binds the value(s) of an {@code Event Message} data({@link EventMessage#data()}) to a resource method parameter
+ * Binds the value(s) of an {@code Event Message} data({@link EventMessage#getData()}) to a resource method parameter
  *
  * @apiNote Able to omit if {@code Java method} has only one parameter that can be deserialize from json
  */

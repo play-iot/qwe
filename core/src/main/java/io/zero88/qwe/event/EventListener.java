@@ -32,7 +32,7 @@ public interface EventListener extends HasLogger, EventListenerLogSystem {
      *
      * @return fallback json key. Default: {@code data}
      */
-    default String fallback() { return "data"; }
+    default String fallback() { return JsonData.SUCCESS_KEY; }
 
     default @NonNull void handle(SharedDataLocalProxy sharedData, Message<Object> msg) {
         new EventListenerExecutorImpl(this, sharedData).execute(msg).onComplete(ar -> {

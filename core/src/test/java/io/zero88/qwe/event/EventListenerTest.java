@@ -77,6 +77,7 @@ public class EventListenerTest {
         eventBusClient.request(address, EventMessage.initial(EventAction.GET_ONE, new JsonObject().put("id", 111)))
                       .onSuccess(msg -> testContext.verify(() -> {
                           Assertions.assertEquals(EventAction.REPLY, msg.getAction());
+                          Assertions.assertEquals(EventAction.GET_ONE, msg.getPrevAction());
                           Assertions.assertEquals(new JsonObject().put("resp", 111), msg.getData());
                           testContext.completeNow();
                       }));
@@ -119,8 +120,8 @@ public class EventListenerTest {
                           Assertions.assertTrue(msg.isError());
                           Assertions.assertEquals(ErrorCode.SERVICE_NOT_FOUND, msg.getError().getCode());
                           Assertions.assertEquals(
-                              "Service not found | Cause: Unsupported event [ANY] - Error Code: UNSUPPORTED | Cause: " +
-                              "Unsupported event [ANY] - Error Code: UNSUPPORTED", msg.getError().getMessage());
+                              "Service not found | Cause: Unsupported event [ANY] - Error Code: UNSUPPORTED",
+                              msg.getError().getMessage());
                           testContext.completeNow();
                       }));
     }

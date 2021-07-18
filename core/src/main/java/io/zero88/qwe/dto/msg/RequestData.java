@@ -57,6 +57,19 @@ public final class RequestData extends AbstractDTO<RequestData> {
         return JsonData.MAPPER.convertValue(this, JsonObject.class).put("sort", sort.toJson());
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(headers(), body(), filter, pagination, sort);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof RequestData)) {
+            return false;
+        }
+        return toJson().equals(((RequestData) obj).toJson());
+    }
+
     public static class Builder {
 
         private JsonObject headers;

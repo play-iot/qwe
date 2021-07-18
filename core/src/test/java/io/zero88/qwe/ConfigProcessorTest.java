@@ -18,12 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.exceptions.QWEException;
 import io.github.zero88.utils.OSHelper;
 import io.github.zero88.utils.SystemHelper;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import io.zero88.qwe.exceptions.QWEException;
 
 @Disabled
 @ExtendWith(VertxExtension.class)
@@ -129,8 +129,9 @@ public class ConfigProcessorTest {
             Assertions.assertEquals(6000, finalResult.getBootConfig().getEventBusOptions().getPort());
             //            Assertions.assertTrue(finalResult.getSystemConfig().getEventBusConfig().getOptions()
             //            .isClustered());
-//            Assertions.assertEquals(ClusterType.ZOOKEEPER, finalResult.getSystemConfig().getClusterManager());
-//            Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
+            //            Assertions.assertEquals(ClusterType.ZOOKEEPER, finalResult.getSystemConfig()
+            //           .getClusterManager());
+            //            Assertions.assertFalse(finalResult.getSystemConfig().getClusterConfig().isActive());
         }, true, true);
     }
 
@@ -156,9 +157,8 @@ public class ConfigProcessorTest {
     public void test_invalid_data_type_should_be_used_default_config() {
         System.setProperty("qwe.system.cluster.active", "invalid_type");
 
-        overrideConfigThenAssert(
-            finalResult -> Assertions.assertTrue(finalResult.getBootConfig().isHAEnabled()), true,
-            true);
+        overrideConfigThenAssert(finalResult -> Assertions.assertTrue(finalResult.getBootConfig().isHAEnabled()), true,
+                                 true);
     }
 
     @Test
@@ -185,8 +185,7 @@ public class ConfigProcessorTest {
                             ".name\":\"edge-connector\"}}";
         qweConfig = IConfig.from(jsonInput1, QWEConfig.class);
         QWEConfig bpConfig2 = IConfig.from(jsonInput2, QWEConfig.class);
-        Optional<QWEConfig> finalResult = this.processor.override(qweConfig.toJson(), bpConfig2.toJson(),
-                                                                  true, true);
+        Optional<QWEConfig> finalResult = this.processor.override(qweConfig.toJson(), bpConfig2.toJson(), true, true);
         Assertions.assertTrue(finalResult.isPresent());
         Object httpConfig = finalResult.get().getAppConfig().lookup("__http__");
         Assertions.assertNotNull(httpConfig);
@@ -198,9 +197,9 @@ public class ConfigProcessorTest {
     @Test
     public void test_data_dir() {
         System.setProperty("qwe.dataDir", OSHelper.getAbsolutePathByOs("test").toString());
-        overrideConfigThenAssert(
-            finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"), finalResult.getAppConfig().dataDir()),
-            true, true);
+        overrideConfigThenAssert(finalResult -> Assertions.assertEquals(OSHelper.getAbsolutePathByOs("test"),
+                                                                        finalResult.getAppConfig().dataDir()), true,
+                                 true);
     }
 
     @Test
@@ -325,8 +324,8 @@ public class ConfigProcessorTest {
             try {
                 JSONAssert.assertEquals("{\"ha\":false,\"instances\":1,\"maxWorkerExecuteTime\":70000000000," +
                                         "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\",\"worker\":false," +
-                                        "\"workerPoolSize\":20}",
-                                        finalResult.getDeployConfig().toJson().encode(), JSONCompareMode.STRICT);
+                                        "\"workerPoolSize\":20}", finalResult.getDeployConfig().toJson().encode(),
+                                        JSONCompareMode.STRICT);
             } catch (JSONException e) {
                 throw new QWEException(e);
             }
@@ -392,7 +391,8 @@ public class ConfigProcessorTest {
         qweConfig = IConfig.from(jsonInput, QWEConfig.class);
         Optional<QWEConfig> finalResult = this.processor.override(qweConfig.toJson(), null, true, true);
         Assertions.assertTrue(finalResult.isPresent());
-        MatcherAssert.assertThat(finalResult.get().getAppConfig().dataDir().toString(), CoreMatchers.containsString("data"));
+        MatcherAssert.assertThat(finalResult.get().getAppConfig().dataDir().toString(),
+                                 CoreMatchers.containsString("data"));
     }
 
     private void overrideConfigThenAssert(Consumer<QWEConfig> configConsumer, boolean overrideAppConfig,
