@@ -62,11 +62,12 @@ class QWEBootConfigTest {
         final QWEBootConfig def = new QWEBootConfig();
         final JsonObject override = new JsonObject(
             "{\"clusterType\":\"HAZELCAST\",\"haGroup\":\"_PLAYIO_\",\"clusterLiteMember\":true, " +
-            "\"eventBusOptions\":{\"port\":7000},\"fileSystemOptions\":{\"fileCacheDir\":\"/data/qwe\"}}");
+            "\"eventBusOptions\":{\"port\":7000, \"clusterPublicPort\":7001}," +
+            "\"fileSystemOptions\":{\"fileCacheDir\":\"/data/qwe\"}}");
         final QWEBootConfig cfg = IConfig.merge(def, override, QWEBootConfig.class);
         System.out.println(cfg.toJson().encodePrettily());
         Assertions.assertEquals(7000, cfg.getEventBusOptions().getPort());
-        Assertions.assertEquals(2468, cfg.getEventBusOptions().getClusterPublicPort());
+        Assertions.assertEquals(7001, cfg.getEventBusOptions().getClusterPublicPort());
         Assertions.assertFalse(cfg.getEventBusOptions().isReusePort());
 
         Assertions.assertEquals("/data/qwe", cfg.getFileSystemOptions().getFileCacheDir());
