@@ -20,7 +20,7 @@ include(":qwe-core")
 project(":qwe-core").projectDir = file("core")
 
 include("http:client", "http:server")
-
+include("sql")
 include("storage:json")
 
 include(

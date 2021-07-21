@@ -3,7 +3,6 @@ object UtilLibs {
     object Version {
 
         const val lombok = "1.18.16"
-        const val classgraph = "4.8.105"
         const val jetbrainsAnnotations = "20.1.0"
     }
 
@@ -80,15 +79,20 @@ object VertxLibs {
     const val serviceDiscovery = "io.vertx:vertx-service-discovery:${Version.vertx}"
     const val circuitBreaker = "io.vertx:vertx-circuit-breaker:${Version.vertx}"
     const val healthCheck = "io.vertx:vertx-health-check:${Version.vertx}"
-
     const val hazelcast = "io.vertx:vertx-hazelcast:${Version.vertx}"
     const val zookeeper = "io.vertx:vertx-zookeeper:${Version.vertx}"
     const val ignite = "io.vertx:vertx-ignite:${Version.vertx}"
     const val infinispan = "io.vertx:vertx-infinispan:${Version.vertx}"
-
     const val rx2 = "io.vertx:vertx-rx-java2:${Version.vertx}"
     const val junit = "io.vertx:vertx-unit:${Version.vertx}"
     const val junit5 = "io.vertx:vertx-junit5:${Version.vertx}"
+
+    const val sqlClient = "io.vertx:vertx-sql-client:${Version.vertx}"
+    const val jdbc = "io.vertx:vertx-jdbc-client:${Version.vertx}"
+    const val pgsql = "io.vertx:vertx-pg-client:${Version.vertx}"
+    const val mysql = "io.vertx:vertx-mysql-client:${Version.vertx}"
+    const val db2 = "io.vertx:vertx-db2-client:${Version.vertx}"
+    const val mssql = "io.vertx:vertx-mssql-client:${Version.vertx}"
 
 }
 
@@ -107,11 +111,43 @@ object LogLibs {
 object ZeroLibs {
     object Version {
 
-        const val utils = "2.0.0-SNAPSHOT"
+        const val jooqx = "1.1.0-SNAPSHOT"
         const val jpaExt = "0.9.0"
+        const val rql = "0.9.0"
+        const val utils = "2.0.0-SNAPSHOT"
     }
 
     const val utils = "io.github.zero88:java-utils:${Version.utils}"
     const val jpaExt = "io.github.zero88:jpa-ext:${Version.jpaExt}"
+    const val jooqx = "io.github.zero88:jooqx-core:${Version.jooqx}"
+    const val jooqxSpi = "io.github.zero88:jooqx-spi:${Version.jooqx}"
+    const val jooqRql = "io.github.zero88:rql-jooq:${Version.rql}"
+}
 
+object DatabaseLibs {
+
+    object Version {
+
+        const val jooq = "3.14.8"
+        const val h2 = "1.4.200"
+        const val pgsql = "42.2.19"
+        const val mysql = "8.0.23"
+        const val hikari = "4.0.2"
+        const val jpa = "2.2"
+        const val jta = "1.3"
+        const val agroal = "1.9"
+        const val sqlite = "3.36.0.1"
+    }
+
+    const val h2 = "com.h2database:h2:${Version.h2}"
+    const val pgsql = "org.postgresql:postgresql:${Version.pgsql}"
+    const val mysql = "mysql:mysql-connector-java:${Version.mysql}"
+    const val hikari = "com.zaxxer:HikariCP:${Version.hikari}"
+    const val jooq = "org.jooq:jooq:${Version.jooq}"
+    const val jooqMeta = "org.jooq:jooq-meta:${Version.jooq}"
+    const val jooqMetaExt = "org.jooq:jooq-meta-extensions:${Version.jooq}"
+    const val jooqCodegen = "org.jooq:jooq-codegen:${Version.jooq}"
+    const val agroalApi = "io.agroal:agroal-api:${Version.agroal}"
+    const val agroalPool = "io.agroal:agroal-pool:${Version.agroal}"
+    const val sqlite = "org.xerial:sqlite-jdbc:${Version.sqlite}"
 }

@@ -1,0 +1,11 @@
+{
+  "__app__": {
+    "__sql__": {
+      "pluginDir": "sql",
+      "dialect": "H2",
+      "jooqxFacadeClass": null,
+      "__sql_conn__": {},
+      "__sql_pool__": {}
+    }
+  }
+}
