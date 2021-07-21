@@ -2,6 +2,8 @@ package io.zero88.qwe;
 
 import java.util.Map;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * A {@code Plugin} configuration
  *
@@ -42,7 +44,7 @@ public interface PluginConfig extends IConfig {
          *
          * @return plugin dir
          */
-        String getPluginDir();
+        @Nullable String getPluginDir();
 
     }
 

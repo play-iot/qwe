@@ -25,9 +25,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 @SuppressWarnings("unchecked")
 public final class QWEJsonCodec implements JsonCodec {
 
-    private static final ObjectMapper mapper = setup(DatabindCodec.mapper());
-    private static final ObjectMapper pretty = setup(DatabindCodec.prettyMapper());
-    private static final ObjectMapper lenient = mapper().copy()
+    private static final ObjectMapper MAPPER = setup(DatabindCodec.mapper());
+    private static final ObjectMapper PRETTY = setup(DatabindCodec.prettyMapper());
+    private static final ObjectMapper LENIENT = mapper().copy()
                                                         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                                                                    false);
 
@@ -42,23 +42,23 @@ public final class QWEJsonCodec implements JsonCodec {
      * @return the {@link ObjectMapper} used for data binding.
      */
     public static ObjectMapper mapper() {
-        return mapper;
+        return MAPPER;
     }
 
     /**
      * @return the {@link ObjectMapper} used for data binding configured for indenting output.
      */
     public static ObjectMapper prettyMapper() {
-        return pretty;
+        return PRETTY;
     }
 
     public static ObjectMapper lenientMapper() {
-        return lenient;
+        return LENIENT;
     }
 
     @Override
     public <T> T fromValue(Object json, Class<T> clazz) {
-        T value = QWEJsonCodec.mapper.convertValue(json, clazz);
+        T value = QWEJsonCodec.MAPPER.convertValue(json, clazz);
         if (clazz == Object.class) {
             value = (T) adapt(value);
         }
@@ -77,7 +77,7 @@ public final class QWEJsonCodec implements JsonCodec {
 
     public static JsonParser createParser(Buffer buf) {
         try {
-            return QWEJsonCodec.mapper.getFactory()
+            return QWEJsonCodec.MAPPER.getFactory()
                                       .createParser((InputStream) new ByteBufInputStream(buf.getByteBuf()));
         } catch (IOException e) {
             throw new DecodeException("Failed to decode:" + e.getMessage(), e);
@@ -86,7 +86,7 @@ public final class QWEJsonCodec implements JsonCodec {
 
     public static JsonParser createParser(String str) {
         try {
-            return QWEJsonCodec.mapper.getFactory().createParser(str);
+            return QWEJsonCodec.MAPPER.getFactory().createParser(str);
         } catch (IOException e) {
             throw new DecodeException("Failed to decode:" + e.getMessage(), e);
         }
@@ -96,7 +96,7 @@ public final class QWEJsonCodec implements JsonCodec {
         T value;
         JsonToken remaining;
         try {
-            value = QWEJsonCodec.mapper.readValue(parser, type);
+            value = QWEJsonCodec.MAPPER.readValue(parser, type);
             remaining = parser.nextToken();
         } catch (Exception e) {
             throw new DecodeException("Failed to decode:" + e.getMessage(), e);
@@ -115,7 +115,7 @@ public final class QWEJsonCodec implements JsonCodec {
     @Override
     public String toString(Object object, boolean pretty) throws EncodeException {
         try {
-            ObjectMapper mapper = pretty ? QWEJsonCodec.pretty : QWEJsonCodec.mapper;
+            ObjectMapper mapper = pretty ? QWEJsonCodec.PRETTY : QWEJsonCodec.MAPPER;
             return mapper.writeValueAsString(object);
         } catch (Exception e) {
             throw new EncodeException("Failed to encode as JSON: " + e.getMessage());
@@ -125,7 +125,7 @@ public final class QWEJsonCodec implements JsonCodec {
     @Override
     public Buffer toBuffer(Object object, boolean pretty) throws EncodeException {
         try {
-            ObjectMapper mapper = pretty ? QWEJsonCodec.pretty : QWEJsonCodec.mapper;
+            ObjectMapper mapper = pretty ? QWEJsonCodec.PRETTY : QWEJsonCodec.MAPPER;
             return Buffer.buffer(mapper.writeValueAsBytes(object));
         } catch (Exception e) {
             throw new EncodeException("Failed to encode as JSON: " + e.getMessage());

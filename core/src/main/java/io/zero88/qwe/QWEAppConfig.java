@@ -60,7 +60,7 @@ public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements 
         this.deliveryOptions = Optional.ofNullable(m.remove(QWEAppConfig.DELIVERY_OPTIONS))
                                        .map(o -> new DeliveryOptions(JsonObject.mapFrom(o)))
                                        .orElseGet(DeliveryOptions::new);
-        this.other.putAll(m);
+        this.putAll(m);
     }
 
     @Override
