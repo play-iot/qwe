@@ -1,6 +1,8 @@
 package io.zero88.qwe;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +61,12 @@ public interface PluginConfig extends IConfig {
     @SuppressWarnings({"rawtypes", "unchecked"})
     interface DynamicPluginConfig<C extends DynamicPluginConfig> extends PluginConfig, IOtherConfig<C> {
 
+        /**
+         * Find correct plugin config map
+         *
+         * @param map json data
+         * @return plugin config
+         */
         default Map<String, Object> find(Map<String, Object> map) {
             if (map.containsKey(QWEAppConfig.NAME)) {
                 return find((Map<String, Object>) map.get(QWEAppConfig.NAME));
@@ -67,6 +75,16 @@ public interface PluginConfig extends IConfig {
                 return (Map<String, Object>) map.get(key());
             }
             return map;
+        }
+
+        abstract class DynamicPluginConfigImpl<C extends DynamicPluginConfig> extends HasOtherConfig<C>
+            implements DynamicPluginConfig<C> {
+
+            public DynamicPluginConfigImpl(Map<String, Object> other) {
+                super();
+                this.putAll(find(Optional.ofNullable(other).orElseGet(HashMap::new)));
+            }
+
         }
 
     }
