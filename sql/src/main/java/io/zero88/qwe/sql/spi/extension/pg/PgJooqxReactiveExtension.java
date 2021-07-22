@@ -16,4 +16,6 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
 public interface PgJooqxReactiveExtension
     extends JooqxReactiveExtension<PgPool>, PgPoolProvider, PgSQLErrorConverterProvider {
 
+    PgJooqxReactiveExtension INSTANCE = new PgJooqxReactiveExtension() {};
+
 }

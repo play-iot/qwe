@@ -1,13 +1,14 @@
 package io.zero88.qwe.sql.handler;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Functions;
+import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.zero88.jooqx.JooqDSLProvider;
 import io.zero88.jooqx.SQLExecutor;
@@ -17,9 +18,9 @@ import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.sql.SQLPluginConfig;
+import io.zero88.qwe.sql.spi.extension.JooqxExtensionRegistry;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 /**
@@ -38,13 +39,13 @@ public abstract class EntityHandlerImpl<S, B, PQ extends SQLPreparedQuery<B>, RS
 
     @Override
     public Future<EntityHandler<S, B, PQ, RS, RC, E>> setup(@NotNull SharedDataLocalProxy sharedData,
-                                                            @NonNull Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls,
+                                                            @NotNull PluginContext pluginContext,
                                                             @NotNull SQLPluginConfig pluginConfig,
-                                                            @NotNull PluginContext pluginContext) {
+                                                            @Nullable Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls) {
         this.sharedData = sharedData;
-        return Functions.getOrThrow(() -> Objects.requireNonNull(createExtension(jooqxExtensionCls, pluginConfig)),
-                                    t -> new InitializerError("Unable create jOOQx extension", t))
-                        .setup(pluginContext)
+        return Functions.getOrThrow(() -> Objects.requireNonNull(createExtension(pluginConfig, jooqxExtensionCls)),
+                                    t -> new InitializerError("Unable create jOOQx Extension"))
+                        .setup(pluginContext, pluginConfig)
                         .jooqx(sharedData.getVertx(), createDSL(pluginConfig), pluginConfig.connectionOptions(),
                                pluginConfig.poolOptions())
                         .onSuccess(jooqx -> this.jooqx = jooqx)
@@ -52,11 +53,22 @@ public abstract class EntityHandlerImpl<S, B, PQ extends SQLPreparedQuery<B>, RS
     }
 
     @SuppressWarnings("unchecked")
-    protected JooqxExtension<S, B, PQ, RS, RC, E> createExtension(
-        @NotNull Class<JooqxExtension<S, B, PQ, RS, RC, E>> facadeCls, @NotNull SQLPluginConfig pluginConfig) {
-        return (JooqxExtension<S, B, PQ, RS, RC, E>) Optional.ofNullable(pluginConfig.getJooqxFacadeClass())
-                                                             .map(ReflectionClass::createObject)
-                                                             .orElseGet(() -> ReflectionClass.createObject(facadeCls));
+    protected JooqxExtension<S, B, PQ, RS, RC, E> createExtension(@NotNull SQLPluginConfig pluginConfig,
+                                                                  Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtCls) {
+        JooqxExtension<S, B, PQ, RS, RC, E> extension = null;
+        if (Strings.isNotBlank(pluginConfig.getJooqxExtensionClass())) {
+            logger().debug("Load jOOQx Extension from class[{}]...", pluginConfig.getJooqxExtensionClass());
+            extension = ReflectionClass.createObject(pluginConfig.getJooqxExtensionClass());
+        }
+        if (Objects.isNull(extension) && Objects.nonNull(jooqxExtCls)) {
+            logger().debug("Load jOOQx Extension from class[{}]...", jooqxExtCls);
+            extension = ReflectionClass.createObject(jooqxExtCls);
+        }
+        if (Objects.isNull(extension) && pluginConfig.isAutoDetect()) {
+            logger().debug("Auto detect jOOQx Extension for {}", pluginConfig.getDialect());
+            extension = JooqxExtensionRegistry.lookup(pluginConfig.getDialect());
+        }
+        return extension;
     }
 
     protected @NotNull DSLContext createDSL(@NotNull SQLPluginConfig pluginConfig) {

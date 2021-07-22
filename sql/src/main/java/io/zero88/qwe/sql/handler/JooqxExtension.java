@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.json.JsonArray;
+import io.vertx.ext.jdbc.spi.DataSourceProvider;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.sqlclient.Row;
@@ -23,11 +24,14 @@ import io.zero88.jooqx.SQLResultCollector;
 import io.zero88.jooqx.provider.JooqxFacade;
 import io.zero88.jooqx.provider.JooqxProvider;
 import io.zero88.jooqx.provider.LegacyJooqxProvider;
+import io.zero88.jooqx.provider.LegacySQLClientProvider;
 import io.zero88.jooqx.provider.ReactiveJooqxProvider;
+import io.zero88.jooqx.provider.ReactiveSQLClientProvider;
 import io.zero88.jooqx.provider.SQLClientProvider;
 import io.zero88.jooqx.spi.jdbc.JDBCErrorConverterProvider;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.PluginContext;
+import io.zero88.qwe.sql.SQLPluginConfig;
 
 /**
  * Represents for jOOQx extension that makes compatible between {@code JooqxFacade} with {@code PluginContext}
@@ -59,11 +63,13 @@ public interface JooqxExtension<S, B, PQ extends SQLPreparedQuery<B>, RS, RC ext
     /**
      * Setup jooqx extension
      *
-     * @param pluginContext plugin context
+     * @param pluginContext SQL plugin context
+     * @param pluginConfig  SQL plugin config
      * @return a reference to this for fluent API
      */
     @NotNull
-    default JooqxExtension<S, B, PQ, RS, RC, E> setup(@NotNull PluginContext pluginContext) {
+    default JooqxExtension<S, B, PQ, RS, RC, E> setup(@NotNull PluginContext pluginContext,
+                                                      @NotNull SQLPluginConfig pluginConfig) {
         return this;
     }
 
@@ -75,11 +81,10 @@ public interface JooqxExtension<S, B, PQ extends SQLPreparedQuery<B>, RS, RC ext
      * @see JooqxReactiveFacade
      * @see ReactiveJooqxProvider
      */
-    interface JooqxReactiveExtension<S extends SqlClient> extends JooqxReactiveFacade<S>, ReactiveJooqxProvider<S>,
-                                                                  JooqxExtension<S, Tuple, ReactiveSQLPreparedQuery,
-                                                                                    RowSet<Row>,
-                                                                                    ReactiveSQLResultCollector,
-                                                                                    ReactiveJooqxBase<S>> {
+    interface JooqxReactiveExtension<S extends SqlClient>
+        extends JooqxReactiveFacade<S>, ReactiveJooqxProvider<S>, ReactiveSQLClientProvider<S>,
+                JooqxExtension<S, Tuple, ReactiveSQLPreparedQuery, RowSet<Row>, ReactiveSQLResultCollector,
+                                  ReactiveJooqxBase<S>> {
 
     }
 
@@ -91,9 +96,10 @@ public interface JooqxExtension<S, B, PQ extends SQLPreparedQuery<B>, RS, RC ext
      * @see LegacyJooqxProvider
      * @see JDBCErrorConverterProvider
      */
-    interface JooqxLegacyExtension extends JooqxLegacyFacade, LegacyJooqxProvider, JDBCErrorConverterProvider,
-                                           JooqxExtension<SQLClient, JsonArray, LegacySQLPreparedQuery, ResultSet,
-                                                             LegacySQLCollector, LegacyJooqx> {
+    interface JooqxLegacyExtension<P extends DataSourceProvider>
+        extends JooqxLegacyFacade, LegacyJooqxProvider, LegacySQLClientProvider<P>, JDBCErrorConverterProvider,
+                JooqxExtension<SQLClient, JsonArray, LegacySQLPreparedQuery, ResultSet, LegacySQLCollector,
+                                  LegacyJooqx> {
 
     }
 

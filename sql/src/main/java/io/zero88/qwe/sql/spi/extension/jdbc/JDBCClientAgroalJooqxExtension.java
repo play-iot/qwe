@@ -1,7 +1,7 @@
 package io.zero88.qwe.sql.spi.extension.jdbc;
 
+import io.vertx.ext.jdbc.spi.impl.AgroalCPDataSourceProvider;
 import io.zero88.jooqx.spi.jdbc.JDBCLegacyAgroalProvider;
-import io.zero88.jooqx.spi.jdbc.JDBCLegacyHikariProvider;
 import io.zero88.qwe.sql.handler.JooqxExtension.JooqxLegacyExtension;
 
 /**
@@ -10,4 +10,7 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxLegacyExtension;
  * @see JooqxLegacyExtension
  * @see JDBCLegacyAgroalProvider
  */
-public interface JDBCJooqxLegacyAgroalExtension extends JooqxLegacyExtension, JDBCLegacyAgroalProvider {}
+public interface JDBCClientAgroalJooqxExtension
+    extends JooqxLegacyExtension<AgroalCPDataSourceProvider>, JDBCLegacyAgroalProvider {
+
+}

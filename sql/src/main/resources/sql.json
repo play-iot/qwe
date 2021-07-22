@@ -2,8 +2,9 @@
   "__app__": {
     "__sql__": {
       "pluginDir": "sql",
-      "dialect": "H2",
-      "jooqxFacadeClass": null,
+      "dialect": null,
+      "jooqxExtensionClass": null,
+      "autoDetect": false,
       "__sql_conn__": {},
       "__sql_pool__": {}
     }

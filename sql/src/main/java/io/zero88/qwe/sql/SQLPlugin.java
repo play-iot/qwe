@@ -53,7 +53,7 @@ public final class SQLPlugin<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extend
 
     @Override
     public Future<Void> onAsyncStart() {
-        return handler.setup(sharedData(), jooqxExtensionClass, pluginConfig().validate(), pluginContext())
+        return handler.setup(sharedData(), pluginContext(), pluginConfig().validate(), jooqxExtensionClass)
                       .flatMap(this::initOrMigrate)
                       .mapEmpty();
     }

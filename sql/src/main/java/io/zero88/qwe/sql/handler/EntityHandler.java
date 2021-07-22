@@ -1,6 +1,7 @@
 package io.zero88.qwe.sql.handler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jooq.Catalog;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
@@ -47,16 +48,16 @@ public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * Setup Entity handler
      *
      * @param sharedData        shared data
-     * @param jooqxExtensionCls jooqx extension class
-     * @param pluginConfig      SQL plugin config
      * @param pluginContext     Pre-plugin context
+     * @param pluginConfig      SQL plugin config
+     * @param jooqxExtensionCls jooqx extension class
      * @return a reference future to this for fluent API
      * @see JooqxExtension
      */
     Future<EntityHandler<S, B, PQ, RS, RC, E>> setup(@NotNull SharedDataLocalProxy sharedData,
-                                                     @NonNull Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls,
+                                                     @NonNull PluginContext pluginContext,
                                                      @NotNull SQLPluginConfig pluginConfig,
-                                                     @NonNull PluginContext pluginContext);
+                                                     @Nullable Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls);
 
     /**
      * jOOQx instance

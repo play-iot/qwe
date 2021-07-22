@@ -14,4 +14,8 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
  * @see JooqxReactiveExtension
  */
 public interface DB2JooqxReactiveExtension
-    extends JooqxReactiveExtension<DB2Pool>, DB2PoolProvider, DB2ErrorConverterProvider {}
+    extends JooqxReactiveExtension<DB2Pool>, DB2PoolProvider, DB2ErrorConverterProvider {
+
+    DB2JooqxReactiveExtension INSTANCE = new DB2JooqxReactiveExtension() {};
+
+}

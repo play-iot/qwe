@@ -14,4 +14,8 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
  * @see JooqxReactiveExtension
  */
 public interface MSSQLJooqxReactiveExtension
-    extends JooqxReactiveExtension<MSSQLPool>, MSSQLPoolProvider, MSSQLErrorConverterProvider {}
+    extends JooqxReactiveExtension<MSSQLPool>, MSSQLPoolProvider, MSSQLErrorConverterProvider {
+
+    MSSQLJooqxReactiveExtension INSTANCE = new MSSQLJooqxReactiveExtension() {};
+
+}
