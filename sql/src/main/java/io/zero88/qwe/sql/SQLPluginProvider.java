@@ -8,16 +8,18 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.sql.handler.EntityHandler;
 import io.zero88.qwe.sql.handler.JooqxExtension;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@AllArgsConstructor
 @SuppressWarnings("rawtypes")
 public final class SQLPluginProvider<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
                                         E extends SQLExecutor<S, B, PQ, RS, RC>>
     implements PluginProvider<SQLPlugin> {
 
     private final Class<EntityHandler<S, B, PQ, RS, RC, E>> entityHandlerClass;
-    private final Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass;
+    private Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass;
 
     @Override
     public Class<SQLPlugin> pluginClass() {

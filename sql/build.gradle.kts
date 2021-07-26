@@ -13,7 +13,6 @@ dependencies {
     compileOnly(VertxLibs.mssql)
 
     testImplementation(VertxLibs.junit5)
-    testImplementation(VertxLibs.sqlClient)
     testImplementation(VertxLibs.jdbc)
     testImplementation(VertxLibs.db2)
     testImplementation(VertxLibs.pgsql)
@@ -21,6 +20,6 @@ dependencies {
     testImplementation(VertxLibs.mssql)
     testImplementation(DatabaseLibs.h2)
     testImplementation(DatabaseLibs.hikari)
-    testImplementation(DatabaseLibs.agroalPool)
     testImplementation(testFixtures(project(":qwe-core")))
+    testImplementation(testFixtures(ZeroLibs.jooqx))
 }

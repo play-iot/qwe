@@ -1,10 +1,15 @@
 package io.zero88.qwe.sql.spi.extension.jdbc;
 
+import java.util.Objects;
+
 import org.jetbrains.annotations.NotNull;
 import org.jooq.SQLDialect;
 
+import io.github.zero88.repl.ReflectionClass;
+import io.vertx.core.json.JsonObject;
 import io.zero88.jooqx.provider.DBEmbeddedProvider;
 import io.zero88.jooqx.spi.DBEmbeddedMode;
+import io.zero88.qwe.exceptions.InitializerError;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +32,16 @@ public class DBEmbeddedDelegate<T extends DBEmbeddedProvider> implements DBEmbed
     @Override
     public @NonNull String driverClassName() {
         return provider.driverClassName();
+    }
+
+    @Override
+    public @NotNull JsonObject createConnOptions(@NotNull String databaseName, @NotNull JsonObject connOptions) {
+        JsonObject conn = DBEmbeddedProvider.super.createConnOptions(databaseName, connOptions);
+        String driverClassName = conn.getString("driverClassName", conn.getString("driver_class"));
+        if (Objects.nonNull(driverClassName) && !ReflectionClass.hasClass(driverClassName)) {
+            throw new InitializerError("Unable load SQL driver [" + driverClassName + "]");
+        }
+        return conn;
     }
 
     public static DBEmbeddedProvider create(String databaseName, SQLDialect dialect, DBEmbeddedMode mode) {

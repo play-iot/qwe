@@ -57,7 +57,7 @@ public abstract class EntityHandlerImpl<S, B, PQ extends SQLPreparedQuery<B>, RS
                                                                   Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtCls) {
         JooqxExtension<S, B, PQ, RS, RC, E> extension = null;
         if (Strings.isNotBlank(pluginConfig.getJooqxExtensionClass())) {
-            logger().debug("Load jOOQx Extension from class[{}]...", pluginConfig.getJooqxExtensionClass());
+            logger().debug("Load jOOQx Extension from config[{}]...", pluginConfig.getJooqxExtensionClass());
             extension = ReflectionClass.createObject(pluginConfig.getJooqxExtensionClass());
         }
         if (Objects.isNull(extension) && Objects.nonNull(jooqxExtCls)) {
@@ -65,7 +65,7 @@ public abstract class EntityHandlerImpl<S, B, PQ extends SQLPreparedQuery<B>, RS
             extension = ReflectionClass.createObject(jooqxExtCls);
         }
         if (Objects.isNull(extension) && pluginConfig.isAutoDetect()) {
-            logger().debug("Auto detect jOOQx Extension for {}", pluginConfig.getDialect());
+            logger().debug("Auto detect jOOQx Extension on[{}]", pluginConfig.getDialect());
             extension = JooqxExtensionRegistry.lookup(pluginConfig.getDialect());
         }
         return extension;
