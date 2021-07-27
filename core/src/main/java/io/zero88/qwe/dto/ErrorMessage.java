@@ -1,13 +1,14 @@
 package io.zero88.qwe.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.function.Function;
 
-import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
+import io.zero88.qwe.exceptions.QWEExceptionConverter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,7 +28,6 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ErrorMessage implements Serializable, JsonData {
 
-    @JsonIgnore
     private QWEException throwable;
     private io.github.zero88.exceptions.ErrorCode code;
     private String message;
@@ -68,6 +68,11 @@ public final class ErrorMessage implements Serializable, JsonData {
 
     public static ErrorMessage parse(@NonNull JsonObject error) {
         return JsonData.convert(error, ErrorMessage.class);
+    }
+
+    @JsonIgnore
+    public QWEException getThrowable() {
+        return Objects.isNull(throwable) ? new QWEException(code, message) : throwable;
     }
 
     @Override

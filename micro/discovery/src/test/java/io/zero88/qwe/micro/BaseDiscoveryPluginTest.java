@@ -12,13 +12,13 @@ import org.junit.jupiter.api.io.TempDir;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.PluginTestHelper;
 import io.zero88.qwe.IConfig;
+import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.event.EventBusClient;
 
 @ExtendWith(VertxExtension.class)
-public abstract class BaseDiscoveryPluginTest implements PluginTestHelper {
+public abstract class BaseDiscoveryPluginTest implements PluginDeployTest<DiscoveryPlugin> {
 
     protected MicroConfig config;
     protected EventBusClient ebClient;
@@ -37,9 +37,8 @@ public abstract class BaseDiscoveryPluginTest implements PluginTestHelper {
     }
 
     @BeforeEach
-    public void setup(Vertx vertx, VertxTestContext ctx) {
-        config = initMicroConfig();
-        discovery = deploy(vertx, ctx, config.toJson(), new DiscoveryPluginProvider()).pluginContext().getDiscovery();
+    public void tearUp(Vertx vertx, VertxTestContext ctx) {
+        discovery = deploy(vertx, ctx, initConfig(), initProvider()).pluginContext().getDiscovery();
         ebClient = EventBusClient.create(createSharedData(vertx));
     }
 
@@ -48,12 +47,18 @@ public abstract class BaseDiscoveryPluginTest implements PluginTestHelper {
         vertx.close(context.succeedingThenComplete());
     }
 
-    protected MicroConfig initMicroConfig() {
-        return IConfig.fromClasspath("local.json", MicroConfig.class);
-    }
-
     protected ServiceGatewayConfig getGatewayConfig() {
         return Objects.requireNonNull(config.lookup(ServiceGatewayConfig.NAME, ServiceGatewayConfig.class));
+    }
+
+    @Override
+    public MicroConfig initConfig() {
+        return config = IConfig.fromClasspath("local.json", MicroConfig.class);
+    }
+
+    @Override
+    public DiscoveryPluginProvider initProvider() {
+        return new DiscoveryPluginProvider();
     }
 
 }

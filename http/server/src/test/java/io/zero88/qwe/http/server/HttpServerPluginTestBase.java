@@ -10,36 +10,26 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.skyscreamer.jsonassert.Customization;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.utils.Strings;
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.RequestOptions;
-import io.vertx.core.http.WebSocket;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.EventBusHelper;
 import io.zero88.qwe.IConfig;
-import io.zero88.qwe.PluginTestHelper;
+import io.zero88.qwe.PluginProvider;
+import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
 import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.dto.msg.ResponseData;
-import io.zero88.qwe.http.HostInfo;
-import io.zero88.qwe.http.client.HttpClientDelegate;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @RunWith(VertxUnitRunner.class)
-public abstract class HttpServerPluginTestBase implements PluginTestHelper, HttpServerTestHelper {
+public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpServerPlugin>, HttpServerTestHelper {
 
     protected static final String DEFAULT_HOST = "127.0.0.1";
 
@@ -64,9 +54,6 @@ public abstract class HttpServerPluginTestBase implements PluginTestHelper, Http
     @Before
     public void before(TestContext context) throws IOException {
         vertx = Vertx.vertx();
-        httpConfig = IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class)
-                            .setHost(DEFAULT_HOST)
-                            .setPort(TestHelper.getRandomPort());
         client = vertx.createHttpClient(createClientOptions());
         requestOptions = new RequestOptions().setHost(DEFAULT_HOST).setPort(httpConfig.getPort());
     }
@@ -85,16 +72,28 @@ public abstract class HttpServerPluginTestBase implements PluginTestHelper, Http
     }
 
     protected HttpServerPlugin startServer(TestContext context, HttpServerRouter httpRouter) {
-        return deploy(vertx, context, httpConfig.toJson(), new HttpServerPluginProvider(httpRouter));
+        return deploy(vertx, context, httpConfig, new HttpServerPluginProvider(httpRouter));
     }
 
     protected void startServer(TestContext context, HttpServerRouter httpRouter, Consumer<Throwable> consumer) {
-        deployFailed(vertx, context, httpConfig.toJson(), new HttpServerPluginProvider(httpRouter), consumer);
+        deployFailed(vertx, context, httpConfig, new HttpServerPluginProvider(httpRouter), consumer);
     }
 
     protected JsonObject notFoundResponse(int port, String path) {
         return new JsonObject().put("message", "Resource not found")
                                .put("uri", Strings.format("http://{0}:{1}{2}", DEFAULT_HOST, port, path));
+    }
+
+    @Override
+    public HttpServerConfig initConfig() {
+        return httpConfig = IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class)
+                                   .setHost(DEFAULT_HOST)
+                                   .setPort(TestHelper.getRandomPort());
+    }
+
+    @Override
+    public PluginProvider<HttpServerPlugin> initProvider() {
+        throw new UnsupportedOperationException("Init plugin per test");
     }
 
 }

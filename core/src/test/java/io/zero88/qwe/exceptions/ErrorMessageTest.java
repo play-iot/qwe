@@ -70,7 +70,7 @@ public class ErrorMessageTest {
         JSONAssert.assertEquals("{\"code\":\"INVALID_ARGUMENT\",\"message\":\"invalid\"}", jsonMsg.encode(),
                                 JSONCompareMode.STRICT);
         ErrorMessage deserialize = jsonMsg.mapTo(ErrorMessage.class);
-        Assertions.assertNull(deserialize.getThrowable());
+        Assertions.assertNotNull(deserialize.getThrowable());
         Assertions.assertEquals("invalid", deserialize.getMessage());
         Assertions.assertEquals(ErrorCode.INVALID_ARGUMENT, deserialize.getCode());
     }

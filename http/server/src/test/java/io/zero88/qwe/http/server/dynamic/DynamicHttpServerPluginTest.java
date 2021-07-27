@@ -21,7 +21,7 @@ public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
 
     private int port;
 
-    protected DeploymentOptions getServiceOptions() throws IOException {
+    protected DeploymentOptions getServiceOptions() {
         port = TestHelper.getRandomPort();
         return new DeploymentOptions().setConfig(deployConfig(port));
     }
