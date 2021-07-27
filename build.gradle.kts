@@ -66,3 +66,8 @@ nexusPublishing {
         }
     }
 }
+
+tasks.register("generateJooq") {
+    group = "jooq"
+    dependsOn(subprojects.map { it.tasks.withType<nu.studer.gradle.jooq.JooqGenerate>() })
+}

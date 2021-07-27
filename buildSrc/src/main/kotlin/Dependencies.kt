@@ -89,7 +89,6 @@ object VertxLibs {
     const val junit = "io.vertx:vertx-unit:${Version.vertx}"
     const val junit5 = "io.vertx:vertx-junit5:${Version.vertx}"
 
-    const val sqlClient = "io.vertx:vertx-sql-client:${Version.vertx}"
     const val jdbc = "io.vertx:vertx-jdbc-client:${Version.vertx}"
     const val pgsql = "io.vertx:vertx-pg-client:${Version.vertx}"
     const val mysql = "io.vertx:vertx-mysql-client:${Version.vertx}"
@@ -146,4 +145,14 @@ object DatabaseLibs {
     const val jooqMeta = "org.jooq:jooq-meta:${Version.jooq}"
     const val jooqMetaExt = "org.jooq:jooq-meta-extensions:${Version.jooq}"
     const val jooqCodegen = "org.jooq:jooq-codegen:${Version.jooq}"
+}
+
+object TestContainers {
+    object Version {
+
+        const val ver = "1.15.2"
+    }
+
+    const val junit5 = "org.testcontainers:junit-jupiter:${Version.ver}"
+    const val pgsql = "org.testcontainers:postgresql:${Version.ver}"
 }
