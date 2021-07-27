@@ -13,9 +13,9 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
  * @see MySQLErrorConverterProvider
  * @see JooqxReactiveExtension
  */
-public interface MySQLJooqxReactiveExtension
-    extends JooqxReactiveExtension<MySQLPool>, MySQLPoolProvider, MySQLErrorConverterProvider {
+public class MySQLJooqxReactiveExtension
+    implements JooqxReactiveExtension<MySQLPool>, MySQLPoolProvider, MySQLErrorConverterProvider {
 
-    MySQLJooqxReactiveExtension INSTANCE = new MySQLJooqxReactiveExtension() {};
+    public static final MySQLJooqxReactiveExtension INSTANCE = new MySQLJooqxReactiveExtension();
 
 }

@@ -10,7 +10,7 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxLegacyExtension;
  * @see JooqxLegacyExtension
  * @see JDBCLegacyHikariProvider
  */
-public interface JDBCClientHikariJooqxExtension
-    extends JooqxLegacyExtension<HikariCPDataSourceProvider>, JDBCLegacyHikariProvider {
+public class JDBCClientHikariJooqxExtension
+    implements JooqxLegacyExtension<HikariCPDataSourceProvider>, JDBCLegacyHikariProvider {
 
 }

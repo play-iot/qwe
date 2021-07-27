@@ -15,9 +15,9 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
  * @see JDBCErrorConverterProvider
  * @see JooqxReactiveExtension
  */
-public interface JDBCPoolAgroalJooqxExtension
-    extends JooqxReactiveExtension<JDBCPool>, JDBCPoolAgroalProvider, JDBCErrorConverterProvider {
+public class JDBCPoolAgroalJooqxExtension
+    implements JooqxReactiveExtension<JDBCPool>, JDBCPoolAgroalProvider, JDBCErrorConverterProvider {
 
-    JDBCPoolAgroalJooqxExtension INSTANCE = new JDBCPoolAgroalJooqxExtension() {};
+    public static final JDBCPoolAgroalJooqxExtension INSTANCE = new JDBCPoolAgroalJooqxExtension();
 
 }

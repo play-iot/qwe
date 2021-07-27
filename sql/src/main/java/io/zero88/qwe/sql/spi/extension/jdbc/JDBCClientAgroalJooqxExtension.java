@@ -10,7 +10,7 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxLegacyExtension;
  * @see JooqxLegacyExtension
  * @see JDBCLegacyAgroalProvider
  */
-public interface JDBCClientAgroalJooqxExtension
-    extends JooqxLegacyExtension<AgroalCPDataSourceProvider>, JDBCLegacyAgroalProvider {
+public class JDBCClientAgroalJooqxExtension
+    implements JooqxLegacyExtension<AgroalCPDataSourceProvider>, JDBCLegacyAgroalProvider {
 
 }

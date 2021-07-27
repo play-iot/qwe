@@ -1,9 +1,12 @@
 package io.zero88.qwe.sql.spi.extension.jdbc;
 
+import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 
+import io.github.zero88.utils.FileUtils;
 import io.vertx.ext.jdbc.spi.DataSourceProvider;
 import io.vertx.jdbcclient.JDBCPool;
 import io.zero88.jooqx.provider.DBEmbeddedProvider;
@@ -28,7 +31,12 @@ public class JDBCPoolJooqxExtension<P extends DataSourceProvider>
     @Override
     public @NotNull JDBCPoolJooqxExtension<P> setup(@NotNull PluginContext pluginContext,
                                                     @NotNull SQLPluginConfig pluginConfig) {
-        DBEmbeddedProvider embedded = DBEmbeddedDelegate.create(pluginContext.appName(), pluginConfig.getDialect(),
+        Path dbPath = Optional.ofNullable(pluginContext.dataDir())
+                              .map(p -> p.resolve(pluginContext.appName()))
+                              .orElseGet(() -> FileUtils.defaultDatadir(pluginContext.appName()))
+                              .resolve(Optional.ofNullable(pluginConfig.getPluginDir()).orElse(""));
+        DBEmbeddedProvider embedded = DBEmbeddedDelegate.create(dbPath.toAbsolutePath().toString(),
+                                                                pluginConfig.getDialect(),
                                                                 pluginConfig.getEmbeddedMode());
         if (Objects.nonNull(embedded)) {
             pluginConfig.connectionOptions(
