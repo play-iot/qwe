@@ -63,7 +63,7 @@ class SQLPluginConfigTest {
 
     @Test
     void test_merge() {
-        SQLPluginConfig c = new SQLPluginConfig().setDialect(SQLDialect.H2)
+        SQLPluginConfig c = new SQLPluginConfig().setDialect(SQLDialect.POSTGRES)
                                                  .setAutoDetect(true)
                                                  .setEmbeddedMode(DBEmbeddedMode.MEMORY);
         final SQLPluginConfig merged = IConfig.merge(JsonUtils.loadJsonInClasspath("sql.json"), c,
@@ -71,13 +71,13 @@ class SQLPluginConfigTest {
         Assertions.assertNotNull(merged);
         Assertions.assertNotNull(merged.validate());
         Assertions.assertEquals("sql", merged.getPluginDir());
-        Assertions.assertEquals(SQLDialect.H2, merged.getDialect());
+        Assertions.assertEquals(SQLDialect.POSTGRES, merged.getDialect());
         Assertions.assertTrue(merged.isAutoDetect());
         Assertions.assertNull(merged.getJooqxExtensionClass());
         Assertions.assertEquals(new JsonObject(), merged.connectionOptions());
         Assertions.assertEquals(new JsonObject(), merged.poolOptions());
         JsonHelper.assertJson(new JsonObject("{\"__sql_conn__\":{},\"__sql_pool__\":{},\"pluginDir\":\"sql\"," +
-                                             "\"dialect\":\"H2\",\"autoDetect\":true,\"embeddedMode\":\"MEMORY\"}"),
+                                             "\"dialect\":\"POSTGRES\",\"autoDetect\":true,\"embeddedMode\":\"MEMORY\"}"),
                               merged.toJson());
     }
 

@@ -61,7 +61,7 @@ public abstract class EntityHandlerImpl<S, B, PQ extends SQLPreparedQuery<B>, RS
             extension = ReflectionClass.createObject(pluginConfig.getJooqxExtensionClass());
         }
         if (Objects.isNull(extension) && Objects.nonNull(jooqxExtCls)) {
-            logger().debug("Load jOOQx Extension from class[{}]...", jooqxExtCls);
+            logger().debug("Load jOOQx Extension from class[{}]...", jooqxExtCls.getName());
             extension = ReflectionClass.createObject(jooqxExtCls);
         }
         if (Objects.isNull(extension) && pluginConfig.isAutoDetect()) {

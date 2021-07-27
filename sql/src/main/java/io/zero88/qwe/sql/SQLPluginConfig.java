@@ -96,7 +96,7 @@ public final class SQLPluginConfig extends DynamicPluginConfigImpl<SQLPluginConf
     @Override
     public JsonObject toJson(@NonNull ObjectMapper mapper) {
         JsonObject kv = new JsonObject().put("pluginDir", pluginDir)
-                                        .put("dialect", Objects.isNull(dialect) ? null : dialect.getName())
+                                        .put("dialect", Objects.isNull(dialect) ? null : dialect.name())
                                         .put("jooqxExtensionClass", jooqxExtensionClass)
                                         .put("autoDetect", autoDetect)
                                         .put("embeddedMode", embeddedMode);
