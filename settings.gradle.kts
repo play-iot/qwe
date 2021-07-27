@@ -11,6 +11,7 @@ rootProject.name = "qwe"
 pluginManagement {
     repositories {
         mavenLocal()
+        maven { url = uri("https://maven-central-asia.storage-download.googleapis.com/maven2/") }
         gradlePluginPortal()
         maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
     }
@@ -20,7 +21,8 @@ include(":qwe-core")
 project(":qwe-core").projectDir = file("core")
 
 include("http:client", "http:server")
-
+include("sql")
+//include("sql:api", "sql:type")
 include("storage:json")
 
 include(

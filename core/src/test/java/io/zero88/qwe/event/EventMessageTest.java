@@ -86,7 +86,7 @@ public class EventMessageTest {
         Assertions.assertNull(message.getData());
         Assertions.assertEquals(ErrorCode.UNKNOWN_ERROR, message.getError().getCode());
         Assertions.assertEquals("UNKNOWN_ERROR | Cause: xxx", message.getError().getMessage());
-        Assertions.assertNull(message.getError().getThrowable());
+        Assertions.assertNotNull(message.getError().getThrowable());
     }
 
     @Test

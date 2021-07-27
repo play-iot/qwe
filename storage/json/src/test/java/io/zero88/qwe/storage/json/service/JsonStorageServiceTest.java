@@ -14,8 +14,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.PluginTestHelper;
-import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
@@ -23,11 +22,12 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.file.FileOption;
 import io.zero88.qwe.file.TextFileOperatorImpl;
 import io.zero88.qwe.storage.json.JsonStorageConfig;
+import io.zero88.qwe.storage.json.JsonStoragePlugin;
 import io.zero88.qwe.storage.json.JsonStorageProvider;
 import io.zero88.qwe.utils.JsonUtils;
 
 @ExtendWith(VertxExtension.class)
-class JsonStorageServiceTest implements PluginTestHelper {
+class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
 
     JsonStorageConfig config;
     EventBusClient client;
@@ -40,11 +40,20 @@ class JsonStorageServiceTest implements PluginTestHelper {
         return tmp;
     }
 
+    @Override
+    public JsonStorageConfig initConfig() {
+        return config = JsonStorageConfig.create();
+    }
+
+    @Override
+    public JsonStorageProvider initProvider() {
+        return new JsonStorageProvider();
+    }
+
     @BeforeEach
     void before(Vertx vertx, VertxTestContext context) {
-        config = JsonStorageConfig.create();
-        pluginDir = deploy(vertx, context, config.toJson(), new JsonStorageProvider()).pluginContext().dataDir();
-        client = EventBusClient.create(SharedDataLocalProxy.create(vertx, JsonStorageServiceTest.class.getName()));
+        pluginDir = deploy(vertx, context, initConfig(), initProvider()).pluginContext().dataDir();
+        client = EventBusClient.create(createSharedData(vertx));
     }
 
     @Test

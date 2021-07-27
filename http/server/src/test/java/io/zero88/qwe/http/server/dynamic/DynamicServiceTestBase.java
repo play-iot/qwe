@@ -56,7 +56,7 @@ public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase im
         return () -> (T) new MockGatewayServer();
     }
 
-    protected DeploymentOptions getServiceOptions() throws IOException {
+    protected DeploymentOptions getServiceOptions() {
         return new DeploymentOptions();
     }
 

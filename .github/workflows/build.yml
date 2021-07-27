@@ -131,6 +131,9 @@ jobs:
           key: ${{ runner.os }}-gradle-test-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: ${{ runner.os }}-gradle-test
 
+      - name: Generate jOOQ
+        run: ./generateJooq.sh
+
       - name: Test
         if: env.ENABLE_TEST == 'true'
         run: ./gradlew jacocoRootReport -PjacocoHtml=false

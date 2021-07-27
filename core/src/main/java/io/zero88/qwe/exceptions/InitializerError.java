@@ -14,10 +14,10 @@ public class InitializerError extends QWEException {
 
     public InitializerError(Throwable e)    { this(null, e); }
 
-    public static final class MigrationError extends InitializerError {
+    public static class MigrationError extends InitializerError {
 
         public MigrationError(String message, Throwable e) {
-            super(message, e);
+            super(ErrorCode.parse("MIGRATION_ERROR"), message, e);
         }
 
         public MigrationError(String message) { this(message, null); }

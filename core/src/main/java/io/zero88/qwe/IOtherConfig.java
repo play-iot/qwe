@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
@@ -99,14 +100,21 @@ public interface IOtherConfig<C extends IOtherConfig> extends IConfig {
             return (C) this;
         }
 
+        protected Object remove(String key) {
+            return this.other.remove(key);
+        }
+
         @Override
         public JsonObject toJson(@NonNull ObjectMapper mapper) {
             return mapper.convertValue(other, JsonObject.class);
         }
 
         protected <T> T parse(Class<T> configClass, Object o) {
-            if (IConfig.class.isAssignableFrom(configClass)) {
+            if (ReflectionClass.assertDataType(configClass, IConfig.class)) {
                 return (T) IConfig.from(o, (Class<IConfig>) configClass);
+            }
+            if (o instanceof Map && ReflectionClass.assertDataType(configClass, JsonObject.class)) {
+                return (T) new JsonObject((Map<String, Object>) o);
             }
             return configClass.cast(o);
         }

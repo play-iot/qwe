@@ -2,6 +2,7 @@ package io.zero88.qwe;
 
 import lombok.NonNull;
 
+@FunctionalInterface
 public interface LogSystem {
 
     /**

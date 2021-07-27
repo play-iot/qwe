@@ -27,8 +27,8 @@ public class GatewayServiceInvokerTest extends BaseDiscoveryPluginTest {
     public static final String EVENT_ADDRESS_1 = "event.address.1";
 
     @BeforeEach
-    public void setup(Vertx vertx, VertxTestContext ctx) {
-        super.setup(vertx, ctx);
+    public void tearUp(Vertx vertx, VertxTestContext ctx) {
+        super.tearUp(vertx, ctx);
         ebClient.register(EVENT_ADDRESS_1, new MockServiceListener());
     }
 

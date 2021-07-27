@@ -3,7 +3,9 @@ package io.zero88.qwe.utils;
 import java.io.InputStream;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -30,6 +32,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JsonUtils {
+
+    public static JsonObject putIfNotNull(@NonNull JsonObject json, @NonNull String name, Object value) {
+        return putIfNotNull(json, Collections.singletonMap(name, value));
+    }
+
+    public static JsonObject putIfNotNull(@NonNull JsonObject json, @NonNull Map<String, Object> keyValues) {
+        keyValues.entrySet()
+                 .stream()
+                 .filter(entry -> Objects.nonNull(entry.getValue()))
+                 .forEach(entry -> json.put(entry.getKey(), entry.getValue()));
+        return json;
+    }
+
+    public static JsonObject putIfNotNull(@NonNull JsonObject json, @NonNull JsonObject keyValues) {
+        keyValues.stream()
+                 .filter(entry -> Objects.nonNull(entry.getValue()))
+                 .forEach(entry -> json.put(entry.getKey(), entry.getValue()));
+        return json;
+    }
 
     public static String kvMsg(@NonNull Object key, @NonNull Object value) {
         return key + "=" + value;

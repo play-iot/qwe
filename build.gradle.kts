@@ -1,6 +1,7 @@
 plugins {
     id(PluginLibs.oss) version PluginLibs.Version.plugin
     id(PluginLibs.root) version PluginLibs.Version.plugin apply false
+    id(PluginLibs.jooq) version PluginLibs.Version.jooq apply false
     id(PluginLibs.nexusPublish) version PluginLibs.Version.nexusPublish
 }
 
@@ -9,9 +10,10 @@ allprojects {
 
     repositories {
         mavenLocal()
+        maven { url = uri("https://maven-central-asia.storage-download.googleapis.com/maven2/") }
+        jcenter()
         maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
         mavenCentral()
-        jcenter()
     }
 }
 
@@ -63,4 +65,9 @@ nexusPublishing {
             password.set(project.property("nexus.password") as String?)
         }
     }
+}
+
+tasks.register("generateJooq") {
+    group = "jooq"
+    dependsOn(subprojects.map { it.tasks.withType<nu.studer.gradle.jooq.JooqGenerate>() })
 }
