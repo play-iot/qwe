@@ -36,6 +36,15 @@ public interface PluginTestHelper {
                                                                .build());
     }
 
+    default <T extends Plugin> void deployFailed(Vertx vertx, VertxTestContext context, PluginConfig config,
+                                                 PluginProvider<T> provider, Consumer<Throwable> handler) {
+        VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
+                                                        .verticle(provider.provide(createSharedData(vertx)))
+                                                        .options(new DeploymentOptions().setConfig(config.toJson()))
+                                                        .failedAsserter(handler)
+                                                        .build());
+    }
+
     default <T extends Plugin> T deploy(Vertx vertx, TestContext context, PluginConfig config,
                                         PluginProvider<T> provider) {
         final T plugin = provider.provide(createSharedData(vertx));
