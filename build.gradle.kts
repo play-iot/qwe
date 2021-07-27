@@ -1,6 +1,7 @@
 plugins {
     id(PluginLibs.oss) version PluginLibs.Version.plugin
     id(PluginLibs.root) version PluginLibs.Version.plugin apply false
+    id(PluginLibs.jooq) version PluginLibs.Version.jooq apply false
     id(PluginLibs.nexusPublish) version PluginLibs.Version.nexusPublish
 }
 

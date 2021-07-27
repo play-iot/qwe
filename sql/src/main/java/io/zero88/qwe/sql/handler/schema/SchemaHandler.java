@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.schema;
+package io.zero88.qwe.sql.handler.schema;
 
 import java.util.Optional;
 
@@ -14,14 +14,13 @@ import io.zero88.jooqx.DSLAdapter;
 import io.zero88.jooqx.SQLExecutor;
 import io.zero88.jooqx.SQLPreparedQuery;
 import io.zero88.jooqx.SQLResultCollector;
-import io.zero88.qwe.dto.ErrorData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.spi.checker.TableExistChecker;
 import io.zero88.qwe.sql.spi.checker.CheckTableExistLoader;
+import io.zero88.qwe.sql.spi.checker.TableExistChecker;
 
 import lombok.NonNull;
 
@@ -70,7 +69,10 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @return the schema initializer
      * @since 1.0.0
      */
-    @NonNull SchemaInitializer<S, B, PQ, RS, RC, E> initializer();
+    @SuppressWarnings("unchecked")
+    default @NonNull SchemaInitializer<S, B, PQ, RS, RC, E> initializer() {
+        return SchemaInitializer.NO_DATA_INITIALIZER;
+    }
 
     /**
      * Declares schema migrator.
@@ -78,7 +80,10 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @return the schema migrator
      * @since 1.0.0
      */
-    @NonNull SchemaMigrator<S, B, PQ, RS, RC, E> migrator();
+    @SuppressWarnings("unchecked")
+    default @NonNull SchemaMigrator<S, B, PQ, RS, RC, E> migrator() {
+        return SchemaMigrator.NON_MIGRATOR;
+    }
 
     /**
      * Declares readiness address for notification after {@link #execute(EntityHandler)}.
@@ -107,8 +112,7 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
         final String address = readinessAddress(entityHandler);
         return this.isNew(entityHandler.jooqx())
                    .flatMap(b -> b ? initializer().execute(entityHandler) : migrator().execute(entityHandler))
-                   .onFailure(t -> c.publish(address, EventMessage.initial(EventAction.NOTIFY_ERROR,
-                                                                           ErrorData.builder().throwable(t).build())))
+                   .onFailure(t -> c.publish(address, EventMessage.error(EventAction.NOTIFY_ERROR, t)))
                    .onSuccess(msg -> {
                        final JsonObject headers = new JsonObject().put("status", msg.getStatus())
                                                                   .put("action", msg.getAction());

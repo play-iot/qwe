@@ -14,14 +14,14 @@ import io.zero88.jooqx.ReactiveJooqx;
 import io.zero88.jooqx.SQLExecutor;
 import io.zero88.jooqx.SQLPreparedQuery;
 import io.zero88.jooqx.SQLResultCollector;
-import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.HasSharedData;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventBusProxy;
+import io.zero88.qwe.sql.SQLLogSystem;
 import io.zero88.qwe.sql.SQLPluginConfig;
-import io.zero88.qwe.sql.schema.SchemaHandler;
+import io.zero88.qwe.sql.handler.schema.SchemaHandler;
 
 import lombok.NonNull;
 
@@ -32,7 +32,7 @@ import lombok.NonNull;
  */
 public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
                                   E extends SQLExecutor<S, B, PQ, RS, RC>>
-    extends HasSharedData, EventBusProxy, HasLogger, JooqDSLProvider {
+    extends HasSharedData, EventBusProxy, JooqDSLProvider, SQLLogSystem {
 
     @Override
     default Logger logger() {

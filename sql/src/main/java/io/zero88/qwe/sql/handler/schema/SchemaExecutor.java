@@ -1,11 +1,11 @@
-package io.zero88.qwe.sql.schema;
+package io.zero88.qwe.sql.handler.schema;
 
 import io.vertx.core.Future;
 import io.zero88.jooqx.SQLExecutor;
 import io.zero88.jooqx.SQLPreparedQuery;
 import io.zero88.jooqx.SQLResultCollector;
-import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.sql.SQLLogSystem;
 import io.zero88.qwe.sql.handler.EntityHandler;
 
 import lombok.NonNull;
@@ -17,7 +17,7 @@ import lombok.NonNull;
  */
 public interface SchemaExecutor<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
                                    E extends SQLExecutor<S, B, PQ, RS, RC>>
-    extends HasLogger {
+    extends SQLLogSystem {
 
     /**
      * Execute task.

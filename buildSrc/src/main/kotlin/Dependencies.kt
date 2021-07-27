@@ -17,6 +17,7 @@ object PluginLibs {
         const val jvm = "1.3.72"
         const val nexusPublish = "1.1.0"
         const val plugin = "2.0.0"
+        const val jooq = "5.2"
     }
 
     const val jvm = "jvm"
@@ -25,6 +26,7 @@ object PluginLibs {
     const val root = "io.github.zero88.gradle.root"
     const val app = "io.github.zero88.gradle.qwe.app"
     const val docker = "io.github.zero88.gradle.qwe.docker"
+    const val jooq = "nu.studer.jooq"
 }
 
 object WebLibs {
@@ -135,19 +137,13 @@ object DatabaseLibs {
         const val hikari = "4.0.2"
         const val jpa = "2.2"
         const val jta = "1.3"
-        const val agroal = "1.9"
-        const val sqlite = "3.36.0.1"
     }
 
     const val h2 = "com.h2database:h2:${Version.h2}"
     const val pgsql = "org.postgresql:postgresql:${Version.pgsql}"
-    const val mysql = "mysql:mysql-connector-java:${Version.mysql}"
     const val hikari = "com.zaxxer:HikariCP:${Version.hikari}"
     const val jooq = "org.jooq:jooq:${Version.jooq}"
     const val jooqMeta = "org.jooq:jooq-meta:${Version.jooq}"
     const val jooqMetaExt = "org.jooq:jooq-meta-extensions:${Version.jooq}"
     const val jooqCodegen = "org.jooq:jooq-codegen:${Version.jooq}"
-    const val agroalApi = "io.agroal:agroal-api:${Version.agroal}"
-    const val agroalPool = "io.agroal:agroal-pool:${Version.agroal}"
-    const val sqlite = "org.xerial:sqlite-jdbc:${Version.sqlite}"
 }

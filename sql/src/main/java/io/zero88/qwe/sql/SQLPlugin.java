@@ -10,12 +10,7 @@ import io.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.dto.ErrorMessage;
-import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.exceptions.InitializerError.MigrationError;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.sql.handler.EntityHandler;
 import io.zero88.qwe.sql.handler.JooqxExtension;
 
@@ -67,28 +62,13 @@ public final class SQLPlugin<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extend
     private Future<EventMessage> initOrMigrate(EntityHandler<S, B, PQ, RS, RC, E> h) {
         return h.schemaHandler()
                 .execute(h)
-                .recover(t -> Future.failedFuture(new InitializerError("Unknown error when setting up database", t)))
-                .flatMap(this::validateInitOrMigrationData)
+                .flatMap(msg -> !msg.isError()
+                                ? Future.succeededFuture(msg)
+                                : Future.failedFuture(msg.getError().getThrowable()))
                 .onSuccess(r -> {
                     logger().info("{} SQL plugin [{}]", r.getAction(), r.rawData());
                     logger().info("DATABASE IS READY TO USE");
                 });
-    }
-
-    private Future<EventMessage> validateInitOrMigrationData(EventMessage result) {
-        if (!result.isError()) {
-            return Future.succeededFuture(result);
-        }
-        ErrorMessage error = result.getError();
-        Throwable t = error.getThrowable();
-        if (Objects.isNull(t)) {
-            t = new QWEException(error.getCode(), error.getMessage());
-        }
-        if (result.getAction() == EventAction.INIT) {
-            return Future.failedFuture(new InitializerError("Failed to startup SQL component", t));
-        } else {
-            return Future.failedFuture(new MigrationError("Failed to startup SQL component", t));
-        }
     }
 
 }
