@@ -55,6 +55,7 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     public void before(TestContext context) throws IOException {
         vertx = Vertx.vertx();
         client = vertx.createHttpClient(createClientOptions());
+        httpConfig = initConfig();
         requestOptions = new RequestOptions().setHost(DEFAULT_HOST).setPort(httpConfig.getPort());
     }
 
@@ -86,9 +87,9 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
 
     @Override
     public HttpServerConfig initConfig() {
-        return httpConfig = IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class)
-                                   .setHost(DEFAULT_HOST)
-                                   .setPort(TestHelper.getRandomPort());
+        return IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class)
+                      .setHost(DEFAULT_HOST)
+                      .setPort(TestHelper.getRandomPort());
     }
 
     @Override
