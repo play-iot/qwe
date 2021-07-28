@@ -2,7 +2,7 @@
   "pluginDir": "storage",
   "maxSizeInMB": 10,
   "serviceAddress": "qwe.storage.json",
-  "serviceHandlerClass": "io.zero88.qwe.storage.json.service.JsonStorageService",
+  "serviceHandlerClass": "io.zero88.qwe.storage.json.JsonStorageService",
   "chunk": false,
   "option": {
     "autoCreate": true,

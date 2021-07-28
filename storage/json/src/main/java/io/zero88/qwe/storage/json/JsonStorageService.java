@@ -1,4 +1,4 @@
-package io.zero88.qwe.storage.json.service;
+package io.zero88.qwe.storage.json;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -12,6 +12,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.pointer.JsonPointer;
+import io.zero88.qwe.ExtensionEntrypoint;
+import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EBContext;
@@ -20,27 +22,23 @@ import io.zero88.qwe.event.EventListener;
 import io.zero88.qwe.file.TextFileOperator;
 import io.zero88.qwe.file.TextFileOperatorImpl;
 import io.zero88.qwe.file.converter.BufferConverter;
-import io.zero88.qwe.storage.json.JsonStorageConfig;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Getter
-@Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class JsonStorageService implements EventListener {
+public class JsonStorageService implements EventListener, ExtensionEntrypoint, HasLogger {
 
-    public static <T extends JsonStorageService> T create(@NonNull Path rootDir, @NonNull JsonStorageConfig config,
-                                                          @NonNull Class<T> clazz) {
-        return ReflectionClass.createObject(clazz, new Arguments().put(Path.class, rootDir)
-                                                                  .put(JsonStorageConfig.class, config));
+    @SuppressWarnings("unchecked")
+    public static <T extends JsonStorageService> T create(@NonNull Path rootDir, @NonNull JsonStorageConfig config) {
+        return ReflectionClass.createObject((Class<T>) config.serviceHandlerClass(),
+                                            new Arguments().put(Path.class, rootDir)
+                                                           .put(JsonStorageConfig.class, config));
     }
 
+    @Getter(value = AccessLevel.PACKAGE)
     private final Path rootDir;
     private final JsonStorageConfig config;
 

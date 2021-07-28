@@ -1,4 +1,4 @@
-package io.zero88.qwe.storage.json.service;
+package io.zero88.qwe.storage.json;
 
 import java.time.Instant;
 import java.util.Date;

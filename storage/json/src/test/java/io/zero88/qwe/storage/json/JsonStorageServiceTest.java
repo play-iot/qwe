@@ -1,4 +1,4 @@
-package io.zero88.qwe.storage.json.service;
+package io.zero88.qwe.storage.json;
 
 import java.io.FileInputStream;
 import java.nio.file.Path;
@@ -14,45 +14,32 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
+import io.zero88.qwe.ExtensionTestHelper;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.file.FileOption;
 import io.zero88.qwe.file.TextFileOperatorImpl;
-import io.zero88.qwe.storage.json.JsonStorageConfig;
-import io.zero88.qwe.storage.json.JsonStoragePlugin;
-import io.zero88.qwe.storage.json.JsonStorageProvider;
 import io.zero88.qwe.utils.JsonUtils;
 
 @ExtendWith(VertxExtension.class)
-class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
-
-    JsonStorageConfig config;
-    EventBusClient client;
+class JsonStorageServiceTest implements ExtensionTestHelper {
     @TempDir
     Path tmp;
-    private Path pluginDir;
+    private JsonStorageConfig config;
+    private EventBusClient client;
+    private Path extDir;
 
     @Override
     public Path testDir() {
         return tmp;
     }
 
-    @Override
-    public JsonStorageConfig initConfig() {
-        return config = JsonStorageConfig.create();
-    }
-
-    @Override
-    public JsonStorageProvider initProvider() {
-        return new JsonStorageProvider();
-    }
-
     @BeforeEach
-    void before(Vertx vertx, VertxTestContext context) {
-        pluginDir = deploy(vertx, context, initConfig(), initProvider()).pluginContext().dataDir();
+    void before(Vertx vertx) {
+        config = JsonStorageConfig.create();
+        extDir = initExtension(vertx, JsonStorageExtension.class, config).entrypoint().getRootDir();
         client = EventBusClient.create(createSharedData(vertx));
     }
 
@@ -66,13 +53,13 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
                                       .build();
         final EventMessage msg = EventMessage.initial(EventAction.CREATE_OR_UPDATE,
                                                       RequestData.builder().body(ji.toJson()).build());
-        final String file = pluginDir.resolve(ji.getFile()).toString();
-        FileUtils.createFolder(pluginDir.toAbsolutePath(), null);
+        final String file = extDir.resolve(ji.getFile()).toString();
+        FileUtils.createFolder(extDir.toAbsolutePath(), null);
         client.request(config.getServiceAddress(), msg)
               .onFailure(context::failNow)
               .onSuccess(result -> context.verify(() -> {
                   System.out.println(result.toJson());
-                  final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file));
+                  JsonObject json = JsonUtils.readAsJson(new FileInputStream(file));
                   Assertions.assertTrue(result.isSuccess());
                   Assertions.assertNotNull(result.getData());
                   Assertions.assertEquals(data, result.getData().getJsonObject(ji.getOutputKey()));
@@ -86,7 +73,7 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
         final JsonObject toInsert = new JsonObject().put("k", 3);
         final JsonInput ji = JsonInput.builder().file("test").pointer("/hh").dataToInsert(toInsert).build();
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
-        final Path file = pluginDir.resolve(ji.getFile());
+        final Path file = extDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.CREATE_OR_UPDATE,
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
@@ -96,7 +83,7 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
                             .flatMap(g -> client.request(config.getServiceAddress(), msg))
                             .onFailure(context::failNow)
                             .onSuccess(result -> context.verify(() -> {
-                                final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
+                                JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
                                 System.out.println(result.toJson());
                                 System.out.println(json);
                                 Assertions.assertTrue(result.isSuccess());
@@ -112,7 +99,7 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
         final String toInsert = "z";
         final JsonInput ji = JsonInput.builder().file("test").pointer("/cd/1").dataToInsert(toInsert).build();
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
-        final Path file = pluginDir.resolve(ji.getFile());
+        final Path file = extDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.CREATE_OR_UPDATE,
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
@@ -121,7 +108,7 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
                             .write(file, FileOption.builder().build(), data.toBuffer())
                             .flatMap(g -> client.request(config.getServiceAddress(), msg))
                             .onComplete(context.succeeding(result -> context.verify(() -> {
-                                final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
+                                JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
                                 System.out.println(json);
                                 System.out.println(result.toJson());
                                 Assertions.assertTrue(result.isSuccess());
@@ -136,7 +123,7 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
     void test_query(Vertx vertx, VertxTestContext context) {
         final JsonInput ji = JsonInput.builder().file("test").pointer("/cd/3").build();
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
-        final Path file = pluginDir.resolve(ji.getFile());
+        final Path file = extDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.parse("QUERY"),
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
@@ -157,7 +144,7 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
     void test_remove_json(Vertx vertx, VertxTestContext context) {
         final JsonObject data = new JsonObject().put("cd", new JsonObject().put("1", "x").put("3", "y"));
         final JsonInput ji = JsonInput.builder().file("test").pointer("/cd").keyToRemove("3").build();
-        final Path file = pluginDir.resolve(ji.getFile());
+        final Path file = extDir.resolve(ji.getFile());
         final EventMessage msg = EventMessage.initial(EventAction.REMOVE,
                                                       RequestData.builder().body(ji.toJson()).build());
         TextFileOperatorImpl.builder()
@@ -166,7 +153,7 @@ class JsonStorageServiceTest implements PluginDeployTest<JsonStoragePlugin> {
                             .write(file, FileOption.builder().build(), data.toBuffer())
                             .flatMap(g -> client.request(config.getServiceAddress(), msg))
                             .onComplete(context.succeeding(result -> context.verify(() -> {
-                                final JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
+                                JsonObject json = JsonUtils.readAsJson(new FileInputStream(file.toString()));
                                 System.out.println(json);
                                 System.out.println(result.toJson());
                                 Assertions.assertTrue(result.isSuccess());
