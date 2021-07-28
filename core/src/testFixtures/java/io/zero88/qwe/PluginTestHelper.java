@@ -10,6 +10,11 @@ import io.vertx.junit5.VertxTestContext;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public interface PluginTestHelper extends AppContextTest {
 
+    @Override
+    default String appName() {
+        return "PluginTest";
+    }
+
     default <T extends Plugin> T deploy(Vertx vertx, VertxTestContext context, PluginConfig config,
                                         PluginProvider<T> provider) {
         final T plugin = provider.provide(createSharedData(vertx));
@@ -56,7 +61,7 @@ public interface PluginTestHelper extends AppContextTest {
     default <T extends Plugin> T preDeploy(T plugin) {
         return (T) plugin.deployHook()
                          .onPreDeploy(plugin,
-                                      PluginContext.createPreContext("PluginTest", plugin.pluginName(), sharedKey(),
+                                      PluginContext.createPreContext(appName(), plugin.pluginName(), sharedKey(),
                                                                      testDir()));
     }
 

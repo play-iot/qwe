@@ -9,6 +9,8 @@ public interface AppContextTest {
 
     Path testDir();
 
+    String appName();
+
     default String sharedKey() {
         return getClass().getName() + "--" + UUID64.random();
     }
