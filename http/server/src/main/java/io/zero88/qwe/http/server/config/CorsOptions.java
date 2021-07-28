@@ -29,7 +29,7 @@ public final class CorsOptions implements IConfig {
     private int maxAgeSeconds = 3600;
 
     @Override
-    public String key() { return NAME; }
+    public String configKey() { return NAME; }
 
     @Override
     public Class<? extends IConfig> parent() { return HttpServerConfig.class; }

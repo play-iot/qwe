@@ -42,6 +42,11 @@ public final class SQLPlugin<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extend
     }
 
     @Override
+    public String configKey() {
+        return SQLPluginConfig.KEY;
+    }
+
+    @Override
     public String pluginName() {
         return "sql-plugin";
     }

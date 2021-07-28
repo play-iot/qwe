@@ -1,26 +1,14 @@
 package io.zero88.qwe;
 
-import java.nio.file.Path;
 import java.util.function.Consumer;
 
-import io.github.zero88.utils.UUID64;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.junit5.VertxTestContext;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public interface PluginTestHelper {
-
-    Path testDir();
-
-    default String sharedKey() {
-        return getClass().getName() + "--" + UUID64.random();
-    }
-
-    default SharedDataLocalProxy createSharedData(Vertx vertx) {
-        return SharedDataLocalProxy.create(vertx, sharedKey());
-    }
+public interface PluginTestHelper extends AppContextTest {
 
     default <T extends Plugin> T deploy(Vertx vertx, VertxTestContext context, PluginConfig config,
                                         PluginProvider<T> provider) {

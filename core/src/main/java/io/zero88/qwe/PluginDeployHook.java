@@ -45,7 +45,7 @@ public interface PluginDeployHook {
      * @param pluginContext an associate post-context of plugin
      * @param isPostStep    a flag to identifies whether is pre-step or post-step
      * @return a plugin context
-     * @see Application#onInstallCompleted(PluginContextLookup)
+     * @see Application#onInstallCompleted(ApplicationContextHolder)
      */
     default PluginContext enrichContext(@NonNull PluginContext pluginContext, boolean isPostStep) {
         return pluginContext;

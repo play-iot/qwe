@@ -22,6 +22,7 @@ import lombok.extern.jackson.Jacksonized;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JsonStorageConfig implements PluginDirConfig {
 
+    public static final String KEY = "__json__";
     @Default
     private final String pluginDir = "storage";
     @Default
@@ -44,8 +45,8 @@ public final class JsonStorageConfig implements PluginDirConfig {
     }
 
     @Override
-    public String key() {
-        return "__json__";
+    public String configKey() {
+        return KEY;
     }
 
     public static JsonStorageConfig create() {

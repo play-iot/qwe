@@ -11,10 +11,11 @@ import lombok.NonNull;
  * @see PluginContext
  * @see PluginVerticle
  */
-public interface Plugin<C extends PluginConfig, T extends PluginContext> extends QWEVerticle<C>, HasPluginName {
+public interface Plugin<C extends PluginConfig, T extends PluginContext>
+    extends QWEVerticle<C>, HasPluginName, HasConfigKey {
 
     /**
-     * Expresses a functional that this plugin bring to. For example: {@code http-server}, {@code sql-mysql}
+     * Expresses a functional that this plugin brings to. For example: {@code http-server}, {@code sql-mysql}
      *
      * @return the plugin function name
      * @apiNote To better identify, {@code plugin name} convention is {@code kebab-case}

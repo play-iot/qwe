@@ -52,10 +52,13 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
     }
 
     @Override
-    public Class<HttpServerConfig> configClass() { return HttpServerConfig.class; }
+    public Class<HttpServerConfig> configClass() {return HttpServerConfig.class;}
 
     @Override
-    public String configFile() { return "httpServer.json"; }
+    public String configKey() {return HttpServerConfig.KEY;}
+
+    @Override
+    public String configFile() {return "httpServer.json";}
 
     @Override
     public void onStart() {
@@ -153,7 +156,7 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
         }
     }
 
-    private Router initHttp2Router(Router router) { return router; }
+    private Router initHttp2Router(Router router) {return router;}
 
     /**
      * Decorator route with produce and consume

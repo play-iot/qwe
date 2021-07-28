@@ -92,7 +92,7 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
     }
 
     @Override
-    public String key() { return NAME; }
+    public String configKey() { return NAME; }
 
     @Override
     public Class<? extends IConfig> parent() { return QWEConfig.class; }

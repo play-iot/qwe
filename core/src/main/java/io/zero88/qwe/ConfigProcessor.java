@@ -150,7 +150,7 @@ public final class ConfigProcessor {
     private Optional<QWEConfig> overrideConfig(Map<String, Object> envConfig, JsonObject fileConfig,
                                                boolean overrideAppConfig, boolean overrideSystemConfig) {
         JsonObject bluePrintConfig = new JsonObject();
-        JsonObject inputAppConfig = fileConfig.getJsonObject(QWEAppConfig.NAME, new JsonObject());
+        JsonObject inputAppConfig = fileConfig.getJsonObject(QWEAppConfig.KEY, new JsonObject());
         JsonObject inputSystemConfig = fileConfig.getJsonObject(QWEBootConfig.NAME, new JsonObject());
         JsonObject inputDeployConfig = fileConfig.getJsonObject(QWEDeployConfig.NAME, new JsonObject());
         JsonObject destAppConfig = new JsonObject();
@@ -178,12 +178,12 @@ public final class ConfigProcessor {
             if (standardKey.equals(QWEDeployConfig.NAME) && overrideSystemConfig) {
                 handleDomainConfig(destDeployConfig, inputDeployConfig, envValue, envKeyParts);
             }
-            if (standardKey.equals(QWEAppConfig.NAME) && overrideAppConfig) {
+            if (standardKey.equals(QWEAppConfig.KEY) && overrideAppConfig) {
                 handleDomainConfig(destAppConfig, inputAppConfig, envValue, envKeyParts);
             }
         }
 
-        bluePrintConfig.put(QWEAppConfig.NAME, new JsonObject(inputAppConfig.toString()).mergeIn(destAppConfig, true));
+        bluePrintConfig.put(QWEAppConfig.KEY, new JsonObject(inputAppConfig.toString()).mergeIn(destAppConfig, true));
         bluePrintConfig.put(QWEBootConfig.NAME,
                             new JsonObject(inputSystemConfig.toString()).mergeIn(destSystemConfig, true));
         bluePrintConfig.put(QWEDeployConfig.NAME,

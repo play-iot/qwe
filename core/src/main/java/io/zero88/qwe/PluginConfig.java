@@ -29,7 +29,7 @@ public interface PluginConfig extends IConfig {
      * @return particular
      */
     default String deploymentKey() {
-        return PLUGIN_DEPLOY_CONFIG_KEY + key();
+        return PLUGIN_DEPLOY_CONFIG_KEY + configKey();
     }
 
     /**
@@ -68,11 +68,11 @@ public interface PluginConfig extends IConfig {
          * @return plugin config
          */
         default Map<String, Object> find(Map<String, Object> map) {
-            if (map.containsKey(QWEAppConfig.NAME)) {
-                return find((Map<String, Object>) map.get(QWEAppConfig.NAME));
+            if (map.containsKey(QWEAppConfig.KEY)) {
+                return find((Map<String, Object>) map.get(QWEAppConfig.KEY));
             }
-            if (map.containsKey(key())) {
-                return (Map<String, Object>) map.get(key());
+            if (map.containsKey(configKey())) {
+                return (Map<String, Object>) map.get(configKey());
             }
             return map;
         }

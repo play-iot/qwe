@@ -48,7 +48,7 @@ public final class WebSocketConfig extends AbstractRouterConfig implements IConf
         public static final String NAME = "__sockjs__";
 
         @Override
-        public String key() { return NAME; }
+        public String configKey() { return NAME; }
 
         @Override
         public Class<? extends IConfig> parent() { return WebSocketConfig.class; }
@@ -61,7 +61,7 @@ public final class WebSocketConfig extends AbstractRouterConfig implements IConf
         public static final String NAME = "__bridge__";
 
         @Override
-        public String key() { return NAME; }
+        public String configKey() { return NAME; }
 
         @Override
         public Class<? extends IConfig> parent() { return WebSocketConfig.class; }

@@ -34,7 +34,7 @@ public final class QWEConfig implements IConfig {
     @JsonProperty(value = QWEDeployConfig.NAME)
     private QWEDeployConfig deployConfig = new QWEDeployConfig();
     @Default
-    @JsonProperty(value = QWEAppConfig.NAME)
+    @JsonProperty(value = QWEAppConfig.KEY)
     private QWEAppConfig appConfig = new QWEAppConfig();
 
     /**
@@ -49,7 +49,7 @@ public final class QWEConfig implements IConfig {
     }
 
     @Override
-    public String key() { return null; }
+    public String configKey() { return null; }
 
     @Override
     public Class<? extends IConfig> parent() { return null; }
@@ -59,7 +59,7 @@ public final class QWEConfig implements IConfig {
         public static final String NAME = "__deploy__";
 
         @Override
-        public String key() { return NAME; }
+        public String configKey() { return NAME; }
 
         @Override
         public Class<? extends IConfig> parent() { return QWEConfig.class; }

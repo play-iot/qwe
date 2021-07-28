@@ -1,25 +1,31 @@
-package io.zero88.qwe;
+package io.zero88.qwe.mock;
 
-import io.zero88.qwe.MockProvider.MockPlugin;
+import io.zero88.qwe.PluginContext;
+import io.zero88.qwe.PluginProvider;
+import io.zero88.qwe.PluginVerticle;
+import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.mock.MockPluginProvider.MockPlugin;
 
 import lombok.Getter;
 import lombok.NonNull;
 
-public class MockProvider implements PluginProvider<MockPlugin> {
+public class MockPluginProvider implements PluginProvider<MockPlugin> {
 
     private final boolean error;
 
-    public MockProvider(boolean error) {this.error = error;}
+    public MockPluginProvider()              {this(false);}
+
+    public MockPluginProvider(boolean error) {this.error = error;}
 
     @Override
-    public Class<MockPlugin> pluginClass() { return MockPlugin.class; }
+    public Class<MockPlugin> pluginClass() {return MockPlugin.class;}
 
     @Override
     public MockPlugin provide(SharedDataLocalProxy sharedData) {
         return new MockPlugin(sharedData, error);
     }
 
-    static final class MockPlugin extends PluginVerticle<MockConfig, PluginContext> {
+    static final class MockPlugin extends PluginVerticle<MockPluginConfig, PluginContext> {
 
         @Getter
         private final boolean error;
@@ -39,8 +45,8 @@ public class MockProvider implements PluginProvider<MockPlugin> {
         }
 
         @Override
-        public @NonNull Class<MockConfig> configClass() {
-            return MockConfig.class;
+        public @NonNull Class<MockPluginConfig> configClass() {
+            return MockPluginConfig.class;
         }
 
         @Override
@@ -53,6 +59,11 @@ public class MockProvider implements PluginProvider<MockPlugin> {
             if (error) {
                 throw new RuntimeException("Error when starting Plugin[" + pluginName() + "]");
             }
+        }
+
+        @Override
+        public String configKey() {
+            return "mock";
         }
 
     }

@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
  */
 public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements IConfig {
 
-    public static final String NAME = "__app__";
+    public static final String KEY = "__app__";
     public static final String DELIVERY_OPTIONS = "__delivery__";
 
     public static final String DATA_DIR = "dataDir";
@@ -64,15 +64,15 @@ public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements 
     }
 
     @Override
-    public String key() { return NAME; }
+    public String configKey() {return KEY;}
 
     @Override
-    public Class<? extends IConfig> parent() { return QWEConfig.class; }
+    public Class<? extends IConfig> parent() {return QWEConfig.class;}
 
     /**
      * Application data dir
      */
-    public String getDataDir() { return dataDir().toAbsolutePath().toString(); }
+    public String getDataDir() {return dataDir().toAbsolutePath().toString();}
 
     /**
      * Other {@code Application} configurations or {@code Plugin} configuration

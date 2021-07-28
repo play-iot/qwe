@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.zero88.qwe.ApplicationVerticle;
-import io.zero88.qwe.PluginContextLookup;
+import io.zero88.qwe.ApplicationContextHolder;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.DiscoveryPluginProvider;
@@ -32,8 +32,8 @@ public class MockEventOneApiOneLocService extends ApplicationVerticle {
     }
 
     @Override
-    public void onInstallCompleted(PluginContextLookup lookup) {
-        publishService(Objects.requireNonNull(lookup.query(DiscoveryContext.class)));
+    public void onInstallCompleted(ApplicationContextHolder holder) {
+        publishService(Objects.requireNonNull(holder.plugin(DiscoveryContext.class)));
     }
 
     protected void publishService(DiscoveryContext discoveryContext) {

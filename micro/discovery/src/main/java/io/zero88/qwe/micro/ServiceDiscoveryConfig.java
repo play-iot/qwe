@@ -32,7 +32,7 @@ public final class ServiceDiscoveryConfig extends ServiceDiscoveryOptions implem
     }
 
     @Override
-    public String key() { return NAME; }
+    public String configKey() { return NAME; }
 
     @Override
     public Class<? extends IConfig> parent() { return MicroConfig.class; }

@@ -9,6 +9,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.exceptions.ConfigException;
+import io.zero88.qwe.mock.MockPluginConfig;
 
 class QWEAppConfigTest {
 
@@ -72,7 +73,7 @@ class QWEAppConfigTest {
     public void test_parse_plugin_config_from_app() {
         final QWEAppConfig appConfig = new QWEAppConfig(Collections.singletonMap("mock", new JsonObject()));
         System.out.println(appConfig.toJson());
-        final MockConfig mockConfig = IConfig.from(appConfig, MockConfig.class);
+        final MockPluginConfig mockConfig = IConfig.from(appConfig, MockPluginConfig.class);
         Assertions.assertNotNull(mockConfig);
         JsonHelper.assertJson(new JsonObject(), mockConfig.toJson());
     }

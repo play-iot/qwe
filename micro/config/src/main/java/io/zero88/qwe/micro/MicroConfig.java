@@ -11,7 +11,7 @@ public final class MicroConfig extends DynamicPluginConfigImpl<MicroConfig> {
     public static final String NAME = "__micro__";
 
     @Override
-    public String key() { return NAME; }
+    public String configKey() { return KEY; }
 
     public MicroConfig() {
         this(null);

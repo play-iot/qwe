@@ -26,10 +26,15 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
     }
 
     @Override
-    public Class<MicroConfig> configClass() { return MicroConfig.class; }
+    public Class<MicroConfig> configClass() {return MicroConfig.class;}
 
     @Override
-    public String configFile() { return "discovery.json"; }
+    public String configKey() {
+        return MicroConfig.KEY;
+    }
+
+    @Override
+    public String configFile() {return "discovery.json";}
 
     @Override
     public Future<Void> onAsyncStop() {

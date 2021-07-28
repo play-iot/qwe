@@ -8,10 +8,8 @@ import org.jooq.SQLDialect;
 
 import io.vertx.core.json.JsonObject;
 import io.zero88.jooqx.spi.DBEmbeddedMode;
-import io.zero88.qwe.IConfig;
 import io.zero88.qwe.PluginConfig.DynamicPluginConfig.DynamicPluginConfigImpl;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
-import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.sql.handler.JooqxExtension;
 import io.zero88.qwe.utils.JsonUtils;
 
@@ -28,7 +26,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public final class SQLPluginConfig extends DynamicPluginConfigImpl<SQLPluginConfig> implements PluginDirConfig {
 
-    public static final String NAME = "__sql__";
+    public static final String KEY = "__sql__";
     public static final String SQL_POOL_KEY = "__sql_pool__";
     public static final String SQL_CONN_KEY = "__sql_conn__";
 
@@ -68,13 +66,8 @@ public final class SQLPluginConfig extends DynamicPluginConfigImpl<SQLPluginConf
     }
 
     @Override
-    public String key() {
-        return NAME;
-    }
-
-    @Override
-    public Class<? extends IConfig> parent() {
-        return QWEAppConfig.class;
+    public String configKey() {
+        return KEY;
     }
 
     public JsonObject connectionOptions() {

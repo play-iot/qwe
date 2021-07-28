@@ -1,4 +1,4 @@
-package io.zero88.qwe;
+package io.zero88.qwe.mock;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +18,11 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.MockProvider.MockPlugin;
+import io.zero88.qwe.DeployContext;
+import io.zero88.qwe.PluginTestHelper;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.VertxHelper;
+import io.zero88.qwe.mock.MockPluginProvider.MockPlugin;
 import io.zero88.qwe.exceptions.ConfigException;
 
 import ch.qos.logback.classic.Level;

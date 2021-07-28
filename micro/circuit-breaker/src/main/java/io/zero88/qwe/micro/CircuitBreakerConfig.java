@@ -20,9 +20,6 @@ public final class CircuitBreakerConfig implements IConfig {
         DEFAULT_NOTIFICATION_ADDRESS);
 
     @Override
-    public String key() { return NAME; }
-
-    @Override
-    public Class<? extends IConfig> parent() { return MicroConfig.class; }
+    public String configKey() {return NAME;}
 
 }

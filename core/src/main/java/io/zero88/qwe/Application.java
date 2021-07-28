@@ -54,11 +54,20 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
     /**
      * Add plugin provider to startup
      *
-     * @param <T>      Type of plugin
+     * @param <P>      Type of plugin
      * @param provider Unit provider
      * @return a reference to this, so the API can be used fluently
      */
-    <T extends Plugin> Application addProvider(PluginProvider<T> provider);
+    <P extends Plugin> Application addProvider(PluginProvider<P> provider);
+
+    /**
+     * Add extension class to startup
+     *
+     * @param extensionCls extension class
+     * @param <E>          Type of extension
+     * @return a reference to this, so the API can be used fluently
+     */
+    <E extends Extension> Application addExtension(Class<E> extensionCls);
 
     /**
      * Compute default plugin pool size
@@ -78,8 +87,7 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
     }
 
     /**
-     * Install the registered {@code plugins} based on the order of given providers of {@link
-     * #addProvider(PluginProvider)}
+     * Install the registered {@code plugins} based on the given providers from {@link #addProvider(PluginProvider)}
      * <p>
      * If any plugin verticle starts failed, future will catch and report it to {@code Vertx}
      *
@@ -90,17 +98,31 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
     Future<Void> installPlugins();
 
     /**
-     * Uninstall a list of register plugins when application is stopped
+     * Uninstall a list of registered {@code plugins} when {@code application} is stopped
      *
      * @return void future
      */
     Future<Void> uninstallPlugins();
 
     /**
-     * Raise event after all plugins are installed completely
+     * Install the registered {@code extensions} based on the given providers from {@link #addExtension(Class)}
      *
-     * @param lookup Context lookup
+     * @return void future
      */
-    void onInstallCompleted(@NonNull PluginContextLookup lookup);
+    Future<Void> installExtensions();
+
+    /**
+     * Uninstall a list of registered {@code extensions} when {@code application} is stopped
+     *
+     * @return void future
+     */
+    Future<Void> uninstallExtensions();
+
+    /**
+     * Raise event after all plugins/extensions are installed completely
+     *
+     * @param holder Context holder
+     */
+    void onInstallCompleted(@NonNull ApplicationContextHolder holder);
 
 }

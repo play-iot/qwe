@@ -3,10 +3,14 @@ package io.zero88.qwe;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.FileUtils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
@@ -26,12 +30,13 @@ import lombok.experimental.Accessors;
 /**
  * @see Application
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class ApplicationVerticle extends AbstractVerticle
     implements Application, SharedDataLocalProxy, VerticleLifecycleHooks {
 
-    private final Map<Class<? extends Plugin>, PluginProvider<? extends Plugin>> providers = new HashMap<>();
-    private final PluginContextLookupInternal contexts = PluginContextLookupInternal.create();
+    private final Map<Class<? extends Plugin>, PluginProvider<? extends Plugin>> pluginProviders = new HashMap<>();
+    private final Set<Class<? extends Extension>> extensions = new HashSet<>();
+    private final ApplicationContextHolderInternal contexts = ApplicationContextHolderInternal.create();
     @Getter
     @Accessors(fluent = true)
     private QWEAppConfig appConfig;
@@ -41,14 +46,16 @@ public abstract class ApplicationVerticle extends AbstractVerticle
         logger().info("Start Application[{}]...", appName());
         this.appConfig = computeConfig(config());
         this.addData(SharedDataLocalProxy.EVENTBUS_DELIVERY_OPTION_KEY,
-                     new EventBusDeliveryOption(this.appConfig.getDeliveryOptions()));
+                     new EventBusDeliveryOption(appConfig.getDeliveryOptions()));
         this.addData(SharedDataLocalProxy.PUBLIC_IPV4_KEY, NetworkUtils.getPublicIpv4());
         this.onStart();
     }
 
     @Override
     public final void start(Promise<Void> promise) {
-        QWEVerticle.asyncRun(vertx, promise, this::start, () -> onAsyncStart().flatMap(ignore -> installPlugins())
+        QWEVerticle.asyncRun(vertx, promise, this::start, () -> onAsyncStart().flatMap(ignore -> installExtensions())
+                                                                              .flatMap(ignore -> installPlugins())
+                                                                              .onSuccess(i -> deployAllSuccess())
                                                                               .onFailure(e -> logError(e, "start"))
                                                                               .mapEmpty());
     }
@@ -61,12 +68,19 @@ public abstract class ApplicationVerticle extends AbstractVerticle
     @Override
     public final void stop(Promise<Void> promise) {
         QWEVerticle.asyncRun(vertx, promise, this::stop, () -> onAsyncStop().eventually(ignore -> uninstallPlugins())
+                                                                            .eventually(ignore -> uninstallExtensions())
                                                                             .onFailure(e -> logError(e, "stop")));
     }
 
     @Override
     public final <T extends Plugin> Application addProvider(PluginProvider<T> provider) {
-        this.providers.put(provider.pluginClass(), provider);
+        this.pluginProviders.put(provider.pluginClass(), provider);
+        return this;
+    }
+
+    @Override
+    public final <E extends Extension> Application addExtension(Class<E> extensionCls) {
+        this.extensions.add(extensionCls);
         return this;
     }
 
@@ -77,36 +91,60 @@ public abstract class ApplicationVerticle extends AbstractVerticle
 
     @Override
     public final Future<Void> installPlugins() {
-        final int defaultPoolSize = defaultPluginThreadPoolSize(providers.size());
-        return CompositeFuture.all(providers.values()
-                                            .stream()
-                                            .map(provider -> deployPlugin(provider, defaultPoolSize))
-                                            .collect(Collectors.toList())).onSuccess(this::deployAllSuccess).mapEmpty();
+        final int defaultPoolSize = defaultPluginThreadPoolSize(pluginProviders.size());
+        return CompositeFuture.all(pluginProviders.values()
+                                                  .stream()
+                                                  .map(provider -> deployPlugin(provider, defaultPoolSize))
+                                                  .collect(Collectors.toList())).onSuccess(r -> {
+            logger().info("Deployed [{}] plugin(s)", r.size() - r.causes().stream().filter(Objects::nonNull).count());
+            pluginProviders.clear();
+        }).mapEmpty();
     }
 
     @Override
     public final Future<Void> uninstallPlugins() {
-        return CompositeFuture.join(contexts.list().stream().map(this::undeployPlugin).collect(Collectors.toList()))
+        return CompositeFuture.join(contexts.plugins().stream().map(this::undeployPlugin).collect(Collectors.toList()))
                               .onSuccess(ar -> logger().info("Uninstalled [{}] plugin(s)", ar.size()))
                               .mapEmpty();
     }
 
     @Override
-    public void onInstallCompleted(PluginContextLookup lookup) { }
+    public Future<Void> installExtensions() {
+        return vertx.executeBlocking(h -> {
+            extensions.stream().map(ReflectionClass::createObject).filter(Objects::nonNull).map(ext -> {
+                logger().info("Setting up Extension[{}]...", ext.extName());
+                ExtensionConfig extCfg = (ExtensionConfig) ext.computeConfig(appConfig().lookupJson(ext.configKey()));
+                return ext.setup(extCfg, appName(), appConfig().dataDir(), this);
+            }).forEach(contexts::addExtension);
+            logger().info("Deployed [{}] extensions(s)", extensions.size());
+            extensions.clear();
+            h.complete();
+        });
+    }
+
+    @Override
+    public Future<Void> uninstallExtensions() {
+        return vertx.executeBlocking(h -> {
+            contexts.extensions().forEach(Extension::stop);
+            h.complete();
+        });
+    }
+
+    @Override
+    public void onInstallCompleted(ApplicationContextHolder holder) {}
 
     Future<Void> undeployPlugin(PluginContext ctx) {
         return vertx.undeploy(ctx.deployId())
                     .onSuccess(unused -> logger().info("Uninstalled Plugin[{}][{}]", ctx.deployId(), ctx.pluginName()));
     }
 
-    @SuppressWarnings("unchecked")
     Future<String> deployPlugin(PluginProvider<? extends Plugin> provider, int defaultPoolSize) {
         Plugin plugin = provider.provide(this);
         logger().info("Deploying Plugin[{}]...", plugin.pluginName());
-        PluginConfig pluginCfg = IConfig.<PluginConfig>from(appConfig, plugin.configClass());
+        PluginConfig pluginCfg = (PluginConfig) plugin.computeConfig(appConfig().lookupJson(plugin.configKey()));
         Path pp = null;
         if (pluginCfg instanceof PluginDirConfig) {
-            pp = Paths.get(FileUtils.createFolder(appConfig.dataDir(), ((PluginDirConfig) pluginCfg).getPluginDir()));
+            pp = Paths.get(FileUtils.createFolder(appConfig().dataDir(), ((PluginDirConfig) pluginCfg).getPluginDir()));
         }
         return vertx.deployVerticle(plugin.deployHook()
                                           .onPreDeploy(plugin,
@@ -121,12 +159,10 @@ public abstract class ApplicationVerticle extends AbstractVerticle
                     .recover(t -> Future.failedFuture(QWEExceptionConverter.friendlyOrKeep(t)));
     }
 
-    void deployAllSuccess(CompositeFuture r) {
-        logger().info("Deployed {}/{} plugin(s)", r.size(), this.providers.size());
-        this.providers.clear();
+    void deployAllSuccess() {
         try {
             //TODO: add liveness event then readiness event
-            this.onInstallCompleted(this.contexts);
+            this.onInstallCompleted(contexts);
         } catch (Exception e) {
             //TODO: add failure readiness event
             logger().warn("Failed after completed plugin deployment", QWEExceptionConverter.friendlyOrKeep(e));
