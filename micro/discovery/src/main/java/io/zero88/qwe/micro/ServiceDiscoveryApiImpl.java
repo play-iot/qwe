@@ -29,7 +29,6 @@ import io.zero88.qwe.micro.filter.PredicateFactoryLoader;
 import io.zero88.qwe.micro.filter.RecordPredicateFactory.SearchFlag;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -41,14 +40,11 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
     @Accessors(fluent = true)
     private final SharedDataLocalProxy sharedData;
     private final ServiceDiscovery sd;
-    @Getter(value = AccessLevel.PACKAGE)
-    private final CircuitBreakerWrapper cb;
     private final PredicateFactoryLoader predicateLoader;
     private final ServiceExecutorFactory executorFactory;
 
-    ServiceDiscoveryApiImpl(SharedDataLocalProxy sharedData, ServiceDiscoveryConfig config, CircuitBreakerWrapper cb) {
+    ServiceDiscoveryApiImpl(SharedDataLocalProxy sharedData, ServiceDiscoveryConfig config) {
         this.sharedData = sharedData;
-        this.cb = cb;
         this.sd = ServiceDiscovery.create(sharedData.getVertx(), config);
         this.predicateLoader = new PredicateFactoryLoader();
         this.executorFactory = new ServiceExecutorFactory();

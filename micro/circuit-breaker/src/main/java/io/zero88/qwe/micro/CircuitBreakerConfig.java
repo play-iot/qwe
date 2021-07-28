@@ -1,25 +1,36 @@
 package io.zero88.qwe.micro;
 
-import io.vertx.circuitbreaker.CircuitBreakerOptions;
-import io.zero88.qwe.IConfig;
+import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.zero88.utils.Strings;
+import io.vertx.circuitbreaker.CircuitBreakerOptions;
+import io.zero88.qwe.ExtensionConfig;
 
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
-public final class CircuitBreakerConfig implements IConfig {
+@Setter
+@Accessors(chain = true)
+public final class CircuitBreakerConfig implements ExtensionConfig {
 
-    public static final String NAME = "__circuitBreaker__";
-    public static final String DEFAULT_NOTIFICATION_ADDRESS = "qwe.circuit.breaker";
+    public static final String KEY = "__circuitBreaker__";
 
-    @JsonProperty(value = "name")
-    private String circuitName = "qwe-circuit-breaker";
-    private boolean enabled = false;
-    private CircuitBreakerOptions options = new CircuitBreakerOptions().setNotificationAddress(
-        DEFAULT_NOTIFICATION_ADDRESS);
+    private String extName = "cb";
+    private CircuitBreakerOptions options = new CircuitBreakerOptions().setNotificationAddress("qwe.circuit-breaker");
 
     @Override
-    public String configKey() {return NAME;}
+    public String configKey() {return KEY;}
+
+    public CircuitBreakerConfig setOptions(CircuitBreakerOptions options) {
+        CircuitBreakerOptions o = Optional.ofNullable(options).orElseGet(CircuitBreakerOptions::new);
+        if (CircuitBreakerOptions.DEFAULT_NOTIFICATION_ADDRESS.equals(o.getNotificationAddress()) ||
+            Strings.isBlank(o.getNotificationAddress())) {
+            o.setNotificationAddress("qwe.circuit-breaker");
+        }
+        this.options = o;
+        return this;
+    }
 
 }

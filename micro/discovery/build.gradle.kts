@@ -5,8 +5,6 @@ dependencies {
     api(project(":http:client"))
     api(VertxLibs.serviceDiscovery)
 
-    implementation(project(":micro:circuit-breaker"))
-
     compileOnly(VertxLibs.codegen)
     compileOnly(VertxLibs.codegen)
     compileOnly(VertxLibs.rx2)

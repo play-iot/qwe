@@ -52,12 +52,9 @@ public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, Discovery
         if (!isPostStep) {
             return discoveryContext;
         }
-        CircuitBreakerWrapper breaker = CircuitBreakerWrapper.create(vertx,
-                                                                     pluginConfig.lookup(CircuitBreakerConfig.NAME,
-                                                                                         CircuitBreakerConfig.class));
         ServiceDiscoveryConfig discoveryConfig = pluginConfig.lookup(ServiceDiscoveryConfig.NAME,
                                                                      ServiceDiscoveryConfig.class);
-        ServiceDiscoveryApi discoveryApi = new ServiceDiscoveryApiImpl(sharedData(), discoveryConfig, breaker);
+        ServiceDiscoveryApi discoveryApi = new ServiceDiscoveryApiImpl(sharedData(), discoveryConfig);
         return discoveryContext.setup(setupGateway(discoveryApi, discoveryConfig));
     }
 
