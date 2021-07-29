@@ -1,8 +1,6 @@
 dependencies {
-    api(project(":micro:micro-config"))
+    api(project(":qwe-core"))
     api(VertxLibs.circuitBreaker)
-
-    compileOnly(VertxLibs.codegen)
 
     testImplementation(VertxLibs.junit)
     testImplementation(testFixtures(project(":qwe-core")))

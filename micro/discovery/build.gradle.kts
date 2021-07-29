@@ -6,7 +6,6 @@ dependencies {
     api(VertxLibs.serviceDiscovery)
 
     compileOnly(VertxLibs.codegen)
-    compileOnly(VertxLibs.codegen)
     compileOnly(VertxLibs.rx2)
     annotationProcessor(VertxLibs.codegen)
 
