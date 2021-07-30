@@ -18,7 +18,7 @@ public final class Http2Config implements IConfig {
     private boolean enabled = false;
 
     @Override
-    public String key() { return NAME; }
+    public String configKey() { return NAME; }
 
     @Override
     public Class<? extends IConfig> parent() { return HttpServerConfig.class; }

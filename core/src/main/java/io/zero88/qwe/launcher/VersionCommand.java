@@ -2,6 +2,7 @@ package io.zero88.qwe.launcher;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -61,6 +62,10 @@ public class VersionCommand extends DefaultCommand {
         } catch (IllegalStateException e) {
             return null;
         }
+    }
+
+    public static ApplicationVersion getVersionOrFake() {
+        return Optional.ofNullable(getVersionOrNull()).orElseGet(ApplicationVersion::fake);
     }
 
     static void printVersion() {

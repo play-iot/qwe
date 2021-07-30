@@ -1,4 +1,5 @@
 {
+  "userAgent": "qwe.httpclient",
   "options": {
     "logActivity": false,
     "receiveBufferSize": -1,
@@ -68,19 +69,17 @@
     "tryUsePerMessageWebSocketCompression": true,
     "tryWebSocketDeflateFrameCompression": false,
     "verifyHost": true,
-    "webSocketClosingTimeout": 10000,
+    "webSocketClosingTimeout": 10,
     "webSocketCompressionAllowClientNoContext": true,
     "webSocketCompressionLevel": 6,
     "webSocketCompressionRequestServerNoContext": true
   },
-  "handlerConfig": {
-    "httpErrorHandlerCls": "io.zero88.qwe.http.client.handler.HttpErrorHandler",
-    "reqComposerCls": "io.zero88.qwe.http.client.handler.HttpRequestMessageComposer",
-    "respTextHandlerCls": "io.zero88.qwe.http.client.handler.HttpResponseTextHandler",
+  "httpHandlers": {
     "respBinaryHandlerCls": "io.zero88.qwe.http.client.handler.HttpResponseBinaryHandler",
-    "webSocketConnectErrorHandlerCls": "io.zero88.qwe.http.client.handler.WebSocketConnectErrorHandler",
-    "webSocketResponseDispatcherCls": "io.zero88.qwe.http.client.handler.WebSocketResponseDispatcher",
-    "webSocketErrorHandlerCls": "io.zero88.qwe.http.client.handler.WebSocketResponseErrorHandler"
+    "respTextHandlerCls": "io.zero88.qwe.http.client.handler.HttpClientJsonResponseHandler"
   },
-  "userAgent": "qwe.httpclient"
+  "webSocketHandlers": {
+    "errorHandlerCls": "io.zero88.qwe.http.client.handler.WebSocketClientErrorHandler",
+    "dispatcherCls": "io.zero88.qwe.http.client.handler.WebSocketClientDispatcher"
+  }
 }

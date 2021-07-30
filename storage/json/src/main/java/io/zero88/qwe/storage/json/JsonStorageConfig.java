@@ -3,9 +3,8 @@ package io.zero88.qwe.storage.json;
 import java.util.Optional;
 
 import io.github.zero88.repl.ReflectionClass;
-import io.zero88.qwe.PluginConfig.PluginDirConfig;
+import io.zero88.qwe.ExtensionConfig;
 import io.zero88.qwe.file.FileOption;
-import io.zero88.qwe.storage.json.service.JsonStorageService;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,8 +19,9 @@ import lombok.extern.jackson.Jacksonized;
 @Builder(builderClassName = "Builder")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class JsonStorageConfig implements PluginDirConfig {
+public final class JsonStorageConfig implements ExtensionConfig {
 
+    public static final String KEY = "__json__";
     @Default
     private final String pluginDir = "storage";
     @Default
@@ -44,8 +44,8 @@ public final class JsonStorageConfig implements PluginDirConfig {
     }
 
     @Override
-    public String key() {
-        return "__json__";
+    public String configKey() {
+        return KEY;
     }
 
     public static JsonStorageConfig create() {

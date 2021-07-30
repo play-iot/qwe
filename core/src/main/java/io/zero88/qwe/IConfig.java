@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-public interface IConfig extends JsonData, Shareable {
+public interface IConfig extends JsonData, Shareable, HasConfigKey {
 
     ObjectMapper MAPPER = JsonData.MAPPER.copy().setSerializationInclusion(Include.NON_NULL);
     ObjectMapper MAPPER_IGNORE_UNKNOWN_PROPERTY = MAPPER.copy()
@@ -117,9 +117,6 @@ public interface IConfig extends JsonData, Shareable {
     }
 
     @JsonIgnore
-    String key();
-
-    @JsonIgnore
     Class<? extends IConfig> parent();
 
     @JsonIgnore
@@ -136,7 +133,7 @@ public interface IConfig extends JsonData, Shareable {
     default JsonObject toJson(@NonNull ObjectMapper mapper) {
         List<? extends IConfig> fieldValues = ReflectionField.getFieldValuesByType(this, IConfig.class);
         JsonObject jsonObject = mapper.convertValue(this, JsonObject.class);
-        fieldValues.forEach(val -> jsonObject.put(val.key(), val.toJson(mapper)));
+        fieldValues.forEach(val -> jsonObject.put(val.configKey(), val.toJson(mapper)));
         return jsonObject;
     }
 
@@ -172,16 +169,16 @@ public interface IConfig extends JsonData, Shareable {
                 throw new HiddenException(throwable.getCause());
             }
             try {
-                object = create(temp.key(), entries, clazz);
+                object = create(temp.configKey(), entries, clazz);
             } catch (HiddenException ex) {
                 if (temp.isRoot()) {
                     throw ex;
                 }
                 IConfig parent = from(entries, temp.parent(), ex);
-                JsonObject parentValue = parent instanceof Map && ((Map) parent).containsKey(parent.key())
-                                         ? parent.toJson().getJsonObject(parent.key(), new JsonObject())
+                JsonObject parentValue = parent instanceof Map && ((Map) parent).containsKey(parent.configKey())
+                                         ? parent.toJson().getJsonObject(parent.configKey(), new JsonObject())
                                          : parent.toJson();
-                Object currentValue = parentValue.getValue(temp.key());
+                Object currentValue = parentValue.getValue(temp.configKey());
                 if (Objects.isNull(currentValue)) {
                     throw ex;
                 }

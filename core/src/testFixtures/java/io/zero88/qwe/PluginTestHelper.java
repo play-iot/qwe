@@ -1,33 +1,39 @@
 package io.zero88.qwe;
 
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import io.github.zero88.utils.UUID64;
+import io.reactivex.annotations.NonNull;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.junit5.VertxTestContext;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public interface PluginTestHelper {
+public interface PluginTestHelper extends AppContextTest {
 
-    Path testDir();
-
-    default String sharedKey() {
-        return getClass().getName() + "--" + UUID64.random();
-    }
-
-    default SharedDataLocalProxy createSharedData(Vertx vertx) {
-        return SharedDataLocalProxy.create(vertx, sharedKey());
+    @Override
+    default String appName() {
+        return "PluginTest";
     }
 
     default <T extends Plugin> T deploy(Vertx vertx, VertxTestContext context, PluginConfig config,
                                         PluginProvider<T> provider) {
-        final T plugin = provider.provide(createSharedData(vertx));
-        final DeploymentOptions options = new DeploymentOptions().setConfig(config.toJson());
+        return deploy(vertx, context, config, provider, null);
+    }
+
+    default <T extends Plugin> T deploy(Vertx vertx, VertxTestContext context, PluginConfig config,
+                                        PluginProvider<T> provider,
+                                        Map<Class<? extends Extension>, ExtensionConfig> extConfigMap) {
+        T plugin = provider.provide(createSharedData(vertx));
+        Set<Extension> ext = getExtensions(provider, plugin.sharedData(), appName(), testDir(), extConfigMap);
+        DeploymentOptions options = new DeploymentOptions().setConfig(config.toJson());
         return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
-                                                               .verticle(preDeploy(plugin))
+                                                               .verticle(preDeploy(plugin, ext))
                                                                .options(options)
                                                                .successAsserter(id -> {
                                                                    postDeploy(plugin, id);
@@ -47,10 +53,11 @@ public interface PluginTestHelper {
 
     default <T extends Plugin> T deploy(Vertx vertx, TestContext context, PluginConfig config,
                                         PluginProvider<T> provider) {
-        final T plugin = provider.provide(createSharedData(vertx));
-        final DeploymentOptions options = new DeploymentOptions().setConfig(config.toJson());
+        T plugin = provider.provide(createSharedData(vertx));
+        Set<Extension> ext = getExtensions(provider, plugin.sharedData(), appName(), testDir(), null);
+        DeploymentOptions options = new DeploymentOptions().setConfig(config.toJson());
         return VertxHelper.deploy(vertx, context, DeployContext.<T>builder()
-                                                               .verticle(preDeploy(plugin))
+                                                               .verticle(preDeploy(plugin, ext))
                                                                .options(options)
                                                                .successAsserter(id -> postDeploy(plugin, id))
                                                                .build());
@@ -65,16 +72,24 @@ public interface PluginTestHelper {
                                                         .build());
     }
 
-    default <T extends Plugin> T preDeploy(T plugin) {
-        return (T) plugin.deployHook()
-                         .onPreDeploy(plugin,
-                                      PluginContext.createPreContext("PluginTest", plugin.pluginName(), sharedKey(),
-                                                                     testDir()));
+    default <T extends Plugin> T preDeploy(T plugin, Set<Extension> extensions) {
+        PluginContext ctx = PluginContext.create(appName(), plugin.pluginName(), sharedKey(), testDir(), extensions);
+        return (T) plugin.deployHook().onPreDeploy(plugin, ctx);
     }
 
     default <T extends Plugin> T postDeploy(T plugin, String deploymentId) {
-        return (T) plugin.deployHook()
-                         .onPostDeploy(plugin, PluginContext.createPostContext(plugin.pluginContext(), deploymentId));
+        return (T) plugin.deployHook().onPostDeploy(plugin, plugin.pluginContext().deployId(deploymentId));
+    }
+
+    @NonNull
+    static <T extends Plugin> Set<Extension> getExtensions(PluginProvider<T> provider, SharedDataLocalProxy sharedData,
+                                                           String appName, Path appDir,
+                                                           Map<Class<? extends Extension>, ExtensionConfig> configMap) {
+        Map<Class<? extends Extension>, ExtensionConfig> c = configMap == null ? Collections.emptyMap() : configMap;
+        return provider.extensions()
+                       .stream()
+                       .map(cls -> ExtensionTestHelper.createExt(sharedData, appName, appDir, cls, c.get(cls)))
+                       .collect(Collectors.toSet());
     }
 
     interface PluginDeployTest<T extends Plugin> extends PluginTestHelper {

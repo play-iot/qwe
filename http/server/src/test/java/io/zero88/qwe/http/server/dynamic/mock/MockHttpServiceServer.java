@@ -7,7 +7,7 @@ import javax.ws.rs.Produces;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.ApplicationVerticle;
-import io.zero88.qwe.PluginContextLookup;
+import io.zero88.qwe.ApplicationContextHolder;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpServerPluginContext;
@@ -30,9 +30,9 @@ public class MockHttpServiceServer extends ApplicationVerticle {
     public String configFile() { return "httpService.json"; }
 
     @Override
-    public void onInstallCompleted(PluginContextLookup lookup) {
-        final HttpServerPluginContext httpContext = lookup.query(HttpServerPluginContext.class);
-        final DiscoveryContext discoveryContext = lookup.query(DiscoveryContext.class);
+    public void onInstallCompleted(ApplicationContextHolder holder) {
+        final HttpServerPluginContext httpContext = holder.plugin(HttpServerPluginContext.class);
+        final DiscoveryContext discoveryContext = holder.plugin(DiscoveryContext.class);
         final ServerInfo info = httpContext.getServerInfo();
         final HttpLocation location = new HttpLocation(info.toJson()).setRoot(info.getApiPath());
         discoveryContext.getDiscovery().register(RecordHelper.create("httpService", location));

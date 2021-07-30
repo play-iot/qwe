@@ -19,7 +19,7 @@ public final class ServiceGatewayConfig implements IConfig {
     private String usageMonitorClass = ServiceGatewayUsageMonitor.class.getName();
 
     @Override
-    public String key() {
+    public String configKey() {
         return NAME;
     }
 

@@ -39,13 +39,12 @@ public interface PluginDeployHook {
     }
 
     /**
-     * Each implementation can enrich any useful information in {@code plugin context} then it can be used later on
-     * {@code application} after all plugins are deployed successfully
+     * Each implementation can enrich any useful information in {@code plugin context} then its context can be used
+     * later on {@code application} after all plugins are deployed successfully
      *
      * @param pluginContext an associate post-context of plugin
      * @param isPostStep    a flag to identifies whether is pre-step or post-step
      * @return a plugin context
-     * @see Application#onInstallCompleted(PluginContextLookup)
      */
     default PluginContext enrichContext(@NonNull PluginContext pluginContext, boolean isPostStep) {
         return pluginContext;

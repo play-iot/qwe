@@ -1,6 +1,7 @@
 package io.zero88.qwe;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -26,10 +27,13 @@ public class DeployContext<T extends Verticle> {
     private final T verticle;
     @Default
     private final int timeout = TestHelper.TEST_TIMEOUT_SEC;
-    @Default
-    private final DeploymentOptions options = new DeploymentOptions();
+    private final DeploymentOptions options;
     private final Consumer<String> successAsserter;
     private final Consumer<Throwable> failedAsserter;
+
+    public DeploymentOptions options() {
+        return Optional.ofNullable(options).orElseGet(DeploymentOptions::new);
+    }
 
     public Consumer<String> successAsserter() {
         if (Objects.nonNull(failedAsserter)) {

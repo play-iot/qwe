@@ -6,7 +6,6 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.AllowForwardHeaders;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
-import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.http.server.config.ApiConfig;
 import io.zero88.qwe.http.server.config.ApiGatewayConfig;
 import io.zero88.qwe.http.server.config.CorsOptions;
@@ -32,7 +31,7 @@ public final class HttpServerConfig implements PluginDirConfig {
 
     public static final long MB = 1024L * 1024L;
 
-    public static final String NAME = "__http__";
+    public static final String KEY = "__http__";
     private String host = "0.0.0.0";
     private int port = 8080;
     @Getter(value = AccessLevel.PRIVATE)
@@ -49,7 +48,7 @@ public final class HttpServerConfig implements PluginDirConfig {
     private ServerOptions options = (ServerOptions) new ServerOptions().setCompressionSupported(true)
                                                                        .setDecompressionSupported(true);
     @JsonProperty(value = ApiConfig.NAME)
-    private ApiConfig apiConfig = (ApiConfig) new ApiConfig().setEnabled(true);
+    private ApiConfig apiConfig = new ApiConfig();
     @JsonProperty(value = ApiGatewayConfig.NAME)
     private ApiGatewayConfig apiGatewayConfig = new ApiGatewayConfig();
     @JsonProperty(value = WebSocketConfig.NAME)
@@ -66,10 +65,7 @@ public final class HttpServerConfig implements PluginDirConfig {
     private StaticWebConfig staticWebConfig = new StaticWebConfig();
 
     @Override
-    public String key() { return NAME; }
-
-    @Override
-    public Class<? extends IConfig> parent() { return QWEAppConfig.class; }
+    public String configKey() { return KEY; }
 
     public String publicServerUrl() {
         return Urls.buildURL(publicScheme, publicHost, publicPort);
@@ -81,7 +77,7 @@ public final class HttpServerConfig implements PluginDirConfig {
         public static final String NAME = "__options__";
 
         @Override
-        public String key() { return NAME; }
+        public String configKey() { return NAME; }
 
         @Override
         public Class<? extends IConfig> parent() { return HttpServerConfig.class; }

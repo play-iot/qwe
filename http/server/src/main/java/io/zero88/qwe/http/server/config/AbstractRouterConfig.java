@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 abstract class AbstractRouterConfig implements IConfig, RouterConfig, HttpSystem {
 
     @Accessors(fluent = true)
-    private final String key;
+    private final String configKey;
     @Accessors(fluent = true)
     private final Class<? extends IConfig> parent;
     @Accessors(chain = true)
@@ -28,12 +28,12 @@ abstract class AbstractRouterConfig implements IConfig, RouterConfig, HttpSystem
 
     protected abstract @NonNull String defaultPath();
 
-    protected AbstractRouterConfig(String key, Class<? extends IConfig> parent) {
-        this(key, parent, false, null);
+    protected AbstractRouterConfig(String configKey, Class<? extends IConfig> parent) {
+        this(configKey, parent, false, null);
     }
 
-    protected AbstractRouterConfig(String key, Class<? extends IConfig> parent, boolean enabled, String path) {
-        this.key = key;
+    protected AbstractRouterConfig(String configKey, Class<? extends IConfig> parent, boolean enabled, String path) {
+        this.configKey = configKey;
         this.parent = parent;
         this.enabled = enabled;
         this.path = Urls.combinePath(Objects.toString(path, defaultPath()));

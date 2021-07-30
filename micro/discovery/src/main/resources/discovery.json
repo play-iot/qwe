@@ -10,22 +10,6 @@
       "__serviceDiscovery__": {
         "announceAddress": "qwe.service.discovery.announce",
         "backendClass": "io.vertx.servicediscovery.impl.DefaultServiceDiscoveryBackend"
-      },
-      "__circuitBreaker__": {
-        "enabled": false,
-        "options": {
-          "timeout": 10000,
-          "maxFailures": 5,
-          "fallbackOnFailure": false,
-          "resetTimeout": 30000,
-          "notificationAddress": "qwe.circuit.breaker",
-          "notificationPeriod": 2000,
-          "maxRetries": 0,
-          "metricsRollingWindow": 10000,
-          "metricsRollingBuckets": 10,
-          "failuresRollingWindow": 10000
-        },
-        "name": "qwe-circuit-breaker"
       }
     }
   }

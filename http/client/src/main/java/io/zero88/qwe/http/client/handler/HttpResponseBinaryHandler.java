@@ -13,7 +13,7 @@ import io.vertx.core.http.HttpClientResponse;
 public class HttpResponseBinaryHandler implements Handler<HttpClientResponse> {
 
     @Override
-    public void handle(HttpClientResponse event) {
+    public void handle(HttpClientResponse resp) {
 
     }
 

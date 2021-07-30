@@ -30,4 +30,8 @@ public final class ApplicationVersion implements JsonData {
         // @formatter:on
     }
 
+    public static ApplicationVersion fake() {
+        return new ApplicationVersion("fake", "", "", "", "");
+    }
+
 }

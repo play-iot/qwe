@@ -29,12 +29,30 @@ public interface IOtherConfig<C extends IOtherConfig> extends IConfig {
     @NotNull JsonObject other();
 
     /**
+     * Check if whether this config contains the given key
+     *
+     * @param key config key
+     * @return {@code true} if containing the given key
+     */
+    boolean has(String key);
+
+    /**
      * Lookup a particular configuration by config key
      *
      * @param key config key
      * @return a particular configuration
      */
     @Nullable Object lookup(String key);
+
+    /**
+     * Lookup a particular configuration in {@code Json} by config key
+     *
+     * @param key config key
+     * @return a particular configuration in json, fallback to new json if not found
+     */
+    default JsonObject lookupJson(String key) {
+        return lookupOrDefault(key, JsonObject.class, JsonObject::new);
+    }
 
     /**
      * Lookup a particular configuration in specific type by config key
@@ -66,9 +84,12 @@ public interface IOtherConfig<C extends IOtherConfig> extends IConfig {
             this.other = Optional.ofNullable(other).orElseGet(HashMap::new);
         }
 
-        public JsonObject other()        { return JsonObject.mapFrom(other); }
+        public JsonObject other() {return JsonObject.mapFrom(other);}
 
-        public Object lookup(String key) { return other.get(key); }
+        @Override
+        public boolean has(String key) {return other.containsKey(key);}
+
+        public Object lookup(String key) {return other.get(key);}
 
         public <T> T lookup(String key, @NonNull Class<T> configClass) {
             return Optional.ofNullable(other.get(key))

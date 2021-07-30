@@ -6,11 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.exceptions.QWEException;
+import io.zero88.qwe.mock.MockPluginConfig;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class HasConfigTest {
 
     private MockHasConfig hasConfig;
@@ -22,21 +21,20 @@ public class HasConfigTest {
 
     @Test
     public void test_not_found_config_file_should_get_default_value() {
-        final MockConfig config = hasConfig.computeConfig(new JsonObject());
+        final MockPluginConfig config = hasConfig.computeConfig(new JsonObject());
         Assertions.assertNotNull(config);
     }
 
     @Test
     public void test_invalid_config_should_throw_exception() {
-        Assertions.assertThrows(QWEException.class,
-                                () -> hasConfig.computeConfig(new JsonObject().put("aaa", "yyy")));
+        Assertions.assertThrows(QWEException.class, () -> hasConfig.computeConfig(new JsonObject().put("aaa", "yyy")));
     }
 
-    static class MockHasConfig implements HasConfig<MockConfig> {
+    static class MockHasConfig implements HasConfig<MockPluginConfig> {
 
         @Override
-        public @NonNull Class<MockConfig> configClass() {
-            return MockConfig.class;
+        public @NonNull Class<MockPluginConfig> configClass() {
+            return MockPluginConfig.class;
         }
 
         @Override

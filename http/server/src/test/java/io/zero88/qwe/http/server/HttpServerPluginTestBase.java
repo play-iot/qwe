@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.json.JsonObject;
@@ -23,6 +22,8 @@ import io.zero88.qwe.IConfig;
 import io.zero88.qwe.PluginProvider;
 import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
 import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.http.client.HttpClientExtension;
+import io.zero88.qwe.http.client.HttpClientWrapper;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -39,22 +40,27 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     protected Vertx vertx;
     protected HttpServerConfig httpConfig;
     @Getter
-    protected HttpClient client;
+    protected HttpClientWrapper client;
     @Getter
     protected RequestOptions requestOptions;
 
     @BeforeClass
-    public static void beforeSuite() { TestHelper.setup(); }
+    public static void beforeSuite() {TestHelper.setup();}
 
     @Override
     public Path testDir() {
         return folder.getRoot().toPath();
     }
 
+    @Override
+    public String appName() {
+        return PluginDeployTest.super.appName();
+    }
+
     @Before
     public void before(TestContext context) throws IOException {
         vertx = Vertx.vertx();
-        client = vertx.createHttpClient(createClientOptions());
+        client = initExtension(vertx, HttpClientExtension.class, null).entrypoint();
         httpConfig = initConfig();
         requestOptions = new RequestOptions().setHost(DEFAULT_HOST).setPort(httpConfig.getPort());
     }
