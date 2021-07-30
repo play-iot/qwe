@@ -50,7 +50,18 @@ public interface HttpClientWrapper extends ExtensionEntrypoint, HasLogger, Wrapp
      * @return response data in future
      */
     default Future<ResponseData> request(RequestOptions options) {
-        return request(options, null, false);
+        return request(options, null);
+    }
+
+    /**
+     * Execute HTTP request
+     *
+     * @param options     Request options
+     * @param requestData Request data
+     * @return response data in future
+     */
+    default Future<ResponseData> request(RequestOptions options, RequestData requestData) {
+        return request(options, requestData, false);
     }
 
     /**

@@ -33,15 +33,7 @@ public final class HttpClientConfig implements ExtensionConfig {
     private WebSocketHandlersConfig webSocketHandlers = new WebSocketHandlersConfig();
 
     HttpClientConfig() {
-        this.options = new HttpClientOptions().setIdleTimeout(HTTP_IDLE_TIMEOUT_SECOND)
-                                              .setIdleTimeoutUnit(TimeUnit.SECONDS)
-                                              .setConnectTimeout(CONNECT_TIMEOUT_SECOND * 1000)
-                                              .setTryUseCompression(true)
-                                              .setWebSocketCompressionLevel(6)
-                                              .setWebSocketCompressionAllowClientNoContext(true)
-                                              .setWebSocketCompressionRequestServerNoContext(true)
-                                              .setTryUsePerFrameWebSocketCompression(false)
-                                              .setTryUsePerMessageWebSocketCompression(true);
+        this.options = defaultOptions();
     }
 
     @Override
@@ -60,11 +52,25 @@ public final class HttpClientConfig implements ExtensionConfig {
                                    @JsonProperty("options") JsonObject options,
                                    @JsonProperty("httpHandlers") JsonObject httpHandlers,
                                    @JsonProperty("webSocketHandlers") JsonObject webSocketHandlers) {
-        return new HttpClientConfig(userAgent, new HttpClientOptions(options),
+        return new HttpClientConfig(userAgent, Optional.ofNullable(options)
+                                                       .map(HttpClientOptions::new)
+                                                       .orElseGet(HttpClientConfig::defaultOptions),
                                     JsonData.convert(Optional.ofNullable(httpHandlers).orElseGet(JsonObject::new),
                                                      HttpHandlersConfig.class),
                                     JsonData.convert(Optional.ofNullable(webSocketHandlers).orElseGet(JsonObject::new),
                                                      WebSocketHandlersConfig.class));
+    }
+
+    static HttpClientOptions defaultOptions() {
+        return new HttpClientOptions().setIdleTimeout(HTTP_IDLE_TIMEOUT_SECOND)
+                                      .setIdleTimeoutUnit(TimeUnit.SECONDS)
+                                      .setConnectTimeout(CONNECT_TIMEOUT_SECOND * 1000)
+                                      .setTryUseCompression(true)
+                                      .setWebSocketCompressionLevel(6)
+                                      .setWebSocketCompressionAllowClientNoContext(true)
+                                      .setWebSocketCompressionRequestServerNoContext(true)
+                                      .setTryUsePerFrameWebSocketCompression(false)
+                                      .setTryUsePerMessageWebSocketCompression(true);
     }
 
 }
