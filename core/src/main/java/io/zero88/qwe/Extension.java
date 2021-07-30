@@ -2,6 +2,9 @@ package io.zero88.qwe;
 
 import java.nio.file.Path;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @param <C> Type of Extension config
  * @param <E> Type of Extension Entrypoint
@@ -23,18 +26,26 @@ public interface Extension<C extends ExtensionConfig, E extends ExtensionEntrypo
     /**
      * Setup {@code Extension} when {@code Application} start
      *
-     * @param config     config
+     * @param sharedData shared data proxy
      * @param appName    application name
      * @param appDir     application data dir
-     * @param sharedData shared data proxy
+     * @param config     extension config
      * @return a reference to this for fluent API
      */
-    Extension<C, E> setup(C config, String appName, Path appDir, SharedDataLocalProxy sharedData);
+    Extension<C, E> setup(@NotNull SharedDataLocalProxy sharedData, @NotNull String appName, @NotNull Path appDir,
+                          @Nullable C config);
 
     /**
      * Stop {@code Extension} when {@code Application} stop
      */
     void stop();
+
+    /**
+     * Get extension config
+     *
+     * @return extension config
+     */
+    C extConfig();
 
     /**
      * Get extension entrypoint

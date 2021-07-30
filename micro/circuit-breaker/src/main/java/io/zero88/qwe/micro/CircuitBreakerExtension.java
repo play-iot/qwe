@@ -1,21 +1,22 @@
 package io.zero88.qwe.micro;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.zero88.qwe.Extension;
 import io.zero88.qwe.SharedDataLocalProxy;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
-@AllArgsConstructor
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@Getter
+@Accessors(fluent = true)
 public final class CircuitBreakerExtension
     implements CircuitBreakerProvider, Extension<CircuitBreakerConfig, CircuitBreakerProvider> {
 
+    private CircuitBreakerConfig extConfig;
     private CircuitBreaker circuitBreaker;
 
     @Override
@@ -39,10 +40,11 @@ public final class CircuitBreakerExtension
     }
 
     @Override
-    public CircuitBreakerExtension setup(CircuitBreakerConfig config, String appName, Path appDir,
-                                         SharedDataLocalProxy sharedData) {
-        circuitBreaker = CircuitBreaker.create(appName + "-" + config.getExtName(), sharedData.getVertx(),
-                                               config.getOptions());
+    public CircuitBreakerExtension setup(SharedDataLocalProxy sharedData, String appName, Path appDir,
+                                         CircuitBreakerConfig config) {
+        extConfig = Optional.ofNullable(config).orElseGet(CircuitBreakerConfig::new);
+        circuitBreaker = CircuitBreaker.create(appName + "-" + extConfig.getExtName(), sharedData.getVertx(),
+                                               extConfig.getOptions());
         return this;
     }
 

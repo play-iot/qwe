@@ -151,9 +151,9 @@ public class ApplicationVerticleTest {
         Async async = context.async(2);
         Handler<ApplicationContextHolder> v = holder -> {
             context.verify(i -> {
-                Assert.assertNotNull(holder.extension(MockExtension.class));
-                Assert.assertEquals(MockExtension.class, holder.extension(MockExtension.class).getClass());
-                Assert.assertEquals(1, ((ApplicationContextHolderInternal) holder).extensions().size());
+                Assert.assertNotNull(holder.getExtension(MockExtension.class));
+                Assert.assertEquals(MockExtension.class, holder.getExtension(MockExtension.class).getClass());
+                Assert.assertEquals(1, holder.extensions().size());
             });
             TestHelper.testComplete(async);
         };
@@ -166,9 +166,9 @@ public class ApplicationVerticleTest {
         Async async = context.async(2);
         Handler<ApplicationContextHolder> v = holder -> {
             context.verify(i -> {
-                Assert.assertNotNull(holder.extension(MockExtension.class));
-                Assert.assertEquals(MockExtension.class, holder.extension(MockExtension.class).getClass());
-                Assert.assertEquals(1, ((ApplicationContextHolderInternal) holder).extensions().size());
+                Assert.assertNotNull(holder.getExtension(MockExtension.class));
+                Assert.assertEquals(MockExtension.class, holder.getExtension(MockExtension.class).getClass());
+                Assert.assertEquals(1, holder.extensions().size());
             });
             TestHelper.testComplete(async);
         };

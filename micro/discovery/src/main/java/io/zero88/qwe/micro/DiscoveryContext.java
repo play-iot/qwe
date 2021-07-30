@@ -13,7 +13,7 @@ public final class DiscoveryContext extends DefaultPluginContext {
     @Getter
     private ServiceDiscoveryApi discovery;
 
-    protected DiscoveryContext(@NonNull PluginContext context) {
+    DiscoveryContext(@NonNull PluginContext context) {
         super(context);
     }
 

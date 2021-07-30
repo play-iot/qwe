@@ -1,12 +1,20 @@
 package io.zero88.qwe;
 
+import java.util.Collection;
+
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Application context holder
  */
-@SuppressWarnings("rawtypes")
-public interface ApplicationContextHolder {
+public interface ApplicationContextHolder extends ExtensionHolder {
+
+    /**
+     * Get list of plugin context
+     *
+     * @return plugin context
+     */
+    Collection<PluginContext> plugins();
 
     /**
      * Lookup plugin context by its class
@@ -16,14 +24,5 @@ public interface ApplicationContextHolder {
      * @return plugin context or {@code null} if not found
      */
     @Nullable <T extends PluginContext> T plugin(Class<T> pluginContextCls);
-
-    /**
-     * Lookup extension entrypoint by extension class
-     *
-     * @param <EE>         Type of extension entrypoint
-     * @param extensionCls extension class
-     * @return extension entrypoint
-     */
-    @Nullable <EE extends ExtensionEntrypoint> EE extension(Class<? extends Extension> extensionCls);
 
 }

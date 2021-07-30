@@ -14,11 +14,7 @@ interface ApplicationContextHolderInternal extends ApplicationContextHolder {
         return new ApplicationContextHolderImpl();
     }
 
-    Collection<PluginContext> plugins();
-
-    Collection<Extension> extensions();
-
-    void add(PluginContext context);
+    void addPlugin(PluginContext context);
 
     void addExtension(Extension extension);
 
@@ -33,8 +29,8 @@ interface ApplicationContextHolderInternal extends ApplicationContextHolder {
         }
 
         @Override
-        public <EE extends ExtensionEntrypoint> @Nullable EE extension(Class<? extends Extension> extensionCls) {
-            return (EE) Optional.ofNullable(this.extensions.get(extensionCls)).map(Extension::entrypoint).orElse(null);
+        public <E extends Extension> @Nullable E getExtension(Class<E> extensionCls) {
+            return (E) Optional.ofNullable(this.extensions.get(extensionCls)).orElse(null);
         }
 
         @Override
@@ -48,7 +44,7 @@ interface ApplicationContextHolderInternal extends ApplicationContextHolder {
         }
 
         @Override
-        public void add(PluginContext context) {
+        public void addPlugin(PluginContext context) {
             this.plugins.put(context.getClass(), context);
         }
 

@@ -10,15 +10,23 @@ import lombok.NonNull;
 
 public class MockExtension implements Extension<MockExtensionConfig, MockExtension>, ExtensionEntrypoint {
 
+    private MockExtensionConfig extConfig;
+
     @Override
-    public Extension<MockExtensionConfig, MockExtension> setup(MockExtensionConfig config, String appName, Path appDir,
-                                                               SharedDataLocalProxy sharedData) {
+    public Extension<MockExtensionConfig, MockExtension> setup(SharedDataLocalProxy sharedData, String appName,
+                                                               Path appDir, MockExtensionConfig config) {
+        this.extConfig = config;
         return this;
     }
 
     @Override
     public void stop() {
 
+    }
+
+    @Override
+    public MockExtensionConfig extConfig() {
+        return extConfig;
     }
 
     @Override
@@ -44,8 +52,8 @@ public class MockExtension implements Extension<MockExtensionConfig, MockExtensi
     public static class MockErrorExtension extends MockExtension {
 
         @Override
-        public Extension<MockExtensionConfig, MockExtension> setup(MockExtensionConfig config, String appName,
-                                                                   Path appDir, SharedDataLocalProxy sharedData) {
+        public Extension<MockExtensionConfig, MockExtension> setup(SharedDataLocalProxy sharedData, String appName,
+                                                                   Path appDir, MockExtensionConfig config) {
             throw new IllegalArgumentException("xxx");
         }
 

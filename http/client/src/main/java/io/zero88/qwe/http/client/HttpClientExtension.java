@@ -14,14 +14,16 @@ import io.zero88.qwe.Extension;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.SharedDataLocalProxy;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpClientExtension implements Extension<HttpClientConfig, HttpClientWrapper>, HasLogger {
 
     private int id;
+    @Getter
+    @Accessors(fluent = true)
+    private HttpClientConfig extConfig;
     private final Map<Integer, HttpClientWrapper> registries = new ConcurrentHashMap<>();
 
     @Override
@@ -40,9 +42,10 @@ public final class HttpClientExtension implements Extension<HttpClientConfig, Ht
     }
 
     @Override
-    public HttpClientExtension setup(HttpClientConfig config, String appName, Path appDir,
-                                     SharedDataLocalProxy sharedData) {
-        HttpClientWrapper wrapper = new HttpClientWrapperImpl(config, appName, appDir, sharedData);
+    public HttpClientExtension setup(SharedDataLocalProxy sharedData, String appName, Path appDir,
+                                     HttpClientConfig config) {
+        this.extConfig = config == null ? new HttpClientConfig() : config;
+        HttpClientWrapper wrapper = new HttpClientWrapperImpl(sharedData, appName, appDir, extConfig);
         this.id = wrapper.id();
         this.registries.put(wrapper.id(), wrapper);
         return this;
