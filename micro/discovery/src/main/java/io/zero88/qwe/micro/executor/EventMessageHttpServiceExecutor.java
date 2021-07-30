@@ -13,9 +13,9 @@ import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
+import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
 
@@ -35,7 +35,8 @@ public final class EventMessageHttpServiceExecutor implements ServiceExecutor {
     }
 
     @Override
-    public Future<ResponseData> execute(ServiceReference serviceReference, RequestData reqData, RequestFilter filter) {
+    public Future<ResponseData> execute(SharedDataLocalProxy sharedData, ServiceReference serviceReference,
+                                        RequestData reqData, RequestFilter filter) {
         return serviceReference.getAs(EventMessagePusher.class)
                                .execute(Optional.ofNullable(filter.getString(ServiceFilterParam.ACTION))
                                                 .map(EventAction::parse)

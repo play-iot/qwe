@@ -112,6 +112,10 @@ public final class GatewayHeaders {
         return HttpMethod.valueOf(headers.getString(X_FORWARDED_METHOD, "UNKNOWN"));
     }
 
+    public String getRequestBy() {
+        return headers.getString(X_REQUEST_BY);
+    }
+
     public String getRequestURI() {
         return headers.getString(X_REQUEST_URI);
     }

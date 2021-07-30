@@ -16,6 +16,7 @@ public interface ServiceExecutor extends HasServiceType {
 
     @Nullable JsonObject getConfiguration(Record record, SharedDataLocalProxy sharedData);
 
-    Future<ResponseData> execute(ServiceReference serviceReference, RequestData requestData, RequestFilter filter);
+    Future<ResponseData> execute(SharedDataLocalProxy sharedData, ServiceReference serviceReference,
+                                 RequestData requestData, RequestFilter filter);
 
 }

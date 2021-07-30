@@ -23,6 +23,10 @@ import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
 
 public interface HttpClientWrapper extends ExtensionEntrypoint, HasLogger, Wrapper<HttpClient> {
 
+    static HttpClientWrapper wrap(HttpClient client, String userAgent) {
+        return new HttpClientWrapperImpl(client, userAgent);
+    }
+
     @Override
     default Logger logger() {
         return LoggerFactory.getLogger(HttpClientWrapper.class);

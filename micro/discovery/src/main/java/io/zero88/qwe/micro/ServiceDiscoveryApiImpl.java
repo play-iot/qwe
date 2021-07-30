@@ -171,7 +171,7 @@ final class ServiceDiscoveryApiImpl implements ServiceDiscoveryApi {
                                          RequestFilter filter) {
         final JsonObject configuration = serviceExecutor.getConfiguration(record, sharedData());
         final ServiceReference ref = get().getReferenceWithConfiguration(record, configuration);
-        return serviceExecutor.execute(ref, requestData, filter).eventually(ignore -> {
+        return serviceExecutor.execute(sharedData(), ref, requestData, filter).eventually(ignore -> {
             ref.release();
             return Future.succeededFuture();
         });

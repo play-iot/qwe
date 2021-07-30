@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Function;
 
-import io.github.zero88.utils.UUID64;
 import io.netty.resolver.dns.DnsNameResolverException;
 import io.netty.resolver.dns.DnsNameResolverTimeoutException;
 import io.vertx.core.Future;
@@ -34,7 +33,7 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.exceptions.TimeoutException;
 import io.zero88.qwe.http.HttpException;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
-import io.zero88.qwe.http.client.handler.HttpResponseTextHandler;
+import io.zero88.qwe.http.client.handler.HttpClientJsonResponseHandler;
 import io.zero88.qwe.http.client.handler.WebSocketClientDispatcher;
 import io.zero88.qwe.http.client.handler.WebSocketClientErrorHandler;
 import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
@@ -66,6 +65,15 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
                                      version.getCoreVersion());
     }
 
+    HttpClientWrapperImpl(HttpClient client, String userAgent) {
+        this.config = new HttpClientConfig();
+        this.id = config.toJson().hashCode();
+        this.userAgent = userAgent;
+        this.client = client;
+        this.transporter = null;
+        this.appDir = null;
+    }
+
     @Override
     public HttpClient unwrap() {
         return client;
@@ -91,8 +99,8 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
                                    })
                                    .flatMap(req -> payload == null ? req.send() : req.send(payload))
                                    .recover(this::wrapError)
-                                   .flatMap(HttpResponseTextHandler.create(swallowError, config.getHttpHandlers()
-                                                                                               .getRespTextHandlerCls()));
+                                   .flatMap(HttpClientJsonResponseHandler.create(swallowError, config.getHttpHandlers()
+                                                                                                     .getRespTextHandlerCls()));
     }
 
     @Override

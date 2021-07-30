@@ -3,9 +3,6 @@ package io.zero88.qwe.http.client.handler;
 import java.util.Objects;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
@@ -16,6 +13,7 @@ import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.QWEException;
@@ -35,15 +33,15 @@ import lombok.RequiredArgsConstructor;
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages#body_2">HTTP Response body</a>
  */
 @RequiredArgsConstructor
-public abstract class HttpResponseTextHandler implements Function<HttpClientResponse, Future<ResponseData>> {
+public abstract class HttpClientJsonResponseHandler
+    implements Function<HttpClientResponse, Future<ResponseData>>, HasLogger {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final boolean swallowError;
 
     @SuppressWarnings("unchecked")
-    public static <T extends HttpResponseTextHandler> T create(boolean swallowError, Class<T> bodyHandlerClass) {
-        if (Objects.isNull(bodyHandlerClass) || HttpResponseTextHandler.class.equals(bodyHandlerClass)) {
-            return (T) new HttpResponseTextHandler(swallowError) {};
+    public static <T extends HttpClientJsonResponseHandler> T create(boolean swallowError, Class<T> bodyHandlerClass) {
+        if (Objects.isNull(bodyHandlerClass) || HttpClientJsonResponseHandler.class.equals(bodyHandlerClass)) {
+            return (T) new HttpClientJsonResponseHandler(swallowError) {};
         }
         return ReflectionClass.createObject(bodyHandlerClass, new Arguments().put(boolean.class, swallowError));
     }
@@ -73,10 +71,10 @@ public abstract class HttpResponseTextHandler implements Function<HttpClientResp
         final String uri = response.request().absoluteURI();
         final boolean isError = response.statusCode() >= 400;
         if (Strings.isNotBlank(contentType) && contentType.contains("json")) {
-            logger.info("Try parsing Json data from {}::{}", method, uri);
+            logger().info("Try parsing Json data from {}::{}", method, uri);
             return JsonData.tryParse(buffer, true, isError).toJson();
         }
-        logger.warn("Try parsing Json in ambiguous case from {}::{}", method, uri);
+        logger().warn("Try parsing Json in ambiguous case from {}::{}", method, uri);
         return JsonData.tryParse(buffer, false, isError).toJson();
     }
 

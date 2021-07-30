@@ -76,7 +76,7 @@
   },
   "httpHandlers": {
     "respBinaryHandlerCls": "io.zero88.qwe.http.client.handler.HttpResponseBinaryHandler",
-    "respTextHandlerCls": "io.zero88.qwe.http.client.handler.HttpResponseTextHandler"
+    "respTextHandlerCls": "io.zero88.qwe.http.client.handler.HttpClientJsonResponseHandler"
   },
   "webSocketHandlers": {
     "errorHandlerCls": "io.zero88.qwe.http.client.handler.WebSocketClientErrorHandler",
