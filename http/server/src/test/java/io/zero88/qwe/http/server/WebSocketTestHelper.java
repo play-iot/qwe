@@ -27,7 +27,7 @@ import lombok.NonNull;
 public interface WebSocketTestHelper extends HttpServerTestHelper {
 
     default Future<WebSocket> setupWSClient(TestContext context, String path) {
-        return client().webSocket(wsOpt(requestOptions().setURI(Urls.combinePath(path, "websocket"))))
+        return client().openWebSocket(wsOpt(requestOptions().setURI(Urls.combinePath(path, "websocket"))))
                        .onFailure(context::fail)
                        .map(ws -> ws.exceptionHandler(context::fail));
     }

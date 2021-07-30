@@ -246,7 +246,7 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
     }
 
     private void assertGreeting(TestContext context, Async async, String uri) {
-        client().request(requestOptions().setURI(uri).setMethod(HttpMethod.GET))
+        client().openRequest(requestOptions().setURI(uri).setMethod(HttpMethod.GET))
                 .onFailure(context::fail)
                 .flatMap(HttpClientRequest::send)
                 .onFailure(context::fail)
@@ -261,20 +261,17 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
     }
 
     private void assertNotFound(TestContext context, Async async, String uri) {
-        client().webSocket(wsOpt(requestOptions().setURI(uri)), ar -> {
-            if (ar.succeeded()) {
-                testComplete(async);
-                return;
-            }
-            final Throwable cause = ar.cause();
-            try {
-                if (cause instanceof UpgradeRejectedException) {
-                    context.assertEquals(404, ((UpgradeRejectedException) cause).getStatus());
-                }
-            } finally {
-                testComplete(async);
-            }
-        });
+        client().openWebSocket(wsOpt(requestOptions().setURI(uri)))
+                .onSuccess(ws -> context.fail("Failed test should not success"))
+                .onFailure(t -> {
+                    try {
+                        if (t.getCause() instanceof UpgradeRejectedException) {
+                            context.assertEquals(404, ((UpgradeRejectedException) t.getCause()).getStatus());
+                        }
+                    } finally {
+                        testComplete(async);
+                    }
+                });
     }
 
     private String wsPath(WebSocketServerPlan fullPlan) {

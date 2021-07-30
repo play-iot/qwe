@@ -2,21 +2,22 @@ package io.zero88.qwe.http.server;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.ext.unit.Async;
+import io.zero88.qwe.ExtensionTestHelper;
 import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.http.client.HttpClientWrapper;
 
-public interface HttpServerTestHelper {
+public interface HttpServerTestHelper extends ExtensionTestHelper {
 
     Vertx vertx();
 
-    HttpClient client();
+    HttpClientWrapper client();
 
     RequestOptions requestOptions();
 
     default Handler<Void> closeClient() {
-        return e -> client().close();
+        return e -> client().unwrap().close();
     }
 
     default void testComplete(Async async) {

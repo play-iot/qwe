@@ -48,7 +48,7 @@ public final class HttpServerConfig implements PluginDirConfig {
     private ServerOptions options = (ServerOptions) new ServerOptions().setCompressionSupported(true)
                                                                        .setDecompressionSupported(true);
     @JsonProperty(value = ApiConfig.NAME)
-    private ApiConfig apiConfig = (ApiConfig) new ApiConfig().setEnabled(true);
+    private ApiConfig apiConfig = new ApiConfig();
     @JsonProperty(value = ApiGatewayConfig.NAME)
     private ApiGatewayConfig apiGatewayConfig = new ApiGatewayConfig();
     @JsonProperty(value = WebSocketConfig.NAME)

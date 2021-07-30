@@ -22,6 +22,7 @@ public final class ApiConfig extends AbstractRouterConfig implements IConfig, Ro
 
     public ApiConfig() {
         super(NAME, HttpServerConfig.class);
+        this.setEnabled(true);
     }
 
     @Override

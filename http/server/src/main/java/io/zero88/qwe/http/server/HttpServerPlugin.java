@@ -91,12 +91,15 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
 
     @Override
     public HttpServerPluginContext enrichContext(@NonNull PluginContext pluginContext, boolean isPostStep) {
-        return new HttpServerPluginContext(pluginContext,
-                                           sharedData().getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY));
+        if (!isPostStep) {
+            return new HttpServerPluginContext(pluginContext);
+        }
+        final ServerInfo info = sharedData().getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY);
+        return ((HttpServerPluginContext) pluginContext).setServerInfo(info);
     }
 
     private ServerInfo createServerInfo(int port) {
-        return ServerInfo.siBuilder()
+        return ServerInfo.builder()
                          .host(pluginConfig.getHost())
                          .port(port)
                          .publicHost(pluginConfig.publicServerUrl())

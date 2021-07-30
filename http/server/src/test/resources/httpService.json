@@ -2,10 +2,7 @@
   "__app__": {
     "__http__": {
       "__api__": {
-        "path": "/rest",
-        "__dynamic__": {
-          "enabled": false
-        }
+        "path": "/rest"
       }
     }
   }

@@ -1,20 +1,18 @@
 package io.zero88.qwe.http.server.dynamic;
 
-import java.io.IOException;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.JsonHelper;
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.http.server.dynamic.mock.MockHttpServiceServer;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.http.server.dynamic.mock.MockHttpServiceServer;
 
 @RunWith(VertxUnitRunner.class)
 public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
@@ -44,8 +42,8 @@ public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
     public void test_error(TestContext context) {
         sendToApiThenAssert(context, HttpMethod.GET, "/api/s/rest/test/error", 500,
                             new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
-                                           .put("message", new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
-                                                                           .put("message", "error")));
+                                            .put("message", new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
+                                                                            .put("message", "error")));
     }
 
     @Test
@@ -62,7 +60,7 @@ public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
     public void test_get_gateway_index(TestContext context) {
         final JsonObject expected = new JsonObject(
             "{\"apis\":[{\"name\":\"httpService\",\"type\":\"http-endpoint\",\"status\":\"UP\"," +
-            "\"location\":\"http://0.0.0.0:" + port + "/rest\"}]}");
+            "\"endpoint\":\"http://0.0.0.0:" + port + "/rest\"}]}");
         sendToApiThenAssert(context, HttpMethod.GET, "/gw/index", 200, expected);
     }
 
