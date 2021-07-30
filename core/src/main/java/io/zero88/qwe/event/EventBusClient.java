@@ -11,6 +11,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.zero88.qwe.HasSharedData;
 import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.Wrapper;
 import io.zero88.qwe.transport.Transporter;
 
 import lombok.NonNull;
@@ -24,7 +25,7 @@ import lombok.NonNull;
  * @see EventReplyHandler
  */
 @VertxGen
-public interface EventBusClient extends Transporter, HasSharedData {
+public interface EventBusClient extends Transporter, HasSharedData, Wrapper<EventBus> {
 
     @GenIgnore
     static EventBusClient create(@NonNull SharedDataLocalProxy localDataProxy) {

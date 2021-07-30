@@ -52,7 +52,7 @@ public final class CircuitBreakerExtension
     }
 
     @Override
-    public CircuitBreaker get() {
+    public CircuitBreaker unwrap() {
         return this.circuitBreaker;
     }
 

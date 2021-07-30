@@ -53,7 +53,7 @@ public final class HttpClientExtension implements Extension<HttpClientConfig, Ht
         Promise<Object> promise = Promise.promise();
         CompositeFuture.join(registries.values()
                                        .stream()
-                                       .map(HttpClientWrapper::get)
+                                       .map(HttpClientWrapper::unwrap)
                                        .map(HttpClient::close)
                                        .collect(Collectors.toList()))
                        .onSuccess(c -> logger().debug("Closed [{}/{}] HTTP client(s)",

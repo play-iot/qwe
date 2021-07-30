@@ -15,12 +15,13 @@ import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
 import io.zero88.qwe.ExtensionEntrypoint;
 import io.zero88.qwe.HasLogger;
+import io.zero88.qwe.Wrapper;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
 
-public interface HttpClientWrapper extends ExtensionEntrypoint, HasLogger {
+public interface HttpClientWrapper extends ExtensionEntrypoint, HasLogger, Wrapper<HttpClient> {
 
     @Override
     default Logger logger() {
@@ -33,8 +34,6 @@ public interface HttpClientWrapper extends ExtensionEntrypoint, HasLogger {
      * @return id
      */
     int id();
-
-    HttpClient get();
 
     /**
      * Open HTTP request

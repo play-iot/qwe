@@ -67,7 +67,7 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
     }
 
     @Override
-    public HttpClient get() {
+    public HttpClient unwrap() {
         return client;
     }
 

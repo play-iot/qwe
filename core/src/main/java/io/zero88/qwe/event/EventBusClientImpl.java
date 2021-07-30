@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.zero88.qwe.HasLogger;
+import io.zero88.qwe.LogSystem;
 import io.zero88.qwe.SharedDataLocalProxy;
 
 import lombok.Getter;
@@ -17,15 +19,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 @RequiredArgsConstructor
-final class EventBusClientImpl implements EventBusClient {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(EventBusClient.class);
+final class EventBusClientImpl implements EventBusClient, HasLogger, LogSystem {
 
     @Getter
     @NonNull
     @Accessors(fluent = true)
     private final SharedDataLocalProxy sharedData;
     private final Class<EventReplyHandler> replyHandlerClass;
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(EventBusClient.class);
+    }
+
+    @Override
+    @NonNull
+    public String function() {
+        return "EventBus";
+    }
 
     @Override
     public EventBusClient send(@NonNull String address, @NonNull EventMessage message, DeliveryOptions options) {
@@ -51,8 +62,8 @@ final class EventBusClientImpl implements EventBusClient {
 
     @Override
     public EventBusClient register(String address, boolean local, @NonNull EventListener listener) {
-        LOGGER.info("Register EventListener [{}][{}][{}]", Strings.requireNotBlank(address),
-                    listener.getClass().getName(), local ? "Local" : "Cluster");
+        logger().info(decor("Register [{}][{}][{}]"), Strings.requireNotBlank(address), listener.getClass().getName(),
+                      local ? "Local" : "Cluster");
         if (local) {
             unwrap().localConsumer(address, msg -> listener.handle(sharedData, msg));
         } else {

@@ -1,19 +1,19 @@
 package io.zero88.qwe.micro;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.core.Future;
 import io.zero88.qwe.ExtensionEntrypoint;
+import io.zero88.qwe.Wrapper;
 
-public interface CircuitBreakerProvider extends Supplier<CircuitBreaker>, ExtensionEntrypoint {
+public interface CircuitBreakerProvider extends Wrapper<CircuitBreaker>, ExtensionEntrypoint {
 
-    default <T> Future<T> wrap(Future<T> command) {
-        if (Objects.isNull(get())) {
+    default <T> Future<T> execute(Future<T> command) {
+        if (Objects.isNull(unwrap())) {
             return command;
         }
-        return get().execute(command::onComplete);
+        return unwrap().execute(command::onComplete);
     }
 
 }
