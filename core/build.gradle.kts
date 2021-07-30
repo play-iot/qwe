@@ -9,10 +9,9 @@ dependencies {
     api(LogLibs.slf4j)
     api(UtilLibs.jetbrainsAnnotations)
     api(VertxLibs.core)
+    api(VertxLibs.auth)
     api(ZeroLibs.utils)
     api(ZeroLibs.jpaExt)
-
-    implementation(VertxLibs.config)
 
     compileOnly(VertxLibs.hazelcast)
     compileOnly(VertxLibs.zookeeper)

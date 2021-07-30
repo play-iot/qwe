@@ -75,7 +75,9 @@ object VertxLibs {
     }
 
     const val core = "io.vertx:vertx-core:${Version.vertx}"
+    const val auth = "io.vertx:vertx-auth-common:${Version.vertx}"
     const val codegen = "io.vertx:vertx-codegen:${Version.vertx}"
+
     const val config = "io.vertx:vertx-config:${Version.vertx}"
     const val web = "io.vertx:vertx-web:${Version.vertx}"
     const val serviceDiscovery = "io.vertx:vertx-service-discovery:${Version.vertx}"

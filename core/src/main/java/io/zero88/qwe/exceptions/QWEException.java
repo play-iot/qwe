@@ -1,9 +1,9 @@
 package io.zero88.qwe.exceptions;
 
 import io.github.zero88.exceptions.ErrorCodeException;
-import io.github.zero88.exceptions.SneakyErrorCodeException;
+import io.github.zero88.exceptions.RuntimeErrorCodeException;
 
-public class QWEException extends SneakyErrorCodeException implements ErrorCodeException {
+public class QWEException extends RuntimeErrorCodeException implements ErrorCodeException {
 
     public QWEException(io.github.zero88.exceptions.ErrorCode errorCode, String message, Throwable e) {
         super(errorCode, message, e);

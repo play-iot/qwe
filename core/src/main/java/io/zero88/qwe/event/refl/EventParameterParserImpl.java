@@ -109,7 +109,7 @@ public class EventParameterParserImpl implements EventParameterParser {
         return tryDeserialize(d, paramClass);
     }
 
-    private Object tryDeserialize(Object data, Class<?> paramClass) {
+    protected Object tryDeserialize(Object data, Class<?> paramClass) {
         try {
             return mapper.convertValue(data, paramClass);
         } catch (IllegalArgumentException e) {
