@@ -10,19 +10,18 @@ import io.github.zero88.exceptions.HiddenException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.cluster.ClusterException;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * @see io.github.zero88.exceptions.ErrorCode
  * @see ErrorCode
  */
 //    TODO need more update
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HttpStatusMapping {
+public class HttpStatusMapping {
 
     private static final Map<String, HttpResponseStatus> STATUS_ERROR = init();
     private static final Map<String, Map<HttpMethod, HttpResponseStatus>> STATUS_METHOD_ERROR = initMethod();
@@ -76,7 +75,7 @@ public final class HttpStatusMapping {
     public static HttpResponseStatus error(HttpMethod method, QWEException exception) {
         final Throwable cause = exception.getCause();
         if (cause instanceof HiddenException) {
-            return error(method, ((HiddenException) cause).errorCode());
+            return error(method, ErrorCode.wrap(((HiddenException) cause).errorCode()));
         }
         return error(method, exception.errorCode());
     }
@@ -89,30 +88,27 @@ public final class HttpStatusMapping {
                                                 .orElse(HttpResponseStatus.INTERNAL_SERVER_ERROR));
     }
 
-    public static io.github.zero88.exceptions.ErrorCode error(HttpMethod method, int code) {
+    public static ErrorCode error(HttpMethod method, int code) {
         return error(method, HttpResponseStatus.valueOf(code));
     }
 
-    public static io.github.zero88.exceptions.ErrorCode error(HttpMethod method, HttpResponseStatus statusCode) {
+    public static ErrorCode error(HttpMethod method, HttpResponseStatus status) {
         return STATUS_METHOD_ERROR.entrySet()
                                   .stream()
                                   .filter(entry -> entry.getValue()
                                                         .entrySet()
                                                         .stream()
-                                                        .anyMatch(
-                                                            e -> e.getKey() == method && e.getValue() == statusCode))
+                                                        .anyMatch(e -> e.getKey() == method && e.getValue() == status))
                                   .map(Entry::getKey)
                                   .findFirst()
                                   .map(ErrorCode::parse)
-                                  .map(io.github.zero88.exceptions.ErrorCode.class::cast)
                                   .orElseGet(() -> STATUS_ERROR.entrySet()
                                                                .stream()
-                                                               .filter(entry -> entry.getValue() == statusCode)
+                                                               .filter(entry -> entry.getValue() == status)
                                                                .map(Entry::getKey)
                                                                .findFirst()
                                                                .map(ErrorCode::parse)
-                                                               .map(io.github.zero88.exceptions.ErrorCode.class::cast)
-                                                               .orElse(ErrorCode.UNKNOWN_ERROR));
+                                                               .orElse(ErrorCode.wrap(ErrorCode.UNKNOWN_ERROR)));
     }
 
 }

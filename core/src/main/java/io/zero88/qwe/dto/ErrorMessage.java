@@ -29,7 +29,7 @@ import lombok.ToString;
 public final class ErrorMessage implements Serializable, JsonData {
 
     private QWEException throwable;
-    private io.github.zero88.exceptions.ErrorCode code;
+    private ErrorCode code;
     private String message;
 
     ErrorMessage(@NonNull QWEException throwable) {
@@ -39,8 +39,7 @@ public final class ErrorMessage implements Serializable, JsonData {
     }
 
     private ErrorMessage(@NonNull io.github.zero88.exceptions.ErrorCode code, String message) {
-        this.code = code;
-        this.message = message;
+        this(ErrorCode.wrap(code), message);
     }
 
     private ErrorMessage(@NonNull ErrorCode code, String message) {
