@@ -18,10 +18,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DownloadRouterCreator implements RouterCreator<FileDownloadConfig>, DownloadSystem {
 
-    private final Path pluginDir;
-
     @Override
-    public Router subRouter(@NonNull FileDownloadConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public Router subRouter(@NonNull Path pluginDir, @NonNull FileDownloadConfig config,
+                            @NonNull SharedDataLocalProxy sharedData) {
         final String downloadDir = FileUtils.createFolder(pluginDir, config.getDownloadDir());
         logger().info(decor("Setup download dir[{}]"), downloadDir);
         final Router router = Router.router(sharedData.getVertx());

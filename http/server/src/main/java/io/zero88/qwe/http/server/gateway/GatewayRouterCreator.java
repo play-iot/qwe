@@ -1,14 +1,16 @@
 package io.zero88.qwe.http.server.gateway;
 
+import java.nio.file.Path;
+
 import io.vertx.ext.web.Router;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.http.server.HttpServerPluginContext;
 import io.zero88.qwe.http.server.config.ApiGatewayConfig;
-import io.zero88.qwe.http.server.rest.RestEventApisCreator;
+import io.zero88.qwe.http.server.rest.ApisCreator.RestEventApisCreatorImpl;
 
 import lombok.NonNull;
 
-public class GatewayRouterCreator extends RestEventApisCreator<ApiGatewayConfig> {
+public class GatewayRouterCreator extends RestEventApisCreatorImpl<ApiGatewayConfig> {
 
     @Override
     public String function() {
@@ -16,9 +18,15 @@ public class GatewayRouterCreator extends RestEventApisCreator<ApiGatewayConfig>
     }
 
     @Override
-    public @NonNull Router subRouter(@NonNull ApiGatewayConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public @NonNull Router subRouter(@NonNull Path pluginDir, @NonNull ApiGatewayConfig config,
+                                     @NonNull SharedDataLocalProxy sharedData) {
         sharedData.addData(HttpServerPluginContext.SERVER_GATEWAY_ADDRESS_DATA_KEY, config.getAddress());
-        return super.subRouter(config, sharedData);
+        return super.subRouter(pluginDir, config, sharedData);
+    }
+
+    @Override
+    protected String subFunction() {
+        return "GatewayAPI";
     }
 
 }

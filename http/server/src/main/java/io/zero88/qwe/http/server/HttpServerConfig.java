@@ -65,10 +65,14 @@ public final class HttpServerConfig implements PluginDirConfig {
     private StaticWebConfig staticWebConfig = new StaticWebConfig();
 
     @Override
-    public String configKey() { return KEY; }
+    public String configKey() {return KEY;}
 
     public String publicServerUrl() {
         return Urls.buildURL(publicScheme, publicHost, publicPort);
+    }
+
+    public long maxBodySize() {
+        return maxBodySizeMB < 0 ? -1 : maxBodySizeMB * MB;
     }
 
     @NoArgsConstructor
@@ -77,10 +81,10 @@ public final class HttpServerConfig implements PluginDirConfig {
         public static final String NAME = "__options__";
 
         @Override
-        public String configKey() { return NAME; }
+        public String configKey() {return NAME;}
 
         @Override
-        public Class<? extends IConfig> parent() { return HttpServerConfig.class; }
+        public Class<? extends IConfig> parent() {return HttpServerConfig.class;}
 
     }
 

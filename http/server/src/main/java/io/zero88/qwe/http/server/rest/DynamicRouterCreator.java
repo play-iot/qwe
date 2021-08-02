@@ -1,5 +1,7 @@
 package io.zero88.qwe.http.server.rest;
 
+import java.nio.file.Path;
+
 import io.github.zero88.repl.Reflections;
 import io.github.zero88.utils.Urls;
 import io.vertx.ext.web.Router;
@@ -31,7 +33,8 @@ public final class DynamicRouterCreator implements RouterCreator<ApiConfig>, Api
     }
 
     @Override
-    public @NonNull Router subRouter(@NonNull ApiConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public @NonNull Router subRouter(@NonNull Path pluginDir, @NonNull ApiConfig config,
+                                     @NonNull SharedDataLocalProxy sharedData) {
         try {
             Class.forName(DiscoveryContext.class.getName(), false, Reflections.contextClassLoader());
         } catch (ClassNotFoundException e) {

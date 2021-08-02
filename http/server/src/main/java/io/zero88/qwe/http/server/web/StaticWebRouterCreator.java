@@ -12,15 +12,12 @@ import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.config.StaticWebConfig;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public final class StaticWebRouterCreator implements RouterCreator<StaticWebConfig>, WebSystem {
 
-    private final Path pluginDir;
-
     @Override
-    public @NonNull Router subRouter(@NonNull StaticWebConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public @NonNull Router subRouter(@NonNull Path pluginDir, @NonNull StaticWebConfig config,
+                                     @NonNull SharedDataLocalProxy sharedData) {
         final StaticHandler staticHandler = StaticHandler.create();
         if (config.isInResource()) {
             staticHandler.setWebRoot(config.getWebRoot());

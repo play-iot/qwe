@@ -19,15 +19,12 @@ import io.zero88.qwe.http.server.config.FileUploadConfig;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public final class UploadRouterCreator implements RouterCreator<FileUploadConfig>, UploadSystem {
 
-    private final Path pluginDir;
-
     @Override
-    public Router subRouter(@NonNull FileUploadConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public Router subRouter(@NonNull Path pluginDir, @NonNull FileUploadConfig config,
+                            @NonNull SharedDataLocalProxy sharedData) {
         final String uploadDir = FileUtils.createFolder(pluginDir, config.getUploadDir());
         final EventBusClient eventbus = EventBusClient.create(sharedData);
         final ServerInfo serverInfo = sharedData.getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY);

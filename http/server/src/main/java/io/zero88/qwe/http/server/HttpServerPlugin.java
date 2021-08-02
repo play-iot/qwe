@@ -1,5 +1,6 @@
 package io.zero88.qwe.http.server;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,10 +21,8 @@ import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.http.HttpUtils;
-import io.zero88.qwe.http.server.config.ApiConfig;
 import io.zero88.qwe.http.server.config.CorsOptions;
 import io.zero88.qwe.http.server.download.DownloadRouterCreator;
-import io.zero88.qwe.http.server.gateway.GatewayIndexApi;
 import io.zero88.qwe.http.server.gateway.GatewayRouterCreator;
 import io.zero88.qwe.http.server.handler.FailureContextHandler;
 import io.zero88.qwe.http.server.handler.NotFoundContextHandler;
@@ -133,26 +132,22 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
             root.routeWithRegex("(?!" + pluginConfig.getFileUploadConfig().getPath() + ").+")
-                .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.getMaxBodySizeMB() * HttpServerConfig.MB));
+                .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.maxBodySize()));
             initHttp2Router(root);
-            new WebSocketRouterCreator(httpRouter.getWebSocketEvents()).mount(root, pluginConfig.getWebSocketConfig(),
-                                                                              sharedData());
+            Path pluginDir = Objects.requireNonNull(pluginContext().dataDir(), "Missing HTTP plugin dir");
+            new WebSocketRouterCreator().register(httpRouter.getWebSocketEvents())
+                                        .mount(root, pluginDir, pluginConfig.getWebSocketConfig(), sharedData());
             new RestApiCreator().register(httpRouter.getRestApiClasses())
-                                .mount(root, pluginConfig.getApiConfig(), sharedData());
-            new RestEventApisCreator<ApiConfig>().register(httpRouter.getRestEventApiClasses())
-                                                 .mount(root, pluginConfig.getApiConfig(), sharedData());
-            new DynamicRouterCreator().mount(root, pluginConfig.getApiConfig(), sharedData());
-            new GatewayRouterCreator().register(Objects.isNull(httpRouter.getGatewayApiClass())
-                                                ? GatewayIndexApi.class
-                                                : httpRouter.getGatewayApiClass())
-                                      .mount(root, pluginConfig.getApiGatewayConfig(), sharedData());
-            new UploadRouterCreator(pluginContext().dataDir()).mount(root, pluginConfig.getFileUploadConfig(),
-                                                                     sharedData());
-            new DownloadRouterCreator(pluginContext().dataDir()).mount(root, pluginConfig.getFileDownloadConfig(),
-                                                                       sharedData());
-            new StaticWebRouterCreator(pluginContext().dataDir()).mount(root, pluginConfig.getStaticWebConfig(),
-                                                                        sharedData());
-            root.route().last().handler(new NotFoundContextHandler());
+                                .mount(root, pluginDir, pluginConfig.getApiConfig(), sharedData());
+            new RestEventApisCreator().register(httpRouter.getRestEventApiClasses())
+                                      .mount(root, pluginDir, pluginConfig.getApiConfig(), sharedData());
+            new DynamicRouterCreator().mount(root, pluginDir, pluginConfig.getApiConfig(), sharedData());
+            new GatewayRouterCreator().register(httpRouter.getGatewayApiClass())
+                                      .mount(root, pluginDir, pluginConfig.getApiGatewayConfig(), sharedData());
+            new UploadRouterCreator().mount(root, pluginDir, pluginConfig.getFileUploadConfig(), sharedData());
+            new DownloadRouterCreator().mount(root, pluginDir, pluginConfig.getFileDownloadConfig(), sharedData());
+            new StaticWebRouterCreator().mount(root, pluginDir, pluginConfig.getStaticWebConfig(), sharedData());
+            httpRouter.getRouterCreator().apply(root).route().last().handler(new NotFoundContextHandler());
             return root;
         } catch (QWEException e) {
             throw new InitializerError("Error when initializing HTTP Server route", e);

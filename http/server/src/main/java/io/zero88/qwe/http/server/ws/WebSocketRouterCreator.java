@@ -1,5 +1,6 @@
 package io.zero88.qwe.http.server.ws;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,8 +32,9 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
     @Getter(AccessLevel.MODULE)
     private final Map<String, List<WebSocketServerPlan>> socketsByPath = new HashMap<>();
 
-    public WebSocketRouterCreator(Collection<WebSocketServerPlan> metadataSockets) {
+    public WebSocketRouterCreator register(Collection<WebSocketServerPlan> metadataSockets) {
         metadataSockets.stream().filter(Objects::nonNull).forEach(this::register);
+        return this;
     }
 
     @Override
@@ -41,7 +43,8 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
     }
 
     @Override
-    public Router subRouter(@NonNull WebSocketConfig config, @NonNull SharedDataLocalProxy sharedData) {
+    public Router subRouter(@NonNull Path pluginDir, @NonNull WebSocketConfig config,
+                            @NonNull SharedDataLocalProxy sharedData) {
         final SockJSHandler sockJSHandler = SockJSHandler.create(sharedData.getVertx(), config.getSockjsOptions());
         final Router router = Router.router(sharedData.getVertx());
         //TODO add auth
