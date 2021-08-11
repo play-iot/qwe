@@ -6,12 +6,13 @@ dependencies {
     api(JacksonLibs.core)
     api(JacksonLibs.databind)
     api(JacksonLibs.datetime)
-    api(LogLibs.slf4j)
-    api(UtilLibs.jetbrainsAnnotations)
     api(VertxLibs.core)
     api(VertxLibs.auth)
     api(ZeroLibs.utils)
     api(ZeroLibs.jpaExt)
+    api(JSRLibs.annotation)
+    api(LogLibs.slf4j)
+    api(UtilLibs.jetbrainsAnnotations)
 
     compileOnly(VertxLibs.hazelcast)
     compileOnly(VertxLibs.zookeeper)
@@ -26,6 +27,7 @@ dependencies {
     testImplementation(VertxLibs.junit)
     testImplementation(VertxLibs.junit5)
     testImplementation(VertxLibs.rx2)
+    testImplementation(VertxLibs.jwt)
 
     testFixturesApi(testFixtures(ZeroLibs.utils))
     testFixturesApi(LogLibs.logback)
