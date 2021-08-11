@@ -12,6 +12,7 @@ import io.github.zero88.utils.Functions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.auth.UserInfo;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.msg.DataTransferObject.StandardKey;
 import io.zero88.qwe.event.EBBody;
@@ -47,14 +48,14 @@ public class EventParameterParserImpl implements EventParameterParser {
         boolean isOne = params.length - Arrays.stream(params).filter(MethodParam::isContext).count() == 1;
         return Arrays.stream(params)
                      .map(param -> param.isContext()
-                                   ? parseEBContext(message.getAction(), param)
+                                   ? parseEBContext(message, param)
                                    : parseEBParam(message, param, isOne))
                      .toArray();
     }
 
-    protected Object parseEBContext(EventAction action, MethodParam param) {
+    protected Object parseEBContext(EventMessage message, MethodParam param) {
         if (param.getParamClass() == EventAction.class) {
-            return action;
+            return message.getAction();
         }
         if (ReflectionClass.assertDataType(param.getParamClass(), Vertx.class)) {
             return localDataProxy.getVertx();
@@ -64,6 +65,9 @@ public class EventParameterParserImpl implements EventParameterParser {
         }
         if (ReflectionClass.assertDataType(param.getParamClass(), EventBusClient.class)) {
             return EventBusClient.create(localDataProxy);
+        }
+        if (ReflectionClass.assertDataType(param.getParamClass(), UserInfo.class)) {
+            return message.getUserInfo();
         }
         throw new ImplementationError(ErrorCode.UNSUPPORTED,
                                       "Unsupported EventBus context [" + param.getParamClass() + "]");
@@ -113,7 +117,7 @@ public class EventParameterParserImpl implements EventParameterParser {
         try {
             return mapper.convertValue(data, paramClass);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Event message format is invalid",
+            throw new IllegalArgumentException("Event message body is invalid",
                                                new HiddenException("Jackson parser error", e));
         }
     }

@@ -13,6 +13,7 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.auth.UserInfo;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.DataTransferObject.StandardKey;
@@ -28,7 +29,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Represents for data transfer object in event bus system.
@@ -57,6 +60,10 @@ public final class EventMessage implements Serializable, JsonData {
     @Getter
     @JsonProperty
     private final ErrorMessage error;
+    @Getter
+    @Setter
+    @Accessors(chain = true)
+    private UserInfo userInfo;
 
     @JsonCreator
     private EventMessage(@JsonProperty(value = "status", defaultValue = "INITIAL") EventStatus status,
