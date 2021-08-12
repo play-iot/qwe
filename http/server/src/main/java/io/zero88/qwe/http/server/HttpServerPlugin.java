@@ -1,9 +1,9 @@
 package io.zero88.qwe.http.server;
 
-import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -35,7 +35,7 @@ import io.zero88.qwe.http.server.ws.WebSocketRouterCreator;
 
 import lombok.NonNull;
 
-public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServerPluginContext> {
+public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServerPluginContext> {
 
     private final HttpServerRouter httpRouter;
     private HttpServer httpServer;
@@ -65,21 +65,22 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
         if (this.pluginConfig.getApiConfig().getDynamicConfig().isEnabled()) {
             this.pluginConfig.getApiConfig().setEnabled(true);
         }
+        this.pluginConfig.setRuntimeConfig(httpRouter);
     }
 
     @Override
     public Future<Void> onAsyncStart() {
-        return vertx.createHttpServer(new HttpServerOptions(pluginConfig.getOptions()).setHost(pluginConfig.getHost())
-                                                                                      .setPort(pluginConfig.getPort()))
+        return vertx.createHttpServer(createHttpServerOptions())
                     .requestHandler(initRouter())
                     .listen()
                     .onSuccess(server -> {
                         httpServer = server;
-                        logger().info("HTTP Server started [{}:{}]", pluginConfig.getHost(), httpServer.actualPort());
+                        pluginConfig.setPort(httpServer.actualPort());
+                        logger().info("HTTP Server started [{}:{}]", pluginConfig.getHost(), pluginConfig.getPort());
                         sharedData().addData(HttpServerPluginContext.SERVER_INFO_DATA_KEY,
-                                             createServerInfo(httpServer.actualPort()));
+                                             ServerInfo.create(pluginConfig, (Router) httpServer.requestHandler()));
                     })
-                    .recover(t -> Future.failedFuture(QWEExceptionConverter.from(t)))
+                    .recover(t -> Future.failedFuture(QWEExceptionConverter.friendlyOrKeep(t)))
                     .mapEmpty();
     }
 
@@ -97,23 +98,15 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
         return ((HttpServerPluginContext) pluginContext).setServerInfo(info);
     }
 
-    private ServerInfo createServerInfo(int port) {
-        return ServerInfo.builder()
-                         .host(pluginConfig.getHost())
-                         .port(port)
-                         .publicHost(pluginConfig.publicServerUrl())
-                         .apiPath(pluginConfig.getApiConfig().path())
-                         .wsPath(pluginConfig.getWebSocketConfig().path())
-                         .gatewayPath(pluginConfig.getApiGatewayConfig().path())
-                         .servicePath(pluginConfig.getApiConfig().getDynamicConfig().path())
-                         .downloadPath(pluginConfig.getFileDownloadConfig().path())
-                         .uploadPath(pluginConfig.getFileUploadConfig().path())
-                         .webPath(pluginConfig.getStaticWebConfig().path())
-                         .router((Router) httpServer.requestHandler())
-                         .build();
+    private HttpServerOptions createHttpServerOptions() {
+        final HttpServerOptions options = new HttpServerOptions(pluginConfig.getOptions());
+        if (pluginConfig.getHttp2Cfg().isEnabled()) {
+            //TODO implement it
+        }
+        return options.setHost(pluginConfig.getHost()).setPort(pluginConfig.getPort());
     }
 
-    protected Router initRouter() {
+    private Router initRouter() {
         try {
             Router root = Router.router(vertx);
             CorsOptions corsOptions = pluginConfig.getCorsOptions();
@@ -126,40 +119,31 @@ public class HttpServerPlugin extends PluginVerticle<HttpServerConfig, HttpServe
             root.allowForward(pluginConfig.getAllowForwardHeaders())
                 .route()
                 .handler(corsHandler)
+                //TODO Add LoggerHandlerProvider configuration
                 .handler(LoggerHandler.create())
                 .handler(ResponseContentTypeHandler.create())
                 .handler(ResponseTimeHandler.create())
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
+            root = Stream.concat(
+                             Stream.of(WebSocketRouterCreator.class, RestApiCreator.class, RestEventApisCreator.class,
+                                       DynamicRouterCreator.class, GatewayRouterCreator.class,
+                                       UploadRouterCreator.class,
+                                       DownloadRouterCreator.class, StaticWebRouterCreator.class)
+                                   .map(ReflectionClass::createObject)
+                                   .map(RouterBuilder.class::cast), Stream.of(httpRouter.getCustomBuilder()))
+                         .reduce(root, (r, b) -> b.setup(vertx, r, pluginConfig(), pluginContext()), (r1, r2) -> r2);
             root.routeWithRegex("(?!" + pluginConfig.getFileUploadConfig().getPath() + ").+")
                 .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.maxBodySize()));
-            initHttp2Router(root);
-            Path pluginDir = Objects.requireNonNull(pluginContext().dataDir(), "Missing HTTP plugin dir");
-            new WebSocketRouterCreator().register(httpRouter.getWebSocketEvents())
-                                        .mount(root, pluginDir, pluginConfig.getWebSocketConfig(), sharedData());
-            new RestApiCreator().register(httpRouter.getRestApiClasses())
-                                .mount(root, pluginDir, pluginConfig.getApiConfig(), sharedData());
-            new RestEventApisCreator().register(httpRouter.getRestEventApiClasses())
-                                      .mount(root, pluginDir, pluginConfig.getApiConfig(), sharedData());
-            new DynamicRouterCreator().mount(root, pluginDir, pluginConfig.getApiConfig(), sharedData());
-            new GatewayRouterCreator().register(httpRouter.getGatewayApiClass())
-                                      .mount(root, pluginDir, pluginConfig.getApiGatewayConfig(), sharedData());
-            new UploadRouterCreator().mount(root, pluginDir, pluginConfig.getFileUploadConfig(), sharedData());
-            new DownloadRouterCreator().mount(root, pluginDir, pluginConfig.getFileDownloadConfig(), sharedData());
-            new StaticWebRouterCreator().mount(root, pluginDir, pluginConfig.getStaticWebConfig(), sharedData());
-            httpRouter.getRouterCreator().apply(root).route().last().handler(new NotFoundContextHandler());
+            root.route().last().handler(new NotFoundContextHandler());
             return root;
-        } catch (QWEException e) {
+        } catch (Exception e) {
             throw new InitializerError("Error when initializing HTTP Server route", e);
         }
     }
 
-    private Router initHttp2Router(Router router) {return router;}
-
     /**
      * Decorator route with produce and consume
-     * <p>
-     * TODO: Need to check again Route#consumes(String)
      *
      * @param route route
      * @see Route#produces(String)

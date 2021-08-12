@@ -32,7 +32,7 @@ public final class HttpClientConfig implements ExtensionConfig {
     private HttpHandlersConfig httpHandlers = new HttpHandlersConfig();
     private WebSocketHandlersConfig webSocketHandlers = new WebSocketHandlersConfig();
 
-    HttpClientConfig() {
+    public HttpClientConfig() {
         this.options = defaultOptions();
     }
 

@@ -17,6 +17,7 @@ import io.github.zero88.exceptions.InvalidUrlException;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
 import io.vertx.core.MultiMap;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
@@ -24,6 +25,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.dto.jackson.QWEJsonFactory;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.jpa.Sort;
 import io.zero88.qwe.dto.msg.RequestFilter;
@@ -56,6 +58,10 @@ public final class HttpUtils {
         }
         final JsonObject jsonObject = JsonObject.mapFrom(result);
         return pretty ? jsonObject.encodePrettily() : jsonObject.encode();
+    }
+
+    public static <T> Buffer prettify(HttpServerRequest request, T result) {
+        return QWEJsonFactory.CODEC.toBuffer(result, isPretty(request));
     }
 
     public static final class HttpHeaderUtils {
@@ -109,7 +115,7 @@ public final class HttpUtils {
     }
 
 
-    public static final class HttpRequests {
+    public static final class HttpRequestUtils {
 
         private static final String EQUAL = "=";
         private static final String SEPARATE = "&";

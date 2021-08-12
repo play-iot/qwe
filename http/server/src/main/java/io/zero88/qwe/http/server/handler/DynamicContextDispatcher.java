@@ -32,8 +32,8 @@ import lombok.NonNull;
  * backend {@code micro-service}.
  * <p>
  * It's responsible for keeping {@code micro REST API} definition to handle an incoming request context then forwarding
- * to {@code micro service owner}. After receiving {@code micro service owner} response, it will return back result to
- * client
+ * to {@code micro service owner}. After receiving {@code micro service owner} response, it will return result to
+ * client.
  *
  * @see DynamicRestApi
  */
@@ -143,7 +143,7 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext>, HasLo
     default Future<Void> handleSuccess(RoutingContext context, ResponseData responseData) {
         return context.response()
                       .setStatusCode(HttpStatusMapping.success(context.request().method()).code())
-                      .end(HttpUtils.prettify(responseData.body(), context.request()));
+                      .end(HttpUtils.prettify(context.request(), responseData.body()));
     }
 
     /**
@@ -156,7 +156,7 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext>, HasLo
     default Future<Void> handleError(@NonNull RoutingContext context, ErrorMessage errorMessage) {
         return context.response()
                       .setStatusCode(HttpStatusMapping.error(context.request().method(), errorMessage.getCode()).code())
-                      .end(HttpUtils.prettify(errorMessage.toJson(), context.request()));
+                      .end(HttpUtils.prettify(context.request(), errorMessage));
     }
 
     default HttpMethod getMethod(RoutingContext context) {

@@ -12,11 +12,9 @@ import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
  */
 public interface RestEventApi extends ActionMethodMapping {
 
-    RestEventApi initRouter();
+    RestEventApi initRouter(SharedDataLocalProxy sharedData);
 
     Collection<RestEventApiMetadata> getRestMetadata();
-
-    RestEventApi registerSharedData(SharedDataLocalProxy proxy);
 
     @SuppressWarnings("unchecked")
     default <T extends RestEventApiDispatcher> Class<T> dispatcher() {

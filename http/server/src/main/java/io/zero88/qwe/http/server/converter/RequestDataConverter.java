@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
-import io.zero88.qwe.http.HttpUtils.HttpRequests;
+import io.zero88.qwe.http.HttpUtils.HttpRequestUtils;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.json.JsonObject;
@@ -26,9 +26,9 @@ public final class RequestDataConverter {
         return RequestData.builder()
                           .headers(HttpHeaderUtils.serializeHeaders(context.request()))
                           .body(body(context))
-                          .sort(HttpRequests.sort(context.request()))
-                          .filter(HttpRequests.query(context.request()))
-                          .pagination(HttpRequests.pagination(context.request()))
+                          .sort(HttpRequestUtils.sort(context.request()))
+                          .filter(HttpRequestUtils.query(context.request()))
+                          .pagination(HttpRequestUtils.pagination(context.request()))
                           .build();
     }
 
@@ -52,7 +52,7 @@ public final class RequestDataConverter {
         if (Strings.isBlank(query)) {
             return builder.build();
         }
-        return builder.filter(HttpRequests.deserializeQuery(query)).build();
+        return builder.filter(HttpRequestUtils.deserializeQuery(query)).build();
     }
 
 }

@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.server.ws;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,7 +41,7 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
     public Timeout timeout = Timeout.seconds(20);
 
     @Before
-    public void before(TestContext context) throws IOException {
+    public void before(TestContext context) {
         super.before(context);
         this.httpConfig.getApiConfig().setEnabled(false);
         this.httpConfig.getWebSocketConfig().setEnabled(true);

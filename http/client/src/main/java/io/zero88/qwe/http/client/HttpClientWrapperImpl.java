@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Function;
 
+import io.github.zero88.utils.Strings;
+import io.github.zero88.utils.Urls;
 import io.netty.resolver.dns.DnsNameResolverException;
 import io.netty.resolver.dns.DnsNameResolverTimeoutException;
 import io.vertx.core.Future;
@@ -33,6 +35,7 @@ import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.exceptions.TimeoutException;
 import io.zero88.qwe.http.HttpException;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
+import io.zero88.qwe.http.HttpUtils.HttpRequestUtils;
 import io.zero88.qwe.http.client.handler.HttpClientJsonResponseHandler;
 import io.zero88.qwe.http.client.handler.WebSocketClientDispatcher;
 import io.zero88.qwe.http.client.handler.WebSocketClientErrorHandler;
@@ -93,6 +96,12 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
                                    .map(HttpHeaderUtils::deserializeHeaders)
                                    .orElseGet(MultiMap::caseInsensitiveMultiMap);
         Buffer payload = Optional.ofNullable(reqData).map(RequestData::body).map(JsonObject::toBuffer).orElse(null);
+        String query = Optional.ofNullable(reqData)
+                               .flatMap(r -> Optional.ofNullable(HttpRequestUtils.serializeQuery(r.filter())))
+                               .orElse(null);
+        if (Strings.isNotBlank(query)) {
+            options.setURI(Urls.buildURL(options.getURI(), query));
+        }
         return openRequest(options).map(req -> {
                                        req.headers().addAll(headers);
                                        return req;

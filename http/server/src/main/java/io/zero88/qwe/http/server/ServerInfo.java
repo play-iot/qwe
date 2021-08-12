@@ -26,4 +26,20 @@ public final class ServerInfo implements JsonData, Shareable {
     private final String webPath;
     private final Router router;
 
+    static ServerInfo create(HttpServerConfig config, Router router) {
+        return ServerInfo.builder()
+                         .host(config.getHost())
+                         .port(config.getPort())
+                         .publicHost(config.getPublicServerUrl())
+                         .apiPath(config.getApiConfig().path())
+                         .wsPath(config.getWebSocketConfig().path())
+                         .gatewayPath(config.getApiGatewayConfig().path())
+                         .servicePath(config.getApiConfig().getDynamicConfig().path())
+                         .downloadPath(config.getFileDownloadConfig().path())
+                         .uploadPath(config.getFileUploadConfig().path())
+                         .webPath(config.getStaticWebConfig().path())
+                         .router(router)
+                         .build();
+    }
+
 }

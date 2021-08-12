@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.server.dynamic;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
@@ -20,7 +19,7 @@ import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
 public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase implements RestApiTestHelper {
 
     @Before
-    public void before(TestContext context) throws IOException {
+    public void before(TestContext context) {
         super.before(context);
         startGatewayAndService(context, service(), getServiceOptions());
     }

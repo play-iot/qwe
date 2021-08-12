@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.HasLogger;
-import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventAction;
 import io.zero88.qwe.event.EventPattern;
 import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
@@ -24,7 +23,6 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisSystem, 
     private final ActionMethodMapping mapping;
     private final SortedMap<String, RestEventApiMetadata> restMetadata = new TreeMap<>(
         Comparator.comparingInt(String::length));
-    protected SharedDataLocalProxy sharedData;
 
     protected AbstractRestEventApi() {
         this.mapping = initHttpEventMap();
@@ -57,12 +55,6 @@ public abstract class AbstractRestEventApi implements RestEventApi, ApisSystem, 
     }
 
     @Override
-    public AbstractRestEventApi registerSharedData(SharedDataLocalProxy proxy) {
-        this.sharedData = proxy;
-        return this;
-    }
-
-    @Override
-    public Map<EventAction, HttpMethod> get() { return mapping.get(); }
+    public Map<EventAction, HttpMethod> get() {return mapping.get();}
 
 }

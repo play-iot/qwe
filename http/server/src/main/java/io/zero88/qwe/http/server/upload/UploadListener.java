@@ -1,5 +1,7 @@
 package io.zero88.qwe.http.server.upload;
 
+import java.util.Objects;
+
 import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
@@ -17,16 +19,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UploadListener implements EventListener {
 
-    protected final SharedDataLocalProxy proxy;
+    protected final SharedDataLocalProxy sharedData;
 
-    public static UploadListener create(SharedDataLocalProxy proxy, String listenerClass) {
+    public static UploadListener create(SharedDataLocalProxy sharedData, String listenerClass) {
         if (Strings.isBlank(listenerClass) || UploadListener.class.getName().equals(listenerClass)) {
-            return new UploadListener(proxy);
+            return new UploadListener(sharedData);
         }
-        return ReflectionClass.createObject(listenerClass, new Arguments().put(SharedDataLocalProxy.class, proxy));
+        return Objects.requireNonNull(
+            ReflectionClass.createObject(listenerClass, new Arguments().put(SharedDataLocalProxy.class, sharedData)));
     }
 
     @EBContract(action = "CREATE")
-    public Future<JsonObject> create(JsonObject data) { return Future.succeededFuture(data); }
+    public Future<JsonObject> create(JsonObject data) {return Future.succeededFuture(data);}
 
 }

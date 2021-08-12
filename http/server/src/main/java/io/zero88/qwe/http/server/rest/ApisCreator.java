@@ -1,7 +1,6 @@
 package io.zero88.qwe.http.server.rest;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -10,11 +9,15 @@ import java.util.Set;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.Urls;
+import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.http.server.BasePaths;
+import io.zero88.qwe.http.server.HttpRuntimeConfig;
+import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpServerPlugin;
+import io.zero88.qwe.http.server.HttpServerPluginContext;
 import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
 import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.RouterCreator;
@@ -35,6 +38,12 @@ public abstract class ApisCreator<X, T extends RouterConfig> implements RouterCr
     private final Set<Class<? extends X>> apis = new HashSet<>();
 
     @Override
+    public Router setup(Vertx vertx, Router rootRouter, HttpServerConfig config, HttpServerPluginContext context) {
+        register(config.getRuntimeConfig());
+        return RouterCreator.super.setup(vertx, rootRouter, config, context);
+    }
+
+    @Override
     public String routerName() {
         return subFunction();
     }
@@ -44,23 +53,20 @@ public abstract class ApisCreator<X, T extends RouterConfig> implements RouterCr
         return !apis.isEmpty();
     }
 
-    @SafeVarargs
-    public final ApisCreator<X, T> register(Class<? extends X>... apis) {
-        return register(Arrays.asList(apis));
-    }
-
-    public final ApisCreator<X, T> register(@NonNull Collection<Class<? extends X>> restApis) {
+    protected final ApisCreator<X, T> register(@NonNull Collection<Class<? extends X>> restApis) {
         restApis.stream().filter(Objects::nonNull).forEach(apis::add);
         return this;
     }
 
     protected abstract String subFunction();
 
+    protected abstract void register(HttpRuntimeConfig runtimeConfig);
+
     public abstract static class RestEventApisCreatorImpl<C extends RouterConfig> extends ApisCreator<RestEventApi, C> {
 
         @Override
-        public @NonNull Router subRouter(@NonNull Path pluginDir, @NonNull C config,
-                                         @NonNull SharedDataLocalProxy sharedData) {
+        public @NonNull Router subRouter(@NonNull SharedDataLocalProxy sharedData, @NonNull Path pluginDir,
+                                         @NonNull C config) {
             Router router = Router.router(sharedData.getVertx());
             getApis().stream()
                      .map(ReflectionClass::createObject)
@@ -71,8 +77,7 @@ public abstract class ApisCreator<X, T extends RouterConfig> implements RouterCr
         }
 
         protected void createRouter(Router router, RestEventApi restApi, C config, SharedDataLocalProxy sharedData) {
-            restApi.registerSharedData(sharedData)
-                   .initRouter()
+            restApi.initRouter(sharedData)
                    .getRestMetadata()
                    .forEach(metadata -> createRouter(router, config, metadata, restApi, sharedData));
         }
@@ -97,4 +102,5 @@ public abstract class ApisCreator<X, T extends RouterConfig> implements RouterCr
         }
 
     }
+
 }

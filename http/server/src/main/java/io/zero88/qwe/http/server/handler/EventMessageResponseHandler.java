@@ -2,14 +2,14 @@ package io.zero88.qwe.http.server.handler;
 
 import java.util.Objects;
 
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.http.HttpStatusMapping;
-import io.zero88.qwe.http.HttpUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
+import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.http.HttpStatusMapping;
+import io.zero88.qwe.http.HttpUtils;
 
 /**
  * Rest response end handler for {@code eventbus}
@@ -31,11 +31,11 @@ public final class EventMessageResponseHandler implements Handler<RoutingContext
         if (eventMessage.isSuccess()) {
             context.response()
                    .setStatusCode(HttpStatusMapping.success(method).code())
-                   .end(HttpUtils.prettify(eventMessage.getData(), context.request()));
+                   .end(HttpUtils.prettify(context.request(), eventMessage.getData()));
         } else {
             context.response()
                    .setStatusCode(HttpStatusMapping.error(method, eventMessage.getError().getCode()).code())
-                   .end(HttpUtils.prettify(eventMessage.getError().toJson(), context.request()));
+                   .end(HttpUtils.prettify(context.request(), eventMessage.getError()));
         }
     }
 

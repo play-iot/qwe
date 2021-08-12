@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.server;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -22,6 +21,7 @@ import io.zero88.qwe.IConfig;
 import io.zero88.qwe.PluginProvider;
 import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
 import io.zero88.qwe.TestHelper;
+import io.zero88.qwe.http.client.HttpClientConfig;
 import io.zero88.qwe.http.client.HttpClientExtension;
 import io.zero88.qwe.http.client.HttpClientWrapper;
 
@@ -41,8 +41,7 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     protected HttpServerConfig httpConfig;
     @Getter
     protected HttpClientWrapper client;
-    @Getter
-    protected RequestOptions requestOptions;
+    private RequestOptions requestOptions;
 
     @BeforeClass
     public static void beforeSuite() {TestHelper.setup();}
@@ -58,9 +57,10 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     }
 
     @Before
-    public void before(TestContext context) throws IOException {
+    public void before(TestContext context) {
         vertx = Vertx.vertx();
-        client = initExtension(vertx, HttpClientExtension.class, null).entrypoint();
+        client = initExtension(vertx, HttpClientExtension.class,
+                               new HttpClientConfig().setOptions(createClientOptions())).entrypoint();
         httpConfig = initConfig();
         requestOptions = new RequestOptions().setHost(DEFAULT_HOST).setPort(httpConfig.getPort());
     }
@@ -101,6 +101,10 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     @Override
     public PluginProvider<HttpServerPlugin> initProvider() {
         throw new UnsupportedOperationException("Init plugin per test");
+    }
+
+    public RequestOptions requestOptions() {
+        return new RequestOptions(requestOptions);
     }
 
 }
