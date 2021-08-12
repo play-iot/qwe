@@ -6,7 +6,7 @@ import io.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.PluginProvider;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.handler.JooqxExtension;
+import io.zero88.qwe.sql.handler.JooqxBaseExtension;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public final class SQLPluginProvider<S, B, PQ extends SQLPreparedQuery<B>, RS, R
     implements PluginProvider<SQLPlugin> {
 
     private final Class<EntityHandler<S, B, PQ, RS, RC, E>> entityHandlerClass;
-    private Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass;
+    private Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass;
 
     @Override
     public Class<SQLPlugin> pluginClass() {

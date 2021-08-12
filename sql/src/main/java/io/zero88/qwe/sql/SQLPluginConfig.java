@@ -10,7 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.jooqx.spi.DBEmbeddedMode;
 import io.zero88.qwe.PluginConfig.DynamicPluginConfig.DynamicPluginConfigImpl;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
-import io.zero88.qwe.sql.handler.JooqxExtension;
+import io.zero88.qwe.sql.handler.JooqxBaseExtension;
 import io.zero88.qwe.utils.JsonUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -33,7 +33,7 @@ public final class SQLPluginConfig extends DynamicPluginConfigImpl<SQLPluginConf
     private String pluginDir;
     private SQLDialect dialect;
     /**
-     * @see JooqxExtension
+     * @see JooqxBaseExtension
      */
     private String jooqxExtensionClass;
     /**

@@ -41,7 +41,7 @@ public abstract class EntityHandlerImpl<S, B, PQ extends SQLPreparedQuery<B>, RS
     public Future<EntityHandler<S, B, PQ, RS, RC, E>> setup(@NotNull SharedDataLocalProxy sharedData,
                                                             @NotNull PluginContext pluginContext,
                                                             @NotNull SQLPluginConfig pluginConfig,
-                                                            @Nullable Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls) {
+                                                            @Nullable Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls) {
         this.sharedData = sharedData;
         return Functions.getOrThrow(() -> Objects.requireNonNull(createExtension(pluginConfig, jooqxExtensionCls)),
                                     t -> new InitializerError("Unable create jOOQx Extension"))
@@ -53,9 +53,9 @@ public abstract class EntityHandlerImpl<S, B, PQ extends SQLPreparedQuery<B>, RS
     }
 
     @SuppressWarnings("unchecked")
-    protected JooqxExtension<S, B, PQ, RS, RC, E> createExtension(@NotNull SQLPluginConfig pluginConfig,
-                                                                  Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtCls) {
-        JooqxExtension<S, B, PQ, RS, RC, E> extension = null;
+    protected JooqxBaseExtension<S, B, PQ, RS, RC, E> createExtension(@NotNull SQLPluginConfig pluginConfig,
+                                                                      Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtCls) {
+        JooqxBaseExtension<S, B, PQ, RS, RC, E> extension = null;
         if (Strings.isNotBlank(pluginConfig.getJooqxExtensionClass())) {
             logger().debug("Load jOOQx Extension from config[{}]...", pluginConfig.getJooqxExtensionClass());
             extension = ReflectionClass.createObject(pluginConfig.getJooqxExtensionClass());

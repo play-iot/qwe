@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import io.vertx.core.Future;
 import io.zero88.jooqx.JooqDSLProvider;
-import io.zero88.jooqx.LegacyJooqx;
-import io.zero88.jooqx.ReactiveJooqx;
+import io.zero88.jooqx.Jooqx;
 import io.zero88.jooqx.SQLExecutor;
 import io.zero88.jooqx.SQLPreparedQuery;
 import io.zero88.jooqx.SQLResultCollector;
@@ -52,19 +51,18 @@ public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @param pluginConfig      SQL plugin config
      * @param jooqxExtensionCls jooqx extension class
      * @return a reference future to this for fluent API
-     * @see JooqxExtension
+     * @see JooqxBaseExtension
      */
     Future<EntityHandler<S, B, PQ, RS, RC, E>> setup(@NotNull SharedDataLocalProxy sharedData,
                                                      @NonNull PluginContext pluginContext,
                                                      @NotNull SQLPluginConfig pluginConfig,
-                                                     @Nullable Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls);
+                                                     @Nullable Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls);
 
     /**
      * jOOQx instance
      *
      * @return jOOQx instance
-     * @see LegacyJooqx
-     * @see ReactiveJooqx
+     * @see Jooqx
      */
     E jooqx();
 

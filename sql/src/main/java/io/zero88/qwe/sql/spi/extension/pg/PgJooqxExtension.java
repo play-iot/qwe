@@ -3,7 +3,7 @@ package io.zero88.qwe.sql.spi.extension.pg;
 import io.vertx.pgclient.PgPool;
 import io.zero88.jooqx.spi.pg.PgPoolProvider;
 import io.zero88.jooqx.spi.pg.PgSQLErrorConverterProvider;
-import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
+import io.zero88.qwe.sql.handler.JooqxExtension;
 
 /**
  * QWE Jooqx reactive extension for {@code PostgreSQL}
@@ -11,11 +11,11 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
  * @see PgPool
  * @see PgPoolProvider
  * @see PgSQLErrorConverterProvider
- * @see JooqxReactiveExtension
+ * @see JooqxExtension
  */
-public class PgJooqxReactiveExtension
-    implements JooqxReactiveExtension<PgPool>, PgPoolProvider, PgSQLErrorConverterProvider {
+public class PgJooqxExtension
+    implements JooqxExtension<PgPool>, PgPoolProvider, PgSQLErrorConverterProvider {
 
-    public static final PgJooqxReactiveExtension INSTANCE = new PgJooqxReactiveExtension();
+    public static final PgJooqxExtension INSTANCE = new PgJooqxExtension();
 
 }

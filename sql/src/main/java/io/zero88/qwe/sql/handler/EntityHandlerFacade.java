@@ -5,9 +5,9 @@ import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.Tuple;
-import io.zero88.jooqx.ReactiveJooqxBase;
-import io.zero88.jooqx.ReactiveSQLPreparedQuery;
-import io.zero88.jooqx.ReactiveSQLResultCollector;
+import io.zero88.jooqx.JooqxBase;
+import io.zero88.jooqx.JooqxPreparedQuery;
+import io.zero88.jooqx.JooqxResultCollector;
 import io.zero88.jooqx.SQLExecutor;
 import io.zero88.jooqx.SQLPreparedQuery;
 import io.zero88.jooqx.SQLResultCollector;
@@ -27,10 +27,9 @@ public interface EntityHandlerFacade<S, B, PQ extends SQLPreparedQuery<B>, RS, R
 
     // @formatter:off
     abstract class ReactiveEntityHandler<S extends Pool> extends
-        EntityHandlerImpl<S, Tuple, ReactiveSQLPreparedQuery, RowSet<Row>, ReactiveSQLResultCollector, ReactiveJooqxBase<S>>
-        implements EntityHandlerFacade<S, Tuple, ReactiveSQLPreparedQuery, RowSet<Row>, ReactiveSQLResultCollector, ReactiveJooqxBase<S>> {
+        EntityHandlerImpl<S, Tuple, JooqxPreparedQuery, RowSet<Row>, JooqxResultCollector, JooqxBase<S>>
+        implements EntityHandlerFacade<S, Tuple, JooqxPreparedQuery, RowSet<Row>, JooqxResultCollector, JooqxBase<S>> {
     // @formatter:on
-
     }
 
 

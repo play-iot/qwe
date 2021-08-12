@@ -12,7 +12,7 @@ import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.handler.JooqxExtension;
+import io.zero88.qwe.sql.handler.JooqxBaseExtension;
 
 import lombok.NonNull;
 
@@ -21,10 +21,10 @@ public final class SQLPlugin<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extend
     extends PluginVerticle<SQLPluginConfig, SQLPluginContext<EntityHandler<S, B, PQ, RS, RC, E>>> {
 
     private final EntityHandler<S, B, PQ, RS, RC, E> handler;
-    private final Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass;
+    private final Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass;
 
     SQLPlugin(SharedDataLocalProxy sharedData, Class<EntityHandler<S, B, PQ, RS, RC, E>> handlerClass,
-              Class<JooqxExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass) {
+              Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass) {
         super(sharedData);
         this.handler = Objects.requireNonNull(ReflectionClass.createObject(handlerClass),
                                               "Not found Entity Handler[" + handlerClass.getName() + "]");

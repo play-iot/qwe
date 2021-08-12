@@ -14,13 +14,13 @@ import io.zero88.jooqx.spi.jdbc.JDBCErrorConverterProvider;
 import io.zero88.jooqx.spi.jdbc.JDBCPoolProvider;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.sql.SQLPluginConfig;
-import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
+import io.zero88.qwe.sql.handler.JooqxExtension;
 
 /**
  * QWE Jooqx extension that wraps JDBC pool
  */
 public class JDBCPoolJooqxExtension<P extends DataSourceProvider>
-    implements JooqxReactiveExtension<JDBCPool>, JDBCPoolProvider<P>, JDBCErrorConverterProvider {
+    implements JooqxExtension<JDBCPool>, JDBCPoolProvider<P>, JDBCErrorConverterProvider {
 
     private final JDBCPoolProvider<P> clientProvider;
 
@@ -42,7 +42,7 @@ public class JDBCPoolJooqxExtension<P extends DataSourceProvider>
             pluginConfig.connectionOptions(
                 embedded.createConnOptions(embedded.init(), pluginConfig.connectionOptions()));
         }
-        return (JDBCPoolJooqxExtension<P>) JooqxReactiveExtension.super.setup(pluginContext, pluginConfig);
+        return (JDBCPoolJooqxExtension<P>) JooqxExtension.super.setup(pluginContext, pluginConfig);
     }
 
     @Override

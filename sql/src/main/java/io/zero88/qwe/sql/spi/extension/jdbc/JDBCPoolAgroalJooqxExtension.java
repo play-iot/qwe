@@ -3,7 +3,7 @@ package io.zero88.qwe.sql.spi.extension.jdbc;
 import io.vertx.jdbcclient.JDBCPool;
 import io.zero88.jooqx.spi.jdbc.JDBCErrorConverterProvider;
 import io.zero88.jooqx.spi.jdbc.JDBCPoolAgroalProvider;
-import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
+import io.zero88.qwe.sql.handler.JooqxExtension;
 
 /**
  * QWE Jooqx reactive extension for generic {@code JDBC pool} that using {@code AgroalCP}
@@ -13,10 +13,10 @@ import io.zero88.qwe.sql.handler.JooqxExtension.JooqxReactiveExtension;
  * @see JDBCPool
  * @see JDBCPoolAgroalProvider
  * @see JDBCErrorConverterProvider
- * @see JooqxReactiveExtension
+ * @see JooqxExtension
  */
 public class JDBCPoolAgroalJooqxExtension
-    implements JooqxReactiveExtension<JDBCPool>, JDBCPoolAgroalProvider, JDBCErrorConverterProvider {
+    implements JooqxExtension<JDBCPool>, JDBCPoolAgroalProvider, JDBCErrorConverterProvider {
 
     public static final JDBCPoolAgroalJooqxExtension INSTANCE = new JDBCPoolAgroalJooqxExtension();
 
