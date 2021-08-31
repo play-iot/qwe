@@ -6,7 +6,6 @@ import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
-import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.event.EventBusClient;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
@@ -15,10 +14,6 @@ import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 import lombok.NonNull;
 
 public final class DiscoveryPlugin extends PluginVerticle<MicroConfig, DiscoveryContext> {
-
-    DiscoveryPlugin(SharedDataLocalProxy sharedData) {
-        super(sharedData);
-    }
 
     @Override
     public String pluginName() {

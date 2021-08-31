@@ -54,11 +54,11 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
     private final String userAgent;
     private final Path appDir;
     private final EventBusClient transporter;
-    private final HttpClientConfig config;
+    private final HttpClientConfig extConfig;
     private HttpClient client;
 
     HttpClientWrapperImpl(SharedDataLocalProxy sharedData, String appName, Path appDir, HttpClientConfig config) {
-        this.config = config;
+        this.extConfig = config;
         this.id = config.toJson().hashCode();
         this.client = sharedData.getVertx().createHttpClient(config.getOptions());
         this.transporter = EventBusClient.create(sharedData);
@@ -69,8 +69,8 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
     }
 
     HttpClientWrapperImpl(HttpClient client, String userAgent) {
-        this.config = new HttpClientConfig();
-        this.id = config.toJson().hashCode();
+        this.extConfig = new HttpClientConfig();
+        this.id = extConfig.toJson().hashCode();
         this.userAgent = userAgent;
         this.client = client;
         this.transporter = null;
@@ -108,8 +108,8 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
                                    })
                                    .flatMap(req -> payload == null ? req.send() : req.send(payload))
                                    .recover(this::wrapError)
-                                   .flatMap(HttpClientJsonResponseHandler.create(swallowError, config.getHttpHandlers()
-                                                                                                     .getRespTextHandlerCls()));
+                                   .flatMap(HttpClientJsonResponseHandler.create(swallowError, extConfig.getHttpHandlers()
+                                                                                                        .getRespTextHandlerCls()));
     }
 
     @Override
@@ -143,7 +143,7 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
         return openWebSocket(options).map(ws -> {
             transporter.register(plan.outbound().getAddress(), new WebSocketClientWriter(ws));
             EventDirection inbound = plan.inbound();
-            WebSocketHandlersConfig h = config.getWebSocketHandlers();
+            WebSocketHandlersConfig h = extConfig.getWebSocketHandlers();
             ws.handler(WebSocketClientDispatcher.create(transporter, inbound, h.getDispatcherCls()))
               .exceptionHandler(WebSocketClientErrorHandler.create(transporter, inbound, h.getErrorHandlerCls()));
             return EventMessage.success(EventAction.parse("OPEN"),
@@ -156,7 +156,7 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
 
     private <T> Future<T> recover(Throwable error, Function<HttpClient, Future<T>> fun) {
         if (error instanceof IllegalStateException && "Client is closed".equals(error.getMessage())) {
-            client = transporter.getVertx().createHttpClient(config.getOptions());
+            client = transporter.getVertx().createHttpClient(extConfig.getOptions());
             return fun.apply(client);
         }
         return wrapError(error);

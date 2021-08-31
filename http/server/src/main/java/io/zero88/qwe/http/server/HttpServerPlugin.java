@@ -1,5 +1,6 @@
 package io.zero88.qwe.http.server;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -7,6 +8,7 @@ import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.net.KeyCertOptions;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -16,9 +18,7 @@ import io.vertx.ext.web.handler.ResponseContentTypeHandler;
 import io.vertx.ext.web.handler.ResponseTimeHandler;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
-import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.exceptions.InitializerError;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.config.CorsOptions;
@@ -40,8 +40,7 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
     private final HttpServerRouter httpRouter;
     private HttpServer httpServer;
 
-    HttpServerPlugin(SharedDataLocalProxy sharedData, @NonNull HttpServerRouter router) {
-        super(sharedData);
+    HttpServerPlugin(@NonNull HttpServerRouter router) {
         this.httpRouter = router;
     }
 
@@ -100,10 +99,16 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
 
     private HttpServerOptions createHttpServerOptions() {
         final HttpServerOptions options = new HttpServerOptions(pluginConfig.getOptions());
-        if (pluginConfig.getHttp2Cfg().isEnabled()) {
-            //TODO implement it
+        if (pluginConfig.getHttp2Cfg().isEnabled() || options.isSsl()) {
+            final KeyCertOptions keyCertOptions = pluginContext().cryptoContext().getKeyCertOptions();
+            if (Objects.isNull(keyCertOptions)) {
+                throw new InitializerError("Missing key cert options to enable HTTP 2");
+            }
+            options.setUseAlpn(pluginConfig.getHttp2Cfg().isEnabled()).setSsl(true).setKeyCertOptions(keyCertOptions);
         }
-        return options.setHost(pluginConfig.getHost()).setPort(pluginConfig.getPort());
+        return options.setHost(pluginConfig.getHost())
+                      .setPort(pluginConfig.getPort())
+                      .setTrustOptions(pluginContext().cryptoContext().getTrustOptions());
     }
 
     private Router initRouter() {

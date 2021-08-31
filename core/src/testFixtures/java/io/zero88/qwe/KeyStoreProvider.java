@@ -53,9 +53,7 @@ public interface KeyStoreProvider extends LazyKeyStore {
         private final Map<String, String> aliasProtection = new HashMap<>();
 
         public KeyStoreProviderImpl(KeyStoreType type, String password, String path) {
-            this.setType(type);
-            this.setPassword(password);
-            this.setPath(path);
+            super(type, null, password, path);
         }
 
         public KeyStoreProvider putPasswordProtection(String alias, String password) {

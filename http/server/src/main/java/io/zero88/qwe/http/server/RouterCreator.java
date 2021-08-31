@@ -30,8 +30,7 @@ public interface RouterCreator<T extends RouterConfig> extends RouterBuilder, Ha
         }
         logger().info(decor("Setup route [{}][{}]"), routerName(), BasePaths.addWildcards(routerPath(cfg)));
         Path dataDir = Objects.requireNonNull(context.dataDir(), "Missing HTTP plugin dir");
-        rootRouter.mountSubRouter(mountPoint(cfg),
-                                  subRouter(SharedDataLocalProxy.create(vertx, context.sharedKey()), dataDir, cfg));
+        rootRouter.mountSubRouter(mountPoint(cfg), subRouter(context.sharedData(), dataDir, cfg));
         return rootRouter;
     }
 

@@ -6,24 +6,23 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
+
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.Extension;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.SharedDataLocalProxy;
+import io.zero88.qwe.security.CryptoContext;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.experimental.Accessors;
 
 public final class HttpClientExtension implements Extension<HttpClientConfig, HttpClientWrapper>, HasLogger {
 
     private int id;
-    @Getter
-    @Accessors(fluent = true)
-    private HttpClientConfig extConfig;
     private final Map<Integer, HttpClientWrapper> registries = new ConcurrentHashMap<>();
 
     @Override
@@ -43,9 +42,12 @@ public final class HttpClientExtension implements Extension<HttpClientConfig, Ht
 
     @Override
     public HttpClientExtension setup(SharedDataLocalProxy sharedData, String appName, Path appDir,
-                                     HttpClientConfig config) {
-        this.extConfig = config == null ? new HttpClientConfig() : config;
-        HttpClientWrapper wrapper = new HttpClientWrapperImpl(sharedData, appName, appDir, extConfig);
+                                     @NotNull JsonObject config, @NotNull CryptoContext cryptoContext) {
+        final HttpClientConfig clientConf = computeConfig(config);
+        clientConf.getOptions()
+                  .setKeyCertOptions(cryptoContext.getKeyCertOptions())
+                  .setTrustOptions(cryptoContext.getTrustOptions());
+        HttpClientWrapper wrapper = new HttpClientWrapperImpl(sharedData, appName, appDir, clientConf);
         this.id = wrapper.id();
         this.registries.put(wrapper.id(), wrapper);
         return this;

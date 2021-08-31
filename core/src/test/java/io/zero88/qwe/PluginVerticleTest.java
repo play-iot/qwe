@@ -1,4 +1,4 @@
-package io.zero88.qwe.mock;
+package io.zero88.qwe;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,7 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.LoggerFactory;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
@@ -18,15 +17,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.zero88.qwe.DeployContext;
-import io.zero88.qwe.PluginTestHelper;
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.VertxHelper;
-import io.zero88.qwe.mock.MockPluginProvider.MockPlugin;
 import io.zero88.qwe.exceptions.ConfigException;
+import io.zero88.qwe.mock.MockPluginProvider.MockPlugin;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 
 @RunWith(VertxUnitRunner.class)
 public class PluginVerticleTest implements PluginTestHelper {
@@ -35,8 +29,7 @@ public class PluginVerticleTest implements PluginTestHelper {
 
     @BeforeClass
     public static void beforeSuite() {
-        TestHelper.setup();
-        ((Logger) LoggerFactory.getLogger("io.github.zero88")).setLevel(Level.TRACE);
+        TestHelper.setup(Level.TRACE);
     }
 
     @Before
@@ -46,7 +39,7 @@ public class PluginVerticleTest implements PluginTestHelper {
 
     @Test
     public void not_have_config_file_should_deploy_success(TestContext context) {
-        MockPlugin plugin = new MockPlugin(createSharedData(vertx));
+        MockPlugin plugin = new MockPlugin();
         Async async = context.async();
         VertxHelper.deploy(vertx, context, DeployContext.builder()
                                                         .verticle(plugin)
@@ -56,20 +49,20 @@ public class PluginVerticleTest implements PluginTestHelper {
 
     @Test
     public void invalid_config_should_deploy_failed(TestContext context) {
-        MockPlugin plugin = new MockPlugin(createSharedData(vertx));
+        MockPlugin plugin = new MockPlugin();
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("xx", "yyy"));
         VertxHelper.deployFailed(vertx, context, options, plugin, t -> {
             TestHelper.testComplete(async);
             Assert.assertEquals("Invalid configuration format", t.getMessage());
-            TestHelper.assertCause(() -> { throw t; }, ConfigException.class, IllegalArgumentException.class);
+            TestHelper.assertCause(() -> {throw t;}, ConfigException.class, IllegalArgumentException.class);
         });
     }
 
     @Test
     @Ignore("Need the information from Zero")
     public void test_register_shared_data(TestContext context) {
-        MockPlugin plugin = new MockPlugin(createSharedData(vertx));
+        MockPlugin plugin = new MockPlugin();
         final String key = MockPlugin.class.getName();
         //        plugin.setup(key);
 
@@ -82,7 +75,7 @@ public class PluginVerticleTest implements PluginTestHelper {
 
     @Test
     public void throw_unexpected_error_cannot_start(TestContext context) {
-        MockPlugin plugin = new MockPlugin(createSharedData(vertx), true);
+        MockPlugin plugin = new MockPlugin(true);
         Async async = context.async();
         DeploymentOptions options = new DeploymentOptions();
         VertxHelper.deployFailed(vertx, context, options, plugin, t -> {
@@ -93,7 +86,7 @@ public class PluginVerticleTest implements PluginTestHelper {
     }
 
     @After
-    public void after() { vertx.close(); }
+    public void after() {vertx.close();}
 
     @Override
     public Path testDir() {

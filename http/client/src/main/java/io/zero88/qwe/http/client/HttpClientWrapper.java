@@ -21,7 +21,7 @@ import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.event.EventMessage;
 import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
 
-public interface HttpClientWrapper extends ExtensionEntrypoint, HasLogger, Wrapper<HttpClient> {
+public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>, HasLogger, Wrapper<HttpClient> {
 
     static HttpClientWrapper wrap(HttpClient client, String userAgent) {
         return new HttpClientWrapperImpl(client, userAgent);
