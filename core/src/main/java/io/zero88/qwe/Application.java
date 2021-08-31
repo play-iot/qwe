@@ -22,9 +22,15 @@ import lombok.NonNull;
  * @see HasConfig
  * @see ApplicationVerticle
  */
+@SuppressWarnings("rawtypes")
 public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasSharedKey {
 
-    String DEFAULT_PLUGIN_THREAD_PREFIX = "qwe-plugin-thread-";
+    static String generateThreadName(Class<? extends Application> cls, String appName, String pluginName) {
+        if (cls.getName().equals(appName)) {
+            return cls.getSimpleName() + "-plugin-" + pluginName + "-thread";
+        }
+        return appName + "-plugin-" + pluginName + "-thread";
+    }
 
     /**
      * Application name
@@ -52,7 +58,11 @@ public interface Application extends QWEVerticle<QWEAppConfig>, HasAppName, HasS
     }
 
     default String sharedKey() {
-        return this.getClass().getName();
+        return getClass().getName();
+    }
+
+    default String generatePluginThreadName(String pluginName) {
+        return generateThreadName(getClass(), appName(), pluginName);
     }
 
     /**

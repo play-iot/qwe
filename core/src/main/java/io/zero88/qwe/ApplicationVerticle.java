@@ -198,8 +198,8 @@ public abstract class ApplicationVerticle extends AbstractVerticle
                              ? defaultPoolSize
                              : options.getWorkerPoolSize();
         String workerPool = Optional.ofNullable(options.getWorkerPoolName())
-                                    .orElseGet(() -> DEFAULT_PLUGIN_THREAD_PREFIX + plugin.pluginName());
-        options.setWorkerPoolName(workerPool).setWorkerPoolSize(workerPoolSize).setConfig(pluginConfig.toJson());
+                                    .orElseGet(() -> generatePluginThreadName(plugin.pluginName()));
+        options.setWorkerPoolName(workerPool).setWorkerPoolSize(workerPoolSize).setConfig(pluginConfig);
         if (logger().isDebugEnabled()) {
             logger().debug("Plugin deployment options [{}][{}]", plugin.pluginName(), options.toJson());
         }
