@@ -5,6 +5,7 @@ import io.zero88.qwe.dto.EnumType;
 import io.zero88.qwe.dto.EnumType.AbstractEnumType;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.sun.crypto.provider.JceKeyStore;
 
 public final class KeyStoreType extends AbstractEnumType {
@@ -37,7 +38,7 @@ public final class KeyStoreType extends AbstractEnumType {
     /**
      * Bouncy Castle UBER KeyStore. More secure version of BKS.
      */
-    public static final KeyStoreType UBER = new KeyStoreType("BKS");
+    public static final KeyStoreType UBER = new KeyStoreType("UBER");
 
     /**
      * Bouncy Castle FIPS KeyStore (uses FIPS compliant algorithms PBDKF2, SHA-512 and AES CCM).
@@ -52,5 +53,8 @@ public final class KeyStoreType extends AbstractEnumType {
     public static KeyStoreType factory(String name) {
         return EnumType.factory(name, KeyStoreType.class, true);
     }
+
+    @JsonValue
+    public String format() {return type();}
 
 }

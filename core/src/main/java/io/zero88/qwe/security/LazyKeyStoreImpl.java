@@ -2,7 +2,6 @@ package io.zero88.qwe.security;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Key;
@@ -33,7 +32,7 @@ import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.net.TrustOptions;
 import io.zero88.qwe.exceptions.CryptoException;
-import io.zero88.qwe.security.KeyEntry.KeyEntryType;
+import io.zero88.qwe.security.KeyAlias.KeyEntryType;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -58,6 +57,17 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
     private KeyStore keyStore;
     private KeyStore clone;
 
+    protected LazyKeyStoreImpl(String type, String provider, String password, String path) {
+        this(KeyStoreType.factory(type), provider, password, path);
+    }
+
+    protected LazyKeyStoreImpl(KeyStoreType type, String provider, String password, String path) {
+        this.type = type;
+        this.provider = provider;
+        this.password = password;
+        this.path = path;
+    }
+
     @Override
     public LazyKeyStore init(Vertx vertx) {
         if (keyStore == null) {
@@ -67,12 +77,12 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
     }
 
     @Override
-    public final Collection<KeyEntry> entries() {
+    public final Collection<KeyAlias> aliases() {
         try {
             final KeyStore ks = get();
             final Enumeration<String> aliases = ks.aliases();
             Set<String> tmp = new HashSet<>();
-            List<KeyEntry> entries = new ArrayList<>();
+            List<KeyAlias> entries = new ArrayList<>();
             while (aliases.hasMoreElements()) {
                 final String alias = aliases.nextElement();
                 if (tmp.contains(alias)) {
@@ -80,7 +90,7 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
                 }
                 for (KeyEntryType type : KeyEntryType.values()) {
                     if (ks.entryInstanceOf(alias, type.getEntryClass())) {
-                        entries.add(new KeyEntry(alias, type));
+                        entries.add(new KeyAlias(alias, type));
                         break;
                     }
                 }
@@ -100,14 +110,14 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
                 return null;
             }
             if (!ks.isKeyEntry(alias)) {
-                throw new IllegalArgumentException("Alias " + alias + " is not Key");
+                throw new IllegalArgumentException("Alias [" + alias + "] is not Key entry");
             }
             if (ks.entryInstanceOf(alias, KeyEntryType.SECRET_KEY.getEntryClass())) {
-                throw new CryptoException("The alias [" + alias + "] is not key-pair format");
+                throw new IllegalArgumentException("The alias [" + alias + "] is not key-pair format");
             }
             Key key = ks.getKey(alias, password);
             String pKey = formatPEM(key.getEncoded(), KeyEntryType.KEY_PAIR.getPEMType(key.getAlgorithm()));
-            String cert = formatPEM(ks.getCertificate(alias).getEncoded(), KeyEntryType.CERT);
+            String cert = formatCertPEM(ks.getCertificate(alias).getEncoded());
             return new PemKeyCertOptions().addKeyValue(Buffer.buffer(pKey)).addCertValue(Buffer.buffer(cert));
         } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException | CertificateEncodingException e) {
             throw new CryptoException("Unable load key", e);
@@ -123,7 +133,7 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
             }
             PemTrustOptions trustOptions = new PemTrustOptions();
             for (Certificate cert : certificates) {
-                trustOptions.addCertValue(Buffer.buffer(formatPEM(cert.getEncoded(), KeyEntryType.CERT)));
+                trustOptions.addCertValue(Buffer.buffer(formatCertPEM(cert.getEncoded())));
             }
             return trustOptions;
         } catch (KeyStoreException | CertificateEncodingException e) {
@@ -138,7 +148,29 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
             if (cert == null) {
                 return null;
             }
-            return new PemTrustOptions().addCertValue(Buffer.buffer(formatPEM(cert.getEncoded(), KeyEntryType.CERT)));
+            return new PemTrustOptions().addCertValue(Buffer.buffer(formatCertPEM(cert.getEncoded())));
+        } catch (KeyStoreException | CertificateEncodingException e) {
+            throw new CryptoException("Unable load certificate", e);
+        }
+    }
+
+    @Override
+    public @Nullable TrustOptions getCertificates(List<String> aliases) {
+        try {
+            PemTrustOptions options = new PemTrustOptions();
+            for (String alias : aliases) {
+                if (alias == null) {
+                    options.addCertValue(null);
+                    continue;
+                }
+                Certificate cert = get().getCertificate(alias);
+                if (cert == null) {
+                    options.addCertValue(null);
+                    continue;
+                }
+                options.addCertValue(Buffer.buffer(formatCertPEM(cert.getEncoded())));
+            }
+            return options;
         } catch (KeyStoreException | CertificateEncodingException e) {
             throw new CryptoException("Unable load certificate", e);
         }
@@ -155,7 +187,7 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
                 if (cert == null) {
                     continue;
                 }
-                options.addCertValue(Buffer.buffer(formatPEM(cert.getEncoded(), KeyEntryType.CERT)));
+                options.addCertValue(Buffer.buffer(formatCertPEM(cert.getEncoded())));
             }
             return options.getCertValues().isEmpty() ? null : options;
         } catch (KeyStoreException | CertificateEncodingException e) {
@@ -169,10 +201,8 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
             return clone;
         }
         try {
-            Path f = Files.createTempFile("", ".tmp");
-            System.out.println(f);
-            byte[] bytes = Files.readAllBytes(Files.copy(Paths.get(getPath()), f, StandardCopyOption.REPLACE_EXISTING));
-            return clone = LazyKeyStore.load(this, () -> bytes);
+            return clone = LazyKeyStore.load(this, Files.copy(Paths.get(getPath()), Files.createTempFile("", ".tmp"),
+                                                              StandardCopyOption.REPLACE_EXISTING));
         } catch (IOException e) {
             throw new CryptoException("Unable clone key store", e);
         }
@@ -188,7 +218,7 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
                 final String alias = aliases.nextElement();
                 final Certificate cert = ks.getCertificate(alias);
                 if (cert != null) {
-                    json.put(alias, new JsonObject().put("cert", formatPEM(cert.getEncoded(), KeyEntryType.CERT)));
+                    json.put(alias, new JsonObject().put("cert", formatCertPEM(cert.getEncoded())));
                 }
             }
             return json;
@@ -208,7 +238,7 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
                 final JsonObject content = new JsonObject();
                 final Certificate cert = ks.getCertificate(alias);
                 if (cert != null) {
-                    content.put("cert", formatPEM(cert.getEncoded(), KeyEntryType.CERT));
+                    content.put("cert", formatCertPEM(cert.getEncoded()));
                 }
                 if (ks.isKeyEntry(alias)) {
                     if (aliasProtection.containsKey(alias)) {
@@ -229,8 +259,8 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
         }
     }
 
-    protected final String formatPEM(byte[] der, KeyEntryType keyEntryType) {
-        return formatPEM(der, keyEntryType.getPEMType(null));
+    protected final String formatCertPEM(byte[] der) {
+        return formatPEM(der, KeyEntryType.CERT.getPEMType(null));
     }
 
     protected final String formatPEM(byte[] der, String pemType) {

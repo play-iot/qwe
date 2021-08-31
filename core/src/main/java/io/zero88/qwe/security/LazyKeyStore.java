@@ -4,12 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -29,7 +32,6 @@ import io.vertx.core.net.TrustOptions;
 import io.zero88.qwe.Wrapper;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.exceptions.CryptoException;
-import io.zero88.qwe.exceptions.QWEException;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,14 +47,21 @@ public interface LazyKeyStore extends Wrapper<KeyStore>, JsonData {
     @JsonCreator
     static LazyKeyStore create(@JsonProperty("type") String type, @JsonProperty("provider") String provider,
                                @JsonProperty("password") String password, @JsonProperty("path") String ksFile) {
-        return new LazyKeyStoreImpl().setType(KeyStoreType.factory(type))
-                                     .setProvider(provider)
-                                     .setPassword(password)
-                                     .setPath(ksFile);
+        return new LazyKeyStoreImpl(type, provider, password, ksFile);
     }
 
     static KeyStore load(Vertx vertx, LazyKeyStore ks) {
         return load(ks, () -> vertx.fileSystem().readFileBlocking(ks.getPath()).getBytes());
+    }
+
+    static KeyStore load(LazyKeyStore ks, Path keyStoreFile) {
+        return load(ks, () -> {
+            try {
+                return Files.readAllBytes(keyStoreFile);
+            } catch (IOException t) {
+                throw new CryptoException("Unable load key store", t);
+            }
+        });
     }
 
     static KeyStore load(LazyKeyStore ks, Supplier<byte[]> supplier) {
@@ -115,12 +124,12 @@ public interface LazyKeyStore extends Wrapper<KeyStore>, JsonData {
     LazyKeyStore init(Vertx vertx);
 
     /**
-     * Get all key entries
+     * Get all key aliases in {@code KeyStore}
      *
-     * @return the key entries, or empty collection if no alias in key store
-     * @see KeyEntry
+     * @return the key aliases, or empty collection if no alias in key store
+     * @see KeyAlias
      */
-    Collection<KeyEntry> entries();
+    Collection<KeyAlias> aliases();
 
     /**
      * Get the {@code PrivateKey} associated with the given alias, using the given password to recover it. Then convert
@@ -169,6 +178,17 @@ public interface LazyKeyStore extends Wrapper<KeyStore>, JsonData {
      * @see KeyStore#getCertificate(String)
      */
     @Nullable TrustOptions getCertificate(String alias);
+
+    /**
+     * Get one or more the certificate associated with the given alias. Then convert to {@link TrustOptions} for
+     * compatible with {@code Vertx API}
+     *
+     * @param aliases the given aliases
+     * @return the trust options, or null if the given alias does not exist or does not contain a certificate.
+     * @apiNote Default output type is {@link PemTrustOptions}
+     * @see KeyStore#getCertificate(String)
+     */
+    @Nullable TrustOptions getCertificates(@NonNull List<String> aliases);
 
     /**
      * Get all certificates

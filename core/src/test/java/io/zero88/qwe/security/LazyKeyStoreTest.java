@@ -24,8 +24,7 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.zero88.qwe.KeyStoreProvider;
-import io.zero88.qwe.exceptions.CryptoException;
-import io.zero88.qwe.security.KeyEntry.KeyEntryType;
+import io.zero88.qwe.security.KeyAlias.KeyEntryType;
 
 @ExtendWith(VertxExtension.class)
 class LazyKeyStoreTest {
@@ -104,8 +103,8 @@ class LazyKeyStoreTest {
 
     @Test
     void test_load_secret_key_should_failed(Vertx vertx, VertxTestContext context) {
-        CryptoException t = Assertions.assertThrows(CryptoException.class,
-                                                    () -> tlsKeyStore.init(vertx).getKeyCert("sec"));
+        IllegalArgumentException t = Assertions.assertThrows(IllegalArgumentException.class,
+                                                             () -> tlsKeyStore.init(vertx).getKeyCert("sec"));
         Assertions.assertEquals("The alias [sec] is not key-pair format", t.getMessage());
         context.completeNow();
     }
@@ -145,7 +144,7 @@ class LazyKeyStoreTest {
 
     @Test
     void test_get_entries(Vertx vertx, VertxTestContext context) {
-        final Collection<KeyEntry> entries = tlsKeyStore.init(vertx).entries();
+        final Collection<KeyAlias> entries = tlsKeyStore.init(vertx).aliases();
         Assertions.assertNotNull(entries);
         Assertions.assertEquals(4, entries.size());
         Assertions.assertEquals(1, entries.stream().filter(ke -> ke.getType() == KeyEntryType.SECRET_KEY).count());

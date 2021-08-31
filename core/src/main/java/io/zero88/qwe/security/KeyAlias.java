@@ -11,10 +11,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Simple information about key entry alias and its type
+ *
+ * @since 1.0.0
+ */
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class KeyEntry {
+public final class KeyAlias {
 
     private final String alias;
     private final KeyEntryType type;
