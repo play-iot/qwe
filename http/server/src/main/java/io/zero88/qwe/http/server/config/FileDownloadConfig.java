@@ -13,7 +13,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public final class FileDownloadConfig extends AbstractRouterConfig implements IConfig, RouterConfig, DownloadSystem {
+public final class FileDownloadConfig extends AbstractRouterConfig implements RouterConfig, DownloadSystem {
 
     public static final String NAME = "__download__";
 

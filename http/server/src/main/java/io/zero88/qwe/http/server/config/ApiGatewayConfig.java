@@ -1,9 +1,8 @@
 package io.zero88.qwe.http.server.config;
 
-import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.BasePaths;
-import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
 import io.zero88.qwe.http.server.HttpServerConfig;
+import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
 import io.zero88.qwe.http.server.RouterConfig;
 
 import lombok.Getter;
@@ -12,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public final class ApiGatewayConfig extends AbstractRouterConfig implements IConfig, RouterConfig, GatewaySystem {
+public final class ApiGatewayConfig extends AbstractRouterConfig implements RouterConfig, GatewaySystem {
 
     public static final String NAME = "__api_gateway__";
 

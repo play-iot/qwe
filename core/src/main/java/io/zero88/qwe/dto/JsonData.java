@@ -1,5 +1,6 @@
 package io.zero88.qwe.dto;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +35,7 @@ import lombok.NonNull;
  * or {@link #ERROR_KEY}
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public interface JsonData {
+public interface JsonData extends Serializable {
 
     ObjectMapper MAPPER = QWEJsonCodec.mapper();
     ObjectMapper LENIENT_MAPPER = QWEJsonCodec.lenientMapper();
@@ -230,7 +231,7 @@ public interface JsonData {
     }
 
     @JsonIgnore
-    default ObjectMapper getMapper() { return MAPPER; }
+    default ObjectMapper getMapper() {return MAPPER;}
 
     @JsonFilter(FILTER_PROP_BY_NAME)
     class PropertyFilterMixIn {}
