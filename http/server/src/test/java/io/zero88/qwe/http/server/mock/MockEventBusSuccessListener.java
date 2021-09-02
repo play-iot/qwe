@@ -6,10 +6,10 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.eventbus.EBContract;
+import io.zero88.qwe.eventbus.EventBusListener;
 
-public class MockEventBusSuccessListener implements EventListener {
+public class MockEventBusSuccessListener implements EventBusListener {
 
     @EBContract(action = "GET_LIST")
     public List<String> list(RequestData data) {

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.eventbus.EventAction;
 import io.vertx.core.http.HttpMethod;
 
 import lombok.NonNull;

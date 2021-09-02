@@ -5,7 +5,7 @@ import java.util.List;
 
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpMethod;
-import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.eventbus.EventAction;
 
 /**
  * HTTP Path rule to create capture path

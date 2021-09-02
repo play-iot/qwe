@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.Extension;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.security.CryptoContext;
 
 import lombok.Getter;

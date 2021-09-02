@@ -2,14 +2,14 @@ package io.zero88.qwe.micro.httpevent;
 
 import java.util.Set;
 
-import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.eventbus.EventBusListener;
 
 /**
  * Represents Event HTTP service.
  *
  * @since 1.0.0
  */
-public interface EventHttpService extends EventListener {
+public interface EventHttpService extends EventBusListener {
 
     /**
      * Declares {@code API Service} name.

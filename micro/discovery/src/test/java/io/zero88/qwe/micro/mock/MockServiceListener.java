@@ -2,12 +2,12 @@ package io.zero88.qwe.micro.mock;
 
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.eventbus.EBContract;
+import io.zero88.qwe.eventbus.EventAction;
+import io.zero88.qwe.eventbus.EventBusListener;
 import io.zero88.qwe.micro.GatewayHeaders;
 
-public final class MockServiceListener implements EventListener {
+public final class MockServiceListener implements EventBusListener {
 
     @EBContract(action = "CREATE")
     public JsonObject create(RequestData requestData) {

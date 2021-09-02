@@ -1,6 +1,6 @@
 package io.zero88.qwe.micro.httpevent;
 
-import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.eventbus.EventPattern;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

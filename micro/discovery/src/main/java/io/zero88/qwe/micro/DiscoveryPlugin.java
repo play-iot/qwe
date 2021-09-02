@@ -7,7 +7,7 @@ import io.vertx.core.Future;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.dto.msg.RequestFilter;
-import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor;
 import io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor;
 

@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.eventbus.EventAction;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

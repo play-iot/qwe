@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.eventbus.EBContract;
+import io.zero88.qwe.eventbus.EventBusListener;
 
-public class MockWebSocketEventListener implements EventListener {
+public class MockWebSocketEventListener implements EventBusListener {
 
     @EBContract(action = "GET_LIST")
     public List<String> list(RequestData data) {

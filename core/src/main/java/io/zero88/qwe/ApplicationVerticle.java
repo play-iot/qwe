@@ -21,7 +21,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
-import io.zero88.qwe.event.EventBusDeliveryOption;
+import io.zero88.qwe.eventbus.EventBusDeliveryOption;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
 import io.zero88.qwe.launcher.BootCommand;
 import io.zero88.qwe.security.CryptoContext;

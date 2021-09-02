@@ -12,7 +12,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.exceptions.InvalidUrlException;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.vertx.core.http.HttpMethod;
 

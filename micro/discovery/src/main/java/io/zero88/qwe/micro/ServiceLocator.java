@@ -9,10 +9,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
-import io.zero88.qwe.event.EBBody;
-import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EBParam;
-import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.eventbus.EBBody;
+import io.zero88.qwe.eventbus.EBContract;
+import io.zero88.qwe.eventbus.EBParam;
+import io.zero88.qwe.eventbus.EventBusListener;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.transfomer.RecordTransformer.ViewType;
 import io.zero88.qwe.micro.transfomer.RecordTransformerLoader;
@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class ServiceLocator implements EventListener {
+public class ServiceLocator implements EventBusListener {
 
     public static final String APIS_KEY = "apis";
     @NonNull

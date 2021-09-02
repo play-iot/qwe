@@ -3,10 +3,10 @@ package io.zero88.qwe.http.server.rest.handler;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.HasLogger;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventBusProxy;
-import io.zero88.qwe.event.EventMessage;
-import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.eventbus.EventAction;
+import io.zero88.qwe.eventbus.EventBusProxy;
+import io.zero88.qwe.eventbus.EventMessage;
+import io.zero88.qwe.eventbus.EventPattern;
 import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
 
 public interface RestEventRequestDispatcher extends Handler<RoutingContext>, EventBusProxy, HasLogger, ApisSystem {

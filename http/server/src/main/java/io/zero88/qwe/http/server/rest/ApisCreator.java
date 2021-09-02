@@ -12,7 +12,7 @@ import io.github.zero88.utils.Urls;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpRuntimeConfig;
 import io.zero88.qwe.http.server.HttpServerConfig;

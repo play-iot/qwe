@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpMethod;
-import io.zero88.qwe.event.EventAction;
-import io.zero88.qwe.event.EventPattern;
+import io.zero88.qwe.eventbus.EventAction;
+import io.zero88.qwe.eventbus.EventPattern;
 import io.zero88.qwe.micro.httpevent.RestEventApiMetadata.Builder;
 
 public class RestEventApiMetadataTest {

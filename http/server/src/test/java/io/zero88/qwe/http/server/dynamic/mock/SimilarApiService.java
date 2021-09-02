@@ -3,10 +3,10 @@ package io.zero88.qwe.http.server.dynamic.mock;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.event.EBBody;
-import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EventBusClient;
-import io.zero88.qwe.event.EventListener;
+import io.zero88.qwe.eventbus.EBBody;
+import io.zero88.qwe.eventbus.EBContract;
+import io.zero88.qwe.eventbus.EventBusClient;
+import io.zero88.qwe.eventbus.EventBusListener;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
@@ -36,7 +36,7 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
                  .onComplete(AsyncResult::succeeded);
     }
 
-    static class MockSiteListener implements EventListener {
+    static class MockSiteListener implements EventBusListener {
 
         @EBContract(action = "GET_LIST")
         public JsonObject list(@EBBody(value = "cId") String clientId) {
@@ -51,7 +51,7 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
     }
 
 
-    static class MockProductListener implements EventListener {
+    static class MockProductListener implements EventBusListener {
 
         @EBContract(action = "GET_LIST")
         public JsonObject list(RequestData data) {

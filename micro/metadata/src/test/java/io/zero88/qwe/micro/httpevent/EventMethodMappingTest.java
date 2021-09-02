@@ -8,7 +8,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.event.EventAction;
+import io.zero88.qwe.eventbus.EventAction;
 
 class EventMethodMappingTest {
 

@@ -6,7 +6,6 @@ import io.zero88.qwe.dto.EnumType.AbstractEnumType;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.sun.crypto.provider.JceKeyStore;
 
 public final class KeyStoreType extends AbstractEnumType {
 
@@ -20,7 +19,6 @@ public final class KeyStoreType extends AbstractEnumType {
     /**
      * Java Cryptography Extension KeyStore. More secure version of JKS.
      *
-     * @see JceKeyStore
      */
     public static final KeyStoreType JCEKS = new KeyStoreType("JCEKS");
     /**

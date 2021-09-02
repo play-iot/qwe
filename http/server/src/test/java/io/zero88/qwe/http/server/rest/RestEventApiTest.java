@@ -6,7 +6,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.event.EventBusClient;
+import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.http.server.HttpServerRouter;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;

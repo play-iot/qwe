@@ -9,7 +9,7 @@ import io.zero88.jooqx.SQLPreparedQuery;
 import io.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
-import io.zero88.qwe.event.EventMessage;
+import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.sql.handler.EntityHandler;
 import io.zero88.qwe.sql.handler.JooqxBaseExtension;
 
