@@ -25,17 +25,17 @@ public interface EventListener extends HasLogger, EventListenerLogSystem {
      *
      * @return Object mapper. Default: {@link JsonData#MAPPER}
      */
-    default ObjectMapper mapper() { return JsonData.MAPPER; }
+    default ObjectMapper mapper() {return JsonData.MAPPER;}
 
     /**
      * Fallback json key if output is {@code collection/primitive} value
      *
      * @return fallback json key. Default: {@code data}
      */
-    default String fallback() { return JsonData.SUCCESS_KEY; }
+    default String fallback() {return JsonData.SUCCESS_KEY;}
 
     default @NonNull void handle(SharedDataLocalProxy sharedData, Message<Object> msg) {
-        new EventListenerExecutorImpl(this, sharedData).execute(msg).onComplete(ar -> {
+        EventListenerExecutor.create(this, sharedData).execute(msg).onComplete(ar -> {
             if (ar.succeeded()) {
                 msg.reply(ar.result().toJson());
             } else {

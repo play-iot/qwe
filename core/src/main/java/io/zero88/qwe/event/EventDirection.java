@@ -9,7 +9,7 @@ import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
 
 /**
- * A direction that helps identifying event address
+ * A direction that helps to identify event address
  *
  * @see EventAction
  * @see EventPattern

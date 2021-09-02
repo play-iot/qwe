@@ -24,13 +24,17 @@ import io.zero88.qwe.exceptions.ImplementationError;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 public class EventParameterParserImpl implements EventParameterParser {
 
-    private final SharedDataLocalProxy localDataProxy;
-    private final ObjectMapper mapper;
+    private SharedDataLocalProxy sharedData;
+    private ObjectMapper mapper;
+
+    @Override
+    public EventParameterParser setup(SharedDataLocalProxy sharedData, ObjectMapper mapper) {
+        this.sharedData = sharedData;
+        this.mapper = mapper;
+        return this;
+    }
 
     @Override
     public Object[] extract(EventMessage message, MethodParam[] params) {
@@ -58,16 +62,18 @@ public class EventParameterParserImpl implements EventParameterParser {
             return message.getAction();
         }
         if (ReflectionClass.assertDataType(param.getParamClass(), Vertx.class)) {
-            return localDataProxy.getVertx();
+            return sharedData.getVertx();
         }
         if (ReflectionClass.assertDataType(param.getParamClass(), SharedDataLocalProxy.class)) {
-            return localDataProxy;
+            return sharedData;
         }
         if (ReflectionClass.assertDataType(param.getParamClass(), EventBusClient.class)) {
-            return EventBusClient.create(localDataProxy);
+            return EventBusClient.create(sharedData);
         }
         if (ReflectionClass.assertDataType(param.getParamClass(), UserInfo.class)) {
-            return message.getUserInfo();
+            return Optional.ofNullable(message.getUserInfo())
+                           .orElseGet(() -> UserInfo.create(
+                               sharedData.getVertx().getOrCreateContext().getLocal(UserInfo.USER_KEY)));
         }
         throw new ImplementationError(ErrorCode.UNSUPPORTED,
                                       "Unsupported EventBus context [" + param.getParamClass() + "]");

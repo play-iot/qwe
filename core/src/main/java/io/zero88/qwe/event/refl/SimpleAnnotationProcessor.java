@@ -81,10 +81,10 @@ public class SimpleAnnotationProcessor implements EventAnnotationProcessor {
     }
 
     protected Map<Class<? extends Annotation>, Annotation> buildParamAnnotation(Parameter param) {
-        return this.supportedAnnotations.stream()
-                                        .map(param::getAnnotation)
-                                        .filter(Objects::nonNull)
-                                        .collect(Collectors.toMap(Annotation::annotationType, Function.identity()));
+        return supportedAnnotations.stream()
+                                   .map(param::getAnnotation)
+                                   .filter(Objects::nonNull)
+                                   .collect(Collectors.toMap(Annotation::annotationType, Function.identity()));
     }
 
 }

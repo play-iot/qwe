@@ -12,6 +12,13 @@ import io.zero88.qwe.dto.JsonData;
  */
 public interface UserInfo extends JsonData {
 
+    /**
+     * The constant key is used in {@code Vertx local context data}
+     */
+    String USER_KEY = "USER_INFO";
+    /**
+     * Identity key for defining user identification
+     */
     String IDENTITY_KEY = "identity";
 
     static UserInfo create(JsonObject user) {

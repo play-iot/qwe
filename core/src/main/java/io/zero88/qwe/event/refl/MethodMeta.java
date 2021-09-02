@@ -18,7 +18,7 @@ public interface MethodMeta {
     MethodParam[] params();
 
     /**
-     * @return a reflect method
+     * @return a reflection method
      * @see Method
      */
     Method method();

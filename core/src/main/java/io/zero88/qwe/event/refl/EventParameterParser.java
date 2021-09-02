@@ -12,8 +12,17 @@ import lombok.NonNull;
 public interface EventParameterParser {
 
     static EventParameterParser create(SharedDataLocalProxy sharedData, ObjectMapper mapper) {
-        return new EventParameterParserImpl(sharedData, mapper);
+        return new EventParameterParserImpl().setup(sharedData, mapper);
     }
+
+    /**
+     * Setup event parameter parser
+     *
+     * @param sharedData shared data
+     * @param mapper     mapper
+     * @return a reference to this for fluent API
+     */
+    EventParameterParser setup(SharedDataLocalProxy sharedData, ObjectMapper mapper);
 
     /**
      * Extract event message to an array of param's value

@@ -3,6 +3,7 @@ package io.zero88.qwe.http.client;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.Extension;
 import io.zero88.qwe.HasLogger;
@@ -55,7 +57,11 @@ public final class HttpClientExtension implements Extension<HttpClientConfig, Ht
 
     @Override
     public void stop() {
-        Promise<Object> promise = Promise.promise();
+        HttpClientWrapperInternal entrypoint = (HttpClientWrapperInternal) entrypoint();
+        Promise<Object> promise = null;
+        if (Objects.nonNull(entrypoint.transporter()) && entrypoint.transporter().getVertx() instanceof VertxInternal) {
+            promise = ((VertxInternal) entrypoint.transporter().getVertx()).promise();
+        }
         CompositeFuture.join(registries.values()
                                        .stream()
                                        .map(HttpClientWrapper::unwrap)
@@ -67,7 +73,7 @@ public final class HttpClientExtension implements Extension<HttpClientConfig, Ht
                        .onFailure(t -> logger().debug("Something error when closing http client", t))
                        .mapEmpty()
                        .recover(t -> Future.succeededFuture())
-                       .onComplete(promise);
+                       .onComplete(Optional.ofNullable(promise).orElseGet(Promise::promise));
     }
 
     @Override
