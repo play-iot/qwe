@@ -11,7 +11,7 @@ import lombok.NonNull;
 
 public interface EventBusListenerExecutor extends HasSharedData {
 
-    static EventBusListenerExecutor create(EventBusListener listener, SharedDataLocalProxy sharedData){
+    static EventBusListenerExecutor create(EventBusListener listener, SharedDataLocalProxy sharedData) {
         return new EventBusListenerExecutorImpl(listener, sharedData);
     }
 
@@ -23,6 +23,10 @@ public interface EventBusListenerExecutor extends HasSharedData {
 
     default EventParameterParser paramParser() {
         return EventParameterParser.create(sharedData(), listener().mapper());
+    }
+
+    default EventBusMessageConverter converter() {
+        return EventBusMessageConverter.DEFAULT;
     }
 
     Future<EventMessage> execute(Message message);

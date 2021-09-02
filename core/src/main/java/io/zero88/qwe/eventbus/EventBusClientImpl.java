@@ -47,11 +47,12 @@ final class EventBusClientImpl implements EventBusClient, HasLogger, LogSystem {
     @Override
     public Future<EventMessage> request(@NonNull String address, @NonNull EventMessage message,
                                         DeliveryOptions options) {
-        EventBusReplyHandler replyHandler = EventBusReplyHandler.create(replyHandlerClass)
-                                                                .loadContext(address, message.getAction());
+        final EventBusReplyHandler replyHandler = EventBusReplyHandler.create(replyHandlerClass);
         return unwrap().request(address, message.toJson(), getOpts(options))
-                       .map(replyHandler::to)
-                       .otherwise(replyHandler::otherwise);
+                       .map(replyHandler::succeed)
+                       .otherwise(t -> replyHandler.error(message.getAction(), t))
+                       .onSuccess(msg -> logger().info(decor("Response [{}][{}=>{}][{}]"), address, msg.getAction(),
+                                                       msg.getPrevAction(), msg.getStatus()));
     }
 
     @Override

@@ -41,7 +41,7 @@ class EventBusListenerExecutorImpl implements EventBusListenerExecutor {
 
     @Override
     public Future<EventMessage> execute(Message message) {
-        final EventMessage msg = EventMessage.convert(message);
+        final EventMessage msg = converter().to(message);
         final String addr = message.address();
         debug("Received message", msg.getAction(), addr);
         return sharedData.getVertx().executeBlocking(promise -> execute(msg, addr).onComplete(promise));
