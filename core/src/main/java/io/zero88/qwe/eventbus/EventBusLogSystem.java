@@ -6,7 +6,7 @@ import lombok.NonNull;
 
 public interface EventBusLogSystem extends LogSystem {
 
-    interface EventBusListenerLogSystem extends EventBusLogSystem {
+    interface EventListenerLogSystem extends EventBusLogSystem {
 
         @Override
         default @NonNull String function() {

@@ -3,7 +3,7 @@ package io.zero88.qwe;
 import io.zero88.qwe.dto.ErrorData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.eventbus.EventPattern;
 
 import lombok.NonNull;
@@ -13,7 +13,7 @@ import lombok.NonNull;
  * <p>
  * It is handler by pattern {@link EventPattern#PUBLISH_SUBSCRIBE}
  */
-public interface ApplicationProbeHandler extends EventBusListener {
+public interface ApplicationProbeHandler extends EventListener {
 
     @EBContract(action = "NOTIFY")
     boolean success(@NonNull RequestData requestData);

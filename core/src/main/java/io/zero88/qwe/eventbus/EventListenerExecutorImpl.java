@@ -6,10 +6,11 @@ import io.github.zero88.utils.Functions;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.dto.JsonDataSerializer;
+import io.zero88.qwe.auth.ReqAuthDefinition;
+import io.zero88.qwe.auth.SecurityFilter;
 import io.zero88.qwe.eventbus.output.AnyToFuture;
-import io.zero88.qwe.eventbus.output.OutputToFutureServiceLoader;
 import io.zero88.qwe.eventbus.refl.MethodMeta;
+import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
@@ -20,28 +21,21 @@ import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @SuppressWarnings({"rawtypes", "unchecked"})
-class EventBusListenerExecutorImpl implements EventBusListenerExecutor {
+class EventListenerExecutorImpl implements EventListenerExecutor {
 
-    private static final OutputToFutureServiceLoader LOADER = new OutputToFutureServiceLoader();
     @Getter
-    private final EventBusListener listener;
+    private final EventListener listener;
     @Getter
     private final SharedDataLocalProxy sharedData;
-    private final JsonDataSerializer serializer;
 
-    EventBusListenerExecutorImpl(EventBusListener listener, SharedDataLocalProxy sharedData) {
+    EventListenerExecutorImpl(EventListener listener, SharedDataLocalProxy sharedData) {
         this.listener = listener;
         this.sharedData = sharedData;
-        this.serializer = JsonDataSerializer.builder()
-                                            .mapper(listener.mapper())
-                                            .backupKey(listener.fallback())
-                                            .lenient(true)
-                                            .build();
     }
 
     @Override
     public Future<EventMessage> execute(Message message) {
-        final EventMessage msg = converter().to(message);
+        final EventMessage msg = messageConverter().from(message);
         final String addr = message.address();
         debug("Received message", msg.getAction(), addr);
         return sharedData.getVertx().executeBlocking(promise -> execute(msg, addr).onComplete(promise));
@@ -53,8 +47,10 @@ class EventBusListenerExecutorImpl implements EventBusListenerExecutor {
         Future<EventMessage> future;
         try {
             final MethodMeta methodMeta = annotationProcessor().lookup(listener.getClass(), action);
-            future = this.executeMethod(methodMeta, paramParser().extract(msg, methodMeta.params()))
-                         .map(serializer)
+            future = this.securityInterceptor()
+                         .validate(sharedData, msg, methodMeta.method())
+                         .flatMap(i -> executeMethod(methodMeta, paramParser().extract(msg, methodMeta.params())))
+                         .map(outputSerializer())
                          .onSuccess(data -> debug("Succeed when handling", action, address))
                          .map(data -> EventMessage.replySuccess(action, data));
         } catch (ImplementationError e) {
@@ -70,12 +66,11 @@ class EventBusListenerExecutorImpl implements EventBusListenerExecutor {
     private Future<Object> executeMethod(MethodMeta methodMeta, Object[] inputs) {
         try {
             final Object response = ReflectionMethod.execute(listener, methodMeta.method(), inputs);
-            return LOADER.getHandlers()
-                         .stream()
-                         .filter(h -> Functions.getOrDefault(false, () -> h.verify(methodMeta)))
-                         .findFirst()
-                         .orElseGet(AnyToFuture::new)
-                         .transform(methodMeta, response);
+            return outputToFuture().stream()
+                                   .filter(h -> Functions.getOrDefault(false, () -> h.verify(methodMeta)))
+                                   .findFirst()
+                                   .orElseGet(AnyToFuture::new)
+                                   .transform(methodMeta, response);
         } catch (ReflectionException e) {
             return Future.failedFuture(e.getCause());
         }

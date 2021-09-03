@@ -6,9 +6,9 @@ import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EBParam;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
-public class MockRx2Listener implements EventBusListener {
+public class MockRx2Listener implements EventListener {
 
     @EBContract(action = "SINGLE")
     public Single<JsonObject> receive(@EBParam("id") int id) {

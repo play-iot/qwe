@@ -15,7 +15,7 @@ import io.zero88.qwe.eventbus.EBContext;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EBParam;
 import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.UnsupportedException;
@@ -31,7 +31,7 @@ public class SimpleAnnotationProcessor implements EventAnnotationProcessor {
     private final Set<Class<? extends Annotation>> supportedAnnotations;
 
     @Override
-    public MethodMeta lookup(@NonNull Class<? extends EventBusListener> listenerClass, @NonNull EventAction action) {
+    public MethodMeta lookup(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action) {
         return find(listenerClass, action);
     }
 

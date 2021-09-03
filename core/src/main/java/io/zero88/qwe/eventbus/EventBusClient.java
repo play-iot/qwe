@@ -20,7 +20,7 @@ import lombok.NonNull;
  * Represents EventBus that {@code send}/{@code request}/{@code publish} EventMessage. It also help to register an
  * {@code EventBus listener}
  *
- * @see EventBusListener
+ * @see EventListener
  * @see EventMessage
  * @see EventBusReplyHandler
  */
@@ -152,16 +152,16 @@ public interface EventBusClient extends Transporter, HasSharedData, Wrapper<Even
     /**
      * Register event listener
      * <p>
-     * It is equivalent to call {@link #register(String, boolean, EventBusListener)} with {@code local} is {@code true}
+     * It is equivalent to call {@link #register(String, boolean, EventListener)} with {@code local} is {@code true}
      *
      * @param address  Event bus address
      * @param listener listener to handle the received message
      * @return a reference to this, so the API can be used fluently
-     * @see EventBusListener
+     * @see EventListener
      */
     @Fluent
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
-    default EventBusClient register(String address, @NonNull EventBusListener listener) {
+    default EventBusClient register(String address, @NonNull EventListener listener) {
         return this.register(address, true, listener);
     }
 
@@ -172,12 +172,12 @@ public interface EventBusClient extends Transporter, HasSharedData, Wrapper<Even
      * @param local    If {@code true}, only register for local event address
      * @param listener listener to handle the received message
      * @return a reference to this, so the API can be used fluently
-     * @see EventBusListener
-     * @see #register(String, EventBusListener)
+     * @see EventListener
+     * @see #register(String, EventListener)
      */
     @Fluent
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
-    EventBusClient register(String address, boolean local, @NonNull EventBusListener listener);
+    EventBusClient register(String address, boolean local, @NonNull EventListener listener);
 
     @Override
     default Vertx getVertx() {

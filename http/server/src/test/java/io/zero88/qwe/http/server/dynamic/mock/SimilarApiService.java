@@ -6,7 +6,7 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBBody;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EventBusClient;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
@@ -36,7 +36,7 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
                  .onComplete(AsyncResult::succeeded);
     }
 
-    static class MockSiteListener implements EventBusListener {
+    static class MockSiteListener implements EventListener {
 
         @EBContract(action = "GET_LIST")
         public JsonObject list(@EBBody(value = "cId") String clientId) {
@@ -51,7 +51,7 @@ public class SimilarApiService extends MockEventOneApiOneLocService {
     }
 
 
-    static class MockProductListener implements EventBusListener {
+    static class MockProductListener implements EventListener {
 
         @EBContract(action = "GET_LIST")
         public JsonObject list(RequestData data) {

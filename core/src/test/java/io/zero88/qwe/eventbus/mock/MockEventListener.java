@@ -6,9 +6,9 @@ import java.util.Map;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
-public class MockEventListener implements EventBusListener {
+public class MockEventListener implements EventListener {
 
     public static final EventAction ERROR_EVENT = EventAction.parse("ERR");
     public static final EventAction PRIMITIVE_EVENT = EventAction.parse("PRIMITIVE");

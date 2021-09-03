@@ -4,12 +4,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EBParam;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class MockReceiveSendOrPublishListener implements EventBusListener {
+public class MockReceiveSendOrPublishListener implements EventListener {
 
     private final String identifier;
     private final Checkpoint cp;

@@ -12,7 +12,7 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.utils.PriorityUtils;
 
@@ -99,7 +99,7 @@ public final class EventMethodDefinition implements JsonData {
      * @param servicePath    Origin service path that represents for manipulating {@code resource} in default {@code
      *                       HTTPMethod} list
      * @param paramPath      Parameter path for manipulating {@code resource}
-     * @param useRequestData Whether use {@link RequestData} in parameter in {@link EventBusListener} or not
+     * @param useRequestData Whether use {@link RequestData} in parameter in {@link EventListener} or not
      * @return new instance
      * @implNote {@code paramPath} will be append after {@code servicePath}. For example:
      *     <ul>

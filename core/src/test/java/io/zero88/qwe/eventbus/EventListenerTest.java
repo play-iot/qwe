@@ -23,7 +23,7 @@ import io.zero88.qwe.eventbus.mock.MockWithVariousParamsListener;
 import io.zero88.qwe.exceptions.ErrorCode;
 
 @ExtendWith(VertxExtension.class)
-public class EventBusListenerTest {
+public class EventListenerTest {
 
     EventBusClient eventBusClient;
     private String address;
@@ -31,7 +31,7 @@ public class EventBusListenerTest {
     @BeforeEach
     void setup(Vertx vertx) {
         address = "test.request";
-        eventBusClient = EventBusClient.create(SharedDataLocalProxy.create(vertx, EventBusListenerTest.class.getName()));
+        eventBusClient = EventBusClient.create(SharedDataLocalProxy.create(vertx, EventListenerTest.class.getName()));
     }
 
     @Test

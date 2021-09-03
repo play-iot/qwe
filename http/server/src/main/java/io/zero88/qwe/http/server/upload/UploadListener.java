@@ -9,7 +9,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
  * Upload listener to handle uploaded file (update database, transfer to another host)
  */
 @RequiredArgsConstructor
-public class UploadListener implements EventBusListener {
+public class UploadListener implements EventListener {
 
     protected final SharedDataLocalProxy sharedData;
 

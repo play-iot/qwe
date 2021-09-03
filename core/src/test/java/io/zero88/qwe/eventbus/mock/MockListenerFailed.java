@@ -5,9 +5,9 @@ import java.util.Map;
 
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
-public class MockListenerFailed implements EventBusListener {
+public class MockListenerFailed implements EventListener {
 
     @EBContract(action = "DUP")
     public Map<String, String> dup1(RequestData data) {

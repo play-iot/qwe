@@ -6,9 +6,9 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EBParam;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
-public class MockKeepEventMessageListener implements EventBusListener {
+public class MockKeepEventMessageListener implements EventListener {
 
     @EBContract(action = "MONITOR")
     public int monitor(@EBParam("data") JsonObject json, @EBParam("error") ErrorMessage err) {

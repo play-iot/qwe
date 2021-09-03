@@ -5,7 +5,7 @@ import io.vertx.core.Future;
 import io.zero88.qwe.eventbus.refl.MethodMeta;
 
 /**
- * Cast or transform EventBus response to {@code Future} type
+ * Cast or wrap a {@code response} in any data type into a {@code Future}
  *
  * @param <T> output type
  */

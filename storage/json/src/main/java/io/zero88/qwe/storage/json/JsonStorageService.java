@@ -18,7 +18,7 @@ import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBContext;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.file.TextFileOperator;
 import io.zero88.qwe.file.TextFileOperatorImpl;
 import io.zero88.qwe.file.converter.BufferConverter;
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class JsonStorageService implements EventBusListener, ExtensionEntrypoint<JsonStorageConfig>, HasLogger {
+public class JsonStorageService implements EventListener, ExtensionEntrypoint<JsonStorageConfig>, HasLogger {
 
     @SuppressWarnings("unchecked")
     public static <T extends JsonStorageService> T create(@NonNull Path rootDir, @NonNull JsonStorageConfig config) {

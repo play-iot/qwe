@@ -7,19 +7,32 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import io.zero88.qwe.eventbus.EBBody;
+import io.zero88.qwe.eventbus.EBContext;
+import io.zero88.qwe.eventbus.EBContract;
+import io.zero88.qwe.eventbus.EBParam;
 import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.UnsupportedException;
 
 import lombok.NonNull;
 
+/**
+ * The Event annotation processor
+ *
+ * @see EBBody
+ * @see EBContext
+ * @see EBContract
+ * @see EBParam
+ */
 public interface EventAnnotationProcessor {
 
     String[] IGNORE_PACKAGES = {
         "java", "jdk", "sun", "com.fasterxml", "com.hazelcast", "ch.qos.logback", "org.apache", "org.junit",
         "org.gradle", "io.vertx", "io.reactivex", "io.netty"
     };
+
+    EventAnnotationProcessor DEFAULT = create();
 
     static EventAnnotationProcessor create() {
         return create(IGNORE_PACKAGES);
@@ -46,6 +59,6 @@ public interface EventAnnotationProcessor {
      * @throws ImplementationError  if event action is bind more than one method
      * @see MethodMeta
      */
-    MethodMeta lookup(@NonNull Class<? extends EventBusListener> listenerClass, @NonNull EventAction action);
+    MethodMeta lookup(@NonNull Class<? extends EventListener> listenerClass, @NonNull EventAction action);
 
 }

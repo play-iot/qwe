@@ -12,7 +12,7 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBBody;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.exceptions.DataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ class MockEventServiceListener {
     static String TEST_EVENT_2_ADDR = "test.MockEventMessageService.2";
     static String TEST_EVENT_3_ADDR = "test.MockEventMessageService.3";
     static String TEST_EVENT_4_ADDR = "test.MockEventMessageService.4";
-    static final EventBusListener TEST_EVENT_LISTENER_1 = new SimpleEventListener();
-    static final EventBusListener TEST_EVENT_LISTENER_2 = new MultiParamEventListener();
-    static final EventBusListener TEST_EVENT_LISTENER_3 = new MultiParamNotUseRequestDataEventListener();
-    static final EventBusListener TEST_EVENT_LISTENER_4 = new MultiApiPathEventListener();
+    static final EventListener TEST_EVENT_LISTENER_1 = new SimpleEventListener();
+    static final EventListener TEST_EVENT_LISTENER_2 = new MultiParamEventListener();
+    static final EventListener TEST_EVENT_LISTENER_3 = new MultiParamNotUseRequestDataEventListener();
+    static final EventListener TEST_EVENT_LISTENER_4 = new MultiApiPathEventListener();
 
 
     @RequiredArgsConstructor
-    static class SimpleEventListener implements EventBusListener {
+    static class SimpleEventListener implements EventListener {
 
         @EBContract(action = "GET_LIST")
         public List<String> list() { return Arrays.asList("1", "2", "3"); }
@@ -42,7 +42,7 @@ class MockEventServiceListener {
 
 
     @RequiredArgsConstructor
-    static class MultiParamEventListener implements EventBusListener {
+    static class MultiParamEventListener implements EventListener {
 
         @EBContract(action = "GET_LIST")
         public List<String> list(RequestData data) { return Collections.singletonList(data.body().getString("cId")); }
@@ -56,7 +56,7 @@ class MockEventServiceListener {
 
 
     @RequiredArgsConstructor
-    static class MultiApiPathEventListener implements EventBusListener {
+    static class MultiApiPathEventListener implements EventListener {
 
         private static final JsonObject CID_01 = new JsonObject().put("cId.01", new JsonArray().add(
             new JsonObject().put("pId.01", "xxx")).add(new JsonObject().put("pId.02", "abc")));
@@ -98,7 +98,7 @@ class MockEventServiceListener {
 
 
     @RequiredArgsConstructor
-    static class MultiParamNotUseRequestDataEventListener implements EventBusListener {
+    static class MultiParamNotUseRequestDataEventListener implements EventListener {
 
         @EBContract(action = "GET_LIST")
         public List<String> list(@EBBody("xId") String xId) {

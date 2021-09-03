@@ -17,7 +17,7 @@ import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.eventbus.EventBusProxy;
 import io.zero88.qwe.eventbus.EventDirection;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.eventbus.EventPattern;
 import io.zero88.qwe.http.HttpException;
@@ -70,7 +70,7 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
     public void test_connect_and_send(VertxTestContext context) {
         Checkpoint cp = context.checkpoint();
         EventBusClient eb = ((EventBusProxy) extension.entrypoint()).transporter();
-        eb.register(LISTENER.getAddress(), new EventBusAsserter(context, cp, new JsonObject().put("k", 1)));
+        eb.register(LISTENER.getAddress(), new EventAsserter(context, cp, new JsonObject().put("k", 1)));
         extension.entrypoint()
                  .openWebSocket(new WebSocketConnectOptions().setHost("echo.websocket.org").setURI("/echo"),
                                 WebSocketClientPlan.create(LISTENER, PUBLISHER_ADDRESS))
@@ -84,7 +84,7 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
     }
 
     @RequiredArgsConstructor
-    static class EventBusAsserter implements EventBusListener {
+    static class EventAsserter implements EventListener {
 
         private final VertxTestContext context;
         private final Checkpoint cp;

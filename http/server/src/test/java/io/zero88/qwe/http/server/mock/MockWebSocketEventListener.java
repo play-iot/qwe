@@ -5,9 +5,9 @@ import java.util.List;
 
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
-public class MockWebSocketEventListener implements EventBusListener {
+public class MockWebSocketEventListener implements EventListener {
 
     @EBContract(action = "GET_LIST")
     public List<String> list(RequestData data) {

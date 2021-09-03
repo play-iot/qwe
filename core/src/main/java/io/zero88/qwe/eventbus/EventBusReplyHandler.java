@@ -39,7 +39,7 @@ public interface EventBusReplyHandler extends HasLogger, EventReplyLogSystem {
      * @return event message
      */
     default EventMessage succeed(Message replyMsg) {
-        return converter().to(replyMsg);
+        return converter().from(replyMsg);
     }
 
     /**

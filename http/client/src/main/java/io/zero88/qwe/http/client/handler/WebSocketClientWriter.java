@@ -3,12 +3,12 @@ package io.zero88.qwe.http.client.handler;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class WebSocketClientWriter implements EventBusListener {
+public final class WebSocketClientWriter implements EventListener {
 
     private final WebSocket webSocket;
 

@@ -4,13 +4,13 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EBParam;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.exceptions.TimeoutException;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class MockFutureListener implements EventBusListener {
+public class MockFutureListener implements EventListener {
 
     @EBContract(action = "GET_ONE")
     public Future<JsonObject> receive(@EBParam("id") int id) {

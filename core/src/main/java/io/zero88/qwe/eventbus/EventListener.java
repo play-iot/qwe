@@ -4,21 +4,22 @@ import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.eventbus.EventBusLogSystem.EventBusListenerLogSystem;
+import io.zero88.qwe.eventbus.EventBusLogSystem.EventListenerLogSystem;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.NonNull;
 
 /**
- * Represents for a listener that receives and processes an {@code EventBus} message then response back to a caller
+ * Represents for a {@code listener} that receives and processes an {@code EventBus} message then response back to a
+ * caller.
  *
  * @see EBContract
  * @see EventMessage
  * @see EventAction
  * @see EventPattern#REQUEST_RESPONSE
  */
-public interface EventBusListener extends HasLogger, EventBusListenerLogSystem {
+public interface EventListener extends HasLogger, EventListenerLogSystem {
 
     /**
      * Jackson Object mapper for serialize/deserialize data
@@ -35,7 +36,7 @@ public interface EventBusListener extends HasLogger, EventBusListenerLogSystem {
     default String fallback() {return JsonData.SUCCESS_KEY;}
 
     default @NonNull void handle(SharedDataLocalProxy sharedData, Message<Object> msg) {
-        EventBusListenerExecutor.create(this, sharedData).execute(msg).onComplete(ar -> {
+        EventListenerExecutor.create(this, sharedData).execute(msg).onComplete(ar -> {
             if (ar.succeeded()) {
                 msg.reply(ar.result().toJson());
             } else {

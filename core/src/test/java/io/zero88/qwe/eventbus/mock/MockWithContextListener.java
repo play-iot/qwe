@@ -14,12 +14,12 @@ import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EBParam;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventBusClient;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class MockWithContextListener implements EventBusListener {
+public class MockWithContextListener implements EventListener {
 
     @EBContract(action = "GET_ONE")
     public void receive(@EBContext EventAction action, @EBContext Vertx vertx,

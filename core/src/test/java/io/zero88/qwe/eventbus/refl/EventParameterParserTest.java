@@ -16,7 +16,7 @@ import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.eventbus.EBBody;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventBusClient;
-import io.zero88.qwe.eventbus.EventBusListenerTest;
+import io.zero88.qwe.eventbus.EventListenerTest;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.eventbus.mock.MockEventListener;
 import io.zero88.qwe.eventbus.mock.MockWithContextListener;
@@ -31,7 +31,7 @@ class EventParameterParserTest {
     @BeforeEach
     void setup(Vertx vertx) {
         processor = EventAnnotationProcessor.create();
-        parser = EventParameterParser.create(SharedDataLocalProxy.create(vertx, EventBusListenerTest.class.getName()),
+        parser = EventParameterParser.create(SharedDataLocalProxy.create(vertx, EventListenerTest.class.getName()),
                                              JsonData.MAPPER);
     }
 

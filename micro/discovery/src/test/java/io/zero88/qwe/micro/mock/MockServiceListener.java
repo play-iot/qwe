@@ -4,10 +4,10 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventBusListener;
+import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.micro.GatewayHeaders;
 
-public final class MockServiceListener implements EventBusListener {
+public final class MockServiceListener implements EventListener {
 
     @EBContract(action = "CREATE")
     public JsonObject create(RequestData requestData) {

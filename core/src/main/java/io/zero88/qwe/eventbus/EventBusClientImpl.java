@@ -62,7 +62,7 @@ final class EventBusClientImpl implements EventBusClient, HasLogger, LogSystem {
     }
 
     @Override
-    public EventBusClient register(String address, boolean local, @NonNull EventBusListener listener) {
+    public EventBusClient register(String address, boolean local, @NonNull EventListener listener) {
         logger().info(decor("Register [{}][{}][{}]"), Strings.requireNotBlank(address), listener.getClass().getName(),
                       local ? "Local" : "Cluster");
         if (local) {
