@@ -12,7 +12,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.security.CryptoContext;
+import io.zero88.qwe.crypto.CryptoContext;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public interface PluginTestHelper extends AppContextTest {

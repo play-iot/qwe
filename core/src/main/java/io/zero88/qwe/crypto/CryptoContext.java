@@ -1,4 +1,4 @@
-package io.zero88.qwe.security;
+package io.zero88.qwe.crypto;
 
 import org.jetbrains.annotations.Nullable;
 

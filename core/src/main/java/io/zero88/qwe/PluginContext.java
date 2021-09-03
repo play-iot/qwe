@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
-import io.zero88.qwe.security.CryptoContext;
+import io.zero88.qwe.crypto.CryptoContext;
 
 import lombok.Getter;
 import lombok.NonNull;

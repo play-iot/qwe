@@ -4,7 +4,7 @@ import java.nio.file.Path;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Vertx;
-import io.zero88.qwe.security.CryptoContext;
+import io.zero88.qwe.crypto.CryptoContext;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public interface ExtensionTestHelper extends AppContextTest {

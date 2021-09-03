@@ -1,4 +1,4 @@
-package io.zero88.qwe.security;
+package io.zero88.qwe.crypto;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,7 +32,7 @@ import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.net.TrustOptions;
 import io.zero88.qwe.exceptions.CryptoException;
-import io.zero88.qwe.security.KeyAlias.KeyEntryType;
+import io.zero88.qwe.crypto.KeyAlias.KeyEntryType;
 
 import lombok.AccessLevel;
 import lombok.Getter;

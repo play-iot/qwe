@@ -1,4 +1,4 @@
-package io.zero88.qwe.security;
+package io.zero88.qwe.crypto;
 
 import java.security.KeyStore;
 import java.util.Collection;
@@ -24,7 +24,7 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.zero88.qwe.KeyStoreProvider;
-import io.zero88.qwe.security.KeyAlias.KeyEntryType;
+import io.zero88.qwe.crypto.KeyAlias.KeyEntryType;
 
 @ExtendWith(VertxExtension.class)
 class LazyKeyStoreTest {

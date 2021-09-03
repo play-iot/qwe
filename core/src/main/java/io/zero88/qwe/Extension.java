@@ -5,8 +5,8 @@ import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.security.CryptoContext;
-import io.zero88.qwe.security.CryptoRequest;
+import io.zero88.qwe.crypto.CryptoContext;
+import io.zero88.qwe.crypto.CryptoRequest;
 
 /**
  * @param <C> Type of Extension config

@@ -1,6 +1,6 @@
 package io.zero88.qwe;
 
-import io.zero88.qwe.security.CryptoRequest;
+import io.zero88.qwe.crypto.CryptoRequest;
 
 import lombok.NonNull;
 

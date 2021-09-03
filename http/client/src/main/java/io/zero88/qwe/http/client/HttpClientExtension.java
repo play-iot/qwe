@@ -18,7 +18,7 @@ import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.Extension;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.security.CryptoContext;
+import io.zero88.qwe.crypto.CryptoContext;
 
 import lombok.NonNull;
 

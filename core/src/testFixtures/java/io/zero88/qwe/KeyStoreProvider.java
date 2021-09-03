@@ -7,9 +7,9 @@ import java.util.Objects;
 import io.github.zero88.repl.Reflections;
 import io.vertx.core.Vertx;
 import io.vertx.core.net.KeyCertOptions;
-import io.zero88.qwe.security.KeyStoreType;
-import io.zero88.qwe.security.LazyKeyStore;
-import io.zero88.qwe.security.LazyKeyStoreImpl;
+import io.zero88.qwe.crypto.KeyStoreType;
+import io.zero88.qwe.crypto.LazyKeyStore;
+import io.zero88.qwe.crypto.LazyKeyStoreImpl;
 
 public interface KeyStoreProvider extends LazyKeyStore {
 
