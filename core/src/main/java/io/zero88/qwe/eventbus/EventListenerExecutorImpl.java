@@ -6,11 +6,9 @@ import io.github.zero88.utils.Functions;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.auth.ReqAuthDefinition;
-import io.zero88.qwe.auth.SecurityFilter;
+import io.zero88.qwe.auth.UserInfo;
 import io.zero88.qwe.eventbus.output.AnyToFuture;
 import io.zero88.qwe.eventbus.refl.MethodMeta;
-import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.ImplementationError;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.exceptions.ServiceUnavailable;
@@ -21,7 +19,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 @SuppressWarnings({"rawtypes", "unchecked"})
-class EventListenerExecutorImpl implements EventListenerExecutor {
+public class EventListenerExecutorImpl implements EventListenerExecutor {
 
     @Getter
     private final EventListener listener;
@@ -36,6 +34,9 @@ class EventListenerExecutorImpl implements EventListenerExecutor {
     @Override
     public Future<EventMessage> execute(Message message) {
         final EventMessage msg = messageConverter().from(message);
+        if (msg.getUserInfo() == null) {
+            msg.setUserInfo(UserInfo.parse(sharedData.getVertx().getOrCreateContext().getLocal(UserInfo.USER_KEY)));
+        }
         final String addr = message.address();
         debug("Received message", msg.getAction(), addr);
         return sharedData.getVertx().executeBlocking(promise -> execute(msg, addr).onComplete(promise));

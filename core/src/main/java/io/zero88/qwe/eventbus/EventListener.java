@@ -35,8 +35,12 @@ public interface EventListener extends HasLogger, EventListenerLogSystem {
      */
     default String fallback() {return JsonData.SUCCESS_KEY;}
 
+    default EventListenerExecutor executor(SharedDataLocalProxy sharedData) {
+        return EventListenerExecutor.create(this, sharedData);
+    }
+
     default @NonNull void handle(SharedDataLocalProxy sharedData, Message<Object> msg) {
-        EventListenerExecutor.create(this, sharedData).execute(msg).onComplete(ar -> {
+        executor(sharedData).execute(msg).onComplete(ar -> {
             if (ar.succeeded()) {
                 msg.reply(ar.result().toJson());
             } else {

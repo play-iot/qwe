@@ -12,7 +12,7 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.mock.MockEventListener;
 import io.zero88.qwe.eventbus.mock.MockChildListener;
-import io.zero88.qwe.eventbus.mock.MockListenerFailed;
+import io.zero88.qwe.eventbus.mock.MockFailedListener;
 import io.zero88.qwe.eventbus.mock.MockFutureListener;
 import io.zero88.qwe.eventbus.mock.MockKeepEventMessageListener;
 import io.zero88.qwe.eventbus.mock.MockParam;
@@ -39,7 +39,7 @@ class EventAnnotationProcessorTest {
     @Test
     void test_scan_duplicate_event_should_failed() {
         Assertions.assertEquals(Assertions.assertThrows(ImplementationError.class,
-                                                        () -> processor.lookup(MockListenerFailed.class,
+                                                        () -> processor.lookup(MockFailedListener.class,
                                                                                EventAction.parse("DUP"))).getMessage(),
                                 "More than one event [DUP]");
     }

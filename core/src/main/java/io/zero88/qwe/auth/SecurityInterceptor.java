@@ -3,7 +3,6 @@ package io.zero88.qwe.auth;
 import java.lang.reflect.Method;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import io.vertx.core.Future;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -19,8 +18,20 @@ import io.zero88.qwe.exceptions.ImplementationError;
 @FunctionalInterface
 public interface SecurityInterceptor {
 
+    /**
+     * Default {@code security interceptor} with {@link SecurityFilter} is loaded by {@code service loader} {@code
+     * META-INF/services}
+     *
+     * @see SecurityFilterLoader
+     */
     SecurityInterceptor DEFAULT = create(SecurityFilterLoader.getInstance().getSecurityFilter());
 
+    /**
+     * Create the security interceptor
+     *
+     * @param securityFilter the security filter
+     * @return the security interceptor
+     */
     static SecurityInterceptor create(SecurityFilter securityFilter) {
         return () -> securityFilter;
     }
@@ -40,7 +51,7 @@ public interface SecurityInterceptor {
      * @return the security filter
      * @see SecurityFilter
      */
-    @Nullable SecurityFilter securityFilter();
+    SecurityFilter securityFilter();
 
     /**
      * Validate authentication/authorization based on the {@link AuthN} or {@link AuthZ} annotation of given method

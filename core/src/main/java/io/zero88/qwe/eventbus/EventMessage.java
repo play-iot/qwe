@@ -9,7 +9,6 @@ import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.repl.ReflectionClass;
 import io.netty.buffer.ByteBuf;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -210,7 +209,7 @@ public final class EventMessage implements Serializable, JsonData {
      * @return the raw message data
      */
     public @Nullable Buffer rawData() {
-        return this.data.copy();
+        return data == null ? null : this.data.copy();
     }
 
     /**

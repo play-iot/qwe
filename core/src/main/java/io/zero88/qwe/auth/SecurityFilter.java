@@ -20,7 +20,7 @@ public interface SecurityFilter {
     /**
      * Check the principal's authentication and authorization.
      * <p>
-     * The output can be failed with one of the reasons:
+     * The {@code Future} output can be failed with one of the reasons:
      * <ul>
      *     <li>{@link AuthenticationException} if not authenticated</li>
      *     <li>{@link InsufficientPermissionError} if not authorized</li>

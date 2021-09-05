@@ -6,6 +6,11 @@ import io.vertx.core.ServiceHelper;
 
 import lombok.Getter;
 
+/**
+ * Represents the service loader {@code META-INF/services} for {@link OutputToFuture} handlers
+ *
+ * @since 1.0.0
+ */
 @SuppressWarnings("rawtypes")
 public final class OutputToFutureServiceLoader {
 

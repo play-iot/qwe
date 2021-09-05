@@ -71,9 +71,7 @@ public class EventParameterParserImpl implements EventParameterParser {
             return EventBusClient.create(sharedData);
         }
         if (ReflectionClass.assertDataType(param.getParamClass(), UserInfo.class)) {
-            return Optional.ofNullable(message.getUserInfo())
-                           .orElseGet(() -> UserInfo.create(
-                               sharedData.getVertx().getOrCreateContext().getLocal(UserInfo.USER_KEY)));
+            return message.getUserInfo();
         }
         throw new ImplementationError(ErrorCode.UNSUPPORTED,
                                       "Unsupported EventBus context [" + param.getParamClass() + "]");

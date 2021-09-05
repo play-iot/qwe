@@ -76,7 +76,7 @@ class AuthAnnotationProcessorTest {
         final ReqAuthDefinition definition = processor.lookup(findMethod(MockAuthAnother.class, "access"));
         Assertions.assertTrue(definition.isLoginRequired());
         Assertions.assertFalse(definition.isAuthzRequired());
-        Assertions.assertNull(definition.getAuthz());
+        Assertions.assertTrue(definition.getAuthz().isEmpty());
     }
 
     @Test
@@ -93,7 +93,7 @@ class AuthAnnotationProcessorTest {
         final ReqAuthDefinition definition = processor.lookup(findMethod(MockNoAuth.class, "noop"));
         Assertions.assertFalse(definition.isLoginRequired());
         Assertions.assertFalse(definition.isAuthzRequired());
-        Assertions.assertNull(definition.getAuthz());
+        Assertions.assertTrue(definition.getAuthz().isEmpty());
     }
 
     @Test

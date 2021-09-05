@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import io.github.zero88.utils.Strings;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 
@@ -20,6 +21,22 @@ public interface UserInfo extends JsonData {
      * Identity key for defining user identification
      */
     String IDENTITY_KEY = "identity";
+
+    static UserInfo parse(Object user) {
+        if (user == null) {
+            return null;
+        }
+        if (user instanceof UserInfo) {
+            return (UserInfo) user;
+        }
+        if (user instanceof JsonObject) {
+            return create((JsonObject) user, IDENTITY_KEY);
+        }
+        if (user instanceof Buffer) {
+            return create(((Buffer) user).toJsonObject(), IDENTITY_KEY);
+        }
+        throw new IllegalArgumentException("Unable parse user");
+    }
 
     static UserInfo create(JsonObject user) {
         return create(user, IDENTITY_KEY);
