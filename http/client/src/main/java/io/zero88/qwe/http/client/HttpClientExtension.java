@@ -13,6 +13,8 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpVersion;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.Extension;
@@ -46,9 +48,11 @@ public final class HttpClientExtension implements Extension<HttpClientConfig, Ht
     public HttpClientExtension setup(SharedDataLocalProxy sharedData, String appName, Path appDir,
                                      @NotNull JsonObject config, @NotNull CryptoContext cryptoContext) {
         final HttpClientConfig clientConf = computeConfig(config);
-        clientConf.getOptions()
-                  .setKeyCertOptions(cryptoContext.getKeyCertOptions())
-                  .setTrustOptions(cryptoContext.getTrustOptions());
+        final HttpClientOptions options = clientConf.getOptions();
+        if (clientConf.isHttp2Enabled()) {
+            options.setProtocolVersion(HttpVersion.HTTP_2).setUseAlpn(true);
+        }
+        options.setKeyCertOptions(cryptoContext.getKeyCertOptions()).setTrustOptions(cryptoContext.getTrustOptions());
         HttpClientWrapper wrapper = new HttpClientWrapperImpl(sharedData, appName, appDir, clientConf);
         this.id = wrapper.id();
         this.registries.put(wrapper.id(), wrapper);

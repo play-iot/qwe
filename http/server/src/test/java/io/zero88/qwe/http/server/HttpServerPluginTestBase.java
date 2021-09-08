@@ -41,7 +41,7 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     protected HttpServerConfig httpConfig;
     @Getter
     protected HttpClientWrapper client;
-    private RequestOptions requestOptions;
+    protected RequestOptions requestOptions;
 
     @BeforeClass
     public static void beforeSuite() {TestHelper.setup();}
@@ -59,8 +59,7 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     @Before
     public void before(TestContext context) {
         vertx = Vertx.vertx();
-        client = initExtension(vertx, HttpClientExtension.class,
-                               new HttpClientConfig().setOptions(createClientOptions())).entrypoint();
+        client = createHttpClient();
         httpConfig = initConfig();
         requestOptions = new RequestOptions().setHost(DEFAULT_HOST).setPort(httpConfig.getPort());
     }
@@ -74,8 +73,10 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
         return "httpServer.json";
     }
 
-    protected HttpClientOptions createClientOptions() {
-        return new HttpClientOptions().setConnectTimeout(TestHelper.TEST_TIMEOUT_SEC);
+    protected HttpClientWrapper createHttpClient() {
+        final HttpClientConfig extConfig = new HttpClientConfig().setOptions(
+            new HttpClientOptions().setConnectTimeout(TestHelper.TEST_TIMEOUT_SEC * 1000));
+        return initExtension(vertx, HttpClientExtension.class, extConfig).entrypoint();
     }
 
     protected HttpServerPlugin startServer(TestContext context, HttpServerRouter httpRouter) {

@@ -3,6 +3,7 @@ package io.zero88.qwe.http.client;
 import java.net.UnknownHostException;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.vertx.core.http.UpgradeRejectedException;
@@ -37,7 +38,7 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
     @Test
     public void test_not_found(VertxTestContext context) {
         Checkpoint cp = context.checkpoint();
-        WebSocketConnectOptions options = new WebSocketConnectOptions().setHost("echo.websocket.org").setURI("/xxx");
+        WebSocketConnectOptions options = new WebSocketConnectOptions().setHost("google.com").setURI("/xxx");
         extension.entrypoint()
                  .openWebSocket(options, WebSocketClientPlan.create(LISTENER, PUBLISHER_ADDRESS))
                  .onFailure(t -> context.verify(() -> {
@@ -67,6 +68,9 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
     }
 
     @Test
+    @Disabled
+    //TODO need to setup simple websocket echo server: https://github.com/jmalloc/echo-server
+    //echo.websocket.org is no longer available
     public void test_connect_and_send(VertxTestContext context) {
         Checkpoint cp = context.checkpoint();
         EventBusClient eb = ((EventBusProxy) extension.entrypoint()).transporter();

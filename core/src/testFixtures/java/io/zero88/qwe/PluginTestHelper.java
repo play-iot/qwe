@@ -77,12 +77,16 @@ public interface PluginTestHelper extends AppContextTest {
 
     default <T extends Plugin> T preDeploy(SharedDataLocalProxy sharedData, T plugin, Set<Extension> extensions) {
         PluginContext ctx = PluginContext.create(appName(), plugin.pluginName(), testDir(), sharedData, extensions,
-                                                 CryptoContext.empty());
+                                                 pluginCryptoContext());
         return (T) plugin.deployHook().onPreDeploy(plugin, ctx);
     }
 
     default <T extends Plugin> T postDeploy(T plugin, String deploymentId) {
         return (T) plugin.deployHook().onPostDeploy(plugin, plugin.pluginContext().deployId(deploymentId));
+    }
+
+    default CryptoContext pluginCryptoContext() {
+        return CryptoContext.empty();
     }
 
     @NonNull

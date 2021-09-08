@@ -16,13 +16,22 @@ public interface ExtensionTestHelper extends AppContextTest {
 
     default <C extends ExtensionConfig, EE extends ExtensionEntrypoint<C>, E extends Extension<C, EE>> E initExtension(
         Vertx vertx, Class<E> cls, C extConfig) {
-        return (E) createExt(createSharedData(vertx), appName(), testDir(), cls, extConfig);
+        return initExtension(vertx, cls, extConfig, CryptoContext.empty());
+    }
+
+    default <C extends ExtensionConfig, EE extends ExtensionEntrypoint<C>, E extends Extension<C, EE>> E initExtension(
+        Vertx vertx, Class<E> cls, C extConfig, CryptoContext cryptoContext) {
+        return (E) createExt(createSharedData(vertx), appName(), testDir(), cls, extConfig, cryptoContext);
     }
 
     static Extension createExt(SharedDataLocalProxy sharedData, String appName, Path appDir,
                                Class<? extends Extension> cls, ExtensionConfig extConfig) {
-        return ReflectionClass.createObject(cls)
-                              .setup(sharedData, appName, appDir, extConfig.toJson(), CryptoContext.empty());
+        return createExt(sharedData, appName, appDir, cls, extConfig, CryptoContext.empty());
+    }
+
+    static Extension createExt(SharedDataLocalProxy sharedData, String appName, Path appDir,
+                               Class<? extends Extension> cls, ExtensionConfig extConfig, CryptoContext cryptoContext) {
+        return ReflectionClass.createObject(cls).setup(sharedData, appName, appDir, extConfig.toJson(), cryptoContext);
     }
 
 }

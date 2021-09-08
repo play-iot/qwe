@@ -23,6 +23,7 @@ import io.zero88.qwe.http.client.handler.WebSocketClientPlan;
 
 public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>, HasLogger, Wrapper<HttpClient> {
 
+    //TODO Fix it in discovery plugin
     static HttpClientWrapper wrap(HttpClient client, String userAgent) {
         return new HttpClientWrapperImpl(client, userAgent);
     }

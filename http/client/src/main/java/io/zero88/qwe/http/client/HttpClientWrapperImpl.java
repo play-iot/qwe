@@ -21,6 +21,7 @@ import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.UpgradeRejectedException;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketConnectOptions;
+import io.vertx.core.http.impl.HttpClientImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
@@ -69,7 +70,10 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
     }
 
     HttpClientWrapperImpl(HttpClient client, String userAgent) {
-        this.extConfig = new HttpClientConfig();
+        this.extConfig = new HttpClientConfig().setUserAgent(userAgent);
+        if (client instanceof HttpClientImpl) {
+            extConfig.setOptions(((HttpClientImpl) client).getOptions());
+        }
         this.id = extConfig.toJson().hashCode();
         this.userAgent = userAgent;
         this.client = client;
@@ -108,8 +112,9 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
                                    })
                                    .flatMap(req -> payload == null ? req.send() : req.send(payload))
                                    .recover(this::wrapError)
-                                   .flatMap(HttpClientJsonResponseHandler.create(swallowError, extConfig.getHttpHandlers()
-                                                                                                        .getRespTextHandlerCls()));
+                                   .flatMap(HttpClientJsonResponseHandler.create(swallowError,
+                                                                                 extConfig.getHttpHandlers()
+                                                                                          .getRespTextHandlerCls()));
     }
 
     @Override
