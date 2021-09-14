@@ -7,7 +7,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.HttpException;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.dto.ErrorMessage;
-import io.zero88.qwe.http.HttpStatusMapping;
+import io.zero88.qwe.http.HttpStatusMappingLoader;
 import io.zero88.qwe.http.HttpUtils;
 
 public final class FailureContextHandler implements Handler<RoutingContext>, HasLogger {
@@ -27,7 +27,10 @@ public final class FailureContextHandler implements Handler<RoutingContext>, Has
             final ErrorMessage errorMessage = ErrorMessage.parse(failure);
             failureContext.response()
                           .putHeader(HttpHeaders.CONTENT_TYPE, HttpUtils.JSON_UTF8_CONTENT_TYPE)
-                          .setStatusCode(HttpStatusMapping.error(method, errorMessage.getThrowable()).code())
+                          .setStatusCode(HttpStatusMappingLoader.getInstance()
+                                                                .get()
+                                                                .error(method, errorMessage.getThrowable())
+                                                                .code())
                           .end(HttpUtils.prettify(failureContext.request(), errorMessage));
         }
     }

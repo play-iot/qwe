@@ -8,7 +8,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventMessage;
-import io.zero88.qwe.http.HttpStatusMapping;
+import io.zero88.qwe.http.HttpStatusMappingLoader;
 import io.zero88.qwe.http.HttpUtils;
 
 /**
@@ -30,11 +30,14 @@ public final class EventMessageResponseHandler implements Handler<RoutingContext
         }
         if (eventMessage.isSuccess()) {
             context.response()
-                   .setStatusCode(HttpStatusMapping.success(method).code())
+                   .setStatusCode(HttpStatusMappingLoader.getInstance().get().success(method).code())
                    .end(HttpUtils.prettify(context.request(), eventMessage.getData()));
         } else {
             context.response()
-                   .setStatusCode(HttpStatusMapping.error(method, eventMessage.getError().getCode()).code())
+                   .setStatusCode(HttpStatusMappingLoader.getInstance()
+                                                         .get()
+                                                         .error(method, eventMessage.getError().getCode())
+                                                         .code())
                    .end(HttpUtils.prettify(context.request(), eventMessage.getError()));
         }
     }

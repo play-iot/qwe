@@ -17,7 +17,7 @@ import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.http.HttpStatusMapping;
+import io.zero88.qwe.http.HttpStatusMappingLoader;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
 
@@ -52,7 +52,9 @@ public abstract class HttpClientJsonResponseHandler
             final JsonObject body = tryParse(response, buffer);
             final int status = response.statusCode();
             if (!swallowError && status >= 400) {
-                ErrorCode code = HttpStatusMapping.error(response.request().getMethod(), status);
+                ErrorCode code = HttpStatusMappingLoader.getInstance()
+                                                        .get()
+                                                        .error(response.request().getMethod(), status);
                 return Future.failedFuture(new QWEException(code, body.encode()));
             }
             return Future.succeededFuture(

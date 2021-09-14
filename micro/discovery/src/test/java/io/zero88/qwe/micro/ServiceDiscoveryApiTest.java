@@ -89,7 +89,6 @@ public class ServiceDiscoveryApiTest extends BaseDiscoveryPluginTest {
                      () -> JsonHelper.assertJson(expected, record.toJson(), JsonHelper.ignore("registration"))))
                  .onSuccess(event -> checkpoint.flag())
                  .onFailure(context::failNow);
-        ;
     }
 
     @Test

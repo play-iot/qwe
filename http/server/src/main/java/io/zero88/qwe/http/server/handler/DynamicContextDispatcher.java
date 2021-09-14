@@ -14,7 +14,7 @@ import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.http.HttpException;
-import io.zero88.qwe.http.HttpStatusMapping;
+import io.zero88.qwe.http.HttpStatusMappingLoader;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
 import io.zero88.qwe.http.server.converter.RequestDataConverter;
@@ -142,7 +142,8 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext>, HasLo
      */
     default Future<Void> handleSuccess(RoutingContext context, ResponseData responseData) {
         return context.response()
-                      .setStatusCode(HttpStatusMapping.success(context.request().method()).code())
+                      .setStatusCode(
+                          HttpStatusMappingLoader.getInstance().get().success(context.request().method()).code())
                       .end(HttpUtils.prettify(context.request(), responseData.body()));
     }
 
@@ -155,7 +156,10 @@ public interface DynamicContextDispatcher extends Handler<RoutingContext>, HasLo
      */
     default Future<Void> handleError(@NonNull RoutingContext context, ErrorMessage errorMessage) {
         return context.response()
-                      .setStatusCode(HttpStatusMapping.error(context.request().method(), errorMessage.getCode()).code())
+                      .setStatusCode(HttpStatusMappingLoader.getInstance()
+                                                            .get()
+                                                            .error(context.request().method(), errorMessage.getCode())
+                                                            .code())
                       .end(HttpUtils.prettify(context.request(), errorMessage));
     }
 
