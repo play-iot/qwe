@@ -1,8 +1,9 @@
-package io.zero88.qwe.micro.httpevent;
+package io.zero88.qwe.http;
 
 import java.util.Objects;
 
 import io.vertx.core.http.HttpMethod;
+import io.zero88.qwe.auth.ReqAuthDefinition;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.eventbus.EventAction;
 
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
@@ -27,7 +29,6 @@ import lombok.extern.jackson.Jacksonized;
 @Builder(builderClassName = "Builder")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-// FIXME Why dont include capturePath and regexPath in equals
 public final class EventMethodMapping implements JsonData {
 
     @Include
@@ -40,11 +41,14 @@ public final class EventMethodMapping implements JsonData {
     /**
      * Optional
      */
+    @Include
     private final String regexPath;
+    @Default
+    private final ReqAuthDefinition auth = ReqAuthDefinition.noAuth();
 
     @JsonProperty("method")
     public String method() {
-        return this.getMethod().name();
+        return getMethod().name();
     }
 
     public static class Builder {
@@ -57,15 +61,12 @@ public final class EventMethodMapping implements JsonData {
         }
 
         public EventMethodMapping build() {
-            return build(new HttpPathRule());
-        }
-
-        public EventMethodMapping build(@NonNull HttpPathRule rule) {
+            final HttpPathRule rule = HttpPathRuleLoader.getInstance().get();
             capturePath = rule.createCapture(method, action, servicePath, capturePath);
             if (Objects.nonNull(capturePath) && Objects.isNull(regexPath)) {
                 regexPath = rule.createRegex(capturePath);
             }
-            return new EventMethodMapping(action, method, capturePath, regexPath);
+            return new EventMethodMapping(action, method, capturePath, regexPath, auth$value);
         }
 
     }

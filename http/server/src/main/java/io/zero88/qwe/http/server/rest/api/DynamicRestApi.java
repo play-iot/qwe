@@ -7,8 +7,8 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
-import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.ErrorCode;
+import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.micro.HasServiceType;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
@@ -17,8 +17,8 @@ import lombok.NonNull;
 
 /**
  * Dynamic REST API that backed by {@code Service Discovery}
- * <p>
- * To use it, your project must depends on {@code :core:micro}
+ *
+ * @implNote To use it, your project must depend on {@code :micro:metadata}
  */
 public interface DynamicRestApi extends HasServiceType {
 
@@ -28,7 +28,7 @@ public interface DynamicRestApi extends HasServiceType {
             return (T) DynamicHttpRestApi.create(record);
         }
         if (EventMessageHttpService.TYPE.equals(record.getType())) {
-            return (T) DynamicEventRestApi.create(record);
+            return (T) DynamicRestEventApi.create(record);
         }
         throw new QWEException(ErrorCode.INVALID_ARGUMENT, "Dynamic Rest API unsupported type " + record.getType());
     }
@@ -76,7 +76,7 @@ public interface DynamicRestApi extends HasServiceType {
     @NonNull String name();
 
     /**
-     * Metadata to help reaching out service
+     * Metadata to help to reach out service
      *
      * @return service metadata, it might be {@code null}
      */

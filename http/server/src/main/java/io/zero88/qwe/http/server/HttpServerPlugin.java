@@ -27,7 +27,7 @@ import io.zero88.qwe.http.server.gateway.GatewayRouterCreator;
 import io.zero88.qwe.http.server.handler.FailureContextHandler;
 import io.zero88.qwe.http.server.handler.NotFoundContextHandler;
 import io.zero88.qwe.http.server.rest.DynamicRouterCreator;
-import io.zero88.qwe.http.server.rest.RestApiCreator;
+import io.zero88.qwe.http.server.rest.RestApisCreator;
 import io.zero88.qwe.http.server.rest.RestEventApisCreator;
 import io.zero88.qwe.http.server.upload.UploadRouterCreator;
 import io.zero88.qwe.http.server.web.StaticWebRouterCreator;
@@ -131,7 +131,7 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
             root = Stream.concat(
-                             Stream.of(WebSocketRouterCreator.class, RestApiCreator.class, RestEventApisCreator.class,
+                             Stream.of(WebSocketRouterCreator.class, RestApisCreator.class, RestEventApisCreator.class,
                                        DynamicRouterCreator.class, GatewayRouterCreator.class,
                                        UploadRouterCreator.class,
                                        DownloadRouterCreator.class, StaticWebRouterCreator.class)

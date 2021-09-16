@@ -13,9 +13,9 @@ import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.dto.msg.ResponseData;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventMessage;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 import io.zero88.qwe.micro.servicetype.EventMessagePusher;
 

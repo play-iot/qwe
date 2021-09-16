@@ -15,7 +15,7 @@ public class RestEventApisCreator extends RestEventApisCreatorImpl<ApiConfig> {
 
     @Override
     protected String subFunction() {
-        return "EventApi";
+        return "REST-Event-API";
     }
 
     @Override

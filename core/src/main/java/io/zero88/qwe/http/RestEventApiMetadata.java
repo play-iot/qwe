@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro.httpevent;
+package io.zero88.qwe.http;
 
 import io.zero88.qwe.eventbus.EventPattern;
 

@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro.httpevent;
+package io.zero88.qwe.http;
 
 import java.util.Collection;
 import java.util.Set;
@@ -57,12 +57,9 @@ public final class EventMethodDefinition implements JsonData {
      */
     @JsonIgnore
     private final int order;
-    @JsonIgnore
-    private final HttpPathRule rule;
 
     private EventMethodDefinition(String servicePath, boolean useRequestData, Set<EventMethodMapping> mapping) {
-        this.rule = new HttpPathRule();
-        this.servicePath = this.rule.createRegex(servicePath);
+        this.servicePath = HttpPathRuleLoader.getInstance().get().createRegex(servicePath);
         if (this.servicePath.endsWith("/.+")) {
             throw new IllegalArgumentException("Service path cannot ends with capture parameter");
         }
@@ -99,7 +96,7 @@ public final class EventMethodDefinition implements JsonData {
      * @param servicePath    Origin service path that represents for manipulating {@code resource} in default {@code
      *                       HTTPMethod} list
      * @param paramPath      Parameter path for manipulating {@code resource}
-     * @param useRequestData Whether use {@link RequestData} in parameter in {@link EventListener} or not
+     * @param useRequestData Whether you use {@link RequestData} in parameter in {@link EventListener} or not
      * @return new instance
      * @implNote {@code paramPath} will be append after {@code servicePath}. For example:
      *     <ul>
@@ -241,7 +238,9 @@ public final class EventMethodDefinition implements JsonData {
     public boolean test(String actualPath, EventAction action) {
         return mapping.stream().anyMatch(mapping -> {
             String regex = Strings.isBlank(mapping.getRegexPath())
-                           ? rule.createRegexPathForSearch(servicePath)
+                           ? HttpPathRuleLoader.getInstance()
+                                               .get()
+                                               .createRegexPathForSearch(servicePath)
                            : mapping.getRegexPath();
             return mapping.getAction() == action && actualPath.matches(regex);
         });
@@ -250,14 +249,17 @@ public final class EventMethodDefinition implements JsonData {
     public boolean test(String actualPath, HttpMethod method) {
         return mapping.stream().anyMatch(mapping -> {
             String regex = Strings.isBlank(mapping.getRegexPath())
-                           ? rule.createRegexPathForSearch(servicePath)
+                           ? HttpPathRuleLoader.getInstance()
+                                               .get()
+                                               .createRegexPathForSearch(servicePath)
                            : mapping.getRegexPath();
             return mapping.getMethod() == method && actualPath.matches(regex);
         });
     }
 
     public boolean test(String actualPath) {
-        return Strings.isNotBlank(actualPath) && actualPath.matches(rule.createRegexPathForSearch(servicePath));
+        return Strings.isNotBlank(actualPath) &&
+               actualPath.matches(HttpPathRuleLoader.getInstance().get().createRegexPathForSearch(servicePath));
     }
 
     public static class Builder {
@@ -265,7 +267,7 @@ public final class EventMethodDefinition implements JsonData {
         Boolean useRequestData = true;
 
         public EventMethodDefinition build() {
-            return new EventMethodDefinition(this.servicePath, this.useRequestData, this.mapping);
+            return new EventMethodDefinition(servicePath, useRequestData, mapping);
         }
 
     }

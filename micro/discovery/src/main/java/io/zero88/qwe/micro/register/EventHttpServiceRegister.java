@@ -17,7 +17,7 @@ import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.eventbus.EventBusClient;
-import io.zero88.qwe.micro.httpevent.EventHttpService;
+import io.zero88.qwe.http.EventHttpService;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
 

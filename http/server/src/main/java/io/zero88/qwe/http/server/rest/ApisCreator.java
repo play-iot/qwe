@@ -24,9 +24,9 @@ import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
 import io.zero88.qwe.http.server.rest.api.RestEventApi;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
-import io.zero88.qwe.micro.httpevent.EventMethodMapping;
-import io.zero88.qwe.micro.httpevent.RestEventApiMetadata;
+import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodMapping;
+import io.zero88.qwe.http.RestEventApiMetadata;
 
 import lombok.AccessLevel;
 import lombok.Getter;

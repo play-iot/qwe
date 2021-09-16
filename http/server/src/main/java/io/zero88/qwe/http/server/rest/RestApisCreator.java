@@ -12,7 +12,7 @@ import io.zero88.qwe.http.server.rest.api.RestApi;
 
 import lombok.NonNull;
 
-public class RestApiCreator extends ApisCreator<RestApi, ApiConfig> {
+public class RestApisCreator extends ApisCreator<RestApi, ApiConfig> {
 
     @Override
     public Function<HttpServerConfig, ApiConfig> lookupConfig() {
@@ -28,7 +28,7 @@ public class RestApiCreator extends ApisCreator<RestApi, ApiConfig> {
 
     @Override
     protected String subFunction() {
-        return "RestAPI";
+        return "REST-API";
     }
 
     @Override

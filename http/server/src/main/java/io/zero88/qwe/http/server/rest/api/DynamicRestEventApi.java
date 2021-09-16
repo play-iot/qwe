@@ -8,22 +8,22 @@ import java.util.stream.Collectors;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
-import io.zero88.qwe.micro.httpevent.EventMethodMapping;
+import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodMapping;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
 
 import lombok.NonNull;
 
-public interface DynamicEventRestApi extends DynamicRestApi {
+public interface DynamicRestEventApi extends DynamicRestApi {
 
-    static DynamicEventRestApi create(Record record) {
+    static DynamicRestEventApi create(Record record) {
         EventMethodDefinition definition = EventMethodDefinition.from(record.getLocation());
         Set<String> paths = Collections.unmodifiableSet(definition.getMapping()
                                                                   .stream()
                                                                   .map(EventMethodMapping::getCapturePath)
                                                                   .filter(Strings::isNotBlank)
                                                                   .collect(Collectors.toSet()));
-        return new DynamicEventRestApi() {
+        return new DynamicRestEventApi() {
 
             @Override
             public String path() { return definition.getServicePath(); }

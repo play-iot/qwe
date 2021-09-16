@@ -13,7 +13,7 @@ import io.zero88.qwe.micro.DiscoveryContext;
 import io.zero88.qwe.micro.DiscoveryPluginProvider;
 import io.zero88.qwe.micro.RecordHelper;
 import io.zero88.qwe.micro.ServiceDiscoveryApi;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 
 public class MockEventOneApiOneLocService extends ApplicationVerticle {
 

@@ -1,4 +1,4 @@
-package io.zero88.qwe.micro.httpevent;
+package io.zero88.qwe.http;
 
 import java.util.Collections;
 import java.util.Map;
@@ -10,7 +10,7 @@ import io.github.zero88.utils.Urls;
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventPattern;
-import io.zero88.qwe.micro.httpevent.RestEventApiMetadata.Builder;
+import io.zero88.qwe.http.RestEventApiMetadata.Builder;
 
 public class RestEventApiMetadataTest {
 
@@ -35,12 +35,7 @@ public class RestEventApiMetadataTest {
     }
 
     private ActionMethodMapping createMapping(EventAction action, HttpMethod method) {
-        return new ActionMethodMapping() {
-            @Override
-            public Map<EventAction, HttpMethod> get() {
-                return Collections.singletonMap(action, method);
-            }
-        };
+        return () -> Collections.singletonMap(action, method);
     }
 
     @Test

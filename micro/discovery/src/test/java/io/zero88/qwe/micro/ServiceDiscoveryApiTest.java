@@ -18,7 +18,7 @@ import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
 import io.zero88.qwe.micro.filter.ServiceStatusPredicateFactory;
-import io.zero88.qwe.micro.httpevent.EventMethodDefinition;
+import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.micro.mock.MockEventBusService;
 import io.zero88.qwe.micro.mock.MockServiceListener;
 
