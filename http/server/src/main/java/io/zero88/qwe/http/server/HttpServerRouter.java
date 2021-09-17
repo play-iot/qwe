@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.http.server.gateway.GatewayIndexApi;
+import io.zero88.qwe.http.server.gateway.GatewayApi;
 import io.zero88.qwe.http.server.rest.api.RestApi;
 import io.zero88.qwe.http.server.rest.api.RestEventApi;
 import io.zero88.qwe.http.server.ws.WebSocketServerPlan;
@@ -20,7 +20,7 @@ public final class HttpServerRouter implements HttpRuntimeConfig {
     private final Set<Class<? extends RestApi>> restApiClasses = new HashSet<>();
     private final Set<Class<? extends RestEventApi>> restEventApiClasses = new HashSet<>();
     private final Set<WebSocketServerPlan> webSocketEvents = new HashSet<>();
-    private Class<? extends RestEventApi> gatewayApiClass = GatewayIndexApi.class;
+    private final Set<Class<? extends GatewayApi>> gatewayApiClasses = new HashSet<>();
     private RouterBuilder customBuilder = RouterBuilder.NONE;
 
     @SafeVarargs
@@ -36,15 +36,14 @@ public final class HttpServerRouter implements HttpRuntimeConfig {
         return this;
     }
 
-    public HttpServerRouter registerEventBusSocket(WebSocketServerPlan... eventBusSocket) {
-        webSocketEvents.addAll(Arrays.stream(eventBusSocket).filter(Objects::nonNull).collect(Collectors.toList()));
+    @SafeVarargs
+    public final HttpServerRouter registerGatewayApi(Class<? extends GatewayApi>... gatewayApiClass) {
+        gatewayApiClasses.addAll(Arrays.stream(gatewayApiClass).filter(Objects::nonNull).collect(Collectors.toList()));
         return this;
     }
 
-    public HttpServerRouter registerGatewayApi(Class<? extends RestEventApi> gatewayApiClass) {
-        if (gatewayApiClass != null) {
-            this.gatewayApiClass = gatewayApiClass;
-        }
+    public HttpServerRouter registerEventBusSocket(WebSocketServerPlan... eventBusSocket) {
+        webSocketEvents.addAll(Arrays.stream(eventBusSocket).filter(Objects::nonNull).collect(Collectors.toList()));
         return this;
     }
 

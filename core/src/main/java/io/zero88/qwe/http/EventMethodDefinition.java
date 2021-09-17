@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldNameConstants;
 import lombok.extern.jackson.Jacksonized;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * It helps define a mapping between dynamic route by {@code regex path} and {@code HttpMethod} with {@code EventAction}
@@ -33,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @see EventMethodMapping
  */
-@Slf4j
 @Getter
 @FieldNameConstants
 @Jacksonized
@@ -42,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventMethodDefinition implements JsonData {
 
+    //TODO rename it to regex path
     @EqualsAndHashCode.Include
     private final String servicePath;
     /**
@@ -50,6 +49,7 @@ public final class EventMethodDefinition implements JsonData {
      * If {@code False}, only {@code path params} and {@code body} in {@code HTTP Request} will be included and omit
      * data in {@code HTTP Request query params} and {@code HTTP Request Header}
      */
+    //TODO move it into EventMethodMapping
     private final boolean useRequestData;
     private final Set<EventMethodMapping> mapping;
     /**
@@ -64,10 +64,6 @@ public final class EventMethodDefinition implements JsonData {
             throw new IllegalArgumentException("Service path cannot ends with capture parameter");
         }
         this.useRequestData = useRequestData;
-        if (!useRequestData) {
-            log.warn("HTTP Path [{}] is not using `RequestData` that will omit data in `HTTP Request Query` and " +
-                     "`HTTP Request Header`", this.servicePath);
-        }
         this.order = PriorityUtils.priorityOrder(this.servicePath.length());
         this.mapping = mapping;
     }

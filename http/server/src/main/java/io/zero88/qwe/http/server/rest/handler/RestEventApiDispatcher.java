@@ -2,21 +2,11 @@ package io.zero88.qwe.http.server.rest.handler;
 
 import java.util.Objects;
 
-import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
-import io.github.zero88.utils.Strings;
-import io.vertx.ext.web.RoutingContext;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventBusClient;
-import io.zero88.qwe.eventbus.EventMessage;
-import io.zero88.qwe.eventbus.EventPattern;
-import io.zero88.qwe.http.server.converter.RequestDataConverter;
+import io.vertx.ext.auth.User;
+import io.zero88.qwe.auth.UserInfo;
+import io.zero88.qwe.eventbus.DeliveryEvent;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * Represents for pushing data via {@code EventBus} then listen {@code reply message}. After receiving {@code reply
@@ -24,42 +14,20 @@ import lombok.experimental.Accessors;
  *
  * @see EventMessageResponseHandler
  */
-@RequiredArgsConstructor
-public class RestEventApiDispatcher implements RestEventRequestDispatcher {
+public interface RestEventApiDispatcher extends RestEventRequestDispatcher {
 
-    @Getter
-    @NonNull
-    @Accessors(fluent = true)
-    private final EventBusClient transporter;
-    @NonNull
-    private final String address;
-    @NonNull
-    private final EventAction action;
-    @NonNull
-    private final EventPattern pattern;
-    private final boolean useRequestData;
-
-    @SuppressWarnings("unchecked")
-    public static <T extends RestEventApiDispatcher> RestEventApiDispatcher create(Class<T> handler,
-                                                                                   EventBusClient eventbus,
-                                                                                   String address, EventAction action,
-                                                                                   EventPattern pattern,
-                                                                                   boolean useRequestData) {
-        Class<T> handlerClass = Objects.isNull(handler) ? (Class<T>) RestEventApiDispatcher.class : handler;
-        return ReflectionClass.createObject(handlerClass, new Arguments().put(EventBusClient.class, eventbus)
-                                                                         .put(String.class,
-                                                                              Strings.requireNotBlank(address))
-                                                                         .put(EventAction.class, action)
-                                                                         .put(EventPattern.class, pattern)
-                                                                         .put(boolean.class, useRequestData));
+    static RestEventApiDispatcher create(Class<RestEventApiDispatcher> cls) {
+        if (cls == null) {
+            return ReflectionClass.createObject(RestEventApiDispatcherImpl.class);
+        }
+        return Objects.requireNonNull(ReflectionClass.createObject(cls), "Unable create REST dispatcher");
     }
 
-    @Override
-    public void handle(RoutingContext context) {
-        EventMessage msg = useRequestData
-                           ? EventMessage.initial(action, RequestDataConverter.convert(context))
-                           : EventMessage.initial(action, RequestDataConverter.body(context));
-        dispatch(context, address, pattern, msg);
+    RestEventApiDispatcher setup(DeliveryEvent deliveryEvent, String sharedKey);
+
+    //TODO move to interceptor
+    static UserInfo convertUser(User user) {
+        return user == null ? null : UserInfo.create(user.get("username"), user.attributes());
     }
 
 }

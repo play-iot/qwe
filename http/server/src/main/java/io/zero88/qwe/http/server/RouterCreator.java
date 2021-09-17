@@ -14,17 +14,17 @@ import io.zero88.qwe.SharedDataLocalProxy;
 
 import lombok.NonNull;
 
-public interface RouterCreator<T extends RouterConfig> extends RouterBuilder, HasLogger, HttpSystem {
+public interface RouterCreator<C extends RouterConfig> extends RouterBuilder, HasLogger, HttpSystem {
 
     default Logger logger() {
         return LoggerFactory.getLogger(RouterCreator.class);
     }
 
-    Function<HttpServerConfig, T> lookupConfig();
+    Function<HttpServerConfig, C> lookupConfig();
 
     @Override
     default Router setup(Vertx vertx, Router rootRouter, HttpServerConfig config, HttpServerPluginContext context) {
-        T cfg = lookupConfig().apply(config);
+        C cfg = lookupConfig().apply(config);
         if (!cfg.isEnabled() || !validate(cfg)) {
             return rootRouter;
         }
@@ -34,7 +34,7 @@ public interface RouterCreator<T extends RouterConfig> extends RouterBuilder, Ha
         return rootRouter;
     }
 
-    default boolean validate(T config) {
+    default boolean validate(C config) {
         return true;
     }
 
@@ -42,11 +42,11 @@ public interface RouterCreator<T extends RouterConfig> extends RouterBuilder, Ha
         return function();
     }
 
-    default String routerPath(@NonNull T config) {
+    default String routerPath(@NonNull C config) {
         return mountPoint(config);
     }
 
-    default @NonNull String mountPoint(@NonNull T config) {
+    default @NonNull String mountPoint(@NonNull C config) {
         return config.getPath();
     }
 
@@ -59,6 +59,6 @@ public interface RouterCreator<T extends RouterConfig> extends RouterBuilder, Ha
      * @return router
      * @see RouterBuilder#setup(Vertx, Router, HttpServerConfig, HttpServerPluginContext)
      */
-    @NonNull Router subRouter(@NonNull SharedDataLocalProxy sharedData, @NonNull Path pluginDir, @NonNull T config);
+    @NonNull Router subRouter(@NonNull SharedDataLocalProxy sharedData, @NonNull Path pluginDir, @NonNull C config);
 
 }

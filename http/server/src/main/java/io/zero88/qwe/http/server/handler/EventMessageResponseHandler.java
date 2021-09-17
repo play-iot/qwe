@@ -2,7 +2,6 @@ package io.zero88.qwe.http.server.handler;
 
 import java.util.Objects;
 
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
@@ -16,7 +15,7 @@ import io.zero88.qwe.http.HttpUtils;
  *
  * @see EventMessage
  */
-public final class EventMessageResponseHandler implements Handler<RoutingContext> {
+public final class EventMessageResponseHandler implements ResponseWriter {
 
     @Override
     public void handle(RoutingContext context) {

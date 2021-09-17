@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.HasLogger;
@@ -37,7 +36,7 @@ import lombok.NonNull;
  *
  * @see DynamicRestApi
  */
-public interface DynamicContextDispatcher extends Handler<RoutingContext>, HasLogger, GatewaySystem {
+public interface DynamicContextDispatcher extends RequestDispatcher, HasLogger, GatewaySystem {
 
     static DynamicContextDispatcher create(@NonNull DynamicRestApi api, ServiceDiscoveryApi dispatcher,
                                            String gatewayPath) {

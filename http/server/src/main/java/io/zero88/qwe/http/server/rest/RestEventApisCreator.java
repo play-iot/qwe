@@ -6,12 +6,12 @@ import io.zero88.qwe.http.server.HttpRuntimeConfig;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.config.ApiConfig;
-import io.zero88.qwe.http.server.rest.ApisCreator.RestEventApisCreatorImpl;
+import io.zero88.qwe.http.server.rest.api.RestEventApi;
 
 /**
  * @see RouterCreator
  */
-public class RestEventApisCreator extends RestEventApisCreatorImpl<ApiConfig> {
+public class RestEventApisCreator extends RestEventApisCreatorImpl<RestEventApi, ApiConfig> {
 
     @Override
     protected String subFunction() {

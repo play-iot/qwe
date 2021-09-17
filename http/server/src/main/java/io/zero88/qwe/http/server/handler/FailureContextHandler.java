@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.server.handler;
 
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
@@ -10,7 +9,7 @@ import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.http.HttpStatusMappingLoader;
 import io.zero88.qwe.http.HttpUtils;
 
-public final class FailureContextHandler implements Handler<RoutingContext>, HasLogger {
+public final class FailureContextHandler implements ResponseWriter, HasLogger {
 
     @Override
     public void handle(RoutingContext failureContext) {
