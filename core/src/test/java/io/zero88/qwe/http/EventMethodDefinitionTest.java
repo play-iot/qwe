@@ -4,17 +4,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.exceptions.InvalidUrlException;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
-import io.vertx.core.http.HttpMethod;
 
 public class EventMethodDefinitionTest {
 
@@ -80,7 +79,6 @@ public class EventMethodDefinitionTest {
             return test;
         };
         EventMethodDefinition definition = EventMethodDefinition.create("/translate", mapping);
-        Assertions.assertTrue(definition.isUseRequestData());
         Assertions.assertEquals(EventAction.GET_LIST, definition.search("/translate", HttpMethod.GET));
         Assertions.assertEquals(EventAction.CREATE, definition.search("/translate", HttpMethod.POST));
         Assertions.assertEquals(EventAction.UPDATE, definition.search("/translate", HttpMethod.PUT));
@@ -89,104 +87,140 @@ public class EventMethodDefinitionTest {
     }
 
     @Test
-    public void test_has_param_but_not_at_last() throws JSONException {
+    public void test_has_param_but_not_at_last() {
         EventMethodDefinition definition = EventMethodDefinition.create("/p/:pid/data", ActionMethodMapping.by(
             ActionMethodMapping.CRD_MAP,
             Arrays.asList(EventAction.GET_ONE, EventAction.CREATE_OR_UPDATE, EventAction.REMOVE)));
-        Assertions.assertTrue(definition.isUseRequestData());
         Assertions.assertEquals(EventAction.GET_ONE, definition.search("/p/123/data", HttpMethod.GET));
         Assertions.assertEquals(EventAction.CREATE_OR_UPDATE, definition.search("/p/123/data", HttpMethod.PUT));
         Assertions.assertEquals(EventAction.REMOVE, definition.search("/p/123/data", HttpMethod.DELETE));
-        JSONAssert.assertEquals(
-            "{\"servicePath\":\"/p/[^/]+/data\",\"mapping\":[{\"action\":\"GET_ONE\",\"method\":\"GET\"," +
-            "\"capturePath\":\"/p/:pid/data\",\"regexPath\":\"/p/[^/]+/data\"},{\"action\":\"CREATE_OR_UPDATE\"," +
-            "\"method\":\"PUT\",\"capturePath\":\"/p/:pid/data\",\"regexPath\":\"/p/[^/]+/data\"}," +
-            "{\"action\":\"REMOVE\",\"method\":\"DELETE\",\"capturePath\":\"/p/:pid/data\"," +
-            "\"regexPath\":\"/p/[^/]+/data\"}],\"useRequestData\":true}", definition.toJson().encode(),
-            JSONCompareMode.LENIENT);
+        JsonHelper.assertJson(new JsonObject(
+            "{\"regexPath\":\"/p/[^/]+/data\",\"mapping\":[{\"action\":\"GET_ONE\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/p/:pid/data\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false," +
+            "\"authz\":[]}},{\"action\":\"CREATE_OR_UPDATE\",\"method\":\"PUT\",\"capturePath\":\"/p/:pid/data\"," +
+            "\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"REMOVE\"," +
+            "\"method\":\"DELETE\",\"capturePath\":\"/p/:pid/data\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}}]}"), definition.toJson());
     }
 
     @Test
     public void test_search() {
         EventMethodDefinition definition = EventMethodDefinition.createDefault("/abc", "/:id");
-        Assertions.assertTrue(definition.isUseRequestData());
         Assertions.assertEquals(EventAction.GET_LIST, definition.search("/abc", HttpMethod.GET));
         Assertions.assertEquals(EventAction.GET_ONE, definition.search("/abc/xyz", HttpMethod.GET));
         Assertions.assertEquals(EventAction.CREATE, definition.search("/abc", HttpMethod.POST));
         Assertions.assertEquals(EventAction.UPDATE, definition.search("/abc/xyz", HttpMethod.PUT));
         Assertions.assertEquals(EventAction.PATCH, definition.search("/abc/xyz", HttpMethod.PATCH));
         Assertions.assertEquals(EventAction.REMOVE, definition.search("/abc/xyz", HttpMethod.DELETE));
+        JsonHelper.assertJson(new JsonObject(
+            "{\"regexPath\":\"/abc\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/abc\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}}," +
+            "{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath\":\"/abc\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"GET_ONE\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/abc/:id\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}}," +
+            "{\"action\":\"UPDATE\",\"method\":\"PUT\",\"capturePath\":\"/abc/:id\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +
+            "\"capturePath\":\"/abc/:id\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}}," +
+            "{\"action\":\"REMOVE\",\"method\":\"DELETE\",\"capturePath\":\"/abc/:id\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}}]}"), definition.toJson());
     }
 
     @Test
     public void test_search_multiParam_pattern_has_resource_between() {
         EventMethodDefinition definition = EventMethodDefinition.createDefault("/client/:clientId/product",
                                                                                "/:productId");
-        Assertions.assertTrue(definition.isUseRequestData());
         Assertions.assertEquals(EventAction.GET_LIST, definition.search("/client/123/product", HttpMethod.GET));
         Assertions.assertEquals(EventAction.GET_ONE, definition.search("/client/123/product/456", HttpMethod.GET));
         Assertions.assertEquals(EventAction.CREATE, definition.search("/client/123/product", HttpMethod.POST));
         Assertions.assertEquals(EventAction.UPDATE, definition.search("/client/123/product/456", HttpMethod.PUT));
         Assertions.assertEquals(EventAction.PATCH, definition.search("/client/123/product/456", HttpMethod.PATCH));
         Assertions.assertEquals(EventAction.REMOVE, definition.search("/client/123/product/456", HttpMethod.DELETE));
+        JsonHelper.assertJson(new JsonObject(
+            "{\"regexPath\":\"/client/[^/]+/product\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/client/:clientId/product\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false," +
+            "\"authz\":[]}},{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath\":\"/client/:clientId/product\"," +
+            "\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"GET_ONE\"," +
+            "\"method\":\"GET\",\"capturePath\":\"/client/:clientId/product/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"UPDATE\",\"method\":\"PUT\"," +
+            "\"capturePath\":\"/client/:clientId/product/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +
+            "\"capturePath\":\"/client/:clientId/product/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"REMOVE\",\"method\":\"DELETE\"," +
+            "\"capturePath\":\"/client/:clientId/product/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}}]}"), definition.toJson());
     }
 
     @Test
     public void test_search_multiParam_pattern_no_resource_between() {
         EventMethodDefinition definition = EventMethodDefinition.createDefault("/client/:clientId/", "/:productId");
-        Assertions.assertTrue(definition.isUseRequestData());
         Assertions.assertEquals(EventAction.GET_LIST, definition.search("/client/123/", HttpMethod.GET));
         Assertions.assertEquals(EventAction.GET_ONE, definition.search("/client/123/456", HttpMethod.GET));
         Assertions.assertEquals(EventAction.CREATE, definition.search("/client/123/", HttpMethod.POST));
         Assertions.assertEquals(EventAction.UPDATE, definition.search("/client/123/456", HttpMethod.PUT));
         Assertions.assertEquals(EventAction.PATCH, definition.search("/client/123/456", HttpMethod.PATCH));
         Assertions.assertEquals(EventAction.REMOVE, definition.search("/client/123/456", HttpMethod.DELETE));
+        JsonObject expected = new JsonObject(
+            "{\"regexPath\":\"/client/.+/\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/client/:clientId/\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false," +
+            "\"authz\":[]}},{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath\":\"/client/:clientId/\"," +
+            "\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"GET_ONE\"," +
+            "\"method\":\"GET\",\"capturePath\":\"/client/:clientId/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"UPDATE\",\"method\":\"PUT\"," +
+            "\"capturePath\":\"/client/:clientId/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +
+            "\"capturePath\":\"/client/:clientId/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"REMOVE\",\"method\":\"DELETE\"," +
+            "\"capturePath\":\"/client/:clientId/:productId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}}]}");
+        JsonHelper.assertJson(expected, definition.toJson());
     }
 
     @Test
-    public void test_to_json() throws JSONException {
+    public void test_to_json() {
         EventMethodDefinition definition = EventMethodDefinition.createDefault("/abc", "/:id");
-        System.out.println(definition.toJson());
-        Assertions.assertTrue(definition.isUseRequestData());
-        JSONAssert.assertEquals("{\"servicePath\":\"/abc\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"}," +
-                                "{\"action\":\"CREATE\",\"method\":\"POST\"},{\"action\":\"UPDATE\"," +
-                                "\"method\":\"PUT\",\"capturePath\":\"/abc/:id\",\"regexPath\":\"/abc/.+\"}," +
-                                "{\"action\":\"GET_ONE\",\"method\":\"GET\",\"capturePath\":\"/abc/:id\"," +
-                                "\"regexPath\":\"/abc/.+\"},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +
-                                "\"capturePath\":\"/abc/:id\",\"regexPath\":\"/abc/.+\"},{\"action\":\"REMOVE\"," +
-                                "\"method\":\"DELETE\",\"capturePath\":\"/abc/:id\",\"regexPath\":\"/abc/.+\"}]}\n",
-                                definition.toJson().encode(), JSONCompareMode.LENIENT);
+        JsonObject expected = new JsonObject(
+            "{\"regexPath\":\"/abc\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/abc\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}}," +
+            "{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath\":\"/abc\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"GET_ONE\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/abc/:id\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}}," +
+            "{\"action\":\"UPDATE\",\"method\":\"PUT\",\"capturePath\":\"/abc/:id\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +
+            "\"capturePath\":\"/abc/:id\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}}," +
+            "{\"action\":\"REMOVE\",\"method\":\"DELETE\",\"capturePath\":\"/abc/:id\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}}]}");
+        JsonHelper.assertJson(expected, definition.toJson());
     }
 
     @Test
-    public void test_to_json_multiParams() throws JSONException {
+    public void test_to_json_multiParams() {
         EventMethodDefinition definition = EventMethodDefinition.createDefault("/c/:cId/p", "/:pId");
-        System.out.println(definition.toJson());
-        Assertions.assertTrue(definition.isUseRequestData());
-        JSONAssert.assertEquals("{\"servicePath\":\"/c/[^/]+/p\",\"mapping\":[{\"action\":\"GET_LIST\"," +
-                                "\"method\":\"GET\",\"capturePath\":\"/c/:cId/p\",\"regexPath\":\"/c/[^/]+/p\"}," +
-                                "{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath\":\"/c/:cId/p\"," +
-                                "\"regexPath\":\"/c/[^/]+/p\"},{\"action\":\"UPDATE\",\"method\":\"PUT\"," +
-                                "\"capturePath\":\"/c/:cId/p/:pId\",\"regexPath\":\"/c/[^/]+/p/.+\"}," +
-                                "{\"action\":\"GET_ONE\",\"method\":\"GET\",\"capturePath\":\"/c/:cId/p/:pId\"," +
-                                "\"regexPath\":\"/c/[^/]+/p/.+\"},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +
-                                "\"capturePath\":\"/c/:cId/p/:pId\",\"regexPath\":\"/c/[^/]+/p/.+\"}," +
-                                "{\"action\":\"REMOVE\",\"method\":\"DELETE\",\"capturePath\":\"/c/:cId/p/:pId\"," +
-                                "\"regexPath\":\"/c/[^/]+/p/.+\"}]}", definition.toJson().encode(),
-                                JSONCompareMode.LENIENT);
+        JsonObject expected = new JsonObject(
+            "{\"regexPath\":\"/c/[^/]+/p\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/c/:cId/p\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}}," +
+            "{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath\":\"/c/:cId/p\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"GET_ONE\",\"method\":\"GET\"," +
+            "\"capturePath\":\"/c/:cId/p/:pId\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false," +
+            "\"authz\":[]}},{\"action\":\"UPDATE\",\"method\":\"PUT\",\"capturePath\":\"/c/:cId/p/:pId\"," +
+            "\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"PATCH\"," +
+            "\"method\":\"PATCH\",\"capturePath\":\"/c/:cId/p/:pId\",\"useRequestData\":true," +
+            "\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"REMOVE\",\"method\":\"DELETE\"," +
+            "\"capturePath\":\"/c/:cId/p/:pId\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false," +
+            "\"authz\":[]}}]}");
+        JsonHelper.assertJson(expected, definition.toJson());
     }
 
     @Test
     public void test_from_json() {
         EventMethodDefinition definition = JsonData.from(
-            "{\"servicePath\":\"/abc\",\"mapping\":[{\"action\":\"GET_LIST\"," +
-            "\"method\":\"GET\"},{\"action\":\"CREATE\",\"method\":\"POST\"},{\"action\":\"UPDATE\"," +
-            "\"method\":\"PUT\",\"capturePath\":\"/abc/:id\"},{\"action\":\"GET_ONE\",\"method\":\"GET\"," +
-            "\"capturePath\":\"/abc/:id\"},{\"action\":\"PATCH\",\"method\":\"PATCH\"," +
-            "\"capturePath\":\"/abc/:id\"},{\"action\":\"REMOVE\",\"method\":\"DELETE\"," +
-            "\"capturePath\":\"/abc/:id\"}]}", EventMethodDefinition.class);
+            "{\"regexPath\":\"/abc\",\"mapping\":[{\"action\":\"GET_LIST\"," +
+            "\"method\":\"GET\",\"capturePath\":\"/abc\"},{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath" +
+            "\":\"/abc\"},{\"action\":\"UPDATE\",\"method\":\"PUT\",\"capturePath\":\"/abc/:id\"}," +
+            "{\"action\":\"GET_ONE\",\"method\":\"GET\",\"capturePath\":\"/abc/:id\"}," +
+            "{\"action\":\"PATCH\",\"method\":\"PATCH\",\"capturePath\":\"/abc/:id\"}," +
+            "{\"action\":\"REMOVE\",\"method\":\"DELETE\",\"capturePath\":\"/abc/:id\"}]}",
+            EventMethodDefinition.class);
         System.out.println(definition.toJson());
-        Assertions.assertTrue(definition.isUseRequestData());
         Assertions.assertEquals(EventAction.GET_LIST, definition.search("/abc", HttpMethod.GET));
         Assertions.assertEquals(EventAction.GET_ONE, definition.search("/abc/xyz", HttpMethod.GET));
         Assertions.assertEquals(EventAction.CREATE, definition.search("/abc", HttpMethod.POST));
@@ -198,10 +232,8 @@ public class EventMethodDefinitionTest {
     @Test
     public void test_from_json_not_use_request_data() {
         EventMethodDefinition definition = JsonData.from(
-            "{\"servicePath\":\"/abc\",\"useRequestData\":false, \"mapping\":[{\"action\":\"GET_LIST\"," +
-            "\"method\":\"GET\"}]}", EventMethodDefinition.class);
-        System.out.println(definition.toJson());
-        Assertions.assertFalse(definition.isUseRequestData());
+            "{\"regexPath\":\"/abc\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
+            "\"useRequestData\":false,\"capturePath\":\"/abc\"}]}", EventMethodDefinition.class);
         Assertions.assertEquals(EventAction.GET_LIST, definition.search("/abc", HttpMethod.GET));
     }
 

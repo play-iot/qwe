@@ -7,7 +7,7 @@ import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.config.ApiGatewayConfig;
 import io.zero88.qwe.http.server.rest.RestEventApisCreatorImpl;
 
-public class GatewayRouterCreator extends RestEventApisCreatorImpl<GatewayApi, ApiGatewayConfig> {
+public final class GatewayRouterCreator extends RestEventApisCreatorImpl<GatewayApi, ApiGatewayConfig> {
 
     @Override
     public String function() {

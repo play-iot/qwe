@@ -48,13 +48,6 @@ public interface DynamicRestApi extends HasServiceType {
     int order();
 
     /**
-     * Identify using whether {@code RequestData} or not
-     *
-     * @return {@code true} if using {@code RequestData}
-     */
-    boolean useRequestData();
-
-    /**
      * It is capturePath paths, might be empty
      *
      * @return alternative paths

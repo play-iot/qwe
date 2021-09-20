@@ -1,6 +1,7 @@
 package io.zero88.qwe.http;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,15 +17,13 @@ import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.exceptions.ServiceNotFoundException;
 import io.zero88.qwe.utils.PriorityUtils;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.experimental.FieldNameConstants;
-import lombok.extern.jackson.Jacksonized;
 
 /**
  * It helps define a mapping between dynamic route by {@code regex path} and {@code HttpMethod} with {@code EventAction}
@@ -33,24 +32,15 @@ import lombok.extern.jackson.Jacksonized;
  * @see EventMethodMapping
  */
 @Getter
-@FieldNameConstants
-@Jacksonized
-@Builder(builderClassName = "Builder")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventMethodDefinition implements JsonData {
 
-    //TODO rename it to regex path
-    @EqualsAndHashCode.Include
-    private final String servicePath;
     /**
-     * Identify using {@link RequestData} or not. Default is {@code True}
-     * <p>
-     * If {@code False}, only {@code path params} and {@code body} in {@code HTTP Request} will be included and omit
-     * data in {@code HTTP Request query params} and {@code HTTP Request Header}
+     * The service regex path
      */
-    //TODO move it into EventMethodMapping
-    private final boolean useRequestData;
+    @EqualsAndHashCode.Include
+    private final String regexPath;
     private final Set<EventMethodMapping> mapping;
     /**
      * Web Router order
@@ -58,13 +48,12 @@ public final class EventMethodDefinition implements JsonData {
     @JsonIgnore
     private final int order;
 
-    private EventMethodDefinition(String servicePath, boolean useRequestData, Set<EventMethodMapping> mapping) {
-        this.servicePath = HttpPathRuleLoader.getInstance().get().createRegex(servicePath);
-        if (this.servicePath.endsWith("/.+")) {
-            throw new IllegalArgumentException("Service path cannot ends with capture parameter");
+    private EventMethodDefinition(String regexPath, Set<EventMethodMapping> mapping) {
+        if (regexPath.endsWith("/.+")) {
+            throw new IllegalArgumentException("Service regex path cannot end with capture parameter");
         }
-        this.useRequestData = useRequestData;
-        this.order = PriorityUtils.priorityOrder(this.servicePath.length());
+        this.regexPath = regexPath;
+        this.order = PriorityUtils.priorityOrder(regexPath.length());
         this.mapping = mapping;
     }
 
@@ -182,35 +171,39 @@ public final class EventMethodDefinition implements JsonData {
             throw new IllegalStateException("Has duplicate HTTP method for same endpoint");
         }
         final String cPath = Strings.isBlank(pPath) ? sPath : Urls.combinePath(sPath, pPath);
-        Set<EventMethodMapping> map = mapping.get()
-                                             .entrySet()
-                                             .stream()
-                                             .map(entry -> EventMethodMapping.builder()
-                                                                             .action(entry.getKey())
-                                                                             .method(entry.getValue())
-                                                                             .servicePath(sPath)
-                                                                             .capturePath(cPath)
-                                                                             .build())
-                                             .collect(Collectors.toSet());
-        return EventMethodDefinition.builder().servicePath(sPath).useRequestData(useRequestData).mapping(map).build();
+        final HttpPathRule rule = HttpPathRuleLoader.getInstance().get();
+        return create(sPath, mapping.get()
+                                    .entrySet()
+                                    .stream()
+                                    .map(e -> new EventMethodMapping(e.getKey(), e.getValue(),
+                                                                     rule.createCapture(e.getValue(), e.getKey(), sPath,
+                                                                                        cPath), useRequestData))
+                                    .collect(Collectors.toSet()));
+    }
+
+    public static EventMethodDefinition create(String servicePath, Set<EventMethodMapping> mapping) {
+        return new EventMethodDefinition(HttpPathRuleLoader.getInstance().get().createRegex(servicePath), mapping);
     }
 
     public static EventMethodDefinition from(@NonNull JsonObject json) {
-        return EventMethodDefinition.builder()
-                                    .servicePath(json.getString(Fields.servicePath))
-                                    .useRequestData(json.getBoolean(Fields.useRequestData, true))
-                                    .mapping(json.getJsonArray(Fields.mapping, new JsonArray())
-                                                 .stream()
-                                                 .map(o -> JsonData.from(o, EventMethodMapping.class))
-                                                 .collect(Collectors.toSet()))
-                                    .build();
+        return new EventMethodDefinition(
+            HttpPathRuleLoader.getInstance().get().createRegex(json.getString("regexPath")),
+            json.getJsonArray("mapping", new JsonArray())
+                .stream()
+                .map(o -> JsonData.from(o, EventMethodMapping.class))
+                .collect(Collectors.toSet()));
+    }
+
+    @JsonCreator
+    public static EventMethodDefinition create(Map<String, Object> json) {
+        return from(JsonObject.mapFrom(json));
     }
 
     public Collection<EventMethodMapping> getMapping() {
         return mapping.stream()
                       .sorted((o1, o2) -> compare(o1.method(), o2.method()))
-                      .sorted((o1, o2) -> compare(Strings.fallback(o1.getCapturePath(), servicePath),
-                                                  Strings.fallback(o2.getCapturePath(), servicePath)))
+                      .sorted((o1, o2) -> compare(Strings.fallback(o1.getCapturePath(), regexPath),
+                                                  Strings.fallback(o2.getCapturePath(), regexPath)))
                       .collect(Collectors.toList());
     }
 
@@ -219,16 +212,19 @@ public final class EventMethodDefinition implements JsonData {
         return c == 0 ? n1.compareTo(n2) : c;
     }
 
-    public EventAction search(String actualPath, @NonNull HttpMethod method) {
+    public EventMethodMapping searchMapping(String actualPath, @NonNull HttpMethod method) {
         return mapping.stream()
                       .filter(mapping -> {
-                          String regex = Strings.isBlank(mapping.getRegexPath()) ? servicePath : mapping.getRegexPath();
+                          String regex = Strings.isBlank(mapping.getRegexPath()) ? regexPath : mapping.getRegexPath();
                           return mapping.getMethod() == method && actualPath.matches(regex);
                       })
-                      .map(EventMethodMapping::getAction)
                       .findFirst()
                       .orElseThrow(() -> new ServiceNotFoundException(
                           Strings.format("Unsupported HTTP method [{0}][{1}]", method, actualPath)));
+    }
+
+    public EventAction search(String actualPath, @NonNull HttpMethod method) {
+        return searchMapping(actualPath, method).getAction();
     }
 
     public boolean test(String actualPath, EventAction action) {
@@ -236,7 +232,7 @@ public final class EventMethodDefinition implements JsonData {
             String regex = Strings.isBlank(mapping.getRegexPath())
                            ? HttpPathRuleLoader.getInstance()
                                                .get()
-                                               .createRegexPathForSearch(servicePath)
+                                               .createRegexPathForSearch(regexPath)
                            : mapping.getRegexPath();
             return mapping.getAction() == action && actualPath.matches(regex);
         });
@@ -247,7 +243,7 @@ public final class EventMethodDefinition implements JsonData {
             String regex = Strings.isBlank(mapping.getRegexPath())
                            ? HttpPathRuleLoader.getInstance()
                                                .get()
-                                               .createRegexPathForSearch(servicePath)
+                                               .createRegexPathForSearch(regexPath)
                            : mapping.getRegexPath();
             return mapping.getMethod() == method && actualPath.matches(regex);
         });
@@ -255,17 +251,7 @@ public final class EventMethodDefinition implements JsonData {
 
     public boolean test(String actualPath) {
         return Strings.isNotBlank(actualPath) &&
-               actualPath.matches(HttpPathRuleLoader.getInstance().get().createRegexPathForSearch(servicePath));
-    }
-
-    public static class Builder {
-
-        Boolean useRequestData = true;
-
-        public EventMethodDefinition build() {
-            return new EventMethodDefinition(servicePath, useRequestData, mapping);
-        }
-
+               actualPath.matches(HttpPathRuleLoader.getInstance().get().createRegexPathForSearch(regexPath));
     }
 
 }

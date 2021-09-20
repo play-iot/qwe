@@ -7,6 +7,7 @@ import io.vertx.ext.auth.User;
 import io.zero88.qwe.auth.UserInfo;
 import io.zero88.qwe.eventbus.DeliveryEvent;
 import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
+import io.zero88.qwe.http.server.handler.RestEventRequestDispatcher;
 
 /**
  * Represents for pushing data via {@code EventBus} then listen {@code reply message}. After receiving {@code reply
@@ -23,7 +24,7 @@ public interface RestEventApiDispatcher extends RestEventRequestDispatcher {
         return Objects.requireNonNull(ReflectionClass.createObject(cls), "Unable create REST dispatcher");
     }
 
-    RestEventApiDispatcher setup(DeliveryEvent deliveryEvent, String sharedKey);
+    RestEventApiDispatcher setup(String sharedKey, DeliveryEvent deliveryEvent);
 
     //TODO move to interceptor
     static UserInfo convertUser(User user) {

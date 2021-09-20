@@ -12,7 +12,7 @@ import io.zero88.qwe.http.server.rest.api.RestApi;
 
 import lombok.NonNull;
 
-public class RestApisCreator extends ApisCreator<RestApi, ApiConfig> {
+public final class RestApisCreator extends ApisCreator<RestApi, ApiConfig> {
 
     @Override
     public Function<HttpServerConfig, ApiConfig> lookupConfig() {
@@ -20,7 +20,8 @@ public class RestApisCreator extends ApisCreator<RestApi, ApiConfig> {
     }
 
     @Override
-    public @NonNull Router subRouter(@NonNull SharedDataLocalProxy sharedData, @NonNull Path pluginDir, @NonNull ApiConfig config) {
+    public @NonNull Router subRouter(@NonNull SharedDataLocalProxy sharedData, @NonNull Path pluginDir,
+                                     @NonNull ApiConfig config) {
         Object[] classes = getApis().toArray(new Class[] {});
         //TODO register RestAPI
         return Router.router(sharedData.getVertx());

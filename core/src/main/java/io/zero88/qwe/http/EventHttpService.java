@@ -1,15 +1,15 @@
 package io.zero88.qwe.http;
 
-import java.util.Set;
-
 import io.zero88.qwe.eventbus.EventListener;
 
 /**
- * Represents Event HTTP service.
+ * Represents an Event HTTP service that handles an incoming request from RESTful API.
  *
+ * @see EventHttpApi
+ * @see EventListener
  * @since 1.0.0
  */
-public interface EventHttpService extends EventListener {
+public interface EventHttpService extends EventHttpApi, EventListener {
 
     /**
      * Declares {@code API Service} name.
@@ -26,16 +26,7 @@ public interface EventHttpService extends EventListener {
      * @since 1.0.0
      */
     default String address() {
-        return this.getClass().getName();
+        return getClass().getName();
     }
-
-    /**
-     * Declares router definitions.
-     *
-     * @return router mapping between {@code EventAction} and {@code HttpMethod}
-     * @see EventMethodDefinition
-     * @since 1.0.0
-     */
-    Set<EventMethodDefinition> definitions();
 
 }

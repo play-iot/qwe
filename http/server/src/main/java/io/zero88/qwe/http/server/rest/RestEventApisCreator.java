@@ -11,7 +11,7 @@ import io.zero88.qwe.http.server.rest.api.RestEventApi;
 /**
  * @see RouterCreator
  */
-public class RestEventApisCreator extends RestEventApisCreatorImpl<RestEventApi, ApiConfig> {
+public final class RestEventApisCreator extends RestEventApisCreatorImpl<RestEventApi, ApiConfig> {
 
     @Override
     protected String subFunction() {

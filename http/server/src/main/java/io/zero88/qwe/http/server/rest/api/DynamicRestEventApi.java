@@ -26,13 +26,10 @@ public interface DynamicRestEventApi extends DynamicRestApi {
         return new DynamicRestEventApi() {
 
             @Override
-            public String path() { return definition.getServicePath(); }
+            public String path() { return definition.getRegexPath(); }
 
             @Override
             public int order() { return definition.getOrder(); }
-
-            @Override
-            public boolean useRequestData() { return definition.isUseRequestData(); }
 
             @Override
             public Optional<Set<String>> alternativePaths() {

@@ -2,21 +2,22 @@ package io.zero88.qwe.http;
 
 import java.util.Objects;
 
+import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpMethod;
 import io.zero88.qwe.auth.ReqAuthDefinition;
 import io.zero88.qwe.dto.JsonData;
+import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EventAction;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.extern.jackson.Jacksonized;
 
 /**
  * Represents for a relationship between {@code EventAction}, {@code HttpMethod} and {@code url capture path}
@@ -25,8 +26,6 @@ import lombok.extern.jackson.Jacksonized;
  * @see HttpMethod
  */
 @Getter
-@Jacksonized
-@Builder(builderClassName = "Builder")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventMethodMapping implements JsonData {
@@ -38,37 +37,42 @@ public final class EventMethodMapping implements JsonData {
     @NonNull
     private final HttpMethod method;
     private final String capturePath;
-    /**
-     * Optional
-     */
     @Include
+    @JsonIgnore
     private final String regexPath;
-    @Default
-    private final ReqAuthDefinition auth = ReqAuthDefinition.noAuth();
+    /**
+     * Identify using {@link RequestData} or not. Default is {@code True}
+     * <p>
+     * If {@code False}, only {@code path params} and {@code body} in {@code HTTP Request} will be included and omit
+     * data in {@code HTTP Request query params} and {@code HTTP Request Header}
+     */
+    private final boolean useRequestData;
+    private final ReqAuthDefinition auth;
+
+    public EventMethodMapping(EventAction action, HttpMethod method, String capturePath) {
+        this(action, method, capturePath, true, null);
+    }
+
+    public EventMethodMapping(EventAction action, HttpMethod method, String capturePath, boolean useRequestData) {
+        this(action, method, capturePath, useRequestData, null);
+    }
+
+    @JsonCreator
+    public EventMethodMapping(@JsonProperty("action") EventAction action, @JsonProperty("method") HttpMethod method,
+                              @JsonProperty("capturePath") String capturePath,
+                              @JsonProperty("useRequestData") Boolean useRequestData,
+                              @JsonProperty("auth") ReqAuthDefinition auth) {
+        this.action = Objects.requireNonNull(action, "Missing event action");
+        this.method = Objects.requireNonNull(method, "Missing HTTP method");
+        this.capturePath = Strings.requireNotBlank(capturePath, "Missing capture path");
+        this.regexPath = HttpPathRuleLoader.getInstance().get().createRegex(capturePath);
+        this.useRequestData = useRequestData == null || useRequestData;
+        this.auth = Objects.isNull(auth) ? ReqAuthDefinition.noAuth() : auth;
+    }
 
     @JsonProperty("method")
     public String method() {
         return getMethod().name();
-    }
-
-    public static class Builder {
-
-        private String servicePath;
-
-        public Builder servicePath(String servicePath) {
-            this.servicePath = servicePath;
-            return this;
-        }
-
-        public EventMethodMapping build() {
-            final HttpPathRule rule = HttpPathRuleLoader.getInstance().get();
-            capturePath = rule.createCapture(method, action, servicePath, capturePath);
-            if (Objects.nonNull(capturePath) && Objects.isNull(regexPath)) {
-                regexPath = rule.createRegex(capturePath);
-            }
-            return new EventMethodMapping(action, method, capturePath, regexPath, auth$value);
-        }
-
     }
 
 }

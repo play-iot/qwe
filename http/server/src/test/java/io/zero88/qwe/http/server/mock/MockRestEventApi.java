@@ -1,17 +1,21 @@
 package io.zero88.qwe.http.server.mock;
 
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.http.EventMethodDefinition;
-import io.zero88.qwe.http.server.config.ApiConfig;
-import io.zero88.qwe.http.server.rest.api.RestEventApi.AbstractRestEventApi;
+import java.util.Collections;
+import java.util.Set;
 
-public class MockRestEventApi extends AbstractRestEventApi {
+import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.http.server.rest.api.RestEventApi;
+
+public class MockRestEventApi implements RestEventApi {
 
     @Override
-    public MockRestEventApi setup(ApiConfig config, SharedDataLocalProxy sharedData) {
-        this.address = "http.server.test";
-        this.definition = EventMethodDefinition.create("/test/events", "/:event_id", mapping());
-        return this;
+    public String address() {
+        return "http.server.test";
+    }
+
+    @Override
+    public Set<EventMethodDefinition> definitions() {
+        return Collections.singleton(EventMethodDefinition.createDefault("/test/events", "/:event_id"));
     }
 
 }

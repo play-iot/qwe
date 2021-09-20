@@ -26,9 +26,6 @@ public interface DynamicHttpRestApi extends DynamicRestApi {
             public int order() { return order; }
 
             @Override
-            public boolean useRequestData() { return true; }
-
-            @Override
             public @NonNull String name() { return record.getName(); }
 
             @Override

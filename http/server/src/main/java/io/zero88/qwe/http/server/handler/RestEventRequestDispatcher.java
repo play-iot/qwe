@@ -1,4 +1,4 @@
-package io.zero88.qwe.http.server.rest.handler;
+package io.zero88.qwe.http.server.handler;
 
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.HasLogger;
@@ -7,7 +7,6 @@ import io.zero88.qwe.eventbus.EventBusProxy;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.eventbus.EventPattern;
 import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
-import io.zero88.qwe.http.server.handler.RequestDispatcher;
 
 public interface RestEventRequestDispatcher extends RequestDispatcher, EventBusProxy, HasLogger, ApisSystem {
 

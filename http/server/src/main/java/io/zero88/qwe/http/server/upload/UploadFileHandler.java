@@ -2,52 +2,50 @@ package io.zero88.qwe.http.server.upload;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
-import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.FileUtils;
-import io.github.zero88.utils.HttpScheme;
 import io.github.zero88.utils.Strings;
-import io.github.zero88.utils.Urls;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
+import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.eventbus.EventPattern;
 import io.zero88.qwe.http.HttpUtils.HttpHeaderUtils;
-import io.zero88.qwe.http.server.rest.handler.RestEventRequestDispatcher;
+import io.zero88.qwe.http.server.handler.RestEventRequestDispatcher;
 
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
  * Only override it if any performance issue
  */
-@Getter
-@RequiredArgsConstructor
 public class UploadFileHandler implements RestEventRequestDispatcher {
 
-    @NonNull
+    @Getter
     @Accessors(fluent = true)
-    private final EventBusClient transporter;
-    private final String address;
-    private final Path uploadDir;
-    private final String publicUrl;
+    private EventBusClient transporter;
+    private String sharedKey;
+    private String address;
+    private Path uploadDir;
 
-    public static UploadFileHandler create(String handlerClass, @NonNull EventBusClient client, @NonNull String address,
-                                           @NonNull Path uploadDir, String publicUrl) {
+    public static UploadFileHandler create(String handlerClass) {
         if (Strings.isBlank(handlerClass) || UploadFileHandler.class.getName().equals(handlerClass)) {
-            return new UploadFileHandler(client, address, uploadDir, publicUrl);
+            return new UploadFileHandler();
         }
-        return ReflectionClass.createObject(handlerClass, new Arguments().put(EventBusClient.class, client)
-                                                                         .put(String.class, address)
-                                                                         .put(Path.class, uploadDir)
-                                                                         .put(String.class, publicUrl));
+        return Objects.requireNonNull(ReflectionClass.createObject(handlerClass));
+    }
+
+    public UploadFileHandler setup(String sharedKey, String address, Path uploadDir) {
+        this.sharedKey = sharedKey;
+        this.address = address;
+        this.uploadDir = uploadDir;
+        return this;
     }
 
     @Override
@@ -56,23 +54,20 @@ public class UploadFileHandler implements RestEventRequestDispatcher {
             context.response().setStatusCode(HttpResponseStatus.BAD_REQUEST.code()).end();
             return;
         }
-        String link = Strings.isBlank(publicUrl) ? Urls.buildURL(HttpScheme.parse(context.request().scheme()),
-                                                                 context.request().host(), -1) : publicUrl;
+        transporter = EventBusClient.create(SharedDataLocalProxy.create(context.vertx(), sharedKey));
         JsonObject data = new JsonObject();
-        context.fileUploads().forEach(fileUpload -> data.put(fileUpload.name(), extractFileInfo(link, fileUpload)));
+        context.fileUploads().forEach(fileUpload -> data.put(fileUpload.name(), extractFileInfo(fileUpload)));
         data.put("attributes", HttpHeaderUtils.serializeHeaders(context.request().formAttributes()));
-        EventMessage message = EventMessage.initial(EventAction.CREATE, data);
-        dispatch(context, address, EventPattern.REQUEST_RESPONSE, message);
+        dispatch(context, address, EventPattern.REQUEST_RESPONSE, EventMessage.initial(EventAction.CREATE, data));
     }
 
-    private JsonObject extractFileInfo(String link, FileUpload fileUpload) {
+    private JsonObject extractFileInfo(FileUpload fileUpload) {
         return new JsonObject().put("fileName", fileUpload.fileName())
                                .put("file", uploadDir.relativize(Paths.get(fileUpload.uploadedFileName())).toString())
                                .put("ext", FileUtils.getExtension(fileUpload.fileName()))
                                .put("charset", fileUpload.charSet())
                                .put("contentType", fileUpload.contentType())
-                               .put("size", fileUpload.size())
-                               .put("serverUrl", link);
+                               .put("size", fileUpload.size());
     }
 
 }

@@ -78,25 +78,13 @@ public interface DynamicContextDispatcher extends RequestDispatcher, HasLogger, 
      */
     @Override
     default void handle(RoutingContext context) {
-        final RequestData reqData = createRequestData(context);
+        final RequestData reqData = RequestDataConverter.convert(context);
         final GatewayHeaders headers = normalizeHeader(context, reqData);
         logger().info(decor("Dispatch dynamic request [{}][{}::{}]"), headers.getCorrelationId(),
                       headers.getForwardedMethod(), headers.getRequestURI());
         dispatcher().execute(createFilter(reqData), reqData)
                     .map(r -> handleSuccess(context, r))
                     .otherwise(t -> handleError(context, ErrorMessage.parse(t)));
-    }
-
-    /**
-     * Convert request data from routing context
-     *
-     * @param context routing context
-     * @return request data
-     */
-    default RequestData createRequestData(RoutingContext context) {
-        return api().useRequestData()
-               ? RequestDataConverter.convert(context)
-               : RequestData.builder().body(RequestDataConverter.body(context)).build();
     }
 
     /**

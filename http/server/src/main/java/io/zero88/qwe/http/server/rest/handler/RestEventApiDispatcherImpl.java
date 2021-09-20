@@ -28,7 +28,7 @@ public class RestEventApiDispatcherImpl implements RestEventApiDispatcher {
     private String sharedKey;
 
     @Override
-    public RestEventApiDispatcher setup(DeliveryEvent deliveryEvent, String sharedKey) {
+    public RestEventApiDispatcher setup(String sharedKey, DeliveryEvent deliveryEvent) {
         this.deliveryEvent = deliveryEvent;
         this.sharedKey = sharedKey;
         return this;
