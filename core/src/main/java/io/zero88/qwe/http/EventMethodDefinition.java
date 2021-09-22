@@ -49,7 +49,7 @@ public final class EventMethodDefinition implements JsonData {
     private final int order;
 
     private EventMethodDefinition(String regexPath, Set<EventMethodMapping> mapping) {
-        if (regexPath.endsWith("/.+")) {
+        if (regexPath.endsWith("/[^/]+")) {
             throw new IllegalArgumentException("Service regex path cannot end with capture parameter");
         }
         this.regexPath = regexPath;
@@ -214,10 +214,8 @@ public final class EventMethodDefinition implements JsonData {
 
     public EventMethodMapping searchMapping(String actualPath, @NonNull HttpMethod method) {
         return mapping.stream()
-                      .filter(mapping -> {
-                          String regex = Strings.isBlank(mapping.getRegexPath()) ? regexPath : mapping.getRegexPath();
-                          return mapping.getMethod() == method && actualPath.matches(regex);
-                      })
+                      .filter(m -> Strings.isNotBlank(m.getRegexPath()))
+                      .filter(m -> m.getMethod() == method && actualPath.matches(m.getRegexPath()))
                       .findFirst()
                       .orElseThrow(() -> new ServiceNotFoundException(
                           Strings.format("Unsupported HTTP method [{0}][{1}]", method, actualPath)));
@@ -228,25 +226,15 @@ public final class EventMethodDefinition implements JsonData {
     }
 
     public boolean test(String actualPath, EventAction action) {
-        return mapping.stream().anyMatch(mapping -> {
-            String regex = Strings.isBlank(mapping.getRegexPath())
-                           ? HttpPathRuleLoader.getInstance()
-                                               .get()
-                                               .createRegexPathForSearch(regexPath)
-                           : mapping.getRegexPath();
-            return mapping.getAction() == action && actualPath.matches(regex);
-        });
+        return mapping.stream()
+                      .filter(m -> Strings.isNotBlank(m.getRegexPath()))
+                      .anyMatch(m -> m.getAction() == action && actualPath.matches(m.getRegexPath()));
     }
 
     public boolean test(String actualPath, HttpMethod method) {
-        return mapping.stream().anyMatch(mapping -> {
-            String regex = Strings.isBlank(mapping.getRegexPath())
-                           ? HttpPathRuleLoader.getInstance()
-                                               .get()
-                                               .createRegexPathForSearch(regexPath)
-                           : mapping.getRegexPath();
-            return mapping.getMethod() == method && actualPath.matches(regex);
-        });
+        return mapping.stream()
+                      .filter(m -> Strings.isNotBlank(m.getRegexPath()))
+                      .anyMatch(m -> m.getMethod() == method && actualPath.matches(m.getRegexPath()));
     }
 
     public boolean test(String actualPath) {

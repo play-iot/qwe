@@ -15,9 +15,8 @@ class EventMethodMappingTest {
     public void serialize() {
         EventMethodMapping mapping = new EventMethodMapping(EventAction.CREATE, HttpMethod.CONNECT, "/abc");
         JsonHelper.assertJson(new JsonObject(
-                                  "{\"action\":\"CREATE\",\"capturePath\":\"/abc\",\"useRequestData\":true," +
-                                  "\"method\":\"CONNECT\",\"auth\":{\"loginRequired\":false,\"authz\":[]}}"),
-                              mapping.toJson());
+            "{\"action\":\"CREATE\",\"capturePath\":\"/abc\",\"useRequestData\":true," +
+            "\"method\":\"CONNECT\",\"auth\":{\"loginRequired\":false,\"authz\":[]}}"), mapping.toJson());
     }
 
     @Test
@@ -27,7 +26,20 @@ class EventMethodMappingTest {
             EventMethodMapping.class);
         final EventMethodMapping expected = new EventMethodMapping(EventAction.REMOVE, HttpMethod.DELETE, "/xyz");
         Assertions.assertEquals(expected, from);
+        Assertions.assertEquals(expected.getRegexPath(), from.getRegexPath());
         JsonHelper.assertJson(expected.toJson(), from.toJson());
+    }
+
+    @Test
+    void test() {
+        Assertions.assertEquals("/c/[^/]+/p/[^/]+", new EventMethodMapping(EventAction.CREATE, HttpMethod.POST,
+                                                                           "/c/:cId/p/:pId").getRegexPath());
+        Assertions.assertEquals("/c/[^/]+/p/[^/]+/", new EventMethodMapping(EventAction.CREATE, HttpMethod.POST,
+                                                                           "/c/:cId/p/:pId/").getRegexPath());
+        Assertions.assertEquals("/c/[^/]+/p", new EventMethodMapping(EventAction.GET_ONE, HttpMethod.GET,
+                                                                     "/c/:cId/p").getRegexPath());
+        Assertions.assertEquals("/c/[^/]+/p/", new EventMethodMapping(EventAction.GET_ONE, HttpMethod.GET,
+                                                                     "/c/:cId/p/").getRegexPath());
     }
 
 }

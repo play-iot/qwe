@@ -11,8 +11,7 @@ public interface HttpPathRule {
     String createCapture(HttpMethod method, EventAction action, String servicePath, String capturePath);
 
     default String createRegex(String path) {
-        //FIXME check with forward url
-        return path.replaceFirst("/:[^/]+(/?)$", "/.+$1").replaceAll("/:[^/]+", "/[^/]+");
+        return path.replaceFirst("/:[^/]+(/?)$", "/[^/]+$1").replaceAll("/:[^/]+", "/[^/]+");
     }
 
     default String createRegexPathForSearch(String servicePath) {

@@ -46,12 +46,6 @@ public class EventMethodDefinitionTest {
     }
 
     @Test
-    public void test_wrong_multiParam_pattern() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> EventMethodDefinition.createDefault("/client/:clientId", "/:productId"));
-    }
-
-    @Test
     public void test_not_found() {
         Assertions.assertThrows(ServiceNotFoundException.class, () -> {
             EventMethodDefinition definition = EventMethodDefinition.createDefault("/abc", "/:id");
@@ -151,6 +145,12 @@ public class EventMethodDefinitionTest {
     }
 
     @Test
+    public void test_wrong_multiParam_pattern() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> EventMethodDefinition.createDefault("/client/:clientId", "/:productId"));
+    }
+
+    @Test
     public void test_search_multiParam_pattern_no_resource_between() {
         EventMethodDefinition definition = EventMethodDefinition.createDefault("/client/:clientId/", "/:productId");
         Assertions.assertEquals(EventAction.GET_LIST, definition.search("/client/123/", HttpMethod.GET));
@@ -160,7 +160,7 @@ public class EventMethodDefinitionTest {
         Assertions.assertEquals(EventAction.PATCH, definition.search("/client/123/456", HttpMethod.PATCH));
         Assertions.assertEquals(EventAction.REMOVE, definition.search("/client/123/456", HttpMethod.DELETE));
         JsonObject expected = new JsonObject(
-            "{\"regexPath\":\"/client/.+/\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
+            "{\"regexPath\":\"/client/[^/]+/\",\"mapping\":[{\"action\":\"GET_LIST\",\"method\":\"GET\"," +
             "\"capturePath\":\"/client/:clientId/\",\"useRequestData\":true,\"auth\":{\"loginRequired\":false," +
             "\"authz\":[]}},{\"action\":\"CREATE\",\"method\":\"POST\",\"capturePath\":\"/client/:clientId/\"," +
             "\"useRequestData\":true,\"auth\":{\"loginRequired\":false,\"authz\":[]}},{\"action\":\"GET_ONE\"," +
@@ -247,8 +247,8 @@ public class EventMethodDefinitionTest {
                                 definition2.search("/device/123/folder/345/point/abc", HttpMethod.GET));
         Assertions.assertEquals(EventAction.GET_LIST,
                                 definition2.search("/device/123/folder/345/point", HttpMethod.GET));
-        Assertions.assertEquals(EventAction.GET_ONE,
-                                definition1.search("/device/123/folder/345/point", HttpMethod.GET));
+        Assertions.assertThrows(ServiceNotFoundException.class,
+                                () -> definition1.search("/device/123/folder/345/point", HttpMethod.GET));
     }
 
 }
