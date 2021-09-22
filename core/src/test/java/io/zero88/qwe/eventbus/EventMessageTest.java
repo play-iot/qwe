@@ -4,63 +4,61 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.github.zero88.exceptions.ErrorCode;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.exceptions.QWEException;
 
 public class EventMessageTest {
 
     @Test
-    public void test_EventMessage_Success() throws JSONException {
+    public void test_EventMessage_Success() {
         EventMessage msg = EventMessage.success(EventAction.CREATE, new JsonObject(
-            "{\"groupId\":\"io.qwespark\",\"version\":\"1.0-SNAPSHOT\"}"));
+            "{\"groupId\":\"io.qwe.spark\",\"version\":\"1.0-SNAPSHOT\"}"));
         Assertions.assertFalse(msg.isError());
         Assertions.assertTrue(msg.isSuccess());
         Assertions.assertEquals(EventAction.CREATE, msg.getAction());
         Assertions.assertNull(msg.getError());
-        JSONAssert.assertEquals("{\"status\":\"SUCCESS\",\"action\":\"CREATE\",\"" +
-                                "data\":{\"groupId\":\"io.qwespark\",\"version\":\"1.0-SNAPSHOT\"}}",
-                                msg.toJson().encode(), JSONCompareMode.STRICT);
+        JsonHelper.assertJson(new JsonObject("{\"status\":\"SUCCESS\",\"action\":\"CREATE\",\"" +
+                                             "data\":{\"groupId\":\"io.qwe.spark\",\"version\":\"1.0-SNAPSHOT\"}}"),
+                              msg.toJson());
     }
 
     @Test
-    public void test_EventMessage_Error() throws JSONException {
+    public void test_EventMessage_Error() {
         EventMessage error = EventMessage.error(EventAction.REMOVE, new RuntimeException("xxx"));
         Assertions.assertTrue(error.isError());
         Assertions.assertFalse(error.isSuccess());
         Assertions.assertEquals(EventAction.REMOVE, error.getAction());
         Assertions.assertNotNull(error.getError());
         Assertions.assertNull(error.getData());
-        JSONAssert.assertEquals("{\"status\":\"FAILED\",\"action\":\"REMOVE\"," +
-                                "\"error\":{\"code\":\"UNKNOWN_ERROR\",\"message\":\"UNKNOWN_ERROR | Cause: xxx\"}}",
-                                error.toJson().encode(), JSONCompareMode.STRICT);
+        JsonHelper.assertJson(new JsonObject("{\"status\":\"FAILED\",\"action\":\"REMOVE\"," +
+                                             "\"error\":{\"code\":\"UNKNOWN_ERROR\",\"message\":\"UNKNOWN_ERROR | " +
+                                             "Cause(xxx)\"}}"), error.toJson());
     }
 
     @Test
     public void test_deserialize_missing_action() {
-        final JsonObject json = new JsonObject("{\"data\":{\"groupId\":\"io.qwespark\"}}");
+        final JsonObject json = new JsonObject("{\"data\":{\"groupId\":\"io.qwe.spark\"}}");
         Assertions.assertThrows(QWEException.class, () -> EventMessage.tryParse(json));
     }
 
     @Test
     public void test_deserialize_success() {
-        JsonObject jsonObject = new JsonObject("{\"action\":\"CREATE\",\"data\":{\"groupId\":\"io.qwespark\"," +
+        JsonObject jsonObject = new JsonObject("{\"action\":\"CREATE\",\"data\":{\"groupId\":\"io.qwe.spark\"," +
                                                "\"artifactId\":\"qwe-edge-ditto-driver\"}}");
         EventMessage message = EventMessage.tryParse(jsonObject);
         Assertions.assertFalse(message.isError());
         Assertions.assertFalse(message.isSuccess());
         Assertions.assertEquals(EventAction.CREATE, message.getAction());
-        Assertions.assertEquals("{\"groupId\":\"io.qwespark\",\"artifactId\":\"qwe-edge-ditto-driver\"}",
-                                message.getData().encode());
         Assertions.assertNull(message.getError());
+        JsonHelper.assertJson(new JsonObject("{\"groupId\":\"io.qwe.spark\",\"artifactId\":\"qwe-edge-ditto-driver\"}"),
+                              message.getData());
     }
 
     @Test

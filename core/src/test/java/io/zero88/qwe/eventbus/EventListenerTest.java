@@ -124,7 +124,7 @@ public class EventListenerTest {
                           Assertions.assertTrue(msg.isError());
                           Assertions.assertEquals(ErrorCode.SERVICE_NOT_FOUND, msg.getError().getCode());
                           Assertions.assertEquals(
-                              "Service not found | Cause: Unsupported event [ANY] - Error Code: UNSUPPORTED",
+                              "Service not found | Cause(Unsupported event [ANY]) - Code(UNSUPPORTED)",
                               msg.getError().getMessage());
                           testContext.completeNow();
                       }));

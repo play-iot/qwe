@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -232,6 +233,14 @@ public interface JsonData extends Serializable {
 
     @JsonIgnore
     default ObjectMapper getMapper() {return MAPPER;}
+
+    @JsonIgnore
+    default ObjectMapper getPrettyMapper() {
+        if (getMapper().equals(QWEJsonCodec.mapper())) {
+            return QWEJsonCodec.prettyMapper();
+        }
+        return getMapper().copy().configure(SerializationFeature.INDENT_OUTPUT, true);
+    }
 
     @JsonFilter(FILTER_PROP_BY_NAME)
     class PropertyFilterMixIn {}

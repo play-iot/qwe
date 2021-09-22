@@ -47,6 +47,12 @@ public final class ErrorMessage implements Serializable, JsonData {
         this.message = message;
     }
 
+    /**
+     * Parse exception to error message with {@link QWEExceptionConverter#friendly(Throwable)}
+     *
+     * @param throwable the exception
+     * @return an error message
+     */
     public static ErrorMessage parse(@NonNull Throwable throwable) {
         return parse(throwable, QWEExceptionConverter::friendly);
     }

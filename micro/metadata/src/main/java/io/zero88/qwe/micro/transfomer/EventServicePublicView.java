@@ -6,6 +6,7 @@ import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.EventMethodMapping;
 import io.zero88.qwe.micro.servicetype.EventMessageHttpService;
+import io.zero88.qwe.utils.JsonUtils.JsonCollectors;
 
 import lombok.NonNull;
 
@@ -27,7 +28,7 @@ public class EventServicePublicView implements RecordTransformer {
                                                      .getMapping()
                                                      .stream()
                                                      .map(this::serializeEventMethod)
-                                                     .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+                                                     .collect(JsonCollectors.toArray());
         return RecordOutput.builder()
                            .name(record.getName())
                            .status(record.getStatus())
