@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 public class UserInfoImpl implements UserInfo {
 
     @Getter
-    private final String identity;
+    private final String identifier;
     private final JsonObject extra;
 
     @Override
@@ -24,7 +24,7 @@ public class UserInfoImpl implements UserInfo {
     @Override
     public JsonObject toJson() {
         JsonObject o = extra == null ? new JsonObject() : new JsonObject(extra.getMap());
-        return o.put("identity", identity);
+        return o.put("identity", identifier);
     }
 
 }

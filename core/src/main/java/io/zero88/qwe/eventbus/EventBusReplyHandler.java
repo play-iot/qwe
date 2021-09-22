@@ -11,7 +11,7 @@ import io.vertx.core.eventbus.Message;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.eventbus.EventBusLogSystem.EventReplyLogSystem;
-import io.zero88.qwe.exceptions.TimeoutException;
+import io.zero88.qwe.exceptions.ServiceUnavailable;
 
 import lombok.NonNull;
 
@@ -52,7 +52,7 @@ public interface EventBusReplyHandler extends HasLogger, EventReplyLogSystem {
      * @see EventMessage#replyError(EventAction, Throwable)
      */
     default EventMessage error(@NonNull EventAction action, @NonNull Throwable error) {
-        return EventMessage.replyError(action, new TimeoutException("No response", new HiddenException(error)));
+        return EventMessage.replyError(action, new ServiceUnavailable("No response", new HiddenException(error)));
     }
 
 }

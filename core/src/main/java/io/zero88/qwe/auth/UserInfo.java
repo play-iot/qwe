@@ -20,7 +20,7 @@ public interface UserInfo extends JsonData {
     /**
      * Identity key for defining user identification
      */
-    String IDENTITY_KEY = "identity";
+    String IDENTITY_KEY = "identifier";
 
     static UserInfo parse(Object user) {
         if (user == null) {
@@ -30,10 +30,10 @@ public interface UserInfo extends JsonData {
             return (UserInfo) user;
         }
         if (user instanceof JsonObject) {
-            return create((JsonObject) user, IDENTITY_KEY);
+            return create((JsonObject) user);
         }
         if (user instanceof Buffer) {
-            return create(((Buffer) user).toJsonObject(), IDENTITY_KEY);
+            return create(((Buffer) user).toJsonObject());
         }
         throw new IllegalArgumentException("Unable parse user");
     }
@@ -46,14 +46,14 @@ public interface UserInfo extends JsonData {
         return create(user.getString(identityKey), user);
     }
 
-    static UserInfo create(String identity, JsonObject extraInfo) {
-        return new UserInfoImpl(Strings.requireNotBlank(identity, "User identity is missing"), extraInfo);
+    static UserInfo create(String identifier, JsonObject extraInfo) {
+        return new UserInfoImpl(Strings.requireNotBlank(identifier, "User identifier is missing"), extraInfo);
     }
 
     /**
      * @return user identity
      */
-    @NotNull String identity();
+    @NotNull String identifier();
 
     /**
      * Get extra property by key

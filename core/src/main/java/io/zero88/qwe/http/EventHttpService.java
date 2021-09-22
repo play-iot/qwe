@@ -1,6 +1,7 @@
 package io.zero88.qwe.http;
 
 import io.zero88.qwe.eventbus.EventListener;
+import io.zero88.qwe.launcher.VersionCommand;
 
 /**
  * Represents an Event HTTP service that handles an incoming request from RESTful API.
@@ -17,7 +18,9 @@ public interface EventHttpService extends EventHttpApi, EventListener {
      * @return service name
      * @since 1.0.0
      */
-    String api();
+    default String api() {
+        return VersionCommand.getVersion().getName() + "::" + resource();
+    }
 
     /**
      * Declares EventBus Address.

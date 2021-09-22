@@ -58,7 +58,7 @@ public abstract class HttpClientJsonResponseHandler
                 return Future.failedFuture(new QWEException(code, body.encode()));
             }
             return Future.succeededFuture(
-                new ResponseData().setStatus(status).setHeaders(overrideHeader(response)).setBody(body));
+                new ResponseData().setStatusCode(status).setHeaders(overrideHeader(response)).setBody(body));
         });
     }
 
