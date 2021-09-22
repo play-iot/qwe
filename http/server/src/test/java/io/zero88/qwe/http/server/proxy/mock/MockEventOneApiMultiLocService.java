@@ -1,4 +1,4 @@
-package io.zero88.qwe.http.server.dynamic.mock;
+package io.zero88.qwe.http.server.proxy.mock;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

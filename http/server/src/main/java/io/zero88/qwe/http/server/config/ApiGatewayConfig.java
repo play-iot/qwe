@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.server.config;
 
-import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
 import io.zero88.qwe.http.server.RouterConfig;
@@ -23,7 +22,7 @@ public final class ApiGatewayConfig extends AbstractRouterConfig implements Rout
 
     @Override
     protected @NonNull String defaultPath() {
-        return BasePaths.ROOT_GATEWAY_PATH;
+        return "/gw";
     }
 
 }

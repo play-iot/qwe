@@ -19,7 +19,6 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpServerPluginContext;
 import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
@@ -60,7 +59,7 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
         //TODO add auth
         socketsByPath.forEach((path, mapping) -> router.mountSubRouter(path, sockJSHandler.bridge(
             createBridgeOptions(config.getBridgeOptions(), mapping,
-                                BasePaths.addWildcards(Urls.combinePath(config.getPath(), path))),
+                                RouterCreator.addWildcards(Urls.combinePath(config.getPath(), path))),
             createHandler(sharedData, mapping, config.bridgeHandlerClass()))));
         return router;
     }

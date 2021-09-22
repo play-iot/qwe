@@ -1,14 +1,14 @@
-package io.zero88.qwe.http.server.dynamic;
+package io.zero88.qwe.http.server.proxy;
 
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import io.zero88.qwe.http.server.dynamic.mock.SimilarApiService;
+import io.zero88.qwe.http.server.proxy.mock.SimilarApiService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 
-public class DynamicSimilarApiTest extends DynamicServiceTestBase {
+public class ProxySimilarApiTest extends ProxyServiceTestBase {
 
     @Override
     @SuppressWarnings("unchecked")

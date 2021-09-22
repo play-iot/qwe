@@ -11,9 +11,8 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.eventbus.DeliveryEvent;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.EventMethodMapping;
-import io.zero88.qwe.http.server.HttpServerPlugin;
 import io.zero88.qwe.http.server.RouterConfig;
-import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
+import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.rest.api.IRestEventApi;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
 
@@ -49,11 +48,12 @@ public abstract class RestEventApisCreatorImpl<X extends IRestEventApi<C>, C ext
                                                                  .setPattern(api.pattern())
                                                                  .setAction(mapping.getAction())
                                                                  .setUseRequestData(mapping.isUseRequestData());
-                HttpServerPlugin.restrictJsonRoute(router.route(mapping.getMethod(), mapping.getCapturePath()))
-                                .order(definition.getOrder())
-                                .handler(RestEventApiDispatcher.create(api.dispatcher())
-                                                               .setup(sharedData.sharedKey(), deliveryEvent))
-                                .handler(new EventMessageResponseHandler());
+                RouterCreator.addContentType(router.route(mapping.getMethod(), mapping.getCapturePath()),
+                                             api.contentTypes())
+                             .order(definition.getOrder())
+                             .handler(RestEventApiDispatcher.create(api.dispatcher())
+                                                            .setup(sharedData.sharedKey(), mapping.getAuth(),
+                                                                   deliveryEvent));
             }
         }
     }

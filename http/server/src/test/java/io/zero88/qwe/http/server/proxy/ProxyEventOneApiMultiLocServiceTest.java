@@ -1,18 +1,18 @@
-package io.zero88.qwe.http.server.dynamic;
+package io.zero88.qwe.http.server.proxy;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.http.server.dynamic.mock.MockEventOneApiMultiLocService;
+import io.zero88.qwe.http.server.proxy.mock.MockEventOneApiMultiLocService;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class DynamicEventOneApiMultiLocServiceTest extends DynamicServiceTestBase {
+public class ProxyEventOneApiMultiLocServiceTest extends ProxyServiceTestBase {
 
     @Override
     @SuppressWarnings("unchecked")

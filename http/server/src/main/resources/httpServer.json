@@ -90,7 +90,7 @@
   "__api__": {
     "enabled": true,
     "path": "/api",
-    "__dynamic__": {
+    "__proxy__": {
       "enabled": false,
       "path": "/s"
     }

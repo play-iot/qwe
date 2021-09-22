@@ -39,7 +39,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase implements RestAp
         EventBusClient.create(createSharedData(vertx)).register("http.server.test", new MockEventErrorListener());
         String path = "/api/test/events";
         JsonObject expected = new JsonObject().put("code", ErrorCode.UNKNOWN_ERROR.code())
-                                              .put("message", "UNKNOWN_ERROR | Cause: xxx");
+                                              .put("message", "UNKNOWN_ERROR | Cause(xxx)");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
         sendToApiThenAssert(context, HttpMethod.GET, path, 500, expected);
     }
@@ -63,11 +63,10 @@ public class RestEventApiTest extends HttpServerPluginTestBase implements RestAp
     }
 
     @Test
-    //FIXME eventbus timeout vs httpclient timeout
     public void test_api_eventbus_no_reply(TestContext context) {
         String path = "/api/test/events/:event_id";
-        JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_ERROR.code())
-                                              .put("message", "Service unavailable");
+        JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_UNAVAILABLE)
+                                              .put("message", "No response");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
         sendToApiThenAssert(context, HttpMethod.GET, path, 503, expected);
     }

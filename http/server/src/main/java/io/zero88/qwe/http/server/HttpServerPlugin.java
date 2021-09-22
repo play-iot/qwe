@@ -9,7 +9,6 @@ import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.net.KeyCertOptions;
-import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
@@ -20,13 +19,12 @@ import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
-import io.zero88.qwe.http.HttpUtils;
 import io.zero88.qwe.http.server.config.CorsOptions;
 import io.zero88.qwe.http.server.download.DownloadRouterCreator;
 import io.zero88.qwe.http.server.gateway.GatewayRouterCreator;
 import io.zero88.qwe.http.server.handler.FailureContextHandler;
 import io.zero88.qwe.http.server.handler.NotFoundContextHandler;
-import io.zero88.qwe.http.server.rest.DynamicRouterCreator;
+import io.zero88.qwe.http.server.rest.ProxyServiceApisCreator;
 import io.zero88.qwe.http.server.rest.RestApisCreator;
 import io.zero88.qwe.http.server.rest.RestEventApisCreator;
 import io.zero88.qwe.http.server.upload.UploadRouterCreator;
@@ -61,7 +59,7 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
     @Override
     public void onStart() {
         super.onStart();
-        if (this.pluginConfig.getApiConfig().getDynamicConfig().isEnabled()) {
+        if (this.pluginConfig.getApiConfig().getProxyConfig().isEnabled()) {
             this.pluginConfig.getApiConfig().setEnabled(true);
         }
         this.pluginConfig.setRuntimeConfig(httpRouter);
@@ -131,12 +129,15 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
             root = Stream.concat(
-                             Stream.of(WebSocketRouterCreator.class, RestApisCreator.class, RestEventApisCreator.class,
-                                       DynamicRouterCreator.class, GatewayRouterCreator.class,
-                                       UploadRouterCreator.class,
-                                       DownloadRouterCreator.class, StaticWebRouterCreator.class)
-                                   .map(ReflectionClass::createObject)
-                                   .map(RouterBuilder.class::cast), Stream.of(httpRouter.getCustomBuilder()))
+                             Stream.<Class<? extends RouterBuilder>>of(WebSocketRouterCreator.class,
+                                                                       RestApisCreator.class,
+                                                                       RestEventApisCreator.class,
+                                                                       ProxyServiceApisCreator.class,
+                                                                       GatewayRouterCreator.class,
+                                                                       UploadRouterCreator.class,
+                                                                       DownloadRouterCreator.class,
+                                                                       StaticWebRouterCreator.class)
+                                   .map(ReflectionClass::createObject), Stream.of(httpRouter.getCustomBuilder()))
                          .reduce(root, (r, b) -> b.setup(vertx, r, pluginConfig(), pluginContext()), (r1, r2) -> r2);
             root.routeWithRegex("(?!" + pluginConfig.getFileUploadConfig().getPath() + ").+")
                 .handler(BodyHandler.create(false).setBodyLimit(pluginConfig.maxBodySize()));
@@ -145,17 +146,6 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
         } catch (Exception e) {
             throw new InitializerError("Error when initializing HTTP Server route", e);
         }
-    }
-
-    /**
-     * Decorator route with produce and consume
-     *
-     * @param route route
-     * @see Route#produces(String)
-     * @see Route#consumes(String)
-     */
-    public static Route restrictJsonRoute(Route route) {
-        return route.produces(HttpUtils.JSON_CONTENT_TYPE).produces(HttpUtils.JSON_UTF8_CONTENT_TYPE);
     }
 
 }

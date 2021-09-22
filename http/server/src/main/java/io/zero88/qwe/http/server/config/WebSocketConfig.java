@@ -6,7 +6,6 @@ import io.github.zero88.repl.ReflectionClass;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 import io.zero88.qwe.IConfig;
-import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
 import io.zero88.qwe.http.server.RouterConfig;
@@ -31,7 +30,7 @@ public final class WebSocketConfig extends AbstractRouterConfig implements Route
     private SocketBridgeConfig bridgeOptions = new SocketBridgeConfig();
 
     public WebSocketConfig() {
-        super(NAME, HttpServerConfig.class, false, BasePaths.ROOT_WS_PATH);
+        super(NAME, HttpServerConfig.class);
     }
 
     public @Nullable Class<? extends WebSocketBridgeEventHandler> bridgeHandlerClass() {
@@ -40,7 +39,7 @@ public final class WebSocketConfig extends AbstractRouterConfig implements Route
 
     @Override
     protected @NonNull String defaultPath() {
-        return BasePaths.ROOT_WS_PATH;
+        return "/ws";
     }
 
     public static class SockJSConfig extends SockJSHandlerOptions implements IConfig {

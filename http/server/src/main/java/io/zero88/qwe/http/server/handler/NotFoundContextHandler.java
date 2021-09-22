@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.http.HttpUtils;
 
-public final class NotFoundContextHandler implements ResponseWriter {
+public final class NotFoundContextHandler implements ResponseErrorHandler {
 
     @Override
     public void handle(RoutingContext event) {

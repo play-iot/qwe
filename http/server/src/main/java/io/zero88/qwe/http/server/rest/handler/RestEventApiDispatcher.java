@@ -3,19 +3,14 @@ package io.zero88.qwe.http.server.rest.handler;
 import java.util.Objects;
 
 import io.github.zero88.repl.ReflectionClass;
-import io.vertx.ext.auth.User;
-import io.zero88.qwe.auth.UserInfo;
+import io.zero88.qwe.auth.ReqAuthDefinition;
 import io.zero88.qwe.eventbus.DeliveryEvent;
-import io.zero88.qwe.http.server.handler.EventMessageResponseHandler;
-import io.zero88.qwe.http.server.handler.RestEventRequestDispatcher;
+import io.zero88.qwe.http.server.handler.EventBusProxyDispatcher;
 
 /**
- * Represents for pushing data via {@code EventBus} then listen {@code reply message}. After receiving {@code reply
- * message}, redirect it to {@code next Context handler}
- *
- * @see EventMessageResponseHandler
+ * Represents for pushing data via {@code EventBus} then listen {@code reply message}
  */
-public interface RestEventApiDispatcher extends RestEventRequestDispatcher {
+public interface RestEventApiDispatcher extends EventBusProxyDispatcher {
 
     static RestEventApiDispatcher create(Class<RestEventApiDispatcher> cls) {
         if (cls == null) {
@@ -24,11 +19,6 @@ public interface RestEventApiDispatcher extends RestEventRequestDispatcher {
         return Objects.requireNonNull(ReflectionClass.createObject(cls), "Unable create REST dispatcher");
     }
 
-    RestEventApiDispatcher setup(String sharedKey, DeliveryEvent deliveryEvent);
-
-    //TODO move to interceptor
-    static UserInfo convertUser(User user) {
-        return user == null ? null : UserInfo.create(user.get("username"), user.attributes());
-    }
+    RestEventApiDispatcher setup(String sharedKey, ReqAuthDefinition authDefinition, DeliveryEvent deliveryEvent);
 
 }

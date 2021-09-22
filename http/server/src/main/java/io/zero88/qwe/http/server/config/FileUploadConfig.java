@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.server.config;
 
-import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
 import io.zero88.qwe.http.server.RouterConfig;
@@ -30,7 +29,7 @@ public final class FileUploadConfig extends AbstractRouterConfig implements Rout
 
     @Override
     protected @NonNull String defaultPath() {
-        return BasePaths.ROOT_UPLOAD_PATH;
+        return "/u";
     }
 
 }

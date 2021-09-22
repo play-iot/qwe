@@ -1,4 +1,4 @@
-package io.zero88.qwe.http.server.dynamic.mock;
+package io.zero88.qwe.http.server.proxy.mock;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

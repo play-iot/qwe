@@ -1,4 +1,4 @@
-package io.zero88.qwe.http.server.dynamic;
+package io.zero88.qwe.http.server.proxy;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -12,10 +12,10 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.http.server.dynamic.mock.MockHttpServiceServer;
+import io.zero88.qwe.http.server.proxy.mock.MockHttpServiceServer;
 
 @RunWith(VertxUnitRunner.class)
-public class DynamicHttpServerPluginTest extends DynamicServiceTestBase {
+public class ProxyHttpServerPluginTest extends ProxyServiceTestBase {
 
     private int port;
 

@@ -1,4 +1,4 @@
-package io.zero88.qwe.http.server.dynamic;
+package io.zero88.qwe.http.server.proxy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,10 +13,10 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.http.server.dynamic.mock.MockEventOneApiOneLocService;
+import io.zero88.qwe.http.server.proxy.mock.MockEventOneApiOneLocService;
 
 @RunWith(VertxUnitRunner.class)
-public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase {
+public class ProxyEventOneApiOneLocServiceTest extends ProxyServiceTestBase {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -28,9 +28,9 @@ public class DynamicEventOneApiOneLocServiceTest extends DynamicServiceTestBase 
     public void test_event_not_found(TestContext context) {
         sendToApiThenAssert(context, HttpMethod.POST, "/api/s/hey", 503,
                             new JsonObject().put("code", ErrorCode.SERVICE_NOT_FOUND.code())
-                                           .put("message",
-                                                "Service not found | Cause: Unsupported event [CREATE] - Error Code: " +
-                                                "UNSUPPORTED"));
+                                            .put("message",
+                                                 "Service not found | Cause(Unsupported event [CREATE]) - Code" +
+                                                 "(UNSUPPORTED)"));
     }
 
     @Test

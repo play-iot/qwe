@@ -168,9 +168,9 @@ public class WebSocketEventServerTest extends HttpServerPluginTestBase implement
         final Async async = context.async(2);
         final EventMessage ackExpected = EventMessage.replyError(EventAction.CREATE,
                                                                  ErrorMessage.parse(ErrorCode.SERVICE_NOT_FOUND,
-                                                                                    "Service not found | Cause: " +
-                                                                                    "Unsupported event [CREATE] - " +
-                                                                                    "Error Code: UNSUPPORTED"));
+                                                                                    "Service not found | Cause" +
+                                                                                    "(Unsupported event [CREATE]) - " +
+                                                                                    "Code(UNSUPPORTED)"));
         final EventMessage openedMsg = createOpenedMessage(MockWebSocketEvent.FULL_PLAN);
         final String path = wsPath(MockWebSocketEvent.FULL_PLAN);
         this.setupWSClient(context, path)

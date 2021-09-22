@@ -1,4 +1,4 @@
-package io.zero88.qwe.http.server.dynamic;
+package io.zero88.qwe.http.server.proxy;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
@@ -14,9 +14,9 @@ import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.VertxHelper;
 import io.zero88.qwe.http.server.HttpServerPluginTestBase;
 import io.zero88.qwe.http.server.RestApiTestHelper;
-import io.zero88.qwe.http.server.dynamic.mock.MockGatewayServer;
+import io.zero88.qwe.http.server.proxy.mock.MockGatewayServer;
 
-public abstract class DynamicServiceTestBase extends HttpServerPluginTestBase implements RestApiTestHelper {
+public abstract class ProxyServiceTestBase extends HttpServerPluginTestBase implements RestApiTestHelper {
 
     @Before
     public void before(TestContext context) {

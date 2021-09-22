@@ -1,6 +1,5 @@
 package io.zero88.qwe.http.server.config;
 
-import io.zero88.qwe.http.server.BasePaths;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.WebSystem;
 import io.zero88.qwe.http.server.RouterConfig;
@@ -24,7 +23,7 @@ public final class StaticWebConfig extends AbstractRouterConfig implements Route
 
     @Override
     protected @NonNull String defaultPath() {
-        return BasePaths.WEB_PATH;
+        return "/web";
     }
 
 }
