@@ -105,12 +105,34 @@ class EventParameterParserTest {
     }
 
     @Test
-    void test_extract_body_and_headers() {
+    void test_extract_body_full_and_headers() {
+        final RequestData reqData = RequestData.builder()
+                                               .body(new JsonObject().put("id", 2))
+                                               .headers(new JsonObject().put("hello", "zero88"))
+                                               .build();
+        final EventMessage msg = EventMessage.initial(EventAction.parse("BODY_FULL"), reqData);
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, meta.params());
+        Assertions.assertEquals(2, inputs.length);
+
+        final EBBody annotation = meta.params()[0].lookupAnnotation(EBBody.class);
+        Assertions.assertNotNull(annotation);
+        Assertions.assertEquals("", annotation.value());
+        Assertions.assertEquals(JsonObject.class, meta.params()[0].getParamClass());
+        Assertions.assertEquals(new JsonObject().put("id", 2), inputs[0]);
+
+        Assertions.assertEquals("headers", meta.params()[1].getParamName());
+        Assertions.assertEquals(JsonObject.class, meta.params()[1].getParamClass());
+        Assertions.assertEquals(new JsonObject().put("hello", "zero88"), inputs[1]);
+    }
+
+    @Test
+    void test_extract_body_part_and_headers() {
         final RequestData reqData = RequestData.builder()
                                                .body(new JsonObject().put("id", 1))
                                                .headers(new JsonObject().put("hello", "world"))
                                                .build();
-        final EventMessage msg = EventMessage.initial(EventAction.parse("BODY"), reqData);
+        final EventMessage msg = EventMessage.initial(EventAction.parse("BODY_PART"), reqData);
         final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
         final Object[] inputs = parser.extract(msg, meta.params());
         Assertions.assertEquals(2, inputs.length);
@@ -128,7 +150,7 @@ class EventParameterParserTest {
 
     @Test
     void test_use_EBBody_but_non_standard_message() {
-        final EventMessage msg = EventMessage.initial(EventAction.parse("BODY"), new JsonObject().put("id", 2));
+        final EventMessage msg = EventMessage.initial(EventAction.parse("BODY_PART"), new JsonObject().put("id", 2));
         final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
         final Object[] inputs = parser.extract(msg, meta.params());
         Assertions.assertEquals(2, inputs.length);

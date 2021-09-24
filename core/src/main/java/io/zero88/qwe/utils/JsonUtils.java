@@ -121,6 +121,7 @@ public final class JsonUtils {
                        });
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class JsonCollectors {
 
         public static <T> Collector<T, JsonArray, JsonArray> toArray() {

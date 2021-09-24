@@ -96,13 +96,16 @@ public class EventParameterParserImpl implements EventParameterParser {
     }
 
     protected Object lookupParamValue(MethodParam param, JsonObject data) {
-        EBBody a = param.lookupAnnotation(EBBody.class);
-        if (Objects.nonNull(a) && data.containsKey(StandardKey.BODY)) {
+        String bodyParam = Optional.ofNullable(param.lookupAnnotation(EBBody.class)).map(EBBody::value).orElse(null);
+        if (Objects.nonNull(bodyParam) && data.containsKey(StandardKey.BODY)) {
             return Functions.getIfThrow(() -> JsonObject.mapFrom(data.getValue(StandardKey.BODY)))
-                            .map(json -> json.getValue(a.value()))
+                            .map(json -> "".equals(bodyParam) ? json : json.getValue(bodyParam))
                             .orElse(null);
         }
-        return data.getValue(Optional.ofNullable(a).map(EBBody::value).orElseGet(param::getParamName));
+        if ("".equals(bodyParam)) {
+            return data;
+        }
+        return data.getValue(Optional.ofNullable(bodyParam).orElseGet(param::getParamName));
     }
 
     protected Object tryParseParamValue(Class<?> paramClass, Object d) {

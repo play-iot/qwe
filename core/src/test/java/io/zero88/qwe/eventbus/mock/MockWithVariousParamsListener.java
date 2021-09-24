@@ -11,10 +11,10 @@ import io.zero88.qwe.eventbus.EBParam;
 public class MockWithVariousParamsListener extends MockEventListener {
 
     @EBContract(action = "NOTIFY")
-    public void noReturn(JsonObject data) { }
+    public void noReturn(JsonObject data) {}
 
     @EBContract(action = "GET_LIST")
-    public String noParam() { return "hello"; }
+    public String noParam() {return "hello";}
 
     @EBContract(action = "GET_ONE")
     public int javaParam(@EBParam("id") String id) {
@@ -27,10 +27,10 @@ public class MockWithVariousParamsListener extends MockEventListener {
     }
 
     @EBContract(action = "CREATE")
-    public RequestData refParam(RequestData data) { return data; }
+    public RequestData refParam(RequestData data) {return data;}
 
     @EBContract(action = "PATCH")
-    public RequestData overrideRefParam(@EBParam("data") RequestData data) { return data; }
+    public RequestData overrideRefParam(@EBParam("data") RequestData data) {return data;}
 
     @EBContract(action = "UPDATE")
     public JsonObject twoRefParams(@EBParam("mock") MockParam param, @EBParam("data") RequestData data) {
@@ -44,8 +44,14 @@ public class MockWithVariousParamsListener extends MockEventListener {
         return result;
     }
 
-    @EBContract(action = "BODY")
-    public JsonObject useBodyAndHeader(@EBBody("id") Integer id, @EBParam("headers") JsonObject headers) {
+    @EBContract(action = "BODY_PART")
+    public JsonObject useBodyPartAndHeader(@EBBody("id") Integer id, @EBParam("headers") JsonObject headers) {
         return new JsonObject().put("id", id).put("headers", headers);
     }
+
+    @EBContract(action = "BODY_FULL")
+    public JsonObject useBodyAndHeader(@EBBody JsonObject body, @EBParam("headers") JsonObject headers) {
+        return new JsonObject().put("id", body).put("headers", headers);
+    }
+
 }

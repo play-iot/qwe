@@ -44,18 +44,32 @@ public interface JsonHelper {
     }
 
     static void assertJson(JsonObject expected, JsonObject actual, Customization... customizations) {
+        assertJson(logAndRethrow(expected, actual), () -> {}, expected, actual, customizations);
+    }
+
+    static void assertJson(Consumer<Throwable> onFailed, Runnable onFinal, JsonObject expected, JsonObject actual,
+                           Customization... customizations) {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
         } catch (JSONException | AssertionError e) {
-            throw logAndRethrowRuntime(expected, actual, e);
+            onFailed.accept(e);
+        } finally {
+            onFinal.run();
         }
     }
 
     static void assertJson(JsonObject expected, JsonObject actual, JSONCompareMode mode) {
+        assertJson(logAndRethrow(expected, actual), () -> {}, expected, actual, mode);
+    }
+
+    static void assertJson(Consumer<Throwable> onFailed, Runnable onFinal, JsonObject expected, JsonObject actual,
+                           JSONCompareMode mode) {
         try {
             JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
-        } catch (JSONException | AssertionError e) {
-            throw logAndRethrowRuntime(expected, actual, e);
+        } catch (JSONException | AssertionError | NullPointerException e) {
+            onFailed.accept(e);
+        } finally {
+            onFinal.run();
         }
     }
 
@@ -76,14 +90,8 @@ public interface JsonHelper {
 
         public static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
                                       JSONCompareMode mode) {
-            try {
-                JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
-                TestHelper.LOGGER.debug("Actual: " + actual.encode());
-            } catch (JSONException | AssertionError e) {
-                context.fail(logError(expected, actual, e));
-            } finally {
-                TestHelper.testComplete(async);
-            }
+            JsonHelper.assertJson(t -> context.fail(logError(expected, actual, t)),
+                                  () -> TestHelper.testComplete(async), expected, actual, mode);
         }
 
         public static void assertJson(TestContext context, Async async, JsonObject expected, JsonObject actual,
@@ -98,13 +106,8 @@ public interface JsonHelper {
                 assertJson(context, async, expected, actual, JSONCompareMode.STRICT);
                 return;
             }
-            try {
-                JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
-            } catch (JSONException | AssertionError e) {
-                context.fail(logError(expected, actual, e));
-            } finally {
-                TestHelper.testComplete(async);
-            }
+            JsonHelper.assertJson(t -> context.fail(logError(expected, actual, t)),
+                                  () -> TestHelper.testComplete(async), expected, actual, customizations);
         }
 
     }
@@ -123,14 +126,8 @@ public interface JsonHelper {
 
         public static void assertJson(VertxTestContext context, Checkpoint flag, JsonObject expected, JsonObject actual,
                                       JSONCompareMode mode) {
-            try {
-                JSONAssert.assertEquals(expected.encode(), actual.encode(), mode);
-                TestHelper.LOGGER.debug("Actual: " + actual.encode());
-            } catch (JSONException | AssertionError e) {
-                context.failNow(logError(expected, actual, e));
-            } finally {
-                flag.flag();
-            }
+            JsonHelper.assertJson(t -> context.failNow(logError(expected, actual, t)), flag::flag, expected, actual,
+                                  mode);
         }
 
         public static void assertJson(VertxTestContext context, Checkpoint flag, JsonObject expected, JsonObject actual,
@@ -145,13 +142,8 @@ public interface JsonHelper {
                 assertJson(context, flag, expected, actual, JSONCompareMode.STRICT);
                 return;
             }
-            try {
-                JSONAssert.assertEquals(expected.encode(), actual.encode(), comparator(customizations));
-            } catch (JSONException | AssertionError e) {
-                context.failNow(logError(expected, actual, e));
-            } finally {
-                flag.flag();
-            }
+            JsonHelper.assertJson(e -> context.failNow(logError(expected, actual, e)), flag::flag, expected, actual,
+                                  customizations);
         }
 
     }
@@ -164,6 +156,10 @@ public interface JsonHelper {
 
     static RuntimeException logAndRethrowRuntime(JsonObject expected, JsonObject actual, Throwable e) {
         return new RuntimeException(logError(expected, actual, e));
+    }
+
+    static Consumer<Throwable> logAndRethrow(JsonObject expected, JsonObject actual) {
+        return t -> {throw logAndRethrowRuntime(expected, actual, t);};
     }
 
 }
