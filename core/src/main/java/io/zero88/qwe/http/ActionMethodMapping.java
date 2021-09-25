@@ -1,5 +1,6 @@
 package io.zero88.qwe.http;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,8 +9,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.eventbus.EventAction;
 import io.vertx.core.http.HttpMethod;
+import io.zero88.qwe.eventbus.EventAction;
 
 import lombok.NonNull;
 
@@ -24,10 +25,10 @@ public interface ActionMethodMapping extends Supplier<Map<EventAction, HttpMetho
 
     /**
      * Default mapping for {@code READ | UPDATE | DELETE} operations
-     *
-     * @see #defaultRUDMap()
      */
-    ActionMethodMapping RUD_MAP = ActionMethodMapping.create(defaultRUDMap());
+    ActionMethodMapping RUD_MAP = ActionMethodMapping.byCRUD(
+        Arrays.asList(EventAction.UPDATE, EventAction.PATCH, EventAction.REMOVE, EventAction.GET_ONE,
+                      EventAction.GET_LIST));
 
     /**
      * Default mapping for {@code CREATE_OR_UPDATE | READ | DELETE} operations
@@ -38,10 +39,9 @@ public interface ActionMethodMapping extends Supplier<Map<EventAction, HttpMetho
 
     /**
      * Default mapping for common {@code CREATE | UPDATE | DELETE} operations
-     *
-     * @see #defaultDMLMap()
      */
-    ActionMethodMapping DML_MAP = ActionMethodMapping.create(defaultDMLMap());
+    ActionMethodMapping DML_MAP = ActionMethodMapping.byCRUD(
+        Arrays.asList(EventAction.CREATE, EventAction.UPDATE, EventAction.PATCH, EventAction.REMOVE));
 
     /**
      * Default mapping for common {@code BATCH_CREATE | BATCH_UPDATE | BATCH_DELETE} operations
@@ -52,13 +52,15 @@ public interface ActionMethodMapping extends Supplier<Map<EventAction, HttpMetho
 
     /**
      * Default mapping for reading {@code GET | GET_LIST} operations
-     *
-     * @see #defaultDQLMap()
      */
-    ActionMethodMapping DQL_MAP = ActionMethodMapping.create(defaultDQLMap());
+    ActionMethodMapping DQL_MAP = ActionMethodMapping.byCRUD(Arrays.asList(EventAction.GET_LIST, EventAction.GET_ONE));
 
     static ActionMethodMapping create(@NonNull Map<EventAction, HttpMethod> map) {
         return () -> Collections.unmodifiableMap(map);
+    }
+
+    static ActionMethodMapping create(EventAction action, HttpMethod method) {
+        return () -> Collections.singletonMap(action, method);
     }
 
     static ActionMethodMapping byCRUD(@NonNull Collection<EventAction> available) {
@@ -88,32 +90,6 @@ public interface ActionMethodMapping extends Supplier<Map<EventAction, HttpMetho
         map.put(EventAction.REMOVE, HttpMethod.DELETE);
         map.put(EventAction.GET_ONE, HttpMethod.GET);
         map.put(EventAction.GET_LIST, HttpMethod.GET);
-        return map;
-    }
-
-    static Map<EventAction, HttpMethod> defaultRUDMap() {
-        Map<EventAction, HttpMethod> map = new HashMap<>();
-        map.put(EventAction.UPDATE, HttpMethod.PUT);
-        map.put(EventAction.PATCH, HttpMethod.PATCH);
-        map.put(EventAction.REMOVE, HttpMethod.DELETE);
-        map.put(EventAction.GET_ONE, HttpMethod.GET);
-        map.put(EventAction.GET_LIST, HttpMethod.GET);
-        return map;
-    }
-
-    static Map<EventAction, HttpMethod> defaultDMLMap() {
-        Map<EventAction, HttpMethod> map = new HashMap<>();
-        map.put(EventAction.CREATE, HttpMethod.POST);
-        map.put(EventAction.UPDATE, HttpMethod.PUT);
-        map.put(EventAction.PATCH, HttpMethod.PATCH);
-        map.put(EventAction.REMOVE, HttpMethod.DELETE);
-        return map;
-    }
-
-    static Map<EventAction, HttpMethod> defaultDQLMap() {
-        Map<EventAction, HttpMethod> map = new HashMap<>();
-        map.put(EventAction.GET_LIST, HttpMethod.GET);
-        map.put(EventAction.GET_ONE, HttpMethod.GET);
         return map;
     }
 

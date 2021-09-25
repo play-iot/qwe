@@ -4,16 +4,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import io.zero88.qwe.eventbus.EBContext;
 import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EBParam;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventListener;
 import io.zero88.qwe.exceptions.ErrorCode;
@@ -69,22 +63,8 @@ public class SimpleAnnotationProcessor implements EventAnnotationProcessor {
             return new MethodParam[] {};
         }
         return Arrays.stream(params)
-                     .map(param -> new MethodParam(lookupParamName(param), buildParamAnnotation(param), param.getType(),
-                                                   param.isAnnotationPresent(EBContext.class)))
+                     .map(param -> MethodParam.create(param, supportedAnnotations))
                      .toArray(MethodParam[]::new);
-    }
-
-    protected String lookupParamName(Parameter param) {
-        return Optional.ofNullable(param.getAnnotation(EBParam.class))
-                       .map(EBParam::value)
-                       .orElseGet(() -> Optional.ofNullable(param.getName()).orElse(""));
-    }
-
-    protected Map<Class<? extends Annotation>, Annotation> buildParamAnnotation(Parameter param) {
-        return supportedAnnotations.stream()
-                                   .map(param::getAnnotation)
-                                   .filter(Objects::nonNull)
-                                   .collect(Collectors.toMap(Annotation::annotationType, Function.identity()));
     }
 
 }

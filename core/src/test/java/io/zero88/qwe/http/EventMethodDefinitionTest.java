@@ -251,4 +251,30 @@ public class EventMethodDefinitionTest {
                                 () -> definition1.search("/device/123/folder/345/point", HttpMethod.GET));
     }
 
+    @Test
+    public void test_custom_gen_path() {
+        EventMethodDefinition d = EventMethodDefinition.create("/api/translate",
+                                                               ActionMethodMapping.create(EventAction.CREATE,
+                                                                                          HttpMethod.POST));
+        Assertions.assertEquals(EventAction.CREATE, d.search("/api/translate", HttpMethod.POST));
+    }
+
+    @Test
+    public void test_combine_multiple_param_sequential() {
+        EventMethodDefinition d = EventMethodDefinition.create("/catalogue/products",
+                                                               "/:catalog_id/:product_type/:product_id",
+                                                               ActionMethodMapping.create(EventAction.GET_ONE,
+                                                                                          HttpMethod.GET));
+        Assertions.assertEquals(EventAction.GET_ONE, d.search("/catalogue/products/123/456/777", HttpMethod.GET));
+    }
+
+    @Test
+    public void test_combine_pattern() {
+        EventMethodDefinition d = EventMethodDefinition.create(
+            "/catalogue/:catalog_id/products/type/:product_type/product", "/:product_id",
+            ActionMethodMapping.create(EventAction.GET_ONE, HttpMethod.GET));
+        Assertions.assertEquals(EventAction.GET_ONE,
+                                d.search("/catalogue/123/products/type/456/product/xyz", HttpMethod.GET));
+    }
+
 }

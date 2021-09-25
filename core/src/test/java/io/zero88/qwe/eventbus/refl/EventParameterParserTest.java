@@ -1,5 +1,14 @@
 package io.zero88.qwe.eventbus.refl;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -19,6 +29,7 @@ import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.eventbus.EventListenerTest;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.eventbus.mock.MockEventListener;
+import io.zero88.qwe.eventbus.mock.MockParam;
 import io.zero88.qwe.eventbus.mock.MockWithContextListener;
 import io.zero88.qwe.eventbus.mock.MockWithVariousParamsListener;
 
@@ -163,6 +174,88 @@ class EventParameterParserTest {
         Assertions.assertEquals("headers", meta.params()[1].getParamName());
         Assertions.assertEquals(JsonObject.class, meta.params()[1].getParamClass());
         Assertions.assertNull(inputs[1]);
+    }
+
+    @Test
+    void test_extract_param_as_list() {
+        final JsonObject data = new JsonObject().put("list", new JsonArray().add("abc").add("xyz"));
+        final EventMessage msg = EventMessage.initial(EventAction.parse("LIST"), data);
+        final MethodMeta methodMeta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, methodMeta.params());
+        Assertions.assertEquals(1, inputs.length);
+        Assertions.assertTrue(ReflectionClass.assertDataType(inputs[0].getClass(), List.class));
+        Assertions.assertEquals(2, ((List) inputs[0]).size());
+        Assertions.assertTrue(
+            ReflectionClass.assertDataType(String.class, ((List) inputs[0]).stream().findFirst().get().getClass()));
+        Assertions.assertEquals(Arrays.asList("abc", "xyz"), inputs[0]);
+    }
+
+    @Test
+    void test_extract_body_as_set() {
+        final RequestData reqData = RequestData.builder()
+                                               .body(new JsonObject().put("set", Collections.singleton(
+                                                   JsonData.tryParse(new MockParam(1, "abc")).toJson())))
+                                               .build();
+        final EventMessage msg = EventMessage.initial(EventAction.parse("SET"), reqData);
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, meta.params());
+        Assertions.assertEquals(1, inputs.length);
+        Assertions.assertTrue(ReflectionClass.assertDataType(inputs[0].getClass(), Set.class));
+        Assertions.assertEquals(1, ((Set) inputs[0]).size());
+        Assertions.assertTrue(
+            ReflectionClass.assertDataType(MockParam.class, ((Set) inputs[0]).stream().findFirst().get().getClass()));
+    }
+
+    @Test
+    void test_extract_body_as_collection() {
+        final JsonObject data = new JsonObject().put("collection", Collections.singleton(
+            JsonData.tryParse(new MockParam(1, "abc")).toJson()));
+        final EventMessage msg = EventMessage.initial(EventAction.parse("COLLECTION"), data);
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, meta.params());
+        Assertions.assertTrue(ReflectionClass.assertDataType(meta.params()[0].getParamClass(), Collection.class));
+        Assertions.assertEquals(1, inputs.length);
+        Assertions.assertTrue(ReflectionClass.assertDataType(inputs[0].getClass(), Collection.class));
+        Assertions.assertEquals(1, ((Collection) inputs[0]).size());
+        Assertions.assertTrue(ReflectionClass.assertDataType(MockParam.class, ((Collection) inputs[0]).stream()
+                                                                                                      .findFirst()
+                                                                                                      .get()
+                                                                                                      .getClass()));
+    }
+
+    @Test
+    void test_extract_param_as_array() {
+        final JsonObject data = new JsonObject().put("array", new JsonArray().add(
+            JsonData.tryParse(new MockParam(1, "abc")).toJson()));
+        final EventMessage msg = EventMessage.initial(EventAction.parse("ARRAY"), data);
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, meta.params());
+        Assertions.assertEquals(1, inputs.length);
+        Assertions.assertTrue(inputs[0].getClass().isArray());
+        Assertions.assertEquals(MockParam.class, inputs[0].getClass().getComponentType());
+        Assertions.assertEquals(1, Array.getLength(inputs[0]));
+        Assertions.assertTrue(ReflectionClass.assertDataType(MockParam.class, Array.get(inputs[0], 0).getClass()));
+        Assertions.assertEquals(1, ((MockParam) Array.get(inputs[0], 0)).getId());
+        Assertions.assertEquals("abc", ((MockParam) Array.get(inputs[0], 0)).getName());
+    }
+
+    @Test
+    void test_extract_body_as_map() {
+        final JsonObject data = new JsonObject().put("map", Collections.singletonMap("x", JsonData.tryParse(
+            new MockParam(1, "abc")).toJson()));
+        final EventMessage msg = EventMessage.initial(EventAction.parse("MAP"), data);
+        final MethodMeta meta = processor.lookup(MockWithVariousParamsListener.class, msg.getAction());
+        final Object[] inputs = parser.extract(msg, meta.params());
+        Assertions.assertTrue(ReflectionClass.assertDataType(meta.params()[0].getParamClass(), Map.class));
+        Assertions.assertEquals(1, inputs.length);
+        Assertions.assertTrue(ReflectionClass.assertDataType(inputs[0].getClass(), Map.class));
+        Assertions.assertEquals(1, ((Map) inputs[0]).size());
+        final Entry entry = (Entry) ((Map) inputs[0]).entrySet().stream().findFirst().get();
+        Assertions.assertTrue(ReflectionClass.assertDataType(String.class, entry.getKey().getClass()));
+        Assertions.assertEquals("x", entry.getKey());
+        Assertions.assertTrue(ReflectionClass.assertDataType(MockParam.class, entry.getValue().getClass()));
+        Assertions.assertEquals(1, ((MockParam)entry.getValue()).getId());
+        Assertions.assertEquals("abc", ((MockParam)entry.getValue()).getName());
     }
 
 }

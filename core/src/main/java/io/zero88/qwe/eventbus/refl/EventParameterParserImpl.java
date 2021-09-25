@@ -15,13 +15,13 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.auth.UserInfo;
 import io.zero88.qwe.dto.ErrorMessage;
 import io.zero88.qwe.dto.msg.DataTransferObject.StandardKey;
-import io.zero88.qwe.eventbus.EBBody;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.exceptions.ErrorCode;
 import io.zero88.qwe.exceptions.ImplementationError;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EventParameterParserImpl implements EventParameterParser {
@@ -49,9 +49,9 @@ public class EventParameterParserImpl implements EventParameterParser {
                        : new Object[] {message.getError(), message.getData()};
             }
         }
-        boolean isOne = params.length - Arrays.stream(params).filter(MethodParam::isContext).count() == 1;
+        boolean isOne = params.length - Arrays.stream(params).filter(MethodParam::isEBContext).count() == 1;
         return Arrays.stream(params)
-                     .map(param -> param.isContext()
+                     .map(param -> param.isEBContext()
                                    ? parseEBContext(message, param)
                                    : parseEBParam(message, param, isOne))
                      .toArray();
@@ -86,43 +86,44 @@ public class EventParameterParserImpl implements EventParameterParser {
         }
         Object d = lookupParamValue(param, data);
         if (Objects.isNull(d)) {
-            if (param.getParamClass().isPrimitive()) {
+            if (param.isPrimitive()) {
                 throw new IllegalArgumentException(
                     "Data Field [" + param.getParamName() + "] is primitive type but given null data");
             }
-            return oneParam ? tryDeserialize(data.getMap(), param.getParamClass()) : null;
+            return oneParam ? tryDeserialize(data.getMap(), param) : null;
         }
-        return tryParseParamValue(param.getParamClass(), d);
+        return tryParseParamValue(param, d);
     }
 
     protected Object lookupParamValue(MethodParam param, JsonObject data) {
-        String bodyParam = Optional.ofNullable(param.lookupAnnotation(EBBody.class)).map(EBBody::value).orElse(null);
-        if (Objects.nonNull(bodyParam) && data.containsKey(StandardKey.BODY)) {
+        if (param.isEBBody() && data.containsKey(StandardKey.BODY)) {
             return Functions.getIfThrow(() -> JsonObject.mapFrom(data.getValue(StandardKey.BODY)))
-                            .map(json -> "".equals(bodyParam) ? json : json.getValue(bodyParam))
+                            .map(json -> "".equals(param.getParamName()) ? json : json.getValue(param.getParamName()))
                             .orElse(null);
         }
-        if ("".equals(bodyParam)) {
-            return data;
-        }
-        return data.getValue(Optional.ofNullable(bodyParam).orElseGet(param::getParamName));
+        return data.getValue(param.getParamName());
     }
 
-    protected Object tryParseParamValue(Class<?> paramClass, Object d) {
+    protected Object tryParseParamValue(MethodParam param, Object d) {
+        final Class<?> paramClass = param.getParamClass();
         try {
-            if (ReflectionClass.isJavaLangObject(paramClass)) {
+            if (!param.isArray() && ReflectionClass.isJavaLangObject(paramClass)) {
                 return ReflectionClass.assertDataType(d.getClass(), paramClass) ? d : paramClass.cast(d);
             }
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Event message format is invalid", new HiddenException(
                 "Unable cast data type [" + paramClass.getName() + "]", e));
         }
-        return tryDeserialize(d, paramClass);
+        return tryDeserialize(d, param);
     }
 
-    protected Object tryDeserialize(Object data, Class<?> paramClass) {
+    protected Object tryDeserialize(Object data, MethodParam param) {
         try {
-            return mapper.convertValue(data, paramClass);
+            final JavaType javaType = param.toJavaType(mapper);
+            if (javaType == null) {
+                return mapper.convertValue(data, param.getParamClass());
+            }
+            return mapper.convertValue(data, javaType);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Event message body is invalid",
                                                new HiddenException("Jackson parser error", e));

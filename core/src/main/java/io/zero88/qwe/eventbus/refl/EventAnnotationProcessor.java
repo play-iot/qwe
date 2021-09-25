@@ -1,8 +1,8 @@
 package io.zero88.qwe.eventbus.refl;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -39,7 +39,7 @@ public interface EventAnnotationProcessor {
     }
 
     static EventAnnotationProcessor create(String[] ignorePackages) {
-        return create(ignorePackages, Collections.singleton(EBBody.class));
+        return create(ignorePackages, Arrays.asList(EBBody.class, EBParam.class, EBContext.class));
     }
 
     static EventAnnotationProcessor create(String[] ignorePackages,

@@ -1,8 +1,14 @@
 package io.zero88.qwe.eventbus.mock;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBBody;
 import io.zero88.qwe.eventbus.EBContract;
@@ -37,13 +43,6 @@ public class MockWithVariousParamsListener extends MockEventListener {
         return new JsonObject().put("param", JsonObject.mapFrom(param)).put("request", data.toJson());
     }
 
-    @EBContract(action = "REMOVE")
-    public JsonObject collectionParam(@EBParam("list") Collection<String> data) {
-        JsonObject result = new JsonObject();
-        data.forEach(item -> result.put(item, item));
-        return result;
-    }
-
     @EBContract(action = "BODY_PART")
     public JsonObject useBodyPartAndHeader(@EBBody("id") Integer id, @EBParam("headers") JsonObject headers) {
         return new JsonObject().put("id", id).put("headers", headers);
@@ -52,6 +51,41 @@ public class MockWithVariousParamsListener extends MockEventListener {
     @EBContract(action = "BODY_FULL")
     public JsonObject useBodyAndHeader(@EBBody JsonObject body, @EBParam("headers") JsonObject headers) {
         return new JsonObject().put("id", body).put("headers", headers);
+    }
+
+    @EBContract(action = "LIST")
+    public JsonObject paramAsList(@EBParam("list") List<String> data) {
+        JsonObject result = new JsonObject();
+        data.forEach(item -> result.put(item, item));
+        return result;
+    }
+
+    @EBContract(action = "SET")
+    public JsonArray paramAsSet(@EBBody("set") Set<MockParam> data) {
+        JsonArray result = new JsonArray();
+        data.forEach(result::add);
+        return result;
+    }
+
+    @EBContract(action = "MAP")
+    public JsonObject paramAsMap(@EBBody("map") Map<String, MockParam> data) {
+        JsonObject result = new JsonObject();
+        data.forEach((s, mockParam) -> result.put(s, JsonData.tryParse(mockParam).toJson()));
+        return result;
+    }
+
+    @EBContract(action = "COLLECTION")
+    public JsonArray paramAsCollection(@EBParam("collection") Collection<MockParam> data) {
+        JsonArray result = new JsonArray();
+        data.forEach(mockParam -> result.add(JsonData.tryParse(mockParam).toJson()));
+        return result;
+    }
+
+    @EBContract(action = "ARRAY")
+    public JsonArray paramAsArray(@EBParam("array") MockParam[] data) {
+        JsonArray result = new JsonArray();
+        Arrays.stream(data).forEach(mockParam -> result.add(JsonData.tryParse(mockParam).toJson()));
+        return result;
     }
 
 }
