@@ -1,35 +1,69 @@
 package io.zero88.qwe.http.server.upload;
 
-import java.util.Objects;
+import java.util.Collections;
+import java.util.Set;
+
+import org.jetbrains.annotations.Nullable;
 
 import io.github.zero88.repl.ReflectionClass;
-import io.github.zero88.utils.Strings;
-import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.eventbus.EBContext;
-import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventListener;
+import io.vertx.core.http.HttpMethod;
+import io.zero88.qwe.eventbus.EventAction;
+import io.zero88.qwe.http.ActionMethodMapping;
+import io.zero88.qwe.http.EventHttpService;
+import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
 
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 
 /**
  * Upload listener to handle uploaded file (update database, transfer to another host)
+ *
+ * @since 1.0.0
  */
-@RequiredArgsConstructor
-public class UploadListener implements EventListener {
+public interface UploadListener extends EventHttpService, UploadSystem {
 
-    public static UploadListener create(String listenerClass) {
-        if (Strings.isBlank(listenerClass) || UploadListener.class.getName().equals(listenerClass)) {
-            return new UploadListener();
+    static @Nullable UploadListener create(Class<Object> listenerClass) {
+        if (listenerClass == null) {
+            return null;
         }
-        return Objects.requireNonNull(ReflectionClass.createObject(listenerClass));
+        if (UploadListener.class.equals(listenerClass)) {
+            return new LoggerUploadListener();
+        }
+        if (ReflectionClass.assertDataType(listenerClass, UploadListener.class)) {
+            return (UploadListener) ReflectionClass.createObject(listenerClass);
+        }
+        return null;
     }
 
-    @EBContract(action = "CREATE")
-    public Future<JsonObject> create(@EBContext SharedDataLocalProxy sharedData, JsonObject data) {
-        logger().info(decor("Upload metadata::{}"), data);
-        return Future.succeededFuture(data);
+    @Override
+    @NonNull
+    default String function() {
+        return UploadSystem.super.function();
+    }
+
+    /**
+     * Max upload size in Megabytes
+     *
+     * @return the max upload size or {@code <= 0} if using configuration
+     */
+    default long maxUploadSize() {
+        return -1;
+    }
+
+    /**
+     * File upload predicate
+     *
+     * @return file upload predicate
+     * @see FileUploadPredicate
+     */
+    default FileUploadPredicate predicate() {
+        return FileUploadPredicate.acceptAll();
+    }
+
+    @Override
+    default Set<EventMethodDefinition> definitions() {
+        return Collections.singleton(EventMethodDefinition.create("/", ActionMethodMapping.create(
+            Collections.singletonMap(EventAction.CREATE, HttpMethod.POST))));
     }
 
 }

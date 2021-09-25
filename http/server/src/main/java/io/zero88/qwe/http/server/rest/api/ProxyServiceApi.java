@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.msg.RequestFilter;
+import io.zero88.qwe.http.server.RoutePath;
 import io.zero88.qwe.micro.HasServiceType;
 
 import lombok.NonNull;
@@ -38,7 +39,7 @@ public interface ProxyServiceApi extends HasServiceType {
      *
      * @return HTTP path for proxy service
      */
-    @NotNull Collection<ProxyPath> paths();
+    @NotNull Collection<RoutePath> paths();
 
     /**
      * Router order

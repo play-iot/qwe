@@ -9,9 +9,9 @@ import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
 import io.zero88.qwe.http.server.HttpServerPluginContext;
 import io.zero88.qwe.http.server.HttpSystem.GatewaySystem;
+import io.zero88.qwe.http.server.RoutePath;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.ServerInfo;
-import io.zero88.qwe.http.server.rest.api.ProxyPath;
 import io.zero88.qwe.http.server.rest.api.ProxyServiceApi;
 import io.zero88.qwe.http.server.rest.handler.ProxyServiceDispatcher;
 import io.zero88.qwe.micro.monitor.ServiceGatewayMonitor;
@@ -28,7 +28,7 @@ public interface ProxyServiceRouteRegister extends ServiceGatewayMonitor, Gatewa
         ProxyServiceApi api = ProxyServiceApi.create(record);
         ServerInfo serverInfo = sharedData().getData(HttpServerPluginContext.SERVER_INFO_DATA_KEY);
         Router router = serverInfo.getRouter();
-        for (ProxyPath pPath : api.paths()) {
+        for (RoutePath pPath : api.paths()) {
             String path = Urls.combinePath(serverInfo.getServicePath(), pPath.getPath());
             if (record.getStatus() == Status.UP) {
                 ProxyServiceDispatcher handler = ProxyServiceDispatcher.create(getDiscovery(),

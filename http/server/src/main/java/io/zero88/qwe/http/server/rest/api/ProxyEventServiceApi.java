@@ -11,6 +11,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.servicediscovery.Record;
 import io.zero88.qwe.dto.msg.RequestFilter;
 import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.http.server.RoutePath;
 import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
@@ -29,12 +30,12 @@ public class ProxyEventServiceApi implements ProxyServiceApi {
     }
 
     @Override
-    public @NotNull Collection<ProxyPath> paths() {
+    public @NotNull Collection<RoutePath> paths() {
         return definition.getMapping()
                          .stream()
                          .filter(m -> Strings.isNotBlank(m.getCapturePath()))
-                         .map(m -> new ProxyPath(m.getCapturePath(), m.getMethod(), m.getAuth()))
-                         .sorted(Comparator.<ProxyPath>comparingInt(p -> p.getPath().length())
+                         .map(RoutePath::create)
+                         .sorted(Comparator.<RoutePath>comparingInt(p -> p.getPath().length())
                                            .thenComparing(p -> p.getMethod().name().length())
                                            .reversed())
                          .collect(Collectors.toList());

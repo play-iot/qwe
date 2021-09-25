@@ -7,16 +7,17 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import io.zero88.qwe.IConfig;
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.utils.JsonUtils;
 
 public class HttpServerConfigTest {
 
     @Test
-    public void test_default() throws JSONException {
+    public void test_default() {
         HttpServerConfig config = new HttpServerConfig();
         System.out.println(config.toJson().encode());
         HttpServerConfig fromFile = IConfig.from(JsonUtils.loadJsonInClasspath("httpServer.json"), HttpServerConfig.class);
-        JSONAssert.assertEquals(fromFile.toJson().encode(), config.toJson().encode(), JSONCompareMode.LENIENT);
+        JsonHelper.assertJson(fromFile.toJson(), config.toJson(), JSONCompareMode.LENIENT);
     }
 
     @Test

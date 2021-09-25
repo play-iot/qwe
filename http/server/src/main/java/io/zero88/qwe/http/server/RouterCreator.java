@@ -20,6 +20,9 @@ import lombok.NonNull;
 public interface RouterCreator<C extends RouterConfig> extends RouterBuilder, HasLogger, HttpSystem {
 
     static Route addContentType(Route route, List<String> contentTypes) {
+        if (contentTypes == null || contentTypes.isEmpty()) {
+            return route;
+        }
         return contentTypes.stream().reduce(route, Route::produces, (r1, r2) -> r1);
     }
 
@@ -37,7 +40,7 @@ public interface RouterCreator<C extends RouterConfig> extends RouterBuilder, Ha
         if (!cfg.isEnabled() || !validate(cfg)) {
             return rootRouter;
         }
-        logger().info(decor("Setup route [{}][{}]"), routerName(), addWildcards(routerPath(cfg)));
+        logger().info("Setup router [{}][{}]", routerName(), addWildcards(routePath(cfg)));
         rootRouter.mountSubRouter(mountPoint(cfg), subRouter(context.sharedData(),
                                                              Objects.requireNonNull(context.dataDir(),
                                                                                     "Missing HTTP plugin dir"), cfg));
@@ -52,12 +55,25 @@ public interface RouterCreator<C extends RouterConfig> extends RouterBuilder, Ha
         return function();
     }
 
-    default String routerPath(@NonNull C config) {
+    default @NonNull
+    String mountPoint(@NonNull C config) {
+        return config.getPath();
+    }
+
+    default String routePath(@NonNull C config) {
         return mountPoint(config);
     }
 
-    default @NonNull String mountPoint(@NonNull C config) {
-        return config.getPath();
+    default Route createRoute(Router router, C config, RoutePath routePath) {
+        return createRoute(router, config, routePath, true);
+    }
+
+    default Route createRoute(Router router, C config, RoutePath routePath, boolean enableLog) {
+        if (enableLog) {
+            logger().info(decor("Register route [{}::{}]"), routePath.getMethod(),
+                          Urls.combinePath(mountPoint(config), routePath.getPath()));
+        }
+        return addContentType(router.route(routePath.getMethod(), routePath.getPath()), routePath.getContentTypes());
     }
 
     Function<HttpServerConfig, C> lookupConfig();
@@ -71,6 +87,7 @@ public interface RouterCreator<C extends RouterConfig> extends RouterBuilder, Ha
      * @return the sub router
      * @see RouterBuilder#setup(Vertx, Router, HttpServerConfig, HttpServerPluginContext)
      */
-    @NonNull Router subRouter(@NonNull SharedDataLocalProxy sharedData, @NonNull Path pluginDir, @NonNull C config);
+    @NonNull
+    Router subRouter(@NonNull SharedDataLocalProxy sharedData, @NonNull Path pluginDir, @NonNull C config);
 
 }

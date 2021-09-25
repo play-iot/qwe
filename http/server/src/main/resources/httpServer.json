@@ -126,7 +126,9 @@
     "uploadDir": "files",
     "maxBodySizeMB": 10,
     "handlerClass": "io.zero88.qwe.http.server.upload.UploadFileHandler",
-    "listenerClass": "io.zero88.qwe.http.server.upload.UploadListener"
+    "listenerClasses": [
+      "io.zero88.qwe.http.server.upload.LoggerUploadListener"
+    ]
   },
   "__download__": {
     "enabled": false,

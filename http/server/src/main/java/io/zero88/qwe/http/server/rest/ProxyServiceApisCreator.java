@@ -23,13 +23,13 @@ public final class ProxyServiceApisCreator implements RouterCreator<ApiConfig>, 
     }
 
     @Override
-    public String routerPath(@NonNull ApiConfig config) {
-        return Urls.combinePath(config.getPath(), config.getProxyConfig().getPath());
+    public @NonNull String mountPoint(@NonNull ApiConfig config) {
+        return config.getProxyConfig().getPath();
     }
 
     @Override
-    public Function<HttpServerConfig, ApiConfig> lookupConfig() {
-        return HttpServerConfig::getApiConfig;
+    public String routePath(@NonNull ApiConfig config) {
+        return Urls.combinePath(config.getPath(), mountPoint(config));
     }
 
     @Override
@@ -38,8 +38,8 @@ public final class ProxyServiceApisCreator implements RouterCreator<ApiConfig>, 
     }
 
     @Override
-    public @NonNull String mountPoint(@NonNull ApiConfig config) {
-        return config.getProxyConfig().getPath();
+    public Function<HttpServerConfig, ApiConfig> lookupConfig() {
+        return HttpServerConfig::getApiConfig;
     }
 
     @Override

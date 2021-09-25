@@ -10,10 +10,7 @@
       "__upload__": {
         "enabled": true,
         "path": "/u",
-        "maxBodySizeMB": 1,
-        "handlerClass": "io.zero88.qwe.http.server.upload.UploadFileHandler",
-        "listenerAddress": "blank.mean.using.container.class.name.upload",
-        "listenerClass": "io.zero88.qwe.http.server.upload.UploadListener"
+        "maxBodySizeMB": 1
       },
       "__download__": {
         "enabled": true,

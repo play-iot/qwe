@@ -6,8 +6,14 @@ import java.util.Objects;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.zero88.qwe.auth.ReqAuthDefinition;
+import io.zero88.qwe.eventbus.DeliveryEvent;
 import io.zero88.qwe.http.server.handler.EventBusProxyDispatcher;
 
+/**
+ * Upload file handler
+ *
+ * @since 1.0.0
+ */
 public interface UploadFileHandler extends EventBusProxyDispatcher {
 
     static UploadFileHandler create(String handlerClass) {
@@ -17,6 +23,7 @@ public interface UploadFileHandler extends EventBusProxyDispatcher {
         return Objects.requireNonNull(ReflectionClass.createObject(handlerClass));
     }
 
-    UploadFileHandler setup(String sharedKey, String address, Path uploadDir, ReqAuthDefinition authDefinition);
+    UploadFileHandler setup(String sharedKey, ReqAuthDefinition authDefinition, DeliveryEvent deliveryEvent,
+                            Path uploadDir, FileUploadPredicate predicate);
 
 }

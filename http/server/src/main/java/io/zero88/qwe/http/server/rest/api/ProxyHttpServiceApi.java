@@ -11,6 +11,8 @@ import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.servicediscovery.types.HttpLocation;
 import io.zero88.qwe.auth.ReqAuthDefinition;
 import io.zero88.qwe.dto.msg.RequestFilter;
+import io.zero88.qwe.http.HttpUtils;
+import io.zero88.qwe.http.server.RoutePath;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.micro.filter.ByPredicateFactory;
 import io.zero88.qwe.micro.filter.ServiceFilterParam;
@@ -32,9 +34,10 @@ public class ProxyHttpServiceApi implements ProxyServiceApi {
     }
 
     @Override
-    public @NotNull Collection<ProxyPath> paths() {
+    public @NotNull Collection<RoutePath> paths() {
         return Collections.singleton(
-            new ProxyPath(RouterCreator.addWildcards(location.getRoot()), HttpMethod.GET, ReqAuthDefinition.noAuth()));
+            new RoutePath(RouterCreator.addWildcards(location.getRoot()), HttpMethod.GET, ReqAuthDefinition.noAuth(),
+                          HttpUtils.JSON_CONTENT_TYPES));
     }
 
     @Override

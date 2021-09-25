@@ -39,7 +39,8 @@ public final class RequestDataInterceptorImpl implements RequestDataInterceptor 
     private RequestData extract(RoutingContext ctx) {
         if (useForUpload) {
             return RequestData.builder()
-                              .body(HttpHeaderUtils.serializeHeaders(ctx.request().formAttributes()))
+                              .body(new JsonObject().put("attributes", HttpHeaderUtils.serializeHeaders(
+                                  ctx.request().formAttributes())))
                               .headers(HttpHeaderUtils.serializeHeaders(ctx.request()))
                               .build();
         }

@@ -11,8 +11,8 @@ import io.zero88.qwe.SharedDataLocalProxy;
 import io.zero88.qwe.eventbus.DeliveryEvent;
 import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.EventMethodMapping;
+import io.zero88.qwe.http.server.RoutePath;
 import io.zero88.qwe.http.server.RouterConfig;
-import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.rest.api.IRestEventApi;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
 
@@ -30,7 +30,6 @@ public abstract class RestEventApisCreatorImpl<X extends IRestEventApi<C>, C ext
                  .filter(Objects::nonNull)
                  .map(api -> api.setup(config, sharedData))
                  .forEach(api -> createRouter(router, api, config, sharedData));
-        //            router.route(BasePaths.addWildcards(config.getPath()));
         return router;
     }
 
@@ -48,12 +47,10 @@ public abstract class RestEventApisCreatorImpl<X extends IRestEventApi<C>, C ext
                                                                  .setPattern(api.pattern())
                                                                  .setAction(mapping.getAction())
                                                                  .setUseRequestData(mapping.isUseRequestData());
-                RouterCreator.addContentType(router.route(mapping.getMethod(), mapping.getCapturePath()),
-                                             api.contentTypes())
-                             .order(definition.getOrder())
-                             .handler(RestEventApiDispatcher.create(api.dispatcher())
-                                                            .setup(sharedData.sharedKey(), mapping.getAuth(),
-                                                                   deliveryEvent));
+                this.createRoute(router, config, RoutePath.create(mapping, api.contentTypes()), false)
+                    .order(definition.getOrder())
+                    .handler(RestEventApiDispatcher.create(api.dispatcher())
+                                                   .setup(sharedData.sharedKey(), mapping.getAuth(), deliveryEvent));
             }
         }
     }
