@@ -1,9 +1,13 @@
 package io.zero88.qwe.http.server.config;
 
+import java.util.Collections;
+import java.util.Set;
+
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.DownloadSystem;
 import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.download.DownloadFileHandler;
+import io.zero88.qwe.http.server.download.LocalDownloadFileListener;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -15,8 +19,9 @@ public final class FileDownloadConfig extends AbstractRouterConfig implements Ro
 
     public static final String NAME = "__download__";
 
-    private String handlerClass = DownloadFileHandler.class.getName();
     private String downloadDir = "files";
+    private String handlerClass = DownloadFileHandler.class.getName();
+    private Set<String> listenerClasses = Collections.singleton(LocalDownloadFileListener.class.getName());
 
     public FileDownloadConfig() {
         super(NAME, HttpServerConfig.class);

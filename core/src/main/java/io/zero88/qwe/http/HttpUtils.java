@@ -22,11 +22,11 @@ import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.zero88.qwe.dto.JsonData;
 import io.zero88.qwe.dto.jackson.QWEJsonCodec;
-import io.zero88.qwe.dto.jackson.QWEJsonFactory;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.jpa.Sort;
 import io.zero88.qwe.dto.msg.RequestFilter;
@@ -51,7 +51,7 @@ public final class HttpUtils {
     }
 
     public static <T> Buffer prettify(HttpServerRequest request, T result) {
-        return QWEJsonFactory.CODEC.toBuffer(result, isPretty(request));
+        return Json.CODEC.toBuffer(result, isPretty(request));
     }
 
     public static Buffer prettify(HttpServerRequest request, JsonData result) {

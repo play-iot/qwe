@@ -13,6 +13,7 @@ import io.zero88.qwe.http.EventMethodDefinition;
 import io.zero88.qwe.http.EventMethodMapping;
 import io.zero88.qwe.http.server.RoutePath;
 import io.zero88.qwe.http.server.RouterConfig;
+import io.zero88.qwe.http.server.handler.HttpEBDispatcher;
 import io.zero88.qwe.http.server.rest.api.IRestEventApi;
 import io.zero88.qwe.http.server.rest.handler.RestEventApiDispatcher;
 
@@ -43,14 +44,14 @@ public abstract class RestEventApisCreatorImpl<X extends IRestEventApi<C>, C ext
                     logger().warn(decor("Path [{}] will omit data in 'HTTP Request Query' and 'HTTP Request Header'"),
                                   fullPath);
                 }
-                DeliveryEvent deliveryEvent = new DeliveryEvent().setAddress(api.address())
-                                                                 .setPattern(api.pattern())
-                                                                 .setAction(mapping.getAction())
-                                                                 .setUseRequestData(mapping.isUseRequestData());
+                HttpEBDispatcher dispatcher = HttpEBDispatcher.create(sharedData.sharedKey(),
+                                                                      new DeliveryEvent().address(api.address())
+                                                                                         .pattern(api.pattern())
+                                                                                         .action(mapping.getAction())
+                                                                                         .useRequestData(mapping.isUseRequestData()));
                 this.createRoute(router, config, RoutePath.create(mapping, api.contentTypes()), false)
                     .order(definition.getOrder())
-                    .handler(RestEventApiDispatcher.create(api.dispatcher())
-                                                   .setup(sharedData.sharedKey(), mapping.getAuth(), deliveryEvent));
+                    .handler(RestEventApiDispatcher.create(api.dispatcher()).setup(dispatcher, mapping.getAuth()));
             }
         }
     }

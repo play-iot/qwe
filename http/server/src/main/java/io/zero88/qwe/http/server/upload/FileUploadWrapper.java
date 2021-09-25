@@ -1,7 +1,5 @@
 package io.zero88.qwe.http.server.upload;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
@@ -34,12 +32,12 @@ public final class FileUploadWrapper implements Wrapper<FileUpload>, JsonData {
     private final String transferEncoding;
     private final long size;
 
-    public static FileUploadWrapper create(Path uploadDir, FileUpload fileUpload) {
+    public static FileUploadWrapper create(FileUpload fileUpload) {
         return FileUploadWrapper.builder()
                                 .fileUpload(Objects.requireNonNull(fileUpload, "File upload is null"))
                                 .name(fileUpload.name())
                                 .fileName(fileUpload.fileName())
-                                .filePath(uploadDir.relativize(Paths.get(fileUpload.uploadedFileName())).toString())
+                                .filePath(fileUpload.uploadedFileName())
                                 .extension(FileUtils.getExtension(fileUpload.fileName()))
                                 .charset(fileUpload.charSet())
                                 .contentType(fileUpload.contentType())

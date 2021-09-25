@@ -62,8 +62,8 @@ public interface UploadListener extends EventHttpService, UploadSystem {
 
     @Override
     default Set<EventMethodDefinition> definitions() {
-        return Collections.singleton(EventMethodDefinition.create("/", ActionMethodMapping.create(
-            Collections.singletonMap(EventAction.CREATE, HttpMethod.POST))));
+        return Collections.singleton(
+            EventMethodDefinition.create("/", ActionMethodMapping.create(EventAction.CREATE, HttpMethod.POST)));
     }
 
 }

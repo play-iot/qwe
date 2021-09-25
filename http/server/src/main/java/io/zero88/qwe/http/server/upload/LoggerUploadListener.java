@@ -13,7 +13,7 @@ public final class LoggerUploadListener implements UploadListener {
     @EBContract(action = "CREATE")
     public JsonObject create(@EBBody("attributes") JsonObject attributes,
                              @EBBody("files") List<FileUploadWrapper> files) {
-        logger().info(decor("Uploaded::{} file(s)"), files.size());
+        logger().info(decor("Uploaded::{}"), files.stream().collect(JsonCollectors.toArray()));
         return new JsonObject().put("attributes", attributes)
                                .put("files", files.stream()
                                                   .collect(JsonCollectors.toArray(

@@ -1,7 +1,6 @@
 package io.zero88.qwe.http.server.upload;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -19,6 +18,7 @@ import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
 import io.zero88.qwe.http.server.RoutePath;
 import io.zero88.qwe.http.server.RouterCreator;
 import io.zero88.qwe.http.server.config.FileUploadConfig;
+import io.zero88.qwe.http.server.handler.HttpEBDispatcher;
 
 import lombok.NonNull;
 
@@ -39,23 +39,26 @@ public final class UploadRouterCreator implements RouterCreator<FileUploadConfig
               .map(ReflectionClass::findClass)
               .map(UploadListener::create)
               .filter(Objects::nonNull)
-              .forEach(listener -> {
-                  EventBusClient.create(sharedData).register(listener.address(), listener);
-                  long limit = HttpServerConfig.MB *
-                               (listener.maxUploadSize() <= 0 ? config.getMaxBodySizeMB() : listener.maxUploadSize());
-                  for (EventMethodDefinition definition : listener.definitions()) {
-                      for (EventMethodMapping mapping : definition.getMapping()) {
-                          this.createRoute(router, config, RoutePath.create(mapping))
-                              .handler(BodyHandler.create(uploadDir).setBodyLimit(limit))
-                              .handler(UploadFileHandler.create(config.getHandlerClass())
-                                                        .setup(sharedData.sharedKey(), mapping.getAuth(),
-                                                               new DeliveryEvent().setAddress(listener.address())
-                                                                                  .setAction(mapping.getAction()),
-                                                               Paths.get(uploadDir), listener.predicate()));
-                      }
-                  }
-              });
+              .forEach(listener -> createRoute(sharedData, config, uploadDir, router, listener));
         return router;
+    }
+
+    private void createRoute(SharedDataLocalProxy sharedData, FileUploadConfig config, String uploadDir, Router router,
+                             UploadListener listener) {
+        EventBusClient.create(sharedData).register(listener.address(), listener);
+        long limit = HttpServerConfig.MB *
+                     (listener.maxUploadSize() <= 0 ? config.getMaxBodySizeMB() : listener.maxUploadSize());
+        for (EventMethodDefinition definition : listener.definitions()) {
+            for (EventMethodMapping mapping : definition.getMapping()) {
+                HttpEBDispatcher dispatcher = HttpEBDispatcher.create(sharedData.sharedKey(),
+                                                                      new DeliveryEvent().address(listener.address())
+                                                                                         .action(mapping.getAction()));
+                this.createRoute(router, config, RoutePath.create(mapping))
+                    .handler(BodyHandler.create(uploadDir).setBodyLimit(limit))
+                    .handler(UploadFileHandler.create(config.getHandlerClass())
+                                              .setup(dispatcher, mapping.getAuth(), listener.predicate()));
+            }
+        }
     }
 
 }

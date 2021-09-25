@@ -1,62 +1,36 @@
 package io.zero88.qwe.http.server.download;
 
-import java.nio.file.Path;
+import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.github.zero88.repl.Arguments;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.vertx.core.Handler;
-import io.vertx.ext.web.RoutingContext;
-import io.zero88.qwe.exceptions.DataNotFoundException;
+import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.http.server.HttpSystem.DownloadSystem;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import io.zero88.qwe.http.server.handler.EventBusProxyDispatcher;
+import io.zero88.qwe.http.server.handler.ResponseFileInterceptor;
+import io.zero88.qwe.http.server.handler.ResponseInterceptor;
 
 /**
  * Download file handler helps extract {@code URL path} to {@code file id} then do some stuffs (e.g: find record in
  * Database) to lookup actual file.
  */
-@Getter
-@RequiredArgsConstructor
-public abstract class DownloadFileHandler implements Handler<RoutingContext>, DownloadSystem {
+public interface DownloadFileHandler extends EventBusProxyDispatcher<DownloadFile>, DownloadSystem {
 
-    private final Logger logger = LoggerFactory.getLogger(DownloadFileHandler.class);
-    private final String downloadPath;
-    private final Path downloadDir;
-
-    public static DownloadFileHandler create(String handlerClass, String downloadPath, @NonNull Path downloadDir) {
-        if (Strings.isBlank(handlerClass) || DownloadFileHandler.class.getName().equals(handlerClass)) {
-            return new DownloadFileHandler(downloadPath, downloadDir) {
-                protected Path getFilePath(String fileId) {
-                    return downloadDir.resolve(fileId);
-                }
-            };
+    static DownloadFileHandler create(String downloadHandlerCls) {
+        if (Strings.isBlank(downloadHandlerCls) || DownloadFileHandler.class.getName().equals(downloadHandlerCls)) {
+            return new DownloadFileHandlerImpl();
         }
-        return ReflectionClass.createObject(handlerClass, new Arguments().put(String.class, downloadPath)
-                                                                         .put(Path.class, downloadDir));
+        return Objects.requireNonNull(ReflectionClass.createObject(downloadHandlerCls));
     }
 
     @Override
-    public void handle(RoutingContext context) {
-        final String fileId = context.request().path().replaceFirst(downloadPath, "");
-        final Path filePath = getFilePath(fileId);
-        if (filePath.toFile().exists()) {
-            context.response()
-                   .setChunked(true)
-                   .setStatusCode(HttpResponseStatus.OK.code())
-                   .sendFile(filePath.toString())
-                   .onFailure(t -> logger.warn(decor("Something wrong when sending file"), t));
-        } else {
-            throw new DataNotFoundException(decor("Not found file: " + fileId + " in system"));
-        }
+    default ResponseInterceptor<DownloadFile> responseInterceptor() {
+        return new ResponseFileInterceptor();
     }
 
-    protected abstract Path getFilePath(String fileId);
+    @Override
+    default DownloadFile convert(EventMessage resp) {
+        return resp.parseAndGetData(DownloadFile.class);
+    }
 
 }

@@ -4,6 +4,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import io.zero88.qwe.auth.UserInfo;
+import io.zero88.qwe.http.server.HttpSystem;
 
 /**
  * Represents for the HTTP request handler that dispatches an incoming request to the appropriate backend
@@ -11,7 +12,7 @@ import io.zero88.qwe.auth.UserInfo;
  * @param <I> Type of request
  * @param <R> Type of response
  */
-public interface RequestDispatcher<I, R> extends Handler<RoutingContext> {
+public interface RequestDispatcher<I, R> extends Handler<RoutingContext>, HttpSystem {
 
     RequestInterceptor<I> validator();
 
