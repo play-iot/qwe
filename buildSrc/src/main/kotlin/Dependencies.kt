@@ -91,6 +91,7 @@ object VertxLibs {
     const val shiro = "io.vertx:vertx-auth-shiro:${Version.vertx}"
     const val config = "io.vertx:vertx-config:${Version.vertx}"
     const val web = "io.vertx:vertx-web:${Version.vertx}"
+    const val webClient = "io.vertx:vertx-web-client:${Version.vertx}"
     const val healthCheck = "io.vertx:vertx-health-check:${Version.vertx}"
     const val circuitBreaker = "io.vertx:vertx-circuit-breaker:${Version.vertx}"
     const val serviceDiscovery = "io.vertx:vertx-service-discovery:${Version.vertx}"
