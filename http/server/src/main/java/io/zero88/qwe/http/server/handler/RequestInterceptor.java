@@ -7,6 +7,6 @@ public interface RequestInterceptor<T> {
 
     RequestInterceptor<RoutingContext> IDENTITY = Future::succeededFuture;
 
-    Future<T> filter(RoutingContext ctx);
+    Future<T> filter(RoutingContext context);
 
 }

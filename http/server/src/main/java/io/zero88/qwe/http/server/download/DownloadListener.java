@@ -7,6 +7,7 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
 import io.github.zero88.repl.ReflectionClass;
+import io.github.zero88.utils.Strings;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.zero88.qwe.eventbus.EventAction;
@@ -19,15 +20,16 @@ import lombok.NonNull;
 
 public interface DownloadListener extends EventHttpService, DownloadSystem {
 
-    static @Nullable DownloadListener create(Class<Object> listenerClass) {
-        if (listenerClass == null) {
+    static @Nullable DownloadListener create(String listenerClass) {
+        if (Strings.isBlank(listenerClass)) {
             return null;
         }
-        if (DownloadListener.class.equals(listenerClass)) {
+        if (DownloadListener.class.getName().equals(listenerClass)) {
             return new LocalDownloadFileListener();
         }
-        if (ReflectionClass.assertDataType(listenerClass, DownloadListener.class)) {
-            return (DownloadListener) ReflectionClass.createObject(listenerClass);
+        Class<?> cls = ReflectionClass.findClass(listenerClass);
+        if (ReflectionClass.assertDataType(cls, DownloadListener.class)) {
+            return ReflectionClass.createObject(listenerClass);
         }
         return null;
     }

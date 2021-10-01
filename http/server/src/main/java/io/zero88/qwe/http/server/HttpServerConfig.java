@@ -9,6 +9,7 @@ import io.zero88.qwe.IConfig;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
 import io.zero88.qwe.http.server.config.ApiConfig;
 import io.zero88.qwe.http.server.config.ApiGatewayConfig;
+import io.zero88.qwe.http.server.config.AuthNConfig;
 import io.zero88.qwe.http.server.config.CorsOptions;
 import io.zero88.qwe.http.server.config.FileDownloadConfig;
 import io.zero88.qwe.http.server.config.FileUploadConfig;
@@ -45,6 +46,8 @@ public final class HttpServerConfig implements PluginDirConfig {
     @JsonProperty(value = ServerOptions.NAME)
     private ServerOptions options = (ServerOptions) new ServerOptions().setCompressionSupported(true)
                                                                        .setDecompressionSupported(true);
+    @JsonProperty(AuthNConfig.NAME)
+    private AuthNConfig authNConfig = new AuthNConfig();
     @JsonProperty(value = ApiConfig.NAME)
     private ApiConfig apiConfig = new ApiConfig();
     @JsonProperty(value = ApiGatewayConfig.NAME)
@@ -72,7 +75,8 @@ public final class HttpServerConfig implements PluginDirConfig {
         if (Strings.isNotBlank(publicServerUrl)) {
             return publicServerUrl;
         }
-        publicServerUrl = Urls.buildURL(http2Cfg.isEnabled() ? HttpScheme.HTTPS : HttpScheme.HTTP, host, port);
+        publicServerUrl = Urls.buildURL(http2Cfg.isEnabled() || options.isSsl() ? HttpScheme.HTTPS : HttpScheme.HTTP,
+                                        host, port);
         return publicServerUrl;
     }
 

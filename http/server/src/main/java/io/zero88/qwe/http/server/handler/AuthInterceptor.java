@@ -21,4 +21,8 @@ public interface AuthInterceptor extends RequestInterceptor<UserInfo> {
 
     AuthInterceptor setup(ReqAuthDefinition authDefinition);
 
+    default UserConverter userConverter() {
+        return UserConverter.create();
+    }
+
 }

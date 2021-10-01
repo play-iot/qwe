@@ -2,7 +2,6 @@ package io.zero88.qwe.http.server.config;
 
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.ApisSystem;
-import io.zero88.qwe.http.server.RouterConfig;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public final class ApiConfig extends AbstractRouterConfig implements RouterConfig, ApisSystem {
+public final class ApiConfig extends AbstractRouterConfig implements ApisSystem {
 
     public static final String NAME = "__api__";
 

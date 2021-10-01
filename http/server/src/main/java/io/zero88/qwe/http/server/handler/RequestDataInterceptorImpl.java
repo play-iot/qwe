@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.vertx.core.Future;
@@ -22,7 +23,14 @@ public final class RequestDataInterceptorImpl implements RequestDataInterceptor 
 
     private final boolean useRequestData;
     private final boolean useForUpload;
+    private Function<RoutingContext, RoutingContext> onBefore;
     private BiFunction<RoutingContext, RequestData, RequestData> andThen;
+
+    @Override
+    public RequestDataInterceptor onBefore(Function<RoutingContext, RoutingContext> onBefore) {
+        this.onBefore = onBefore;
+        return this;
+    }
 
     @Override
     public RequestDataInterceptor andThen(BiFunction<RoutingContext, RequestData, RequestData> andThen) {
@@ -31,9 +39,10 @@ public final class RequestDataInterceptorImpl implements RequestDataInterceptor 
     }
 
     @Override
-    public Future<RequestData> filter(RoutingContext ctx) {
-        return Future.succeededFuture(extract(ctx))
-                     .map(req -> Optional.ofNullable(andThen).map(at -> at.apply(ctx, req)).orElse(req));
+    public Future<RequestData> filter(RoutingContext context) {
+        return Future.succeededFuture(Optional.ofNullable(onBefore).map(ob -> ob.apply(context)).orElse(context))
+                     .map(this::extract)
+                     .map(req -> Optional.ofNullable(andThen).map(at -> at.apply(context, req)).orElse(req));
     }
 
     private RequestData extract(RoutingContext ctx) {

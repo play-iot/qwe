@@ -1,6 +1,7 @@
 package io.zero88.qwe.http.server.handler;
 
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import io.github.zero88.utils.Strings;
 import io.vertx.core.http.ServerWebSocket;
@@ -39,6 +40,8 @@ public interface RequestDataInterceptor extends RequestInterceptor<RequestData> 
     static RequestDataInterceptor createForUpload() {
         return new RequestDataInterceptorImpl(false, true);
     }
+
+    RequestDataInterceptor onBefore(Function<RoutingContext, RoutingContext> onBefore);
 
     RequestDataInterceptor andThen(BiFunction<RoutingContext, RequestData, RequestData> andThen);
 

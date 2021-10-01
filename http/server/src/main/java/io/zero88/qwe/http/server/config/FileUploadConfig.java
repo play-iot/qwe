@@ -5,7 +5,6 @@ import java.util.Set;
 
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
-import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.upload.LoggerUploadListener;
 import io.zero88.qwe.http.server.upload.UploadFileHandler;
 
@@ -16,7 +15,7 @@ import lombok.Setter;
 
 @Getter
 @Setter(value = AccessLevel.PACKAGE)
-public final class FileUploadConfig extends AbstractRouterConfig implements RouterConfig, UploadSystem {
+public final class FileUploadConfig extends AbstractRouterConfig implements UploadSystem {
 
     public static final String NAME = "__upload__";
 

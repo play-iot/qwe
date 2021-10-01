@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.FileUtils;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -36,7 +35,6 @@ public final class UploadRouterCreator implements RouterCreator<FileUploadConfig
         final Router router = Router.router(sharedData.getVertx());
         config.getListenerClasses()
               .stream()
-              .map(ReflectionClass::findClass)
               .map(UploadListener::create)
               .filter(Objects::nonNull)
               .forEach(listener -> createRoute(sharedData, config, uploadDir, router, listener));

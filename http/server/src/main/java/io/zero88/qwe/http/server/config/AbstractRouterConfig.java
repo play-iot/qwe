@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-public abstract class AbstractRouterConfig implements IConfig, RouterConfig, HttpSystem {
+public abstract class AbstractRouterConfig implements RouterConfig, HttpSystem {
 
     @Accessors(fluent = true)
     private final String configKey;

@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Function;
 
-import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.FileUtils;
 import io.vertx.ext.web.Router;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -38,7 +37,6 @@ public final class DownloadRouterCreator implements RouterCreator<FileDownloadCo
         logger().info(decor("Setup download dir[{}]"), downloadDir);
         config.getListenerClasses()
               .stream()
-              .map(ReflectionClass::findClass)
               .map(DownloadListener::create)
               .filter(Objects::nonNull)
               .map(listener -> listener.setup(downloadDir))

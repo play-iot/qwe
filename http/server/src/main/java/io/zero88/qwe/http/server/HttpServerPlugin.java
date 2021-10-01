@@ -19,6 +19,7 @@ import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.exceptions.InitializerError;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;
+import io.zero88.qwe.http.server.authn.AuthNRouterCreator;
 import io.zero88.qwe.http.server.config.CorsOptions;
 import io.zero88.qwe.http.server.download.DownloadRouterCreator;
 import io.zero88.qwe.http.server.gateway.GatewayRouterCreator;
@@ -129,11 +130,11 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
             root = Stream.concat(
-                             Stream.<Class<? extends RouterBuilder>>of(WebSocketRouterCreator.class,
-                                                                       RestApisCreator.class,
+                             Stream.<Class<? extends RouterBuilder>>of(AuthNRouterCreator.class, RestApisCreator.class,
                                                                        RestEventApisCreator.class,
                                                                        ProxyServiceApisCreator.class,
                                                                        GatewayRouterCreator.class,
+                                                                       WebSocketRouterCreator.class,
                                                                        UploadRouterCreator.class,
                                                                        DownloadRouterCreator.class,
                                                                        StaticWebRouterCreator.class)

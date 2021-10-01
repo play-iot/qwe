@@ -22,15 +22,16 @@ import lombok.NonNull;
  */
 public interface UploadListener extends EventHttpService, UploadSystem {
 
-    static @Nullable UploadListener create(Class<Object> listenerClass) {
+    static @Nullable UploadListener create(String listenerClass) {
         if (listenerClass == null) {
             return null;
         }
-        if (UploadListener.class.equals(listenerClass)) {
+        if (UploadListener.class.getName().equals(listenerClass)) {
             return new LoggerUploadListener();
         }
-        if (ReflectionClass.assertDataType(listenerClass, UploadListener.class)) {
-            return (UploadListener) ReflectionClass.createObject(listenerClass);
+        Class<?> cls = ReflectionClass.findClass(listenerClass);
+        if (ReflectionClass.assertDataType(cls, UploadListener.class)) {
+            return ReflectionClass.createObject(listenerClass);
         }
         return null;
     }

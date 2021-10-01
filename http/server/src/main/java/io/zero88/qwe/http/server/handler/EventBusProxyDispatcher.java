@@ -7,13 +7,16 @@ import io.zero88.qwe.auth.UserInfo;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EventMessage;
 
-public interface EventBusProxyDispatcher<T> extends RequestDispatcher<RequestData, T> {
+/**
+ * @param <R> Type of response
+ */
+public interface EventBusProxyDispatcher<R> extends RequestDispatcher<RequestData, R> {
 
-    EventBusProxyDispatcher<T> setup(HttpEBDispatcher dispatcher, ReqAuthDefinition authDefinition);
+    EventBusProxyDispatcher<R> setup(HttpEBDispatcher dispatcher, ReqAuthDefinition authDefinition);
 
-    HttpEBDispatcher getDispatcher();
+    HttpEBDispatcher dispatcher();
 
-    T convert(EventMessage resp);
+    R convertResponse(EventMessage resp);
 
     @Override
     default RequestInterceptor<RequestData> validator() {
@@ -21,8 +24,23 @@ public interface EventBusProxyDispatcher<T> extends RequestDispatcher<RequestDat
     }
 
     @Override
-    default Future<T> proceed(RoutingContext context, UserInfo userInfo, RequestData reqData) {
-        return getDispatcher().init(context).dispatch(reqData, userInfo).map(this::convert);
+    default Future<R> proceed(RoutingContext context, UserInfo userInfo, RequestData reqData) {
+        return dispatcher().init(context).dispatch(reqData, userInfo).map(this::convertResponse);
+    }
+
+    interface EventMessageResponseDispatcher extends EventBusProxyDispatcher<EventMessage> {
+
+
+        @Override
+        default ResponseInterceptor<EventMessage> responseInterceptor() {
+            return new ResponseEventInterceptor();
+        }
+
+        @Override
+        default EventMessage convertResponse(EventMessage resp) {
+            return resp;
+        }
+
     }
 
 }

@@ -1,7 +1,5 @@
 package io.zero88.qwe.http.server;
 
-import java.util.Objects;
-
 import io.github.zero88.utils.Urls;
 import io.vertx.core.shareddata.Shareable;
 import io.vertx.ext.web.Router;
@@ -30,10 +28,10 @@ public final class ServerInfo implements JsonData, Shareable {
     private final Router router;
 
     static ServerInfo create(HttpServerConfig config, Router router) {
-        String psPath = !config.getApiConfig().getProxyConfig().isEnabled()
-                        ? null
-                        : Urls.combinePath(Objects.requireNonNull(config.getApiConfig().path()),
-                                           Objects.requireNonNull(config.getApiConfig().getProxyConfig().path()));
+        String proxyServicePath = !config.getApiConfig().getProxyConfig().isEnabled()
+                                  ? null
+                                  : Urls.combinePath(config.getApiConfig().getPath(),
+                                                     config.getApiConfig().getProxyConfig().getPath());
         return ServerInfo.builder()
                          .host(config.getHost())
                          .port(config.getPort())
@@ -41,7 +39,7 @@ public final class ServerInfo implements JsonData, Shareable {
                          .apiPath(config.getApiConfig().path())
                          .wsPath(config.getWebSocketConfig().path())
                          .gatewayPath(config.getApiGatewayConfig().path())
-                         .servicePath(psPath)
+                         .servicePath(proxyServicePath)
                          .downloadPath(config.getFileDownloadConfig().path())
                          .uploadPath(config.getFileUploadConfig().path())
                          .webPath(config.getStaticWebConfig().path())

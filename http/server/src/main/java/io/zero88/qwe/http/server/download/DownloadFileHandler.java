@@ -29,7 +29,7 @@ public interface DownloadFileHandler extends EventBusProxyDispatcher<DownloadFil
     }
 
     @Override
-    default DownloadFile convert(EventMessage resp) {
+    default DownloadFile convertResponse(EventMessage resp) {
         return resp.parseAndGetData(DownloadFile.class);
     }
 

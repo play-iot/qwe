@@ -5,7 +5,6 @@ import java.util.Set;
 
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.DownloadSystem;
-import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.download.DownloadFileHandler;
 import io.zero88.qwe.http.server.download.LocalDownloadFileListener;
 
@@ -15,7 +14,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public final class FileDownloadConfig extends AbstractRouterConfig implements RouterConfig, DownloadSystem {
+public final class FileDownloadConfig extends AbstractRouterConfig implements DownloadSystem {
 
     public static final String NAME = "__download__";
 

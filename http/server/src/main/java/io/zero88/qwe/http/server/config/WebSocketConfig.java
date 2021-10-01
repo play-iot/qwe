@@ -8,7 +8,6 @@ import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.http.server.HttpServerConfig;
 import io.zero88.qwe.http.server.HttpSystem.WebSocketSystem;
-import io.zero88.qwe.http.server.RouterConfig;
 import io.zero88.qwe.http.server.ws.DefaultWebSocketBridgeEventHandler;
 import io.zero88.qwe.http.server.ws.WebSocketBridgeEventHandler;
 
@@ -20,7 +19,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public final class WebSocketConfig extends AbstractRouterConfig implements RouterConfig, WebSocketSystem {
+public final class WebSocketConfig extends AbstractRouterConfig implements WebSocketSystem {
 
     public static final String NAME = "__websocket__";
     private String bridgeHandlerClass = DefaultWebSocketBridgeEventHandler.class.getName();
