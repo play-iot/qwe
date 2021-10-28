@@ -1,0 +1,49 @@
+package io.zero88.qwe.sql.query;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
+import org.jooq.DSLContext;
+import org.jooq.ResultQuery;
+import org.jooq.UpdatableRecord;
+
+import io.zero88.qwe.sql.EntityMetadata;
+import io.vertx.core.Future;
+import io.zero88.jooqx.JsonRecord;
+import io.zero88.qwe.dto.jpa.Pagination;
+import io.zero88.qwe.dto.msg.RequestData;
+import io.zero88.qwe.sql.handler.EntityHandler;
+
+import lombok.NonNull;
+
+@SuppressWarnings("unchecked")
+class SimpleDaoQueryExecutor<K, P extends JsonRecord, R extends UpdatableRecord<R>, D extends VertxDAO<R, P, K>>
+    extends BaseDaoQueryExecutor<P> implements SimpleQueryExecutor<P> {
+
+    SimpleDaoQueryExecutor(EntityHandler handler, EntityMetadata<K, P, R> metadata) {
+        super(handler, metadata);
+    }
+
+    public EntityMetadata<K, P, R> metadata() {
+        return super.metadata();
+    }
+
+    @Override
+    public @NonNull Future<List<P>> findMany(RequestData reqData) {
+        final Pagination paging = Optional.ofNullable(reqData.pagination()).orElse(Pagination.builder().build());
+        return dao(metadata()).queryExecutor()
+                              .findMany((Function<DSLContext, ResultQuery<R>>) queryBuilder().view(reqData.filter(),
+                                                                                                   reqData.sort(),
+                                                                                                   paging))
+                              .flattenAsObservable(records -> records);
+    }
+
+    @Override
+    public @NonNull Future<P> findOneByKey(RequestData requestData) {
+        final K pk = metadata().parseKey(requestData);
+        return dao(metadata()).findOneById(pk)
+                              .flatMap(o -> o.map(Single::just).orElse(Single.error(metadata().notFound(pk))));
+    }
+
+}
