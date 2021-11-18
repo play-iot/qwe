@@ -1,33 +1,44 @@
 package io.zero88.qwe.http.server.upload;
 
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.zero88.qwe.TestHelper;
-import io.zero88.qwe.http.server.HttpServerRouter;
-import io.zero88.qwe.http.server.HttpServerPluginTestBase;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.RequestOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.multipart.MultipartForm;
+import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.http.server.HttpServerPluginTestBase;
+import io.zero88.qwe.http.server.HttpServerRouter;
 
 @RunWith(VertxUnitRunner.class)
 public class UploadDownloadServerTest extends HttpServerPluginTestBase {
 
-    @Rule
-    public Timeout timeout = Timeout.seconds(TestHelper.TEST_TIMEOUT_SEC);
-
     @Override
-    protected String httpConfigFile() { return "uploadDownload.json"; }
+    protected String httpConfigFile() {return "uploadDownload.json";}
 
     @Test
-    @Ignore
-    //TODO fix it when implementing HTTP client. For test, replace TEST_TIMEOUT_SEC to `3000`
-    public void test(TestContext context) {
+    public void test_default_logger_upload_listener(TestContext context) {
+        JsonObject expected = new JsonObject(
+            "{\"attributes\":{\"description\":\"hello\"},\"files\":[{\"charset\":\"UTF-8\",\"fileName\":\"test.txt\"," +
+            "\"extension\":\"txt\",\"transferEncoding\":\"7bit\",\"size\":14680064,\"name\":\"abc\"," +
+            "\"contentType\":\"text/plain\"}]}");
         Async async = context.async();
         startServer(context, new HttpServerRouter());
+        RequestOptions options = requestOptions().setURI("/u");
+        MultipartForm form = MultipartForm.create()
+                                          .attribute("description", "hello")
+                                          .textFileUpload("abc", "test.txt", Buffer.buffer("content"), "text/plain");
+
+        WebClient.create(vertx)
+                 .post(options.getPort(), options.getHost(), options.getURI())
+                 .sendMultipartForm(form)
+                 .onSuccess(resp -> JsonHelper.Junit4.assertJson(context, async, expected, resp.bodyAsJsonObject()))
+                 .onFailure(context::fail);
     }
 
 }

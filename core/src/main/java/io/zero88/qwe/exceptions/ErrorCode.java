@@ -2,6 +2,7 @@ package io.zero88.qwe.exceptions;
 
 import java.util.Objects;
 
+import io.github.zero88.repl.ReflectionField;
 import io.zero88.qwe.dto.EnumType;
 import io.zero88.qwe.dto.EnumType.AbstractEnumType;
 
@@ -14,28 +15,28 @@ import lombok.NonNull;
 @Getter
 public final class ErrorCode extends AbstractEnumType implements io.github.zero88.exceptions.ErrorCode, EnumType {
 
-    public static final ErrorCode DESIRED_ERROR = parse("DESIRED_ERROR");
-    public static final ErrorCode CONFLICT_ERROR = parse("CONFLICT_ERROR");
+    public static final ErrorCode DESIRED_ERROR = new ErrorCode("DESIRED_ERROR");
+    public static final ErrorCode CONFLICT_ERROR = new ErrorCode("CONFLICT_ERROR");
 
-    public static final ErrorCode DATA_ALREADY_EXIST = parse("DATA_ALREADY_EXIST");
-    public static final ErrorCode DATA_BEING_USED = parse("DATA_BEING_USED");
-    public static final ErrorCode DATA_NOT_FOUND = parse("DATA_NOT_FOUND");
+    public static final ErrorCode DATA_ALREADY_EXIST = new ErrorCode("DATA_ALREADY_EXIST");
+    public static final ErrorCode DATA_BEING_USED = new ErrorCode("DATA_BEING_USED");
+    public static final ErrorCode DATA_NOT_FOUND = new ErrorCode("DATA_NOT_FOUND");
 
-    public static final ErrorCode ENGINE_ERROR = parse("ENGINE_ERROR");
+    public static final ErrorCode ENGINE_ERROR = new ErrorCode("ENGINE_ERROR");
 
-    public static final ErrorCode NETWORK_ERROR = parse("NETWORK_ERROR");
+    public static final ErrorCode NETWORK_ERROR = new ErrorCode("NETWORK_ERROR");
 
-    public static final ErrorCode INITIALIZER_ERROR = parse("INITIALIZER_ERROR");
+    public static final ErrorCode INITIALIZER_ERROR = new ErrorCode("INITIALIZER_ERROR");
 
-    public static final ErrorCode SERVICE_ERROR = parse("SERVICE_ERROR");
-    public static final ErrorCode SERVICE_UNAVAILABLE = parse("SERVICE_UNAVAILABLE");
-    public static final ErrorCode SERVICE_NOT_FOUND = parse("SERVICE_NOT_FOUND");
+    public static final ErrorCode SERVICE_ERROR = new ErrorCode("SERVICE_ERROR");
+    public static final ErrorCode SERVICE_UNAVAILABLE = new ErrorCode("SERVICE_UNAVAILABLE");
+    public static final ErrorCode SERVICE_NOT_FOUND = new ErrorCode("SERVICE_NOT_FOUND");
 
-    public static final ErrorCode SECURITY_ERROR = parse("SECURITY_ERROR");
-    public static final ErrorCode AUTHENTICATION_ERROR = parse("AUTHENTICATION_ERROR");
-    public static final ErrorCode INSUFFICIENT_PERMISSION_ERROR = parse("INSUFFICIENT_PERMISSION_ERROR");
+    public static final ErrorCode SECURITY_ERROR = new ErrorCode("SECURITY_ERROR");
+    public static final ErrorCode AUTHENTICATION_ERROR = new ErrorCode("AUTHENTICATION_ERROR");
+    public static final ErrorCode INSUFFICIENT_PERMISSION_ERROR = new ErrorCode("INSUFFICIENT_PERMISSION_ERROR");
 
-    public static final ErrorCode TIMEOUT_ERROR = parse("TIMEOUT_ERROR");
+    public static final ErrorCode TIMEOUT_ERROR = new ErrorCode("TIMEOUT_ERROR");
 
     @JsonCreator
     private ErrorCode(String code) {
@@ -49,7 +50,16 @@ public final class ErrorCode extends AbstractEnumType implements io.github.zero8
     }
 
     public static ErrorCode parse(String code) {
-        return EnumType.factory(code, ErrorCode.class, true);
+        return ReflectionField.streamConstants(ErrorCode.class, io.github.zero88.exceptions.ErrorCode.class)
+                              .filter(Objects::nonNull)
+                              .filter(et -> et.code().equals(code))
+                              .map(ErrorCode::wrap)
+                              .findFirst()
+                              .orElseGet(() -> new ErrorCode(code));
+    }
+
+    public static ErrorCode wrap(io.github.zero88.exceptions.ErrorCode code) {
+        return code instanceof ErrorCode ? (ErrorCode) code : new ErrorCode(code.code());
     }
 
     public int hashCode() {

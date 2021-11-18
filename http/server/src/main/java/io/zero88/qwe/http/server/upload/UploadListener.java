@@ -1,32 +1,70 @@
 package io.zero88.qwe.http.server.upload;
 
-import io.github.zero88.repl.Arguments;
-import io.github.zero88.repl.ReflectionClass;
-import io.github.zero88.utils.Strings;
-import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.SharedDataLocalProxy;
-import io.zero88.qwe.event.EBContract;
-import io.zero88.qwe.event.EventListener;
+import java.util.Collections;
+import java.util.Set;
 
-import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
+
+import io.github.zero88.repl.ReflectionClass;
+import io.vertx.core.http.HttpMethod;
+import io.zero88.qwe.eventbus.EventAction;
+import io.zero88.qwe.http.ActionMethodMapping;
+import io.zero88.qwe.http.EventHttpService;
+import io.zero88.qwe.http.EventMethodDefinition;
+import io.zero88.qwe.http.server.HttpSystem.UploadSystem;
+
+import lombok.NonNull;
 
 /**
  * Upload listener to handle uploaded file (update database, transfer to another host)
+ *
+ * @since 1.0.0
  */
-@RequiredArgsConstructor
-public class UploadListener implements EventListener {
+public interface UploadListener extends EventHttpService, UploadSystem {
 
-    protected final SharedDataLocalProxy proxy;
-
-    public static UploadListener create(SharedDataLocalProxy proxy, String listenerClass) {
-        if (Strings.isBlank(listenerClass) || UploadListener.class.getName().equals(listenerClass)) {
-            return new UploadListener(proxy);
+    static @Nullable UploadListener create(String listenerClass) {
+        if (listenerClass == null) {
+            return null;
         }
-        return ReflectionClass.createObject(listenerClass, new Arguments().put(SharedDataLocalProxy.class, proxy));
+        if (UploadListener.class.getName().equals(listenerClass)) {
+            return new LoggerUploadListener();
+        }
+        Class<?> cls = ReflectionClass.findClass(listenerClass);
+        if (ReflectionClass.assertDataType(cls, UploadListener.class)) {
+            return ReflectionClass.createObject(listenerClass);
+        }
+        return null;
     }
 
-    @EBContract(action = "CREATE")
-    public Future<JsonObject> create(JsonObject data) { return Future.succeededFuture(data); }
+    @Override
+    @NonNull
+    default String function() {
+        return UploadSystem.super.function();
+    }
+
+    /**
+     * Max upload size in Megabytes
+     *
+     * @return the max upload size or {@code <= 0} if using configuration
+     */
+    default long maxUploadSize() {
+        return -1;
+    }
+
+    /**
+     * File upload predicate
+     *
+     * @return file upload predicate
+     * @see FileUploadPredicate
+     */
+    default FileUploadPredicate predicate() {
+        return FileUploadPredicate.acceptAll();
+    }
+
+    @Override
+    default Set<EventMethodDefinition> definitions() {
+        return Collections.singleton(
+            EventMethodDefinition.create("/", ActionMethodMapping.create(EventAction.CREATE, HttpMethod.POST)));
+    }
 
 }

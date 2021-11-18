@@ -1,5 +1,6 @@
 package io.zero88.qwe.http.server;
 
+import io.github.zero88.utils.Urls;
 import io.vertx.core.shareddata.Shareable;
 import io.vertx.ext.web.Router;
 import io.zero88.qwe.dto.JsonData;
@@ -25,5 +26,25 @@ public final class ServerInfo implements JsonData, Shareable {
     private final String servicePath;
     private final String webPath;
     private final Router router;
+
+    static ServerInfo create(HttpServerConfig config, Router router) {
+        String proxyServicePath = !config.getApiConfig().getProxyConfig().isEnabled()
+                                  ? null
+                                  : Urls.combinePath(config.getApiConfig().getPath(),
+                                                     config.getApiConfig().getProxyConfig().getPath());
+        return ServerInfo.builder()
+                         .host(config.getHost())
+                         .port(config.getPort())
+                         .publicHost(config.getPublicServerUrl())
+                         .apiPath(config.getApiConfig().path())
+                         .wsPath(config.getWebSocketConfig().path())
+                         .gatewayPath(config.getApiGatewayConfig().path())
+                         .servicePath(proxyServicePath)
+                         .downloadPath(config.getFileDownloadConfig().path())
+                         .uploadPath(config.getFileUploadConfig().path())
+                         .webPath(config.getStaticWebConfig().path())
+                         .router(router)
+                         .build();
+    }
 
 }

@@ -14,6 +14,16 @@ public interface HttpSystem extends LogSystem {
     }
 
 
+    interface AuthNSystem extends HttpSystem {
+
+        @Override
+        default String function() {
+            return "Authentication";
+        }
+
+    }
+
+
     interface WebSocketSystem extends HttpSystem {
 
         @Override
