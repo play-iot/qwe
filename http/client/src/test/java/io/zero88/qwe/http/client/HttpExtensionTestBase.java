@@ -9,10 +9,10 @@ import org.junit.jupiter.api.io.TempDir;
 
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
-import io.zero88.qwe.ExtensionTestHelper;
+import io.zero88.qwe.BaseExtensionTest;
 
 @ExtendWith(VertxExtension.class)
-public abstract class HttpExtensionTestBase implements ExtensionTestHelper {
+public abstract class HttpExtensionTestBase implements BaseExtensionTest {
 
     @TempDir
     Path tmp;

@@ -6,10 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 
 import io.vertx.junit5.VertxExtension;
-import io.zero88.qwe.PluginTestHelper;
+import io.zero88.qwe.BasePluginTest;
 
 @ExtendWith(VertxExtension.class)
-public abstract class SQLPluginFailedTest implements PluginTestHelper {
+public abstract class SQLPluginFailedTest implements BasePluginTest {
 
     @TempDir
     public Path folder;

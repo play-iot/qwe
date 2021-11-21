@@ -2,6 +2,7 @@ package io.zero88.qwe.http.server.auth;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.github.zero88.utils.HttpScheme;
@@ -20,7 +21,8 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.OAuth2AuthHandler;
-import io.zero88.qwe.JsonHelper.Junit4;
+import io.zero88.qwe.JsonHelper;
+import io.zero88.qwe.PluginDeploymentHelper;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.http.server.HttpServerPluginProvider;
@@ -54,7 +56,7 @@ public class HTTPKeyCloakServerTest extends HttpServerPluginTestBase {
             this.oauth2 = oauth2;
         }).onComplete(r -> flag.countDown());
         //        oauth2 = KeycloakAuth.create(vertx, OAuth2FlowType.AUTH_CODE, c);
-        deploy(vertx, context, httpConfig, initProvider());
+        PluginDeploymentHelper.Junit4.create(this).deploy(vertx, context, httpConfig, initProvider());
     }
 
     @Override
@@ -96,6 +98,7 @@ public class HTTPKeyCloakServerTest extends HttpServerPluginTestBase {
     }
 
     @Test
+    @Ignore
     public void test_with_login(TestContext context) {
         Async async = context.async();
         RequestData req = RequestData.builder()
@@ -113,7 +116,7 @@ public class HTTPKeyCloakServerTest extends HttpServerPluginTestBase {
         }).onSuccess(resp -> {
             System.out.println(resp.headers());
             Assert.assertFalse(resp.isError());
-            Junit4.assertJson(context, async, new JsonObject().put("data", "hello, zero88"), resp.body());
+            JsonHelper.Junit4.assertJson(context, async, new JsonObject().put("data", "hello, zero88"), resp.body());
         }).onFailure(context::fail);
     }
 

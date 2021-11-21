@@ -70,14 +70,14 @@ public interface TestHelper {
         }
     }
 
-    static <T extends Throwable> void assertCause(Executable ex, Class<T> throwable,
+    static <T extends Throwable> void assertCause(Executable ex, Class<T> throwableClass,
                                                   Class<? extends Throwable> causeClass) {
-        TestHelper.assertCause(ex, throwable, causeClass, null);
+        TestHelper.assertCause(ex, throwableClass, causeClass, null);
     }
 
-    static <T extends Throwable> void assertCause(Executable ex, Class<T> throwable,
+    static <T extends Throwable> void assertCause(Executable ex, Class<T> throwableClass,
                                                   Class<? extends Throwable> causeClass, String throwMsg) {
-        Assertions.assertNotNull(assertCause(Assertions.assertThrows(throwable, ex, throwMsg), causeClass));
+        Assertions.assertNotNull(assertCause(Assertions.assertThrows(throwableClass, ex, throwMsg), causeClass));
     }
 
     static <T extends Throwable> void assertCause(Executable ex, Class<T> throwable,
@@ -89,9 +89,14 @@ public interface TestHelper {
     }
 
     static Throwable assertCause(Throwable ex, Class<? extends Throwable> causeClass) {
-        ex.printStackTrace(System.out);
+        ex.printStackTrace(System.err);
         Assertions.assertTrue(causeClass.isInstance(ex.getCause()));
         return ex.getCause();
+    }
+
+    static void assertThrow(Throwable ex, Class<? extends Throwable> eClass) {
+        ex.printStackTrace(System.err);
+        Assertions.assertTrue(eClass.isInstance(ex));
     }
 
     static void waitTimeout(int timeout, CountDownLatch latch) {

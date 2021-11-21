@@ -17,9 +17,10 @@ import io.vertx.core.http.RequestOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.zero88.qwe.BasePluginTest.PluginDeployTest;
 import io.zero88.qwe.IConfig;
+import io.zero88.qwe.PluginDeploymentHelper;
 import io.zero88.qwe.PluginProvider;
-import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.http.client.HttpClientConfig;
 import io.zero88.qwe.http.client.HttpClientExtension;
@@ -80,11 +81,15 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
     }
 
     protected HttpServerPlugin startServer(TestContext context, HttpServerRouter httpRouter) {
-        return deploy(vertx, context, httpConfig, new HttpServerPluginProvider(httpRouter));
+        return PluginDeploymentHelper.Junit4.create(this)
+                                            .deploy(vertx, context, httpConfig,
+                                                    new HttpServerPluginProvider(httpRouter));
     }
 
-    protected void startServer(TestContext context, HttpServerRouter httpRouter, Consumer<Throwable> consumer) {
-        deployFailed(vertx, context, httpConfig, new HttpServerPluginProvider(httpRouter), consumer);
+    protected void startFailed(TestContext context, HttpServerRouter httpRouter, Consumer<Throwable> consumer) {
+        PluginDeploymentHelper.Junit4.create(this)
+                                     .deployFailed(vertx, context, httpConfig, new HttpServerPluginProvider(httpRouter),
+                                                   consumer);
     }
 
     protected JsonObject notFoundResponse(int port, String path) {

@@ -14,7 +14,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.ExtensionTestHelper;
+import io.zero88.qwe.BaseExtensionTest;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventBusClient;
@@ -24,7 +24,8 @@ import io.zero88.qwe.file.TextFileOperatorImpl;
 import io.zero88.qwe.utils.JsonUtils;
 
 @ExtendWith(VertxExtension.class)
-class JsonStorageServiceTest implements ExtensionTestHelper {
+class JsonStorageServiceTest implements BaseExtensionTest {
+
     @TempDir
     Path tmp;
     private JsonStorageConfig config;

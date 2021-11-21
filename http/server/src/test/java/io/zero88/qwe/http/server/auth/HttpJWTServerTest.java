@@ -20,8 +20,9 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.JWTAuthHandler;
-import io.zero88.qwe.JsonHelper.Junit4;
+import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.KeyStoreProvider;
+import io.zero88.qwe.PluginDeploymentHelper;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.http.server.HttpServerPluginProvider;
@@ -42,7 +43,7 @@ public class HttpJWTServerTest extends HttpServerPluginTestBase {
             new JWTOptions().setAlgorithm("ES512").setExpiresInMinutes(10)));
         users.put("zero88", "123");
         users.put("xyz", "123");
-        deploy(vertx, context, httpConfig, initProvider());
+        PluginDeploymentHelper.Junit4.create(this).deploy(vertx, context, httpConfig, initProvider());
     }
 
     @Override
@@ -88,7 +89,7 @@ public class HttpJWTServerTest extends HttpServerPluginTestBase {
             System.out.println(resp.headers());
             Assert.assertEquals(401, resp.getStatus().code());
             Assert.assertTrue(resp.isError());
-            Junit4.assertJson(context, async, new JsonObject(
+            JsonHelper.Junit4.assertJson(context, async, new JsonObject(
                 "{\"message\":\"UNKNOWN_ERROR | Cause(Unauthorized)\",\"code\":\"UNKNOWN_ERROR\"}"), resp.body());
         }).onFailure(context::fail);
     }
@@ -109,7 +110,7 @@ public class HttpJWTServerTest extends HttpServerPluginTestBase {
         }).onSuccess(resp -> {
             System.out.println(resp.headers());
             Assert.assertFalse(resp.isError());
-            Junit4.assertJson(context, async, new JsonObject().put("data", "hello, zero88"), resp.body());
+            JsonHelper.Junit4.assertJson(context, async, new JsonObject().put("data", "hello, zero88"), resp.body());
         }).onFailure(context::fail);
     }
 
@@ -129,7 +130,7 @@ public class HttpJWTServerTest extends HttpServerPluginTestBase {
         }).onSuccess(resp -> {
             System.out.println(resp.headers());
             Assert.assertFalse(resp.isError());
-            Junit4.assertJson(context, async, new JsonObject().put("data", "hi, zero88"), resp.body());
+            JsonHelper.Junit4.assertJson(context, async, new JsonObject().put("data", "hi, zero88"), resp.body());
         }).onFailure(context::fail);
     }
 

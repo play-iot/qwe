@@ -10,7 +10,7 @@ import io.zero88.qwe.crypto.CryptoContext;
 import io.zero88.qwe.dto.JsonData;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public interface ExtensionTestHelper extends AppContextTest {
+public interface BaseExtensionTest extends BaseAppContextTest {
 
     @Override
     default String appName() {

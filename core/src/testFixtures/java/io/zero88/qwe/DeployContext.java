@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Builder
 @Accessors(fluent = true)
-public class DeployContext<T extends Verticle> {
+public final class DeployContext<T extends Verticle> {
 
     public static final Function<Class<? extends Verticle>, Consumer<String>> DEFAULT_ASSERTER
         = cls -> id -> TestHelper.LOGGER.info(

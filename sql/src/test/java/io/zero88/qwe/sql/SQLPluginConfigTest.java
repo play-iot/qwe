@@ -48,17 +48,18 @@ class SQLPluginConfigTest {
                                                "\"idleTimeout\":0,\"metricsEnabled\":false," +
                                                "\"tracingPolicy\":\"PROPAGATE\",\"user\":\"xxx\"}"),
                                 c.connectionOptions());
-        Assertions.assertEquals(
-            new JsonObject("{\"idleTimeout\":0,\"idleTimeoutUnit\":\"SECONDS\",\"maxSize\":3,\"maxWaitQueueSize\":-1}"),
-            c.poolOptions());
+        Assertions.assertEquals(new JsonObject("{\"connectionTimeout\":30,\"connectionTimeoutUnit\":\"SECONDS\"," +
+                                               "\"idleTimeout\":0,\"idleTimeoutUnit\":\"SECONDS\",\"maxSize\":3," +
+                                               "\"maxWaitQueueSize\":-1,\"poolCleanerPeriod\":1000}"), c.poolOptions());
         JsonHelper.assertJson(new JsonObject("{\"__sql_conn__\":{\"connectTimeout\":60000," +
                                              "\"dataSourceImplementation\":\"AGROAL\",\"idleTimeout\":0," +
                                              "\"metricsEnabled\":false,\"tracingPolicy\":\"PROPAGATE\"," +
-                                             "\"user\":\"xxx\"},\"__sql_pool__\":{\"idleTimeout\":0," +
-                                             "\"idleTimeoutUnit\":\"SECONDS\",\"maxSize\":3,\"maxWaitQueueSize\":-1}," +
-                                             "\"pluginDir\":\"h2\",\"dialect\":\"H2\",\"jooqxExtensionClass\":\"" +
-                                             "io.zero88.qwe.sql.spi.extension.jdbc.JDBCPoolHikariJooqxExtension\"," +
-                                             "\"autoDetect\":false}"), c.toJson());
+                                             "\"user\":\"xxx\"},\"__sql_pool__\":{\"connectionTimeout\":30," +
+                                             "\"connectionTimeoutUnit\":\"SECONDS\",\"idleTimeout\":0," +
+                                             "\"idleTimeoutUnit\":\"SECONDS\",\"maxSize\":3,\"maxWaitQueueSize\":-1," +
+                                             "\"poolCleanerPeriod\":1000},\"pluginDir\":\"h2\",\"dialect\":\"H2\"," +
+                                             "\"jooqxExtensionClass\":\"io.zero88.qwe.sql.spi.extension.jdbc" +
+                                             ".JDBCPoolHikariJooqxExtension\",\"autoDetect\":false}"), c.toJson());
     }
 
     @Test
@@ -77,8 +78,8 @@ class SQLPluginConfigTest {
         Assertions.assertEquals(new JsonObject(), merged.connectionOptions());
         Assertions.assertEquals(new JsonObject(), merged.poolOptions());
         JsonHelper.assertJson(new JsonObject("{\"__sql_conn__\":{},\"__sql_pool__\":{},\"pluginDir\":\"sql\"," +
-                                             "\"dialect\":\"POSTGRES\",\"autoDetect\":true,\"embeddedMode\":\"MEMORY\"}"),
-                              merged.toJson());
+                                             "\"dialect\":\"POSTGRES\",\"autoDetect\":true," +
+                                             "\"embeddedMode\":\"MEMORY\"}"), merged.toJson());
     }
 
 }

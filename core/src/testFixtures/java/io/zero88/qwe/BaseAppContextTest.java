@@ -4,7 +4,7 @@ import java.nio.file.Path;
 
 import io.vertx.core.Vertx;
 
-public interface AppContextTest {
+public interface BaseAppContextTest {
 
     Path testDir();
 

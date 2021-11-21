@@ -10,9 +10,8 @@ import org.junit.jupiter.api.io.TempDir;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.qwe.PluginProvider;
-import io.zero88.qwe.PluginTestHelper;
-import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
+import io.zero88.qwe.BasePluginTest.PluginDeployTest;
+import io.zero88.qwe.PluginDeploymentHelper;
 import io.zero88.qwe.sql.handler.EntityHandler;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -30,8 +29,9 @@ public abstract class SQLPluginTest<T extends EntityHandler> implements PluginDe
 
     @BeforeEach
     public void tearUp(Vertx vertx, VertxTestContext testContext) {
-        entityHandler = (T) ((SQLPluginContext) deploy(vertx, testContext, initConfig(),
-                                                       initProvider()).pluginContext()).entityHandler();
+        final SQLPlugin plugin = PluginDeploymentHelper.Junit5.create(this)
+                                                              .deploy(vertx, testContext, initConfig(), initProvider());
+        entityHandler = (T) ((SQLPluginContext) plugin.pluginContext()).entityHandler();
     }
 
     @AfterEach

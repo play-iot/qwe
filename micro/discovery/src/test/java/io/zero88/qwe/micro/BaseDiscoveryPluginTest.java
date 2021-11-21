@@ -12,8 +12,9 @@ import org.junit.jupiter.api.io.TempDir;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import io.zero88.qwe.BasePluginTest.PluginDeployTest;
 import io.zero88.qwe.IConfig;
-import io.zero88.qwe.PluginTestHelper.PluginDeployTest;
+import io.zero88.qwe.PluginDeploymentHelper;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.eventbus.EventBusClient;
 
@@ -38,7 +39,10 @@ public abstract class BaseDiscoveryPluginTest implements PluginDeployTest<Discov
 
     @BeforeEach
     public void tearUp(Vertx vertx, VertxTestContext ctx) {
-        discovery = deploy(vertx, ctx, initConfig(), initProvider()).pluginContext().getDiscovery();
+        discovery = PluginDeploymentHelper.Junit5.create(this)
+                                                 .deploy(vertx, ctx, initConfig(), initProvider())
+                                                 .pluginContext()
+                                                 .getDiscovery();
         ebClient = EventBusClient.create(createSharedData(vertx));
     }
 

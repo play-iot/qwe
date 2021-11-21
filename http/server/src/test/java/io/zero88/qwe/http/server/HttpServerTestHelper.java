@@ -4,11 +4,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.ext.unit.Async;
-import io.zero88.qwe.ExtensionTestHelper;
+import io.zero88.qwe.BaseExtensionTest;
 import io.zero88.qwe.TestHelper;
 import io.zero88.qwe.http.client.HttpClientWrapper;
 
-public interface HttpServerTestHelper extends ExtensionTestHelper {
+public interface HttpServerTestHelper extends BaseExtensionTest {
 
     Vertx vertx();
 

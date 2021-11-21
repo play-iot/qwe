@@ -23,7 +23,7 @@ import io.zero88.qwe.mock.MockPluginProvider.MockPlugin;
 import ch.qos.logback.classic.Level;
 
 @RunWith(VertxUnitRunner.class)
-public class PluginVerticleTest implements PluginTestHelper {
+public class PluginVerticleTest implements BasePluginTest {
 
     private Vertx vertx;
 
