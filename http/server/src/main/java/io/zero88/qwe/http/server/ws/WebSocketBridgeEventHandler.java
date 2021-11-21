@@ -44,7 +44,7 @@ public interface WebSocketBridgeEventHandler extends Handler<BridgeEvent>, HasLo
     }
 
     /**
-     * Setup the handler
+     * Set up the handler
      *
      * @param sharedDataProxy   The shared data proxy
      * @param socketServerPlans The list of WebSocket server plan

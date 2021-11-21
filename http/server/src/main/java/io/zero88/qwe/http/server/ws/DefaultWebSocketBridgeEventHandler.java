@@ -39,7 +39,7 @@ public class DefaultWebSocketBridgeEventHandler implements WebSocketBridgeEventH
                                              @NonNull List<WebSocketServerPlan> wsPlans) {
         this.executor = () -> sharedDataProxy;
         this.c2sAddresses = wsPlans.stream()
-                                   .filter(p -> !p.isOnlyOutbound())
+                                   .filter(p -> !p.isOnlyOutbound() && Strings.isNotBlank(p.inboundAddress()))
                                    .collect(Collectors.toMap(EventBridgePlan::inboundAddress, Function.identity()));
         this.s2cAddresses = wsPlans.stream()
                                    .filter(p -> Strings.isNotBlank(p.outboundAddress()))

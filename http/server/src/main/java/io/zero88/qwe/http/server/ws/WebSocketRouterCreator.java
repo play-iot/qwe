@@ -75,7 +75,7 @@ public final class WebSocketRouterCreator implements RouterCreator<WebSocketConf
                                                     String fullPath) {
         SockJSBridgeOptions opts = new SockJSBridgeOptions(config);
         metadata.forEach(m -> {
-            if (!m.isOnlyOutbound()) {
+            if (!m.isOnlyOutbound() && Strings.isNotBlank(m.inboundAddress())) {
                 logger().info(decor("Add Inbound Permitted [{}][{}=>{}]"), fullPath, m.inboundAddress(),
                               m.processAddress());
                 opts.addInboundPermitted(new PermittedOptions().setAddress(m.inboundAddress()));

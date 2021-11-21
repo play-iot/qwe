@@ -95,7 +95,7 @@ public class RunCommand extends BootCommand {
     public void setConfig(String configuration) {
         if (configuration != null) {
             // For inlined configuration remove first and end single and double quotes if any
-            this.config = configuration.trim().replaceAll("^\"|\"$", "").replaceAll("^'|'$", "");
+            this.config = configuration.trim().replaceAll("^[\"']|[\"']$", "");
         } else {
             this.config = null;
         }
@@ -246,7 +246,8 @@ public class RunCommand extends BootCommand {
         executionContext.execute("stop", vertxApplicationBackgroundId, "--redeploy");
         if (redeployTerminationPeriod > 0) {
             try {
-                Thread.sleep(redeployTerminationPeriod);
+                this.wait(redeployTerminationPeriod);
+                //                Thread.sleep(redeployTerminationPeriod);
             } catch (InterruptedException e) {
                 // Ignore the exception.
                 Thread.currentThread().interrupt();
