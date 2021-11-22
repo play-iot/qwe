@@ -14,7 +14,7 @@ import io.zero88.qwe.crypto.LazyKeyStoreImpl;
 public interface KeyStoreProvider extends LazyKeyStore {
 
     static KeyStoreProvider create(KeyStoreType type, String classpathFile, String password) {
-        String file = Objects.requireNonNull(Reflections.contextClassLoader().getResource(classpathFile)).getFile();
+        String file = Objects.requireNonNull(Reflections.contextClassLoader().getResource(classpathFile)).toString();
         return new KeyStoreProviderImpl(type, password, file);
     }
 

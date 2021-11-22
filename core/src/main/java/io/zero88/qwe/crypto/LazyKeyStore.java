@@ -3,6 +3,7 @@ package io.zero88.qwe.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -50,32 +50,76 @@ public interface LazyKeyStore extends Wrapper<KeyStore>, JsonData {
         return new LazyKeyStoreImpl(type, provider, password, ksFile);
     }
 
-    static KeyStore load(Vertx vertx, LazyKeyStore ks) {
-        return load(ks, () -> vertx.fileSystem().readFileBlocking(ks.getPath()).getBytes());
+    /**
+     * Loads the key store from the lazy key store
+     *
+     * @param vertx        vertx
+     * @param lazyKeyStore the lazy key store
+     * @return the key store instance
+     */
+    static KeyStore load(Vertx vertx, LazyKeyStore lazyKeyStore) {
+        final String path = JarFileUtils.normalize(lazyKeyStore.getPath());
+        if (JarFileUtils.isJarUrl(lazyKeyStore.getPath())) {
+            return load(lazyKeyStore, URI.create(path));
+        }
+        return load(lazyKeyStore, new ByteArrayInputStream(vertx.fileSystem().readFileBlocking(path).getBytes()));
     }
 
-    static KeyStore load(LazyKeyStore ks, Path keyStoreFile) {
-        return load(ks, () -> {
-            try {
-                return Files.readAllBytes(keyStoreFile);
-            } catch (IOException t) {
-                throw new CryptoException("Unable load key store", t);
-            }
-        });
-    }
-
-    static KeyStore load(LazyKeyStore ks, Supplier<byte[]> supplier) {
+    /**
+     * Loads the key store from the lazy key store and the specific file
+     *
+     * @param lazyKeyStore the lazy key store
+     * @param keystoreFile the keystore file
+     * @return the key store instance
+     * @see KeyStore
+     */
+    static KeyStore load(LazyKeyStore lazyKeyStore, Path keystoreFile) {
+        final String path = JarFileUtils.normalize(lazyKeyStore.getPath());
+        if (JarFileUtils.isJarUrl(keystoreFile.toString())) {
+            return load(lazyKeyStore, URI.create(path));
+        }
         try {
-            String type = ks.getType().type();
-            KeyStore keyStore = Strings.isBlank(ks.getProvider())
+            return load(lazyKeyStore, new ByteArrayInputStream(Files.readAllBytes(keystoreFile)));
+        } catch (IOException e) {
+            throw new CryptoException("Unable load key store", e);
+        }
+    }
+
+    /**
+     * Loads the key store from the lazy key store and the specific file
+     *
+     * @param lazyKeyStore the lazy key store
+     * @param fileUri      the keystore uri
+     * @return the key store instance
+     * @see KeyStore
+     */
+    static KeyStore load(LazyKeyStore lazyKeyStore, URI fileUri) {
+        try {
+            return load(lazyKeyStore, fileUri.toURL().openStream());
+        } catch (IOException | IllegalArgumentException e) {
+            throw new CryptoException("Unable load key store", e);
+        }
+    }
+
+    /**
+     * Loads the key store from the lazy key store and the input stream
+     *
+     * @param lazyKeyStore the lazy key store
+     * @param inputStream  the keystore stream
+     * @return the key store instance
+     * @see KeyStore
+     */
+    static KeyStore load(LazyKeyStore lazyKeyStore, InputStream inputStream) {
+        try {
+            String type = lazyKeyStore.getType().type();
+            KeyStore keyStore = Strings.isBlank(lazyKeyStore.getProvider())
                                 ? KeyStore.getInstance(type)
-                                : KeyStore.getInstance(type, ks.getProvider());
+                                : KeyStore.getInstance(type, lazyKeyStore.getProvider());
             synchronized (LazyKeyStore.class) {
-                InputStream is = new ByteArrayInputStream(supplier.get());
                 try {
-                    keyStore.load(is, ks.getPassword().toCharArray());
+                    keyStore.load(inputStream, lazyKeyStore.getPassword().toCharArray());
                 } finally {
-                    FileUtils.silentClose(is);
+                    FileUtils.silentClose(inputStream);
                 }
             }
             return keyStore;

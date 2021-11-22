@@ -27,13 +27,7 @@ class JsonStorageConfigTest {
     @Test
     void test_under_invalid_cfg() {
         TestHelper.assertCause(() -> IConfig.fromClasspath("invalid-cfg.json", JsonStorageConfig.class),
-                               ConfigException.class, IllegalArgumentException.class, "Invalid configuration format",
-                               "Unrecognized field \"__app1__\" (class" +
-                               " io.zero88.qwe.storage.json.JsonStorageConfig$Builder), not marked as ignorable (6 " +
-                               "known properties: \"serviceHandlerClass\", \"option\", \"pluginDir\", \"chunk\", " +
-                               "\"maxSizeInMB\", \"serviceAddress\"])\n" +
-                               " at [Source: UNKNOWN; line: -1, column: -1] (through reference chain: io.zero88.qwe" +
-                               ".storage.json.JsonStorageConfig$Builder[\"__app1__\"])");
+                               ConfigException.class, IllegalArgumentException.class, "Invalid configuration format");
     }
 
     @Test

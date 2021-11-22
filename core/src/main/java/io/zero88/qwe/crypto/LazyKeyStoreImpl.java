@@ -1,7 +1,9 @@
 package io.zero88.qwe.crypto;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Key;
@@ -24,6 +26,7 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
 import io.github.zero88.utils.Strings;
+import io.github.zero88.utils.UUID64;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
@@ -31,8 +34,9 @@ import io.vertx.core.net.KeyCertOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PemTrustOptions;
 import io.vertx.core.net.TrustOptions;
-import io.zero88.qwe.exceptions.CryptoException;
+import io.zero88.qwe.QWEAppConfig;
 import io.zero88.qwe.crypto.KeyAlias.KeyEntryType;
+import io.zero88.qwe.exceptions.CryptoException;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -201,8 +205,16 @@ public class LazyKeyStoreImpl implements LazyKeyStore {
             return clone;
         }
         try {
-            return clone = LazyKeyStore.load(this, Files.copy(Paths.get(getPath()), Files.createTempFile("", ".tmp"),
-                                                              StandardCopyOption.REPLACE_EXISTING));
+            final Path tmp = Files.createFile(QWEAppConfig.DEFAULT_DATADIR.resolve(UUID64.random() + ".tmp"));
+            final String origin = JarFileUtils.normalize(getPath());
+            if (JarFileUtils.isJarUrl(getPath())) {
+                Files.copy(new URL(origin).openStream(), tmp, StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                Files.copy(Paths.get(origin), tmp, StandardCopyOption.REPLACE_EXISTING);
+            }
+            clone = LazyKeyStore.load(this, tmp);
+            Files.delete(tmp);
+            return clone;
         } catch (IOException e) {
             throw new CryptoException("Unable clone key store", e);
         }
