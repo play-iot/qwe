@@ -38,6 +38,7 @@ dependencies {
     jooqGenerator(DatabaseLibs.pgsql)
     jooqGenerator(DatabaseLibs.jooqMetaExt)
 }
+val pgHost: String? by project
 
 jooq {
     version.set(DatabaseLibs.Version.jooq)
@@ -79,7 +80,7 @@ jooq {
                 logging = Logging.INFO
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://localhost:5423/testdb"
+                    url = """jdbc:postgresql://${pgHost ?: "localhost"}:5423/testdb"""
                     user = "postgres"
                     password = "123"
                 }
@@ -104,7 +105,7 @@ jooq {
                         isDaos = false
                     }
                     target.apply {
-                        packageName = "io.zero88.jooqx.integtest.pgsql"
+                        packageName = "io.zero88.qwe.sql.integtest.pgsql"
                         directory = "build/generated/pgsql"
                     }
                 }
