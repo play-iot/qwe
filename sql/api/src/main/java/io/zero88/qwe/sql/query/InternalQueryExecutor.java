@@ -3,10 +3,10 @@ package io.zero88.qwe.sql.query;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.sql.EntityMetadata;
 import io.vertx.core.Future;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.reactivex.Single;
 
 import lombok.NonNull;

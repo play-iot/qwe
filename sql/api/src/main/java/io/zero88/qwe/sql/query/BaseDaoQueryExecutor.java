@@ -13,7 +13,7 @@ import org.jooq.ResultQuery;
 import io.zero88.qwe.sql.EntityMetadata;
 import io.zero88.qwe.sql.pojos.DMLPojo;
 import io.vertx.core.Future;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.sql.handler.AuditDecorator;

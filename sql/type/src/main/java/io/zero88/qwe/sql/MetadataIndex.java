@@ -9,7 +9,7 @@ import org.jooq.Table;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.repl.ReflectionField;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 
 import lombok.NonNull;
 

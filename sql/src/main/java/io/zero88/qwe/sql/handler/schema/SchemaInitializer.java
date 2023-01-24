@@ -18,12 +18,12 @@ import org.jooq.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.zero88.jooqx.SQLExecutor;
+import io.github.zero88.jooqx.SQLPreparedQuery;
+import io.github.zero88.jooqx.SQLResultCollector;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.SQLExecutor;
-import io.zero88.jooqx.SQLPreparedQuery;
-import io.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.sql.SQLError.InitDataError;
@@ -39,9 +39,9 @@ import lombok.NonNull;
  * @since 1.0.0
  */
 @SuppressWarnings("rawtypes")
-public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
-                                      E extends SQLExecutor<S, B, PQ, RS, RC>>
-    extends SchemaExecutor<S, B, PQ, RS, RC, E> {
+public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RC extends SQLResultCollector,
+                                      E extends SQLExecutor<S, B, PQ, RC>>
+    extends SchemaExecutor<S, B, PQ, RC, E> {
 
     SchemaInitializer NO_DATA_INITIALIZER = entityHandler -> Future.succeededFuture(new JsonObject());
 
@@ -57,7 +57,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      * @param schema  the schema
      * @return the schema in future for fluent API
      */
-    default @NonNull Future<Schema> createSchema(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler,
+    default @NonNull Future<Schema> createSchema(@NonNull EntityHandler<S, B, PQ, RC, E> handler,
                                                  @NonNull Schema schema) {
         return handler.jooqx()
                       .ddl(dsl -> dsl.createSchemaIfNotExists(schema))
@@ -72,7 +72,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      * @param table   the table
      * @return the table in future for fluent API
      */
-    default @NonNull Future<Table> createTable(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler,
+    default @NonNull Future<Table> createTable(@NonNull EntityHandler<S, B, PQ, RC, E> handler,
                                                @NonNull Table<?> table) {
         return handler.jooqx()
                       .ddl(dsl -> dsl.createTableIfNotExists(table).columns(table.fields()))
@@ -87,7 +87,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      * @param table   the table
      * @return the table in future for fluent API
      */
-    default @NonNull Future<Table> createIndexes(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler,
+    default @NonNull Future<Table> createIndexes(@NonNull EntityHandler<S, B, PQ, RC, E> handler,
                                                  @NonNull Table<?> table) {
         //@formatter:off
         BiFunction<DSLContext, Index, CreateIndexStep> f = (dsl, idx) -> idx.getUnique()
@@ -112,7 +112,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      *     {@code Schema} are created
      * @since 1.0.0
      */
-    default @NonNull Future<Table> createConstraints(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler,
+    default @NonNull Future<Table> createConstraints(@NonNull EntityHandler<S, B, PQ, RC, E> handler,
                                                      @NonNull Table<?> table) {
         Stream<Constraint> cs = table.getKeys().stream().map(Key::constraint);
         if (Objects.nonNull(table.getPrimaryKey())) {
@@ -139,7 +139,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      *     {@code Schema} are created
      * @since 1.0.0
      */
-    default @NonNull Future<Table> createTriggers(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler,
+    default @NonNull Future<Table> createTriggers(@NonNull EntityHandler<S, B, PQ, RC, E> handler,
                                                   @NonNull Table<?> table) {
         return Future.succeededFuture(table);
     }
@@ -151,7 +151,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      * @return succeeded future if no error
      * @since 1.0.0
      */
-    default Future<Void> doMisc(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler) {
+    default Future<Void> doMisc(@NonNull EntityHandler<S, B, PQ, RC, E> handler) {
         return Future.succeededFuture();
     }
 
@@ -161,7 +161,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      * @param handler entity handler
      * @return succeeded future if no error
      */
-    default Future<Void> setupSchema(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler) {
+    default Future<Void> setupSchema(@NonNull EntityHandler<S, B, PQ, RC, E> handler) {
         logger().info(decor("Creating database model..."));
         Function<Table, Future<Table>> f1 = t -> createTable(handler, t).flatMap(a -> createIndexes(handler, a));
         Function<Table, Future<Table>> f2 = t -> createConstraints(handler, t);
@@ -187,12 +187,13 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RS, RC 
      * @param handler an entity handler
      * @return json result in future
      */
-    @NonNull Future<JsonObject> initData(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler);
+    @NonNull Future<JsonObject> initData(@NonNull EntityHandler<S, B, PQ, RC, E> handler);
 
     @Override
-    default Future<EventMessage> execute(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler) {
+    default Future<EventMessage> execute(@NonNull EntityHandler<S, B, PQ, RC, E> handler) {
         return setupSchema(handler).recover(t -> Future.failedFuture(new InitSchemaError(t)))
-                                   .flatMap(i -> initData(handler).recover(t -> Future.failedFuture(new InitDataError(t))))
+                                   .flatMap(
+                                       i -> initData(handler).recover(t -> Future.failedFuture(new InitDataError(t))))
                                    .map(b -> EventMessage.success(EventAction.INIT, b));
     }
 

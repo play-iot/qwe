@@ -1,8 +1,8 @@
 package io.zero88.qwe.sql.spi.extension.mysql;
 
 import io.vertx.mysqlclient.MySQLPool;
-import io.zero88.jooqx.spi.mysql.MySQLErrorConverterProvider;
-import io.zero88.jooqx.spi.mysql.MySQLPoolProvider;
+import io.github.zero88.jooqx.spi.mysql.MySQLErrorConverterProvider;
+import io.github.zero88.jooqx.spi.mysql.MySQLPoolProvider;
 import io.zero88.qwe.sql.handler.JooqxExtension;
 
 /**

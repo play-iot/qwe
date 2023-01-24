@@ -1,6 +1,6 @@
 package io.zero88.qwe.sql.workflow.task;
 
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.eventbus.EventBusClient;
 import io.zero88.qwe.sql.pojos.DMLPojo;
 import io.zero88.qwe.sql.query.EntityQueryExecutor;

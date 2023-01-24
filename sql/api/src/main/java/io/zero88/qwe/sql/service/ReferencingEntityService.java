@@ -1,6 +1,6 @@
 package io.zero88.qwe.sql.service;
 
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.sql.EntityMetadata;
 import io.zero88.qwe.sql.marker.ReferencingEntityMarker;
 import io.zero88.qwe.sql.query.ReferencingQueryExecutor;

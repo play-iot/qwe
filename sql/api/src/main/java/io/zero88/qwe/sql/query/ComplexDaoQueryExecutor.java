@@ -13,7 +13,7 @@ import org.jooq.RecordMapper;
 import org.jooq.ResultQuery;
 
 import io.github.jklingsporn.vertx.jooq.rx.jdbc.JDBCRXGenericQueryExecutor;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.sql.CompositeMetadata;
 import io.zero88.qwe.sql.EntityMetadata;
 import io.zero88.qwe.sql.pojos.CompositePojo;

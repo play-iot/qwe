@@ -2,7 +2,7 @@ package io.zero88.qwe.sql.service;
 
 import java.util.Collection;
 
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.sql.EntityMetadata;
 import io.zero88.qwe.sql.handler.EntityHandler;

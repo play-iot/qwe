@@ -2,7 +2,7 @@ package io.zero88.qwe.sql.workflow.task;
 
 import java.util.Objects;
 
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.workflow.TaskExecuter;
 
 /**

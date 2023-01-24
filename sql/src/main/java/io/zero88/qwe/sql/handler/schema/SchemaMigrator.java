@@ -3,11 +3,11 @@ package io.zero88.qwe.sql.handler.schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.zero88.jooqx.SQLExecutor;
+import io.github.zero88.jooqx.SQLPreparedQuery;
+import io.github.zero88.jooqx.SQLResultCollector;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.SQLExecutor;
-import io.zero88.jooqx.SQLPreparedQuery;
-import io.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventMessage;
 import io.zero88.qwe.sql.SQLError.SQLMigrationError;
@@ -20,9 +20,9 @@ import lombok.NonNull;
  *
  * @since 1.0.0
  */
-public interface SchemaMigrator<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
-                                   E extends SQLExecutor<S, B, PQ, RS, RC>>
-    extends SchemaExecutor<S, B, PQ, RS, RC, E> {
+public interface SchemaMigrator<S, B, PQ extends SQLPreparedQuery<B>, RC extends SQLResultCollector,
+                                   E extends SQLExecutor<S, B, PQ, RC>>
+    extends SchemaExecutor<S, B, PQ, RC, E> {
 
     SchemaMigrator NON_MIGRATOR = entityHandler -> Future.succeededFuture(new JsonObject().put("migration", "Nope"));
 
@@ -32,7 +32,7 @@ public interface SchemaMigrator<S, B, PQ extends SQLPreparedQuery<B>, RS, RC ext
     }
 
     @Override
-    default Future<EventMessage> execute(@NonNull EntityHandler<S, B, PQ, RS, RC, E> entityHandler) {
+    default Future<EventMessage> execute(@NonNull EntityHandler<S, B, PQ, RC, E> entityHandler) {
         return doMigrate(entityHandler).recover(t -> Future.failedFuture(new SQLMigrationError(t)))
                                        .map(b -> EventMessage.success(EventAction.MIGRATE, b));
     }
@@ -43,7 +43,7 @@ public interface SchemaMigrator<S, B, PQ extends SQLPreparedQuery<B>, RS, RC ext
      * @param handler an entity handler
      * @return json result in future
      */
-    @NonNull Future<JsonObject> doMigrate(@NonNull EntityHandler<S, B, PQ, RS, RC, E> handler);
+    @NonNull Future<JsonObject> doMigrate(@NonNull EntityHandler<S, B, PQ, RC, E> handler);
 
 }
 

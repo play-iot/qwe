@@ -1,6 +1,6 @@
 package io.zero88.qwe.sql.workflow;
 
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.sql.workflow.step.DQLStep;
 
 import lombok.NonNull;

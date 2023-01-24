@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.jooq.SQLDialect;
 
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.spi.DBEmbeddedMode;
+import io.github.zero88.jooqx.spi.DBEmbeddedMode;
 import io.zero88.qwe.PluginConfig.DynamicPluginConfig.DynamicPluginConfigImpl;
 import io.zero88.qwe.PluginConfig.PluginDirConfig;
 import io.zero88.qwe.sql.handler.JooqxBaseExtension;

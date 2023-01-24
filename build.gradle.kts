@@ -1,6 +1,8 @@
 plugins {
-    id(PluginLibs.oss) version PluginLibs.Version.plugin
-    id(PluginLibs.root) version PluginLibs.Version.plugin apply false
+    eclipse
+    idea
+    id(PluginLibs.oss) version PluginLibs.Version.gradlePlugin
+    id(PluginLibs.root) version PluginLibs.Version.gradlePlugin
     id(PluginLibs.jooq) version PluginLibs.Version.jooq apply false
     id(PluginLibs.nexusPublish) version PluginLibs.Version.nexusPublish
 }
@@ -11,37 +13,24 @@ allprojects {
     repositories {
         mavenLocal()
         maven { url = uri("https://maven-central-asia.storage-download.googleapis.com/maven2/") }
-        jcenter()
         maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
         mavenCentral()
     }
 
-    apply(plugin = PluginLibs.oss)
+    val skipPublish = (gradle as ExtensionAware).extensions["SKIP_PUBLISH"] as Array<*>
+    sonarqube {
+        isSkipProject = project.path in skipPublish
+    }
 
-    oss {
-        zero88.set(true)
-        publishingInfo {
-            homepage.set("https://github.com/zero88/qwe")
-            license {
-                name.set("The Apache License, Version 2.0")
-                url.set("https://github.com/zero88/qwe/blob/master/LICENSE")
-            }
-            scm {
-                connection.set("scm:git:git://git@github.com:zero88/qwe.git")
-                developerConnection.set("scm:git:ssh://git@github.com:zero88/qwe.git")
-                url.set("https://github.com/zero88/qwe")
-            }
+    tasks {
+        withType<AbstractPublishToMaven> {
+            enabled = project != rootProject && project.path !in skipPublish
         }
     }
 }
 
 subprojects {
-    apply(plugin = "eclipse")
-    apply(plugin = "idea")
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-    }
+    apply(plugin = PluginLibs.oss)
 
     dependencies {
         compileOnly(UtilLibs.lombok)
@@ -54,9 +43,27 @@ subprojects {
         testCompileOnly(UtilLibs.lombok)
         testAnnotationProcessor(UtilLibs.lombok)
     }
-}
 
-apply(plugin = PluginLibs.root)
+    oss {
+        zero88.set(true)
+        publishingInfo {
+            enabled.set(true)
+            homepage.set("https://github.com/zero88/qwe")
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://github.com/zero88/qwe/blob/master/LICENSE")
+            }
+            scm {
+                connection.set("scm:git:git://git@github.com:zero88/qwe.git")
+                developerConnection.set("scm:git:ssh://git@github.com:zero88/qwe.git")
+                url.set("https://github.com/zero88/qwe")
+            }
+        }
+        testLogger {
+            slowThreshold = 5000
+        }
+    }
+}
 
 nexusPublishing {
     packageGroup.set("io.github.zero88")

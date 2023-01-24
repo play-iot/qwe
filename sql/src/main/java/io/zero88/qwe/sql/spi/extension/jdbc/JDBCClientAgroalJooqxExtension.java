@@ -1,7 +1,7 @@
 package io.zero88.qwe.sql.spi.extension.jdbc;
 
 import io.vertx.ext.jdbc.spi.impl.AgroalCPDataSourceProvider;
-import io.zero88.jooqx.spi.jdbc.JDBCLegacyAgroalProvider;
+import io.github.zero88.jooqx.spi.jdbc.JDBCLegacyAgroalProvider;
 import io.zero88.qwe.sql.handler.JooqxLegacyExtension;
 
 /**

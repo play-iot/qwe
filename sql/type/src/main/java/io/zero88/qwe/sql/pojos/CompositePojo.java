@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.JsonData;
 
 import lombok.NonNull;

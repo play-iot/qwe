@@ -6,7 +6,7 @@ import java.util.function.BiConsumer;
 import org.jooq.Configuration;
 
 import io.vertx.core.Future;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.sql.pojos.DMLPojo;

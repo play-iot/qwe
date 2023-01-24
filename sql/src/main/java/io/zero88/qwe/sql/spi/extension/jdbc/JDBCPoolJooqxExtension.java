@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 
+import io.github.zero88.jooqx.provider.DBEmbeddedProvider;
+import io.github.zero88.jooqx.spi.jdbc.JDBCErrorConverterProvider;
+import io.github.zero88.jooqx.spi.jdbc.JDBCPoolProvider;
 import io.github.zero88.utils.FileUtils;
 import io.vertx.ext.jdbc.spi.DataSourceProvider;
 import io.vertx.jdbcclient.JDBCPool;
-import io.zero88.jooqx.provider.DBEmbeddedProvider;
-import io.zero88.jooqx.spi.jdbc.JDBCErrorConverterProvider;
-import io.zero88.jooqx.spi.jdbc.JDBCPoolProvider;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.sql.SQLPluginConfig;
 import io.zero88.qwe.sql.handler.JooqxExtension;
@@ -33,7 +33,7 @@ public class JDBCPoolJooqxExtension<P extends DataSourceProvider>
                                                     @NotNull SQLPluginConfig pluginConfig) {
         Path dbPath = Optional.ofNullable(pluginContext.dataDir())
                               .map(p -> p.resolve(pluginContext.appName()))
-                              .orElseGet(() -> FileUtils.defaultDatadir(pluginContext.appName()))
+                              .orElseGet(() -> FileUtils.getUserHomePath(pluginContext.appName()))
                               .resolve(Optional.ofNullable(pluginConfig.getPluginDir()).orElse(""));
         DBEmbeddedProvider embedded = DBEmbeddedDelegate.create(dbPath.toAbsolutePath().toString(),
                                                                 pluginConfig.getDialect(),

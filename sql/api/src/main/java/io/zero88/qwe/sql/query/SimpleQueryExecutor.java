@@ -3,7 +3,7 @@ package io.zero88.qwe.sql.query;
 import org.jooq.UpdatableRecord;
 
 import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.sql.handler.EntityHandler;
 
 import lombok.NonNull;

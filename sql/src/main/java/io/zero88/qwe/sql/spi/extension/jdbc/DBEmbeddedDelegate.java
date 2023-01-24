@@ -5,10 +5,10 @@ import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.SQLDialect;
 
+import io.github.zero88.jooqx.provider.DBEmbeddedProvider;
+import io.github.zero88.jooqx.spi.DBEmbeddedMode;
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.provider.DBEmbeddedProvider;
-import io.zero88.jooqx.spi.DBEmbeddedMode;
 import io.zero88.qwe.exceptions.InitializerError;
 
 import lombok.NonNull;

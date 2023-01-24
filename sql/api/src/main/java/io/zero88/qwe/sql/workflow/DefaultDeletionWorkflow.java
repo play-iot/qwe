@@ -1,7 +1,7 @@
 package io.zero88.qwe.sql.workflow;
 
 import io.vertx.core.Future;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.sql.pojos.DMLPojo;
 import io.zero88.qwe.sql.validation.OperationValidator;

@@ -7,7 +7,7 @@ import io.zero88.qwe.sql.Status;
 import io.zero88.qwe.sql.pojos.HasTimeAudit;
 import io.zero88.qwe.sql.type.TimeAudit;
 import io.github.zero88.utils.Strings;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.micro.GatewayHeaders;
 import io.zero88.qwe.sql.handler.EntitySyncHandler;

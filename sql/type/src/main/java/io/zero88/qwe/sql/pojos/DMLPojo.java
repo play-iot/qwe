@@ -3,7 +3,7 @@ package io.zero88.qwe.sql.pojos;
 import java.util.Optional;
 
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 
 import lombok.Builder;
 import lombok.Getter;

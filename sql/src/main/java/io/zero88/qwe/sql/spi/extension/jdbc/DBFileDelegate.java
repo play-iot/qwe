@@ -5,11 +5,11 @@ import org.jooq.SQLDialect;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.UUID64;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.provider.DBEmbeddedProvider.DBFileProvider;
-import io.zero88.jooqx.spi.derby.DerbyFileProvider;
-import io.zero88.jooqx.spi.h2.H2FileProvider;
-import io.zero88.jooqx.spi.hsqldb.HSQLDBFileProvider;
-import io.zero88.jooqx.spi.sqlite.SQLiteFileProvider;
+import io.github.zero88.jooqx.provider.DBEmbeddedProvider.DBFileProvider;
+import io.github.zero88.jooqx.spi.derby.DerbyFileProvider;
+import io.github.zero88.jooqx.spi.h2.H2FileProvider;
+import io.github.zero88.jooqx.spi.hsqldb.HSQLDBFileProvider;
+import io.github.zero88.jooqx.spi.sqlite.SQLiteFileProvider;
 import io.zero88.qwe.HasLogger;
 import io.zero88.qwe.exceptions.InitializerError;
 

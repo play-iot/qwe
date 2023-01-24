@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.sql.EntityMetadata;
 import io.zero88.qwe.sql.marker.OneToOneEntityMarker;

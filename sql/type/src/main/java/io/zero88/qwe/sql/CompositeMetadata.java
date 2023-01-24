@@ -18,7 +18,7 @@ import org.jooq.UpdatableRecord;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.sql.pojos.CompositePojo;
 import io.zero88.qwe.sql.validation.CompositeValidation;

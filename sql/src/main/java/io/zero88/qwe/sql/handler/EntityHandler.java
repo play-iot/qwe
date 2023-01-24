@@ -8,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.Future;
-import io.zero88.jooqx.JooqDSLProvider;
-import io.zero88.jooqx.Jooqx;
-import io.zero88.jooqx.SQLExecutor;
-import io.zero88.jooqx.SQLPreparedQuery;
-import io.zero88.jooqx.SQLResultCollector;
+import io.github.zero88.jooqx.JooqDSLProvider;
+import io.github.zero88.jooqx.Jooqx;
+import io.github.zero88.jooqx.SQLExecutor;
+import io.github.zero88.jooqx.SQLPreparedQuery;
+import io.github.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.HasSharedData;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.SharedDataLocalProxy;
@@ -29,8 +29,8 @@ import lombok.NonNull;
  *
  * @since 1.0.0
  */
-public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
-                                  E extends SQLExecutor<S, B, PQ, RS, RC>>
+public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RC extends SQLResultCollector,
+                                  E extends SQLExecutor<S, B, PQ, RC>>
     extends HasSharedData, EventBusProxy, JooqDSLProvider, SQLLogSystem {
 
     @Override
@@ -53,10 +53,10 @@ public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @return a reference future to this for fluent API
      * @see JooqxBaseExtension
      */
-    Future<EntityHandler<S, B, PQ, RS, RC, E>> setup(@NotNull SharedDataLocalProxy sharedData,
-                                                     @NonNull PluginContext pluginContext,
-                                                     @NotNull SQLPluginConfig pluginConfig,
-                                                     @Nullable Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionCls);
+    Future<EntityHandler<S, B, PQ, RC, E>> setup(@NotNull SharedDataLocalProxy sharedData,
+                                                 @NonNull PluginContext pluginContext,
+                                                 @NotNull SQLPluginConfig pluginConfig,
+                                                 @Nullable Class<JooqxBaseExtension<S, B, PQ, RC, E>> jooqxExtensionCls);
 
     /**
      * jOOQx instance
@@ -86,7 +86,7 @@ public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @see SchemaHandler
      * @since 1.0.0
      */
-    @NonNull SchemaHandler<S, B, PQ, RS, RC, E> schemaHandler();
+    @NonNull SchemaHandler<S, B, PQ, RC, E> schemaHandler();
 
     //    /**
     //     * Gets {@code entity constraint holder}.

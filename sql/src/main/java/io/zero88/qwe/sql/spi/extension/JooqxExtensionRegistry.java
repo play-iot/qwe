@@ -9,8 +9,8 @@ import org.jooq.SQLDialect;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.ext.jdbc.spi.DataSourceProvider;
-import io.zero88.jooqx.provider.JDBCExtension;
-import io.zero88.jooqx.spi.jdbc.JDBCPoolProvider;
+import io.github.zero88.jooqx.provider.JDBCExtension;
+import io.github.zero88.jooqx.spi.jdbc.JDBCPoolProvider;
 import io.zero88.qwe.sql.handler.JooqxBaseExtension;
 import io.zero88.qwe.sql.spi.extension.db2.DB2JooqxExtension;
 import io.zero88.qwe.sql.spi.extension.jdbc.JDBCPoolAgroalJooqxExtension;

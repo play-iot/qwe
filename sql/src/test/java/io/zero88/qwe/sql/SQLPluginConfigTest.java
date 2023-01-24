@@ -4,10 +4,10 @@ import org.jooq.SQLDialect;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import io.github.zero88.jooqx.spi.DBEmbeddedMode;
 import io.vertx.core.json.JsonObject;
 import io.vertx.jdbcclient.JDBCConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
-import io.zero88.jooqx.spi.DBEmbeddedMode;
 import io.zero88.qwe.IConfig;
 import io.zero88.qwe.JsonHelper;
 import io.zero88.qwe.sql.spi.extension.jdbc.JDBCPoolHikariJooqxExtension;

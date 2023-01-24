@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.zero88.utils.Urls;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.http.httpevent.ActionMethodMapping;
 import io.zero88.qwe.http.httpevent.EventHttpService;
 import io.zero88.qwe.http.httpevent.EventMethodDefinition;

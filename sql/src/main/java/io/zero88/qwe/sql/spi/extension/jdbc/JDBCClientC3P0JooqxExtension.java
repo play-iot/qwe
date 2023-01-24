@@ -1,7 +1,7 @@
 package io.zero88.qwe.sql.spi.extension.jdbc;
 
 import io.vertx.ext.jdbc.spi.impl.C3P0DataSourceProvider;
-import io.zero88.jooqx.spi.jdbc.JDBCLegacyC3P0Provider;
+import io.github.zero88.jooqx.spi.jdbc.JDBCLegacyC3P0Provider;
 import io.zero88.qwe.sql.handler.JooqxLegacyExtension;
 
 /**

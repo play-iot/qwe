@@ -31,7 +31,7 @@ public final class QWEAppConfig extends HasOtherConfig<QWEAppConfig> implements 
     public static final String DELIVERY_OPTIONS = "__delivery__";
 
     public static final String DATA_DIR = "dataDir";
-    public static final Path DEFAULT_DATADIR = FileUtils.defaultDatadir(".playio");
+    public static final Path DEFAULT_DATADIR = FileUtils.getUserHomePath(".playio");
     /**
      * Application data dir
      */

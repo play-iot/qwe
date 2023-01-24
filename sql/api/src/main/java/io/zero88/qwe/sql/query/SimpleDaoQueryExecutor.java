@@ -10,7 +10,7 @@ import org.jooq.UpdatableRecord;
 
 import io.zero88.qwe.sql.EntityMetadata;
 import io.vertx.core.Future;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.sql.handler.EntityHandler;

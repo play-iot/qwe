@@ -8,12 +8,12 @@ import org.jooq.SQLDialect;
 import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 
+import io.github.zero88.jooqx.DSLAdapter;
+import io.github.zero88.jooqx.SQLExecutor;
+import io.github.zero88.jooqx.SQLPreparedQuery;
+import io.github.zero88.jooqx.SQLResultCollector;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.DSLAdapter;
-import io.zero88.jooqx.SQLExecutor;
-import io.zero88.jooqx.SQLPreparedQuery;
-import io.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EventAction;
 import io.zero88.qwe.eventbus.EventBusClient;
@@ -29,8 +29,8 @@ import lombok.NonNull;
  *
  * @since 1.0.0
  */
-public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
-                                  E extends SQLExecutor<S, B, PQ, RS, RC>> {
+public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RC extends SQLResultCollector,
+                                  E extends SQLExecutor<S, B, PQ, RC>> {
 
     String READINESS_ADDRESS = "SCHEMA_READINESS_ADDRESS";
 
@@ -70,7 +70,7 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @since 1.0.0
      */
     @SuppressWarnings("unchecked")
-    default @NonNull SchemaInitializer<S, B, PQ, RS, RC, E> initializer() {
+    default @NonNull SchemaInitializer<S, B, PQ, RC, E> initializer() {
         return SchemaInitializer.NO_DATA_INITIALIZER;
     }
 
@@ -81,7 +81,7 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @since 1.0.0
      */
     @SuppressWarnings("unchecked")
-    default @NonNull SchemaMigrator<S, B, PQ, RS, RC, E> migrator() {
+    default @NonNull SchemaMigrator<S, B, PQ, RC, E> migrator() {
         return SchemaMigrator.NON_MIGRATOR;
     }
 
@@ -92,7 +92,7 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @return readiness address
      * @since 1.0.0
      */
-    default @NonNull String readinessAddress(@NonNull EntityHandler<S, B, PQ, RS, RC, E> entityHandler) {
+    default @NonNull String readinessAddress(@NonNull EntityHandler<S, B, PQ, RC, E> entityHandler) {
         return Optional.ofNullable((String) entityHandler.sharedData().getData(READINESS_ADDRESS))
                        .orElse(this.getClass().getName() + ".readiness");
     }
@@ -107,7 +107,7 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RS, RC exte
      * @see #migrator()
      * @since 1.0.0
      */
-    default @NonNull Future<EventMessage> execute(@NonNull EntityHandler<S, B, PQ, RS, RC, E> entityHandler) {
+    default @NonNull Future<EventMessage> execute(@NonNull EntityHandler<S, B, PQ, RC, E> entityHandler) {
         final EventBusClient c = entityHandler.transporter();
         final String address = readinessAddress(entityHandler);
         return this.isNew(entityHandler.jooqx())

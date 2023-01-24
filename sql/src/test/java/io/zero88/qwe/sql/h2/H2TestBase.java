@@ -5,9 +5,9 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import io.github.zero88.jooqx.DSLAdapter;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
-import io.zero88.jooqx.DSLAdapter;
 import io.zero88.qwe.PluginProvider;
 import io.zero88.qwe.sql.SQLPlugin;
 import io.zero88.qwe.sql.SQLPluginProvider;

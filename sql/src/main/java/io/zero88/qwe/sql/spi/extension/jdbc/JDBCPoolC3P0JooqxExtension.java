@@ -1,8 +1,8 @@
 package io.zero88.qwe.sql.spi.extension.jdbc;
 
 import io.vertx.jdbcclient.JDBCPool;
-import io.zero88.jooqx.spi.jdbc.JDBCErrorConverterProvider;
-import io.zero88.jooqx.spi.jdbc.JDBCPoolC3P0Provider;
+import io.github.zero88.jooqx.spi.jdbc.JDBCErrorConverterProvider;
+import io.github.zero88.jooqx.spi.jdbc.JDBCPoolC3P0Provider;
 import io.zero88.qwe.sql.handler.JooqxExtension;
 
 /**

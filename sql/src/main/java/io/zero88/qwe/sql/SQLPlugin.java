@@ -4,9 +4,9 @@ import java.util.Objects;
 
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.Future;
-import io.zero88.jooqx.SQLExecutor;
-import io.zero88.jooqx.SQLPreparedQuery;
-import io.zero88.jooqx.SQLResultCollector;
+import io.github.zero88.jooqx.SQLExecutor;
+import io.github.zero88.jooqx.SQLPreparedQuery;
+import io.github.zero88.jooqx.SQLResultCollector;
 import io.zero88.qwe.PluginContext;
 import io.zero88.qwe.PluginVerticle;
 import io.zero88.qwe.eventbus.EventMessage;
@@ -15,17 +15,17 @@ import io.zero88.qwe.sql.handler.JooqxBaseExtension;
 
 import lombok.NonNull;
 
-public final class SQLPlugin<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extends SQLResultCollector<RS>,
-                                E extends SQLExecutor<S, B, PQ, RS, RC>>
-    extends PluginVerticle<SQLPluginConfig, SQLPluginContext<EntityHandler<S, B, PQ, RS, RC, E>>> {
+public final class SQLPlugin<S, B, PQ extends SQLPreparedQuery<B>, RC extends SQLResultCollector,
+                                E extends SQLExecutor<S, B, PQ, RC>>
+    extends PluginVerticle<SQLPluginConfig, SQLPluginContext<EntityHandler<S, B, PQ, RC, E>>> {
 
-    private final EntityHandler<S, B, PQ, RS, RC, E> handler;
-    private final Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass;
+    private final EntityHandler<S, B, PQ, RC, E> handler;
+    private final Class<JooqxBaseExtension<S, B, PQ, RC, E>> jooqxExtensionClass;
 
-    SQLPlugin(Class<EntityHandler<S, B, PQ, RS, RC, E>> handlerClass,
-              Class<JooqxBaseExtension<S, B, PQ, RS, RC, E>> jooqxExtensionClass) {
-        this.handler = Objects.requireNonNull(ReflectionClass.createObject(handlerClass),
-                                              "Not found Entity Handler[" + handlerClass.getName() + "]");
+    SQLPlugin(Class<EntityHandler<S, B, PQ, RC, E>> handlerClass,
+              Class<JooqxBaseExtension<S, B, PQ, RC, E>> jooqxExtensionClass) {
+        this.handler             = Objects.requireNonNull(ReflectionClass.createObject(handlerClass),
+                                                          "Not found Entity Handler[" + handlerClass.getName() + "]");
         this.jooqxExtensionClass = jooqxExtensionClass;
     }
 
@@ -57,12 +57,12 @@ public final class SQLPlugin<S, B, PQ extends SQLPreparedQuery<B>, RS, RC extend
     }
 
     @Override
-    public SQLPluginContext<EntityHandler<S, B, PQ, RS, RC, E>> enrichContext(@NonNull PluginContext pluginContext,
-                                                                              boolean isPostStep) {
+    public SQLPluginContext<EntityHandler<S, B, PQ, RC, E>> enrichContext(@NonNull PluginContext pluginContext,
+                                                                          boolean isPostStep) {
         return new SQLPluginContext<>(pluginContext, handler);
     }
 
-    private Future<EventMessage> initOrMigrate(EntityHandler<S, B, PQ, RS, RC, E> h) {
+    private Future<EventMessage> initOrMigrate(EntityHandler<S, B, PQ, RC, E> h) {
         return h.schemaHandler()
                 .execute(h)
                 .flatMap(msg -> !msg.isError()

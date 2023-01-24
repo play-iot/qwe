@@ -11,9 +11,7 @@ rootProject.name = "qwe"
 pluginManagement {
     repositories {
         mavenLocal()
-        maven { url = uri("https://maven-central-asia.storage-download.googleapis.com/maven2/") }
         gradlePluginPortal()
-        maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
     }
 }
 //include("manifest")
@@ -35,4 +33,11 @@ include(
 project(":micro:micro-config").projectDir = file("micro/config")
 project(":micro:micro-metadata").projectDir = file("micro/metadata")
 
-include("examples:shared", "examples:systemd", "examples:docker", "examples:fatjar", "examples:cluster-node")
+val examples = arrayOf("examples:shared", "examples:systemd", "examples:docker", "examples:fatjar", "examples:cluster-node")
+
+examples.forEach { include(it) }
+
+if (gradle is ExtensionAware) {
+    val extensions = (gradle as ExtensionAware).extensions
+    extensions.add("SKIP_PUBLISH", examples)
+}

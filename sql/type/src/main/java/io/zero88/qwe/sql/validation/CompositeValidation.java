@@ -13,7 +13,7 @@ import io.zero88.qwe.sql.pojos.JsonPojo;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.TripleFunction;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.exceptions.QWEException;
 import io.zero88.qwe.exceptions.QWEExceptionConverter;

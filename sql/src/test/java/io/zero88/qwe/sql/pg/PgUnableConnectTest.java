@@ -12,11 +12,10 @@ import io.zero88.qwe.sql.SQLPluginConfig;
 import io.zero88.qwe.sql.SQLPluginFailedTest;
 import io.zero88.qwe.sql.SQLPluginProvider;
 
-@SuppressWarnings("ALL")
-public class PgUnableConnectTest extends SQLPluginFailedTest {
+class PgUnableConnectTest extends SQLPluginFailedTest {
 
     @Test
-    public void unable_connect(Vertx vertx, VertxTestContext testContext) {
+    void unable_connect(Vertx vertx, VertxTestContext testContext) {
         Checkpoint cp = testContext.checkpoint();
         PluginDeploymentHelper.Junit5.create(this)
                                      .deployFailed(vertx, testContext,

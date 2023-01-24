@@ -3,7 +3,7 @@ package io.zero88.qwe.sql.h2;
 import org.jooq.SQLDialect;
 
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.spi.DBEmbeddedMode;
+import io.github.zero88.jooqx.spi.DBEmbeddedMode;
 import io.zero88.qwe.sql.SQLPluginConfig;
 
 public class H2MemAutoDetectTest extends H2TestBase {

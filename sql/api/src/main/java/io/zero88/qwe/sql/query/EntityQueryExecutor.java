@@ -14,7 +14,7 @@ import org.jooq.exception.TooManyRowsException;
 import io.github.zero88.exceptions.HiddenException;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.jpa.Pagination;
 import io.zero88.qwe.dto.jpa.Sort;
 import io.zero88.qwe.dto.msg.RequestData;

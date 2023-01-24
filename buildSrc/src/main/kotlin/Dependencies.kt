@@ -14,19 +14,18 @@ object PluginLibs {
 
     object Version {
 
-        const val jvm = "1.3.72"
-        const val nexusPublish = "1.1.0"
-        const val plugin = "2.0.0"
         const val jooq = "5.2"
+        const val nexusPublish = "1.1.0"
+        const val gradlePlugin = "2.1.0"
     }
 
-    const val jvm = "jvm"
     const val nexusPublish = "io.github.gradle-nexus.publish-plugin"
     const val oss = "io.github.zero88.gradle.oss"
     const val root = "io.github.zero88.gradle.root"
     const val app = "io.github.zero88.gradle.qwe.app"
     const val docker = "io.github.zero88.gradle.qwe.docker"
     const val jooq = "nu.studer.jooq"
+
 }
 
 object JSRLibs {
@@ -124,15 +123,15 @@ object LogLibs {
 object ZeroLibs {
     object Version {
 
-        const val jooqx = "1.1.0-SNAPSHOT"
+        const val jooqx = "2.0.0-rc1"
         const val jpaExt = "0.9.0"
         const val rql = "0.9.0"
-        const val utils = "2.0.0-SNAPSHOT"
+        const val utils = "2.0.0"
     }
 
     const val utils = "io.github.zero88:java-utils:${Version.utils}"
     const val jpaExt = "io.github.zero88:jpa-ext:${Version.jpaExt}"
-    const val jooqx = "io.github.zero88:jooqx-core:${Version.jooqx}"
+    const val jooqx = "io.github.zero88:jooqx:${Version.jooqx}"
     const val jooqxSpi = "io.github.zero88:jooqx-spi:${Version.jooqx}"
     const val jooqRql = "io.github.zero88:rql-jooq:${Version.rql}"
 }

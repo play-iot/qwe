@@ -17,7 +17,7 @@ import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.UUID64;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.sql.tables.JsonTable;
 import io.zero88.qwe.sql.type.TimeAudit;

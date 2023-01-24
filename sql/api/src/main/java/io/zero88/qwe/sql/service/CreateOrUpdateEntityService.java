@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.zero88.jooqx.JsonRecord;
+import io.github.zero88.jooqx.JsonRecord;
 import io.zero88.qwe.dto.msg.RequestData;
 import io.zero88.qwe.eventbus.EBContract;
 import io.zero88.qwe.eventbus.EventAction;
