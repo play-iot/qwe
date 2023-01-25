@@ -128,7 +128,7 @@ jobs:
 
       - name: Test
         if: env.ENABLE_TEST == 'true'
-        run: ./gradlew jacocoRootReport -PjacocoHtml=false
+        run: ./gradlew jacocoTestReport -PjacocoHtml=false
 
       - name: SonarQube
         if: needs.context.outputs.shouldPublish == 'true' && env.ENABLE_SONAR == 'true'
