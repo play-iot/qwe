@@ -59,7 +59,7 @@ jobs:
         shell: bash
         run: |
           [[ "${{ steps.context.outputs.isTag }}" == "true" ]] && sv="" || sv=$(grep semanticVersion gradle.properties | cut -d'=' -f2)
-          echo ::set-output name=semanticVersion::$sv
+          echo semanticVersion=$sv >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
