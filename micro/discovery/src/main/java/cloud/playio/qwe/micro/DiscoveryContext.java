@@ -2,12 +2,9 @@ package cloud.playio.qwe.micro;
 
 import cloud.playio.qwe.PluginContext;
 import cloud.playio.qwe.PluginContext.DefaultPluginContext;
-
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public final class DiscoveryContext extends DefaultPluginContext {
 
     @Getter

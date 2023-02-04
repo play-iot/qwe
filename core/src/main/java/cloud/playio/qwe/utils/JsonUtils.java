@@ -23,15 +23,13 @@ import io.github.zero88.utils.DateTimes.Iso8601Formatter;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+
 import cloud.playio.qwe.exceptions.ErrorCode;
 import cloud.playio.qwe.exceptions.QWEException;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JsonUtils {
 
@@ -83,11 +81,9 @@ public final class JsonUtils {
     }
 
     public static JsonObject loadJsonInClasspath(String file) {
-        return loadJsonInCp(file, true);
-    }
-
-    public static JsonObject silentLoadJsonInClasspath(String file) {
-        return loadJsonInCp(file, false);
+        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
+                       .map(JsonUtils::readAsJson)
+                       .orElseGet(JsonObject::new);
     }
 
     public static JsonObject readAsJson(@NonNull InputStream resourceAsStream) {
@@ -108,17 +104,6 @@ public final class JsonUtils {
 
     public static Optional<String> findString(JsonObject filter, String attribute) {
         return Optional.ofNullable(filter).flatMap(f -> Optional.ofNullable(f.getString(attribute)));
-    }
-
-    private static JsonObject loadJsonInCp(String file, boolean logIt) {
-        return Optional.ofNullable(Reflections.contextClassLoader().getResourceAsStream(file))
-                       .map(JsonUtils::readAsJson)
-                       .orElseGet(() -> {
-                           if (logIt) {
-                               log.warn("Resource file '" + file + "' not found");
-                           }
-                           return new JsonObject();
-                       });
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
