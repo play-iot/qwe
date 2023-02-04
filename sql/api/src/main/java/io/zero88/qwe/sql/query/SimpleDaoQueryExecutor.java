@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,12 +8,12 @@ import org.jooq.DSLContext;
 import org.jooq.ResultQuery;
 import org.jooq.UpdatableRecord;
 
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
 import io.vertx.core.Future;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.jpa.Pagination;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.dto.jpa.Pagination;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.sql.handler.EntityHandler;
 
 import lombok.NonNull;
 

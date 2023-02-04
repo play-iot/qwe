@@ -1,6 +1,6 @@
-package io.zero88.qwe.sql.pojos;
+package cloud.playio.qwe.sql.pojos;
 
-import io.zero88.qwe.sql.type.SyncAudit;
+import cloud.playio.qwe.sql.type.SyncAudit;
 import io.github.zero88.jooqx.JsonRecord;
 
 public interface HasSyncAudit extends JsonRecord {

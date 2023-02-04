@@ -1,11 +1,11 @@
-package io.zero88.qwe.sql.service.cache;
+package cloud.playio.qwe.sql.service.cache;
 
 import java.util.Optional;
 
-import io.zero88.qwe.cache.AbstractLocalCache;
-import io.zero88.qwe.cache.LocalDataCache;
-import io.zero88.qwe.exceptions.ServiceNotFoundException;
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.cache.AbstractLocalCache;
+import cloud.playio.qwe.cache.LocalDataCache;
+import cloud.playio.qwe.exceptions.ServiceNotFoundException;
+import cloud.playio.qwe.sql.EntityMetadata;
 
 import lombok.NonNull;
 

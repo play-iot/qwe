@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql;
+package cloud.playio.qwe.sql;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,10 +18,10 @@ import io.github.zero88.utils.Strings;
 import io.github.zero88.utils.UUID64;
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.sql.tables.JsonTable;
-import io.zero88.qwe.sql.type.TimeAudit;
-import io.zero88.qwe.sql.validation.EntityValidation;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.sql.tables.JsonTable;
+import cloud.playio.qwe.sql.type.TimeAudit;
+import cloud.playio.qwe.sql.validation.EntityValidation;
 
 import lombok.NonNull;
 

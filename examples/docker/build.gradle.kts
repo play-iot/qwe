@@ -17,7 +17,7 @@ oss {
 
 qwe {
     app {
-        appVerticle.set("io.zero88.qwe.example.docker.DockerVerticle")
+        appVerticle.set("cloud.playio.qwe.example.docker.DockerVerticle")
     }
     systemd {
         enabled.set(false)

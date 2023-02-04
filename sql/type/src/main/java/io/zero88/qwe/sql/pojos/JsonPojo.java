@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.pojos;
+package cloud.playio.qwe.sql.pojos;
 
 import java.io.IOException;
 import java.util.Map;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.JsonData;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

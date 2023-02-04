@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
 import java.util.Map;
 import java.util.Objects;
@@ -12,15 +12,15 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventBusClient;
-import io.zero88.qwe.eventbus.EventMessage;
-import io.zero88.qwe.sql.CompositeMetadata;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.marker.ReferencedEntityMarker;
-import io.zero88.qwe.sql.pojos.CompositePojo;
+import cloud.playio.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.eventbus.EventAction;
+import cloud.playio.qwe.eventbus.EventBusClient;
+import cloud.playio.qwe.eventbus.EventMessage;
+import cloud.playio.qwe.sql.CompositeMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.marker.ReferencedEntityMarker;
+import cloud.playio.qwe.sql.pojos.CompositePojo;
 
 import lombok.Builder;
 import lombok.Getter;

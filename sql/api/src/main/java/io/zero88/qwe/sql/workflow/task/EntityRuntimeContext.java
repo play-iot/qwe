@@ -1,10 +1,10 @@
-package io.zero88.qwe.sql.workflow.task;
+package cloud.playio.qwe.sql.workflow.task;
 
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.workflow.TaskExecutionContext;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.eventbus.EventAction;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.workflow.TaskExecutionContext;
 
 import lombok.Builder;
 import lombok.Getter;

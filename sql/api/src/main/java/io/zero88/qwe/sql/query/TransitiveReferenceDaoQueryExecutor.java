@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -10,18 +10,18 @@ import org.jooq.DSLContext;
 import org.jooq.ResultQuery;
 import org.jooq.UpdatableRecord;
 
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
 import io.vertx.core.Future;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.jpa.Pagination;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.dto.msg.RequestFilter;
-import io.zero88.qwe.utils.JsonUtils;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.marker.EntityReferences;
-import io.zero88.qwe.sql.marker.TransitiveReferenceMarker;
-import io.zero88.qwe.sql.marker.TransitiveReferenceMarker.TransitiveEntity;
+import cloud.playio.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.jpa.Pagination;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.dto.msg.RequestFilter;
+import cloud.playio.qwe.utils.JsonUtils;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.marker.EntityReferences;
+import cloud.playio.qwe.sql.marker.TransitiveReferenceMarker;
+import cloud.playio.qwe.sql.marker.TransitiveReferenceMarker.TransitiveEntity;
 import io.vertx.core.json.JsonObject;
 
 import lombok.NonNull;

@@ -1,8 +1,8 @@
-package io.zero88.qwe.sql.marker;
+package cloud.playio.qwe.sql.marker;
 
 import java.util.Map;
 
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
 
 import lombok.Getter;
 import lombok.NonNull;

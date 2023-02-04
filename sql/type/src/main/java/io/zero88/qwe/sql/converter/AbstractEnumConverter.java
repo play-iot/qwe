@@ -1,10 +1,10 @@
-package io.zero88.qwe.sql.converter;
+package cloud.playio.qwe.sql.converter;
 
 import java.util.Objects;
 
 import org.jooq.Converter;
 
-import io.zero88.qwe.dto.EnumType;
+import cloud.playio.qwe.dto.EnumType;
 
 public abstract class AbstractEnumConverter<T extends EnumType> implements Converter<String, T> {
 

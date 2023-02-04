@@ -1,12 +1,12 @@
-package io.zero88.qwe.sql.converter;
+package cloud.playio.qwe.sql.converter;
 
 import java.util.Objects;
 
 import org.jooq.Converter;
 
 import io.github.zero88.utils.Strings;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.sql.type.SyncAudit;
+import cloud.playio.qwe.dto.JsonData;
+import cloud.playio.qwe.sql.type.SyncAudit;
 
 public final class SyncAuditConverter implements Converter<String, SyncAudit> {
 

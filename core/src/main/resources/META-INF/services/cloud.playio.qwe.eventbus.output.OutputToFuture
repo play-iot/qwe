@@ -1,0 +1,5 @@
+cloud.playio.qwe.eventbus.output.VoidToFuture
+cloud.playio.qwe.eventbus.output.FutureIdentify
+cloud.playio.qwe.eventbus.output.Rx2SingleToFuture
+cloud.playio.qwe.eventbus.output.Rx2MaybeToFuture
+cloud.playio.qwe.eventbus.output.Rx2CompletableToFuture

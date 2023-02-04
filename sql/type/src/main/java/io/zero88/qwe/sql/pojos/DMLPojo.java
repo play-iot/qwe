@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.pojos;
+package cloud.playio.qwe.sql.pojos;
 
 import java.util.Optional;
 

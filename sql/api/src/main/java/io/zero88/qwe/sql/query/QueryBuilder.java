@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,11 +31,11 @@ import org.jooq.Table;
 import org.jooq.impl.DSL;
 
 import io.github.zero88.jpa.Sortable.Direction;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.tables.JsonTable;
-import io.zero88.qwe.dto.jpa.Pagination;
-import io.zero88.qwe.dto.jpa.Sort;
-import io.zero88.qwe.dto.msg.RequestFilter;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.tables.JsonTable;
+import cloud.playio.qwe.dto.jpa.Pagination;
+import cloud.playio.qwe.dto.jpa.Sort;
+import cloud.playio.qwe.dto.msg.RequestFilter;
 import io.github.zero88.rql.jooq.JooqFieldMapper;
 import io.github.zero88.rql.jooq.JooqQueryContext;
 import io.github.zero88.rql.jooq.JooqRqlParser;

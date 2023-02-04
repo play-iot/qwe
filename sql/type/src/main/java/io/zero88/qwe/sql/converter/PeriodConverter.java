@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.converter;
+package cloud.playio.qwe.sql.converter;
 
 import java.time.Period;
 import java.time.format.DateTimeParseException;
@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import org.jooq.Converter;
 
-import io.zero88.qwe.sql.exceptions.DBConverterException;
+import cloud.playio.qwe.sql.exceptions.DBConverterException;
 
 public final class PeriodConverter implements Converter<String, Period> {
 

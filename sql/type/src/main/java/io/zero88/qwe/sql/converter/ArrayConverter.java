@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.converter;
+package cloud.playio.qwe.sql.converter;
 
 import java.util.Objects;
 import java.util.stream.Stream;

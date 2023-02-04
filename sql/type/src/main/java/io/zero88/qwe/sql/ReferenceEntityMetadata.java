@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql;
+package cloud.playio.qwe.sql;
 
 import java.util.Objects;
 
@@ -6,8 +6,8 @@ import org.jooq.ForeignKey;
 import org.jooq.Table;
 import org.jooq.TableField;
 
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.ImplementationError;
+import cloud.playio.qwe.exceptions.ErrorCode;
+import cloud.playio.qwe.exceptions.ImplementationError;
 
 import lombok.Builder;
 import lombok.Getter;

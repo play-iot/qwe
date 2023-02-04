@@ -1,0 +1,21 @@
+package cloud.playio.qwe;
+
+import java.nio.file.Path;
+
+import io.vertx.core.Vertx;
+
+public interface BaseAppContextTest {
+
+    Path testDir();
+
+    String appName();
+
+    default String sharedKey() {
+        return getClass().getName();
+    }
+
+    default SharedDataLocalProxy createSharedData(Vertx vertx) {
+        return SharedDataLocalProxy.create(vertx, sharedKey());
+    }
+
+}

@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.workflow.step;
+package cloud.playio.qwe.sql.workflow.step;
 
 /**
  * Represents a direct execution step in batch into/onto database

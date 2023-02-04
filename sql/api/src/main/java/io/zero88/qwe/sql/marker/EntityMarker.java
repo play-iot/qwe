@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.marker;
+package cloud.playio.qwe.sql.marker;
 
 import java.util.Collections;
 import java.util.Set;

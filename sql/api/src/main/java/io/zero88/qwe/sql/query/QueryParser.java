@@ -1,12 +1,12 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.dto.msg.RequestFilter;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.dto.msg.RequestFilter;
 import io.vertx.core.json.JsonObject;
 
 import lombok.NonNull;

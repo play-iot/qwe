@@ -1,16 +1,16 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
 import java.util.Collection;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.eventbus.EBContract;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.exceptions.DataNotFoundException;
-import io.zero88.qwe.http.httpevent.ActionMethodMapping;
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.eventbus.EBContract;
+import cloud.playio.qwe.eventbus.EventAction;
+import cloud.playio.qwe.exceptions.DataNotFoundException;
+import cloud.playio.qwe.http.httpevent.ActionMethodMapping;
+import cloud.playio.qwe.sql.EntityMetadata;
 
 import lombok.NonNull;
 

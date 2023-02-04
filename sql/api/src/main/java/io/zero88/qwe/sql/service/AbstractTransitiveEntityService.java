@@ -1,11 +1,11 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.marker.TransitiveReferenceMarker;
-import io.zero88.qwe.sql.query.TransitiveReferenceQueryExecutor;
-import io.zero88.qwe.sql.service.decorator.HasReferenceRequestDecorator;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.marker.TransitiveReferenceMarker;
+import cloud.playio.qwe.sql.query.TransitiveReferenceQueryExecutor;
+import cloud.playio.qwe.sql.service.decorator.HasReferenceRequestDecorator;
 
 import lombok.NonNull;
 

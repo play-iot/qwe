@@ -1,6 +1,6 @@
-package io.zero88.qwe.sql.service.cache;
+package cloud.playio.qwe.sql.service.cache;
 
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
 
 import lombok.NonNull;
 

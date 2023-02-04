@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.service.decorator;
+package cloud.playio.qwe.sql.service.decorator;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 import io.github.zero88.utils.Functions;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.marker.HasReferenceEntityMarker;
+import cloud.playio.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.marker.HasReferenceEntityMarker;
 
 import lombok.NonNull;
 

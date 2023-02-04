@@ -125,16 +125,16 @@
     "path": "/u",
     "uploadDir": "files",
     "maxBodySizeMB": 10,
-    "handlerClass": "io.zero88.qwe.http.server.upload.UploadFileHandler",
+    "handlerClass": "cloud.playio.qwe.http.server.upload.UploadFileHandler",
     "listenerClasses": [
-      "io.zero88.qwe.http.server.upload.LoggerUploadListener"
+      "cloud.playio.qwe.http.server.upload.LoggerUploadListener"
     ]
   },
   "__download__": {
     "enabled": false,
     "path": "/f",
     "downloadDir": "files",
-    "handlerClass": "io.zero88.qwe.http.server.download.DownloadFileHandler"
+    "handlerClass": "cloud.playio.qwe.http.server.download.DownloadFileHandler"
   },
   "__static__": {
     "enabled": false,

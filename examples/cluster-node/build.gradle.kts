@@ -16,7 +16,7 @@ oss {
 qwe {
     app {
         appName.set("qwe-example-boot")
-        appVerticle.set("io.zero88.qwe.example.boot.BootVerticle")
+        appVerticle.set("cloud.playio.qwe.example.boot.BootVerticle")
         fatJar.set(true)
         logging {
             otherLoggers.set(

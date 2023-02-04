@@ -1,8 +1,8 @@
-package io.zero88.qwe.sql.service.decorator;
+package cloud.playio.qwe.sql.service.decorator;
 
 import java.util.List;
 
-import io.zero88.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.dto.msg.RequestData;
 
 import lombok.NonNull;
 

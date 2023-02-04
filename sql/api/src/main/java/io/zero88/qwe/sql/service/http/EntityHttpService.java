@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.service.http;
+package cloud.playio.qwe.sql.service.http;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.zero88.utils.Urls;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.http.httpevent.ActionMethodMapping;
-import io.zero88.qwe.http.httpevent.EventMethodDefinition;
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.eventbus.EventAction;
+import cloud.playio.qwe.http.httpevent.ActionMethodMapping;
+import cloud.playio.qwe.http.httpevent.EventMethodDefinition;
+import cloud.playio.qwe.sql.EntityMetadata;
 
 import lombok.NonNull;
 

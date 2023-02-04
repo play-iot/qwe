@@ -14,7 +14,7 @@ oss {
 
 qwe {
     app {
-        appVerticle.set("io.zero88.qwe.example.fatjar.FatJarVerticle")
+        appVerticle.set("cloud.playio.qwe.example.fatjar.FatJarVerticle")
         fatJar.set(true)
         logging {
             otherLoggers.set(

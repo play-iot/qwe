@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.validation;
+package cloud.playio.qwe.sql.validation;
 
 import java.util.Optional;
 
@@ -7,14 +7,14 @@ import org.jooq.Field;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.exceptions.DataAlreadyExistException;
-import io.zero88.qwe.exceptions.DataBeingUsedException;
-import io.zero88.qwe.exceptions.DataNotFoundException;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.pojos.JsonPojo;
-import io.zero88.qwe.utils.JsonUtils;
+import cloud.playio.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.exceptions.DataAlreadyExistException;
+import cloud.playio.qwe.exceptions.DataBeingUsedException;
+import cloud.playio.qwe.exceptions.DataNotFoundException;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.pojos.JsonPojo;
+import cloud.playio.qwe.utils.JsonUtils;
 
 import lombok.NonNull;
 

@@ -1,16 +1,16 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
 import io.vertx.core.Future;
-import io.zero88.qwe.sql.CompositeMetadata;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.marker.ManyToManyMarker;
-import io.zero88.qwe.sql.pojos.CompositePojo;
-import io.zero88.qwe.sql.query.ComplexQueryExecutor;
-import io.zero88.qwe.sql.service.decorator.ManyToManyRequestDecorator;
-import io.zero88.qwe.sql.service.transformer.ManyToManyEntityTransformer;
-import io.zero88.qwe.sql.validation.CompositeValidation;
-import io.zero88.qwe.sql.validation.OperationValidator;
+import cloud.playio.qwe.sql.CompositeMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.marker.ManyToManyMarker;
+import cloud.playio.qwe.sql.pojos.CompositePojo;
+import cloud.playio.qwe.sql.query.ComplexQueryExecutor;
+import cloud.playio.qwe.sql.service.decorator.ManyToManyRequestDecorator;
+import cloud.playio.qwe.sql.service.transformer.ManyToManyEntityTransformer;
+import cloud.playio.qwe.sql.validation.CompositeValidation;
+import cloud.playio.qwe.sql.validation.OperationValidator;
 
 import lombok.NonNull;
 

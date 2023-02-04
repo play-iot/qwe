@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.handler;
+package cloud.playio.qwe.sql.handler;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,14 +19,14 @@ import io.github.zero88.jooqx.JsonRecord;
 import io.github.zero88.jooqx.SQLExecutor;
 import io.github.zero88.jooqx.SQLPreparedQuery;
 import io.github.zero88.jooqx.SQLResultCollector;
-import io.zero88.qwe.dto.ErrorMessage;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.Status;
-import io.zero88.qwe.sql.pojos.HasSyncAudit;
-import io.zero88.qwe.sql.pojos.HasTimeAudit;
-import io.zero88.qwe.sql.pojos.JsonPojo;
-import io.zero88.qwe.sql.type.SyncAudit;
+import cloud.playio.qwe.dto.ErrorMessage;
+import cloud.playio.qwe.eventbus.EventAction;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.Status;
+import cloud.playio.qwe.sql.pojos.HasSyncAudit;
+import cloud.playio.qwe.sql.pojos.HasTimeAudit;
+import cloud.playio.qwe.sql.pojos.JsonPojo;
+import cloud.playio.qwe.sql.type.SyncAudit;
 
 import lombok.NonNull;
 

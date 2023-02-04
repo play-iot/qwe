@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.service.http;
+package cloud.playio.qwe.sql.service.http;
 
 import java.util.Collection;
 import java.util.Set;
@@ -8,11 +8,11 @@ import java.util.stream.Stream;
 
 import io.github.zero88.utils.Urls;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.http.httpevent.ActionMethodMapping;
-import io.zero88.qwe.http.httpevent.EventHttpService;
-import io.zero88.qwe.http.httpevent.EventMethodDefinition;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.service.OneToOneChildEntityService;
+import cloud.playio.qwe.http.httpevent.ActionMethodMapping;
+import cloud.playio.qwe.http.httpevent.EventHttpService;
+import cloud.playio.qwe.http.httpevent.EventMethodDefinition;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.service.OneToOneChildEntityService;
 
 /**
  * Represents for an entity HTTP service that has {@code one-to-one} relationship to other entities and in business

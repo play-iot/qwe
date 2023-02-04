@@ -4,8 +4,8 @@
       "__gateway__": {
         "enabled": false,
         "indexAddress": "qwe.service.gateway.index",
-        "announceMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
-        "usageMonitorClass": "io.zero88.qwe.micro.monitor.ServiceGatewayUsageMonitor"
+        "announceMonitorClass": "cloud.playio.qwe.micro.monitor.ServiceGatewayAnnounceMonitor",
+        "usageMonitorClass": "cloud.playio.qwe.micro.monitor.ServiceGatewayUsageMonitor"
       },
       "__serviceDiscovery__": {
         "announceAddress": "qwe.service.discovery.announce",

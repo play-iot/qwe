@@ -1,14 +1,14 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.function.Predicate;
 
 import io.github.jklingsporn.vertx.jooq.rx.RXQueryExecutor;
 import io.github.jklingsporn.vertx.jooq.shared.internal.jdbc.JDBCQueryExecutor;
-import io.zero88.qwe.sql.CompositeMetadata;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.pojos.CompositePojo;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.marker.EntityReferences;
+import cloud.playio.qwe.sql.CompositeMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.pojos.CompositePojo;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.marker.EntityReferences;
 import io.reactivex.Single;
 
 

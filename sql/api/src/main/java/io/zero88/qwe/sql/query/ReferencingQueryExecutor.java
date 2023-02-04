@@ -1,15 +1,15 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.Optional;
 
 import org.jooq.UpdatableRecord;
 
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
 import io.vertx.core.Future;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.marker.ReferencingEntityMarker;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.marker.ReferencingEntityMarker;
 
 import lombok.NonNull;
 

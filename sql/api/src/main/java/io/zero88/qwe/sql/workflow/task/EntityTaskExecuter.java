@@ -1,9 +1,9 @@
-package io.zero88.qwe.sql.workflow.task;
+package cloud.playio.qwe.sql.workflow.task;
 
 import java.util.Objects;
 
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.workflow.TaskExecuter;
+import cloud.playio.qwe.workflow.TaskExecuter;
 
 /**
  * Represents {@code Entity Task} executer.

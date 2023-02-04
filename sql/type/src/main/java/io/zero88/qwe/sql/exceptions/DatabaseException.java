@@ -1,7 +1,7 @@
-package io.zero88.qwe.sql.exceptions;
+package cloud.playio.qwe.sql.exceptions;
 
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.QWEException;
+import cloud.playio.qwe.exceptions.ErrorCode;
+import cloud.playio.qwe.exceptions.QWEException;
 
 public class DatabaseException extends QWEException {
 

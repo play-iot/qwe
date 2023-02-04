@@ -1,0 +1,10 @@
+cloud.playio.qwe.micro.filter.ByRegistrationPredicateFactory
+cloud.playio.qwe.micro.filter.ByEndpointPredicateFactory
+cloud.playio.qwe.micro.filter.ByGroupPredicateFactory
+cloud.playio.qwe.micro.filter.HttpEndpointPathPredicate
+cloud.playio.qwe.micro.filter.EventMessageServicePathPredicate
+
+cloud.playio.qwe.micro.filter.ServiceNamePredicateFactory
+cloud.playio.qwe.micro.filter.ServiceTypePredicateFactory
+cloud.playio.qwe.micro.filter.ServiceStatusPredicateFactory
+cloud.playio.qwe.micro.filter.ServiceScopePredicateFactory

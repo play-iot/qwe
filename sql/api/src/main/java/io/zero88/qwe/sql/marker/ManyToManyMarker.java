@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.marker;
+package cloud.playio.qwe.sql.marker;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.zero88.qwe.sql.CompositeMetadata;
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.CompositeMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
 
 import lombok.NonNull;
 
