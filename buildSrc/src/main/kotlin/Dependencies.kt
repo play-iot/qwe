@@ -2,8 +2,8 @@ object UtilLibs {
 
     object Version {
 
-        const val lombok = "1.18.16"
-        const val jetbrainsAnnotations = "20.1.0"
+        const val lombok = "1.18.26"
+        const val jetbrainsAnnotations = "24.0.0"
     }
 
     const val lombok = "org.projectlombok:lombok:${Version.lombok}"
@@ -47,7 +47,7 @@ object JacksonLibs {
 
     object Version {
 
-        const val jackson = "2.12.0"
+        const val jackson = "2.14.2"
     }
 
     const val core = "com.fasterxml.jackson.core:jackson-core:${Version.jackson}"
@@ -61,8 +61,8 @@ object TestLibs {
 
     object Version {
 
-        const val junit5 = "5.7.0"
-        const val jsonAssert = "1.5.0"
+        const val junit5 = "5.9.2"
+        const val jsonAssert = "1.5.1"
     }
 
     const val junit5Api = "org.junit.jupiter:junit-jupiter-api:${Version.junit5}"
