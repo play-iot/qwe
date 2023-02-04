@@ -26,7 +26,7 @@ import cloud.playio.qwe.http.client.handler.WebSocketClientPlan;
 
 import lombok.RequiredArgsConstructor;
 
-public class WebSocketExtensionTest extends HttpExtensionTestBase {
+class WebSocketExtensionTest extends HttpExtensionTestBase {
 
     private static final EventDirection LISTENER = EventDirection.builder()
                                                                  .address("ws.listener")
@@ -36,7 +36,7 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
     private static final String PUBLISHER_ADDRESS = "ws.publisher";
 
     @Test
-    public void test_not_found(VertxTestContext context) {
+    void test_not_found(VertxTestContext context) {
         Checkpoint cp = context.checkpoint();
         WebSocketConnectOptions options = new WebSocketConnectOptions().setHost("google.com").setURI("/xxx");
         extension.entrypoint()
@@ -51,7 +51,7 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
     }
 
     @Test
-    public void test_connect_failed_due_unknown_dns(VertxTestContext context) {
+    void test_connect_failed_due_unknown_dns(VertxTestContext context) {
         Checkpoint cp = context.checkpoint();
         WebSocketConnectOptions options = new WebSocketConnectOptions().setHost("echo.websocket.test").setURI("/xxx");
         extension.entrypoint()
@@ -60,7 +60,7 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
                      Assertions.assertTrue(t instanceof HttpException);
                      Assertions.assertTrue(t.getCause() instanceof UnknownHostException);
                      Assertions.assertEquals(
-                         "failed to resolve 'echo.websocket.test'. Exceeded max queries per resolve 4 ",
+                         "Search domain query failed. Original hostname: 'echo.websocket.test' Unable to create DNS Question for: [echo.websocket.test.., A(1)]",
                          t.getCause().getMessage());
                      cp.flag();
                  }))
@@ -71,7 +71,7 @@ public class WebSocketExtensionTest extends HttpExtensionTestBase {
     @Disabled
     //TODO need to setup simple websocket echo server: https://github.com/jmalloc/echo-server
     //echo.websocket.org is no longer available
-    public void test_connect_and_send(VertxTestContext context) {
+    void test_connect_and_send(VertxTestContext context) {
         Checkpoint cp = context.checkpoint();
         EventBusClient eb = ((EventBusProxy) extension.entrypoint()).transporter();
         eb.register(LISTENER.getAddress(), new EventAsserter(context, cp, new JsonObject().put("k", 1)));

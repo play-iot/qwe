@@ -2,18 +2,17 @@ package cloud.playio.qwe.sql.handler.schema;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.jooq.Record;
-import org.jooq.Record1;
 import org.jooq.SQLDialect;
-import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 
-import io.github.zero88.jooqx.DSLAdapter;
 import io.github.zero88.jooqx.SQLExecutor;
 import io.github.zero88.jooqx.SQLPreparedQuery;
 import io.github.zero88.jooqx.SQLResultCollector;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+
 import cloud.playio.qwe.dto.msg.RequestData;
 import cloud.playio.qwe.eventbus.EventAction;
 import cloud.playio.qwe.eventbus.EventBusClient;
@@ -21,7 +20,6 @@ import cloud.playio.qwe.eventbus.EventMessage;
 import cloud.playio.qwe.sql.handler.EntityHandler;
 import cloud.playio.qwe.sql.spi.checker.CheckTableExistLoader;
 import cloud.playio.qwe.sql.spi.checker.TableExistChecker;
-
 import lombok.NonNull;
 
 /**
@@ -53,14 +51,13 @@ public interface SchemaHandler<S, B, PQ extends SQLPreparedQuery<B>, RC extends 
      * @see TableExistChecker
      * @since 1.0.0
      */
-    default Future<Boolean> isNew(E jooqx) {
+    default Future<@NotNull Boolean> isNew(E jooqx) {
         final SQLDialect dialect = jooqx.dsl().family();
         final TableExistChecker check = new CheckTableExistLoader().lookup(dialect);
         if (check == null) {
             return Future.succeededFuture(false);
         }
-        final SelectConditionStep<Record1<Integer>> q = check.query(jooqx.dsl(), table());
-        return jooqx.execute(dsl -> q, DSLAdapter.fetchExists(q.asTable()));
+        return jooqx.fetchExists(dsl -> check.query(dsl, table()));
     }
 
     /**
