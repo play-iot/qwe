@@ -76,11 +76,11 @@
     "webSocketCompressionRequestServerNoContext": true
   },
   "httpHandlers": {
-    "respBinaryHandlerCls": "io.zero88.qwe.http.client.handler.HttpResponseBinaryHandler",
-    "respTextHandlerCls": "io.zero88.qwe.http.client.handler.HttpClientJsonResponseHandler"
+    "respBinaryHandlerCls": "cloud.playio.qwe.http.client.handler.HttpResponseBinaryHandler",
+    "respTextHandlerCls": "cloud.playio.qwe.http.client.handler.HttpClientJsonResponseHandler"
   },
   "webSocketHandlers": {
-    "errorHandlerCls": "io.zero88.qwe.http.client.handler.WebSocketClientErrorHandler",
-    "dispatcherCls": "io.zero88.qwe.http.client.handler.WebSocketClientDispatcher"
+    "errorHandlerCls": "cloud.playio.qwe.http.client.handler.WebSocketClientErrorHandler",
+    "dispatcherCls": "cloud.playio.qwe.http.client.handler.WebSocketClientDispatcher"
   }
 }

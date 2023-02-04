@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,23 +14,23 @@ import org.jooq.ResultQuery;
 
 import io.github.jklingsporn.vertx.jooq.rx.jdbc.JDBCRXGenericQueryExecutor;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.sql.CompositeMetadata;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.pojos.CompositePojo;
-import io.zero88.qwe.sql.pojos.DMLPojo;
+import cloud.playio.qwe.sql.CompositeMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.pojos.CompositePojo;
+import cloud.playio.qwe.sql.pojos.DMLPojo;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.dto.msg.RequestFilter;
-import io.zero88.qwe.sql.handler.AuditDecorator;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.marker.EntityReferences;
-import io.zero88.qwe.sql.marker.ReferencingEntityMarker;
-import io.zero88.qwe.sql.validation.OperationValidator;
-import io.zero88.qwe.utils.JsonUtils;
+import cloud.playio.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.dto.msg.RequestFilter;
+import cloud.playio.qwe.sql.handler.AuditDecorator;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.marker.EntityReferences;
+import cloud.playio.qwe.sql.marker.ReferencingEntityMarker;
+import cloud.playio.qwe.sql.validation.OperationValidator;
+import cloud.playio.qwe.utils.JsonUtils;
 
 import lombok.Getter;
 import lombok.NonNull;

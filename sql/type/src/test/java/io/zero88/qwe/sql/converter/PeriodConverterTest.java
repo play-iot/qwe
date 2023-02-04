@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.converter;
+package cloud.playio.qwe.sql.converter;
 
 import java.time.Period;
 import java.util.Objects;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.zero88.qwe.sql.exceptions.DBConverterException;
+import cloud.playio.qwe.sql.exceptions.DBConverterException;
 
 public class PeriodConverterTest {
 

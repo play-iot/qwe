@@ -1,7 +1,7 @@
-package io.zero88.qwe.workflow;
+package cloud.playio.qwe.workflow;
 
-import io.zero88.qwe.transport.ProxyService;
-import io.zero88.qwe.transport.Transporter;
+import cloud.playio.qwe.transport.ProxyService;
+import cloud.playio.qwe.transport.Transporter;
 
 /**
  * Represents for {@code proxy task}.

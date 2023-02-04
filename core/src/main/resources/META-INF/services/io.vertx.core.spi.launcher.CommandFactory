@@ -1,7 +1,7 @@
-io.zero88.qwe.launcher.AboutCommandFactory
-io.zero88.qwe.launcher.BootCommandFactory
-io.zero88.qwe.launcher.VersionCommandFactory
-io.zero88.qwe.launcher.RunCommandFactory
+cloud.playio.qwe.launcher.AboutCommandFactory
+cloud.playio.qwe.launcher.BootCommandFactory
+cloud.playio.qwe.launcher.VersionCommandFactory
+cloud.playio.qwe.launcher.RunCommandFactory
 
 # Background application control
 io.vertx.core.impl.launcher.commands.ListCommandFactory

@@ -1,8 +1,8 @@
-package io.zero88.qwe.sql.workflow.task;
+package cloud.playio.qwe.sql.workflow.task;
 
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.query.EntityQueryExecutor;
-import io.zero88.qwe.sql.service.cache.EntityServiceIndex;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.query.EntityQueryExecutor;
+import cloud.playio.qwe.sql.service.cache.EntityServiceIndex;
 
 import lombok.NonNull;
 

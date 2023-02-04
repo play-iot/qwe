@@ -1,7 +1,7 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.handler.EntityHandler;
 
 import lombok.NonNull;
 

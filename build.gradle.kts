@@ -8,7 +8,7 @@ plugins {
 }
 
 allprojects {
-    group = "io.github.zero88.qwe"
+    group = "cloud.playio.qwe"
 
     repositories {
         mavenLocal()

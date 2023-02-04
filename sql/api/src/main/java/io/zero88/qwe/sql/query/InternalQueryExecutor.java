@@ -1,10 +1,10 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.Objects;
 import java.util.Optional;
 
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
 import io.vertx.core.Future;
 import io.github.zero88.jooqx.JsonRecord;
 import io.reactivex.Single;

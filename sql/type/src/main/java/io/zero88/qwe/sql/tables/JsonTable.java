@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.tables;
+package cloud.playio.qwe.sql.tables;
 
 import java.util.Map;
 import java.util.Map.Entry;

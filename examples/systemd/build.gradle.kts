@@ -15,7 +15,7 @@ oss {
 qwe {
     app {
         appName.set("kaka")
-        appVerticle.set("io.zero88.qwe.example.systemd.SystemdVerticle")
+        appVerticle.set("cloud.playio.qwe.example.systemd.SystemdVerticle")
 //        fatJar.set(true)
         logging {
             otherLoggers.set(

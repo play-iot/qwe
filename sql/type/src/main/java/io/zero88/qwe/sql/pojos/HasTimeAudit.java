@@ -1,6 +1,6 @@
-package io.zero88.qwe.sql.pojos;
+package cloud.playio.qwe.sql.pojos;
 
-import io.zero88.qwe.sql.type.TimeAudit;
+import cloud.playio.qwe.sql.type.TimeAudit;
 import io.github.zero88.jooqx.JsonRecord;
 
 public interface HasTimeAudit extends JsonRecord {

@@ -1,12 +1,12 @@
-package io.zero88.qwe.sql.service.decorator;
+package cloud.playio.qwe.sql.service.decorator;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.marker.ManyToManyMarker;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.marker.ManyToManyMarker;
 
 import lombok.NonNull;
 

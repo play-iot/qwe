@@ -1,8 +1,8 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.query.SimpleQueryExecutor;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.query.SimpleQueryExecutor;
 
 import lombok.NonNull;
 

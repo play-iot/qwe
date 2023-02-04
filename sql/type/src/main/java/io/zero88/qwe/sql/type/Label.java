@@ -1,6 +1,6 @@
-package io.zero88.qwe.sql.type;
+package cloud.playio.qwe.sql.type;
 
-import io.zero88.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.JsonData;
 
 import lombok.Builder;
 import lombok.Getter;

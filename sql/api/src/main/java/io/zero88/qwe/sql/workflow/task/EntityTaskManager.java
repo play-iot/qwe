@@ -1,7 +1,7 @@
-package io.zero88.qwe.sql.workflow.task;
+package cloud.playio.qwe.sql.workflow.task;
 
-import io.zero88.qwe.sql.workflow.task.EntityTaskExecuter.AsyncEntityTaskExecuter;
-import io.zero88.qwe.sql.workflow.task.EntityTaskExecuter.BlockingEntityTaskExecuter;
+import cloud.playio.qwe.sql.workflow.task.EntityTaskExecuter.AsyncEntityTaskExecuter;
+import cloud.playio.qwe.sql.workflow.task.EntityTaskExecuter.BlockingEntityTaskExecuter;
 
 /**
  * The interface Entity task manager.

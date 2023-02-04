@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.validation;
+package cloud.playio.qwe.sql.validation;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
@@ -6,18 +6,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.zero88.qwe.sql.CompositeMetadata;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.pojos.CompositePojo;
-import io.zero88.qwe.sql.pojos.JsonPojo;
+import cloud.playio.qwe.sql.CompositeMetadata;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.pojos.CompositePojo;
+import cloud.playio.qwe.sql.pojos.JsonPojo;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.TripleFunction;
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.exceptions.QWEExceptionConverter;
-import io.zero88.qwe.utils.JsonUtils;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.exceptions.QWEException;
+import cloud.playio.qwe.exceptions.QWEExceptionConverter;
+import cloud.playio.qwe.utils.JsonUtils;
 
 import lombok.NonNull;
 

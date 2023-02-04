@@ -1,0 +1,2 @@
+cloud.playio.qwe.sql.spi.checker.H2TableExistChecker
+cloud.playio.qwe.sql.spi.checker.PgTableExistChecker

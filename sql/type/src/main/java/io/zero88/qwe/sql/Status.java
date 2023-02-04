@@ -1,6 +1,6 @@
-package io.zero88.qwe.sql;
+package cloud.playio.qwe.sql;
 
-import io.zero88.qwe.dto.EnumType.AbstractEnumType;
+import cloud.playio.qwe.dto.EnumType.AbstractEnumType;
 
 public final class Status extends AbstractEnumType {
 

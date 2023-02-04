@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -10,16 +10,16 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.ResultQuery;
 
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.pojos.DMLPojo;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.pojos.DMLPojo;
 import io.vertx.core.Future;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.jpa.Pagination;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.sql.handler.AuditDecorator;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.validation.OperationValidator;
-import io.zero88.qwe.utils.JsonUtils;
+import cloud.playio.qwe.dto.jpa.Pagination;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.sql.handler.AuditDecorator;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.validation.OperationValidator;
+import cloud.playio.qwe.utils.JsonUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.pojos;
+package cloud.playio.qwe.sql.pojos;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +10,7 @@ import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.JsonData;
+import cloud.playio.qwe.dto.JsonData;
 
 import lombok.NonNull;
 

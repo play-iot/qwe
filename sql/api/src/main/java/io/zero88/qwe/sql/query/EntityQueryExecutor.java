@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.query;
+package cloud.playio.qwe.sql.query;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,19 +15,19 @@ import io.github.zero88.exceptions.HiddenException;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Future;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.jpa.Pagination;
-import io.zero88.qwe.dto.jpa.Sort;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.dto.msg.RequestFilter;
-import io.zero88.qwe.exceptions.ImplementationError;
-import io.zero88.qwe.exceptions.QWEException;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.exceptions.DatabaseException;
-import io.zero88.qwe.sql.EntityConstraintHolder;
-import io.zero88.qwe.sql.handler.EntityHandler;
-import io.zero88.qwe.sql.pojos.DMLPojo;
-import io.zero88.qwe.sql.validation.OperationValidator;
-import io.zero88.qwe.utils.JsonUtils;
+import cloud.playio.qwe.dto.jpa.Pagination;
+import cloud.playio.qwe.dto.jpa.Sort;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.dto.msg.RequestFilter;
+import cloud.playio.qwe.exceptions.ImplementationError;
+import cloud.playio.qwe.exceptions.QWEException;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.exceptions.DatabaseException;
+import cloud.playio.qwe.sql.EntityConstraintHolder;
+import cloud.playio.qwe.sql.handler.EntityHandler;
+import cloud.playio.qwe.sql.pojos.DMLPojo;
+import cloud.playio.qwe.sql.validation.OperationValidator;
+import cloud.playio.qwe.utils.JsonUtils;
 
 import lombok.NonNull;
 

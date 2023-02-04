@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql;
+package cloud.playio.qwe.sql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +19,9 @@ import org.jooq.UpdatableRecord;
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.sql.pojos.CompositePojo;
-import io.zero88.qwe.sql.validation.CompositeValidation;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.sql.pojos.CompositePojo;
+import cloud.playio.qwe.sql.validation.CompositeValidation;
 
 import lombok.NonNull;
 

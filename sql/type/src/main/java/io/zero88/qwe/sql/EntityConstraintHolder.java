@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql;
+package cloud.playio.qwe.sql;
 
 import java.util.Collection;
 import java.util.List;

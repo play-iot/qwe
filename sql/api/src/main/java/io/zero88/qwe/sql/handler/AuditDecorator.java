@@ -1,16 +1,16 @@
-package io.zero88.qwe.sql.handler;
+package cloud.playio.qwe.sql.handler;
 
 import java.util.Optional;
 
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.Status;
-import io.zero88.qwe.sql.pojos.HasTimeAudit;
-import io.zero88.qwe.sql.type.TimeAudit;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.Status;
+import cloud.playio.qwe.sql.pojos.HasTimeAudit;
+import cloud.playio.qwe.sql.type.TimeAudit;
 import io.github.zero88.utils.Strings;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.micro.GatewayHeaders;
-import io.zero88.qwe.sql.handler.EntitySyncHandler;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.micro.GatewayHeaders;
+import cloud.playio.qwe.sql.handler.EntitySyncHandler;
 
 import lombok.NonNull;
 

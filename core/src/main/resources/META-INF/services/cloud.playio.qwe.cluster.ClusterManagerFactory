@@ -1,0 +1,2 @@
+cloud.playio.qwe.cluster.HazelcastManagerFactory
+cloud.playio.qwe.cluster.ZookeeperManagerFactory

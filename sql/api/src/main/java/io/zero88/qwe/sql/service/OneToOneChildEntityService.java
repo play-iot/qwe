@@ -1,13 +1,13 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.marker.OneToOneEntityMarker;
+import cloud.playio.qwe.eventbus.EventAction;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.marker.OneToOneEntityMarker;
 
 import lombok.NonNull;
 

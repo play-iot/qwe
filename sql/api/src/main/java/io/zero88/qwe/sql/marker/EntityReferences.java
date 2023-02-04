@@ -1,4 +1,4 @@
-package io.zero88.qwe.sql.marker;
+package cloud.playio.qwe.sql.marker;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,10 +12,10 @@ import java.util.stream.Stream;
 import io.github.zero88.utils.Functions;
 import io.github.zero88.utils.Strings;
 import io.vertx.core.json.JsonObject;
-import io.zero88.qwe.dto.JsonData;
-import io.zero88.qwe.exceptions.ErrorCode;
-import io.zero88.qwe.exceptions.ImplementationError;
-import io.zero88.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.dto.JsonData;
+import cloud.playio.qwe.exceptions.ErrorCode;
+import cloud.playio.qwe.exceptions.ImplementationError;
+import cloud.playio.qwe.sql.EntityMetadata;
 
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

@@ -1,21 +1,21 @@
-package io.zero88.qwe.sql.service;
+package cloud.playio.qwe.sql.service;
 
 import java.util.Collection;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.github.zero88.jooqx.JsonRecord;
-import io.zero88.qwe.dto.msg.RequestData;
-import io.zero88.qwe.dto.msg.RequestFilter;
-import io.zero88.qwe.eventbus.EventAction;
-import io.zero88.qwe.eventbus.EventListener;
-import io.zero88.qwe.http.httpevent.ActionMethodMapping;
-import io.zero88.qwe.sql.EntityMetadata;
-import io.zero88.qwe.sql.query.EntityQueryExecutor;
-import io.zero88.qwe.sql.service.decorator.RequestDecorator;
-import io.zero88.qwe.sql.service.transformer.EntityTransformer;
-import io.zero88.qwe.sql.validation.EntityValidation;
-import io.zero88.qwe.sql.workflow.task.EntityTaskManager;
+import cloud.playio.qwe.dto.msg.RequestData;
+import cloud.playio.qwe.dto.msg.RequestFilter;
+import cloud.playio.qwe.eventbus.EventAction;
+import cloud.playio.qwe.eventbus.EventListener;
+import cloud.playio.qwe.http.httpevent.ActionMethodMapping;
+import cloud.playio.qwe.sql.EntityMetadata;
+import cloud.playio.qwe.sql.query.EntityQueryExecutor;
+import cloud.playio.qwe.sql.service.decorator.RequestDecorator;
+import cloud.playio.qwe.sql.service.transformer.EntityTransformer;
+import cloud.playio.qwe.sql.validation.EntityValidation;
+import cloud.playio.qwe.sql.workflow.task.EntityTaskManager;
 
 import lombok.NonNull;
 

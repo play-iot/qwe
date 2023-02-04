@@ -67,7 +67,7 @@ jooq {
                         isPojos = false
                     }
                     target.apply {
-                        packageName = "io.zero88.qwe.sql.integtest.h2"
+                        packageName = "cloud.playio.qwe.sql.integtest.h2"
                         directory = "build/generated/h2"
                     }
                 }
@@ -105,7 +105,7 @@ jooq {
                         isDaos = false
                     }
                     target.apply {
-                        packageName = "io.zero88.qwe.sql.integtest.pgsql"
+                        packageName = "cloud.playio.qwe.sql.integtest.pgsql"
                         directory = "build/generated/pgsql"
                     }
                 }
