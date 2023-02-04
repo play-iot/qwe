@@ -2,20 +2,20 @@ package cloud.playio.qwe.http.server.ws;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import io.vertx.ext.web.handler.sockjs.SockJSSocket;
+
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.SharedDataLocalProxy;
 import cloud.playio.qwe.eventbus.EventAction;
 import cloud.playio.qwe.eventbus.EventMessage;
 import cloud.playio.qwe.http.server.HttpSystem.WebSocketSystem;
-
 import lombok.NonNull;
 
 /**
@@ -40,7 +40,7 @@ public interface WebSocketBridgeEventHandler extends Handler<BridgeEvent>, HasLo
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(WebSocketBridgeEventHandler.class);
+        return LogManager.getLogger(WebSocketBridgeEventHandler.class);
     }
 
     /**

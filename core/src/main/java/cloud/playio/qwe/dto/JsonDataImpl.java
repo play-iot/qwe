@@ -3,22 +3,22 @@ package cloud.playio.qwe.dto;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
+
 import cloud.playio.qwe.exceptions.ErrorCode;
 import cloud.playio.qwe.exceptions.QWEException;
-
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @NoArgsConstructor
 final class JsonDataImpl extends HashMap<String, Object> implements JsonData {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonDataImpl.class);
+    private static final Logger logger = LogManager.getLogger(JsonDataImpl.class);
 
     JsonDataImpl(@NonNull Map<String, Object> map) { this.putAll(map); }
 

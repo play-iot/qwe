@@ -11,7 +11,7 @@ dependencies {
     api(ZeroLibs.utils)
     api(ZeroLibs.jpaExt)
     api(JSRLibs.annotation)
-    api(LogLibs.slf4j)
+    api(LogLibs.log4j2Api)
     api(UtilLibs.jetbrainsAnnotations)
 
     compileOnly(VertxLibs.hazelcast)
@@ -30,7 +30,7 @@ dependencies {
     testImplementation(VertxLibs.jwt)
 
     testFixturesApi(testFixtures(ZeroLibs.utils))
-    testFixturesApi(LogLibs.logback)
+    testFixturesApi(LogLibs.log4j2Core)
     testFixturesApi(TestLibs.junit5Api)
     testFixturesApi(TestLibs.junit5Engine)
     testFixturesApi(TestLibs.junit5Vintage)

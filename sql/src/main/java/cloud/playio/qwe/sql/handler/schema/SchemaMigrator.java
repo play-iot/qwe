@@ -1,18 +1,18 @@
 package cloud.playio.qwe.sql.handler.schema;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.github.zero88.jooqx.SQLExecutor;
 import io.github.zero88.jooqx.SQLPreparedQuery;
 import io.github.zero88.jooqx.SQLResultCollector;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+
 import cloud.playio.qwe.eventbus.EventAction;
 import cloud.playio.qwe.eventbus.EventMessage;
 import cloud.playio.qwe.sql.SQLError.SQLMigrationError;
 import cloud.playio.qwe.sql.handler.EntityHandler;
-
 import lombok.NonNull;
 
 /**
@@ -28,7 +28,7 @@ public interface SchemaMigrator<S, B, PQ extends SQLPreparedQuery<B>, RC extends
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(SchemaMigrator.class);
+        return LogManager.getLogger(SchemaMigrator.class);
     }
 
     @Override

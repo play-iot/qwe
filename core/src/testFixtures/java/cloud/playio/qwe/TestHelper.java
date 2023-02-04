@@ -7,22 +7,26 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
-import org.slf4j.LoggerFactory;
 
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Handler;
 import io.vertx.ext.unit.Async;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-
-public interface TestHelper {
+public interface TestHelper extends HasLogger {
 
     int TEST_TIMEOUT_SEC = 8;
 
-    org.slf4j.Logger LOGGER = LoggerFactory.getLogger("LOG_TEST");
+    Logger LOGGER = HasLogger.getLogger("LOG_TEST");
+
+    @Override
+    default Logger logger() {
+        return LOGGER;
+    }
 
     static int getRandomPort() {
         try (ServerSocket socket = new ServerSocket(0)) {
@@ -37,9 +41,10 @@ public interface TestHelper {
     }
 
     static void setup(Level projLogLvl) {
-        System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
-        ((Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.INFO);
-        ((Logger) LoggerFactory.getLogger("io.zero88")).setLevel(projLogLvl);
+        System.setProperty("vertx.logger-delegate-factory-class-name",
+                           "io.vertx.core.logging.Log4j2LogDelegateFactory");
+        Configurator.setRootLevel(Level.INFO);
+        Configurator.setLevel("cloud.playio.qwe", projLogLvl);
     }
 
     static void testComplete(Async async) {
@@ -47,7 +52,7 @@ public interface TestHelper {
     }
 
     static void testComplete(Async async, String msgEvent, Handler<Void> completeAction) {
-        LOGGER.info("Current Test Async Count: " + async.count() + ". Countdown...");
+        LOGGER.info("Current Test Async Count: {}. Countdown...", async.count());
         if (Strings.isBlank(msgEvent)) {
             LOGGER.debug(msgEvent);
         }

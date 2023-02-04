@@ -1,12 +1,16 @@
 package cloud.playio.qwe;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public interface HasLogger {
 
+    static Logger getLogger(String name) {
+        return LogManager.getLogger(name);
+    }
+
     default Logger logger() {
-        return LoggerFactory.getLogger(getClass());
+        return LogManager.getLogger(getClass());
     }
 
 }

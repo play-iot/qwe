@@ -7,11 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.dto.JsonData;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,9 +16,8 @@ import lombok.experimental.Accessors;
 
 @Getter(value = AccessLevel.PROTECTED)
 @Accessors(fluent = true)
-public abstract class AbstractLocalCache<K, V, C extends AbstractLocalCache> implements LocalCache<K, V> {
+public abstract class AbstractLocalCache<K, V, C extends AbstractLocalCache> implements LocalCache<K, V>, HasLogger {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ConcurrentMap<K, V> cache = new ConcurrentHashMap<>();
     private Function<K, V> discover;
 
@@ -32,15 +28,15 @@ public abstract class AbstractLocalCache<K, V, C extends AbstractLocalCache> imp
             return val;
         }
         if (Objects.nonNull(val)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Get {} by {}:{} from cache", valueLabel(), keyLabel(),
-                             key instanceof JsonData ? ((JsonData) key).toJson() : key);
+            if (logger().isDebugEnabled()) {
+                logger().debug("Get {} by {}:{} from cache", valueLabel(), keyLabel(),
+                               key instanceof JsonData ? ((JsonData) key).toJson() : key);
             }
             return val;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Find {} by {}:{} then put into cache", valueLabel(), keyLabel(),
-                         key instanceof JsonData ? ((JsonData) key).toJson() : key);
+        if (logger().isDebugEnabled()) {
+            logger().debug("Find {} by {}:{} then put into cache", valueLabel(), keyLabel(),
+                           key instanceof JsonData ? ((JsonData) key).toJson() : key);
         }
         return cache.computeIfAbsent(key, discover);
     }

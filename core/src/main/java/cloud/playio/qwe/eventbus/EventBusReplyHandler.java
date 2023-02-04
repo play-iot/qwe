@@ -2,17 +2,17 @@ package cloud.playio.qwe.eventbus;
 
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.repl.ReflectionClass;
 import io.vertx.core.eventbus.Message;
+
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.dto.ErrorMessage;
 import cloud.playio.qwe.eventbus.EventBusLogSystem.EventReplyLogSystem;
 import cloud.playio.qwe.exceptions.ServiceUnavailable;
-
 import lombok.NonNull;
 
 public interface EventBusReplyHandler extends HasLogger, EventReplyLogSystem {
@@ -27,7 +27,7 @@ public interface EventBusReplyHandler extends HasLogger, EventReplyLogSystem {
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(EventBusReplyHandler.class);
+        return LogManager.getLogger(EventBusReplyHandler.class);
     }
 
     @NonNull EventBusMessageConverter converter();

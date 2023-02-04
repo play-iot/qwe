@@ -6,8 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.repl.ReflectionClass;
@@ -152,7 +152,7 @@ public interface IConfig extends JsonData, Shareable, HasConfigKey {
         private final Class<T> clazz;
         private final JsonObject entries;
         private final ObjectMapper mapper;
-        private final static Logger log = LoggerFactory.getLogger(IConfig.class);
+        private final static Logger log = LogManager.getLogger(IConfig.class);
 
         static <T extends IConfig> T create(Class<T> clazz, JsonObject data, ObjectMapper mapper) {
             final Provider<T> p = () -> ReflectionClass.createObject(clazz);

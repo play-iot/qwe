@@ -3,6 +3,7 @@ package cloud.playio.qwe;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.logging.log4j.Level;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,10 +18,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+
 import cloud.playio.qwe.exceptions.ConfigException;
 import cloud.playio.qwe.mock.MockPluginProvider.MockPlugin;
 
-import ch.qos.logback.classic.Level;
 
 @RunWith(VertxUnitRunner.class)
 public class PluginVerticleTest implements BasePluginTest {

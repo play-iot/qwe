@@ -4,15 +4,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.github.zero88.exceptions.ErrorCode;
 import io.github.zero88.exceptions.ErrorCodeException;
 import io.github.zero88.exceptions.HiddenException;
 import io.github.zero88.repl.ReflectionClass;
 import io.github.zero88.utils.Strings;
 
+import cloud.playio.qwe.HasLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -23,9 +21,8 @@ import lombok.NonNull;
  * @see QWEException
  */
 @AllArgsConstructor
-public class QWEExceptionConverter implements Function<Throwable, QWEException> {
+public class QWEExceptionConverter implements Function<Throwable, QWEException>, HasLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(QWEExceptionConverter.class);
     private final boolean friendly;
     private final String overrideMsg;
 
@@ -94,8 +91,8 @@ public class QWEExceptionConverter implements Function<Throwable, QWEException> 
             return overrideMsg(friendly ? convert(e, t instanceof QWEException) : e);
         }
         if (t.getCause() instanceof QWEException) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Wrapper Exception: ", t);
+            if (logger().isDebugEnabled()) {
+                logger().debug("Wrapper Exception: ", t);
             }
             final QWEException c = (QWEException) t.getCause();
             return overrideMsg(friendly ? convert(c, false) : c);

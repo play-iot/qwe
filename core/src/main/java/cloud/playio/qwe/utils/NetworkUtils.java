@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.github.zero88.utils.Strings;
-import cloud.playio.qwe.exceptions.NetworkException;
 
+import cloud.playio.qwe.exceptions.NetworkException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +31,7 @@ public final class NetworkUtils {
                                                                       address instanceof Inet4Address;
     public static final Predicate<InterfaceAddress> IS_V4 = address -> IS_NAT_V4.test(address.getAddress());
 
-    private static final Logger logger = LoggerFactory.getLogger(NetworkUtils.class);
+    private static final Logger logger = LogManager.getLogger(NetworkUtils.class);
     private static final String GLOBAL_ADDRESS = "0.0.0.0";
     private static final List<String> BLACKLIST_ADDRESSES = Arrays.asList(GLOBAL_ADDRESS, "127.0.0.1", "localhost");
 

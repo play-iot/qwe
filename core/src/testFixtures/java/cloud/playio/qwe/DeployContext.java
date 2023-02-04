@@ -20,8 +20,7 @@ import lombok.experimental.Accessors;
 public final class DeployContext<T extends Verticle> {
 
     public static final Function<Class<? extends Verticle>, Consumer<String>> DEFAULT_ASSERTER
-        = cls -> id -> TestHelper.LOGGER.info(
-        "DEPLOY VERTICLE [" + cls.getName() + "][" + Objects.requireNonNull(id) + "]");
+        = cls -> id -> TestHelper.LOGGER.info("DEPLOY VERTICLE [{}][{}]", cls.getName(), id);
 
     @NonNull
     private final T verticle;

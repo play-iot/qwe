@@ -112,12 +112,11 @@ object LogLibs {
 
     object Version {
 
-        const val slf4j = "1.7.30"
-        const val logback = "1.2.3"
+        const val log4j2 = "2.19.0"
     }
 
-    const val slf4j = "org.slf4j:slf4j-api:${Version.slf4j}"
-    const val logback = "ch.qos.logback:logback-classic:${Version.logback}"
+    const val log4j2Api = "org.apache.logging.log4j:log4j-api:${Version.log4j2}"
+    const val log4j2Core = "org.apache.logging.log4j:log4j-core:${Version.log4j2}"
 }
 
 object ZeroLibs {

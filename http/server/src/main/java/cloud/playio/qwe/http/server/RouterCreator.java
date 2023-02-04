@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.github.zero88.utils.Urls;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
+
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.SharedDataLocalProxy;
-
 import lombok.NonNull;
 
 public interface RouterCreator<C extends RouterConfig> extends RouterBuilder, HasLogger, HttpSystem {
@@ -31,7 +31,7 @@ public interface RouterCreator<C extends RouterConfig> extends RouterBuilder, Ha
     }
 
     default Logger logger() {
-        return LoggerFactory.getLogger(RouterCreator.class);
+        return LogManager.getLogger(RouterCreator.class);
     }
 
     @Override

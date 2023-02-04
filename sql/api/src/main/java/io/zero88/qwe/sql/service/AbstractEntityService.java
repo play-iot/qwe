@@ -44,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 public abstract class AbstractEntityService<P extends JsonRecord, M extends EntityMetadata>
     implements SimpleEntityService<P, M>, RequestDecorator, EntityTransformer {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected final Logger logger = LogManager.getLogger(this.getClass());
     private final EntityHandler entityHandler;
 
     @Override
