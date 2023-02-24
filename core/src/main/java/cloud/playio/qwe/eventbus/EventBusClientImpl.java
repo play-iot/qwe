@@ -3,16 +3,16 @@ package cloud.playio.qwe.eventbus;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
+
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.LogSystem;
 import cloud.playio.qwe.SharedDataLocalProxy;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ final class EventBusClientImpl implements EventBusClient, HasLogger, LogSystem {
 
     @Override
     public Logger logger() {
-        return LoggerFactory.getLogger(EventBusClient.class);
+        return LogManager.getLogger(EventBusClient.class);
     }
 
     @Override

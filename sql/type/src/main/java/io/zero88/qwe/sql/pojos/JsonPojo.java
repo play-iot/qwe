@@ -34,7 +34,7 @@ public final class JsonPojo<T extends JsonRecord> implements JsonData {
                                                              .addMixIn(JsonObject.class, PropertyFilterMixIn.class)
                                                              .addMixIn(JsonRecord.class, PropertyFilterMixIn.class)
                                                              .addMixIn(JsonData.class, PropertyFilterMixIn.class);
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonPojo.class);
+    private static final Logger LOGGER = LogManager.getLogger(JsonPojo.class);
     @Getter
     @JsonIgnore
     private final T pojo;

@@ -1,7 +1,7 @@
 package cloud.playio.qwe.http.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.vertx.core.Future;
 import io.vertx.core.file.AsyncFile;
@@ -13,6 +13,7 @@ import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
+
 import cloud.playio.qwe.ExtensionEntrypoint;
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.Wrapper;
@@ -30,7 +31,7 @@ public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(HttpClientWrapper.class);
+        return LogManager.getLogger(HttpClientWrapper.class);
     }
 
     /**

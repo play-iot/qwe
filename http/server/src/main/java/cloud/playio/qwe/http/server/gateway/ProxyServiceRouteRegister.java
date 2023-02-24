@@ -1,12 +1,13 @@
 package cloud.playio.qwe.http.server.gateway;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.github.zero88.utils.Urls;
 import io.vertx.ext.web.Router;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.Status;
+
 import cloud.playio.qwe.http.server.HttpServerPluginContext;
 import cloud.playio.qwe.http.server.HttpSystem.GatewaySystem;
 import cloud.playio.qwe.http.server.RoutePath;
@@ -16,12 +17,10 @@ import cloud.playio.qwe.http.server.rest.api.ProxyServiceApi;
 import cloud.playio.qwe.http.server.rest.handler.ProxyServiceDispatcher;
 import cloud.playio.qwe.micro.monitor.ServiceGatewayMonitor;
 
-import lombok.NonNull;
-
 public interface ProxyServiceRouteRegister extends ServiceGatewayMonitor, GatewaySystem {
 
-    default @NonNull Logger logger() {
-        return LoggerFactory.getLogger(RouterCreator.class);
+    default Logger logger() {
+        return LogManager.getLogger(RouterCreator.class);
     }
 
     default void registerRouter(Record record) {

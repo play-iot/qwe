@@ -3,6 +3,7 @@ package cloud.playio.qwe;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.Level;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,6 +19,7 @@ import io.vertx.core.impl.VertxImpl;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+
 import cloud.playio.qwe.exceptions.QWEException;
 import cloud.playio.qwe.mock.DummyPluginProvider;
 import cloud.playio.qwe.mock.MockApplication;
@@ -25,8 +27,6 @@ import cloud.playio.qwe.mock.MockExtension;
 import cloud.playio.qwe.mock.MockExtension.MockErrorExtension;
 import cloud.playio.qwe.mock.MockPluginConfig;
 import cloud.playio.qwe.mock.MockPluginProvider;
-
-import ch.qos.logback.classic.Level;
 
 @RunWith(VertxUnitRunner.class)
 public class ApplicationVerticleTest {

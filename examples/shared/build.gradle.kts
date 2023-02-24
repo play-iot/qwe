@@ -1,4 +1,4 @@
 dependencies {
     api(project(":qwe-core"))
-    api(LogLibs.logback)
+    api(LogLibs.log4j2Core)
 }

@@ -8,19 +8,19 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.servicediscovery.Record;
+
 import cloud.playio.qwe.SharedDataLocalProxy;
 import cloud.playio.qwe.eventbus.EventBusClient;
 import cloud.playio.qwe.http.EventHttpService;
 import cloud.playio.qwe.micro.RecordHelper;
 import cloud.playio.qwe.micro.ServiceDiscoveryApi;
-
 import lombok.Builder;
 import lombok.NonNull;
 
@@ -34,7 +34,7 @@ import lombok.NonNull;
 @Builder(builderClassName = "Builder")
 public final class EventHttpServiceRegister<S extends EventHttpService> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventHttpServiceRegister.class);
+    private static final Logger LOGGER = LogManager.getLogger(EventHttpServiceRegister.class);
 
     @NonNull
     private final Vertx vertx;

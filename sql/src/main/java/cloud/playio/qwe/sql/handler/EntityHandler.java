@@ -1,18 +1,19 @@
 package cloud.playio.qwe.sql.handler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.Catalog;
 import org.jooq.DSLContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import io.vertx.core.Future;
 import io.github.zero88.jooqx.JooqDSLProvider;
 import io.github.zero88.jooqx.Jooqx;
 import io.github.zero88.jooqx.SQLExecutor;
 import io.github.zero88.jooqx.SQLPreparedQuery;
 import io.github.zero88.jooqx.SQLResultCollector;
+import io.vertx.core.Future;
+
 import cloud.playio.qwe.HasSharedData;
 import cloud.playio.qwe.PluginContext;
 import cloud.playio.qwe.SharedDataLocalProxy;
@@ -21,7 +22,6 @@ import cloud.playio.qwe.eventbus.EventBusProxy;
 import cloud.playio.qwe.sql.SQLLogSystem;
 import cloud.playio.qwe.sql.SQLPluginConfig;
 import cloud.playio.qwe.sql.handler.schema.SchemaHandler;
-
 import lombok.NonNull;
 
 /**
@@ -35,7 +35,7 @@ public interface EntityHandler<S, B, PQ extends SQLPreparedQuery<B>, RC extends 
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(EntityHandler.class);
+        return LogManager.getLogger(EntityHandler.class);
     }
 
     @Override

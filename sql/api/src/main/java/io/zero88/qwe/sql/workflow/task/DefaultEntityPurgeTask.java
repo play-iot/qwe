@@ -34,7 +34,7 @@ import lombok.experimental.Accessors;
 final class DefaultEntityPurgeTask<P extends JsonRecord>
     implements EntityPurgeTask<PurgeDefinitionContext, P, DMLPojo> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EntityPurgeTask.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(EntityPurgeTask.class.getName());
     @NonNull
     private final PurgeDefinitionContext definitionContext;
     private final boolean supportForceDeletion;

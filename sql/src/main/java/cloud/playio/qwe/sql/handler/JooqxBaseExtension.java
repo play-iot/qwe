@@ -1,8 +1,8 @@
 package cloud.playio.qwe.sql.handler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.github.zero88.jooqx.SQLExecutor;
 import io.github.zero88.jooqx.SQLPreparedQuery;
@@ -10,6 +10,7 @@ import io.github.zero88.jooqx.SQLResultCollector;
 import io.github.zero88.jooqx.provider.BaseJooqxFacade;
 import io.github.zero88.jooqx.provider.BaseJooqxProvider;
 import io.github.zero88.jooqx.provider.SQLClientProvider;
+
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.PluginContext;
 import cloud.playio.qwe.sql.SQLPluginConfig;
@@ -28,7 +29,7 @@ public interface JooqxBaseExtension<S, B, PQ extends SQLPreparedQuery<B>, RC ext
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(JooqxBaseExtension.class);
+        return LogManager.getLogger(JooqxBaseExtension.class);
     }
 
     @Override

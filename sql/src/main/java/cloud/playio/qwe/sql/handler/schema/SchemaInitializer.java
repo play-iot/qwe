@@ -7,6 +7,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.Constraint;
 import org.jooq.CreateIndexStep;
 import org.jooq.DSLContext;
@@ -15,8 +17,6 @@ import org.jooq.Index;
 import org.jooq.Key;
 import org.jooq.Schema;
 import org.jooq.Table;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.github.zero88.jooqx.SQLExecutor;
 import io.github.zero88.jooqx.SQLPreparedQuery;
@@ -24,13 +24,13 @@ import io.github.zero88.jooqx.SQLResultCollector;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+
 import cloud.playio.qwe.eventbus.EventAction;
 import cloud.playio.qwe.eventbus.EventMessage;
 import cloud.playio.qwe.sql.SQLError.InitDataError;
 import cloud.playio.qwe.sql.SQLError.InitSchemaError;
 import cloud.playio.qwe.sql.handler.EntityHandler;
 import cloud.playio.qwe.utils.FutureHelpers;
-
 import lombok.NonNull;
 
 /**
@@ -47,7 +47,7 @@ public interface SchemaInitializer<S, B, PQ extends SQLPreparedQuery<B>, RC exte
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(SchemaInitializer.class);
+        return LogManager.getLogger(SchemaInitializer.class);
     }
 
     /**

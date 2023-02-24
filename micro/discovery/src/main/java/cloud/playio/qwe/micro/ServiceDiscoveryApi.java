@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
@@ -13,6 +13,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
+
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.HasSharedData;
 import cloud.playio.qwe.dto.msg.RequestData;
@@ -108,7 +109,7 @@ public interface ServiceDiscoveryApi extends Supplier<ServiceDiscovery>, HasShar
     @Override
     @GenIgnore(GenIgnore.PERMITTED_TYPE)
     default Logger logger() {
-        return LoggerFactory.getLogger(ServiceDiscoveryApi.class);
+        return LogManager.getLogger(ServiceDiscoveryApi.class);
     }
 
 }

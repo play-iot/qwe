@@ -18,7 +18,7 @@ public final class HazelcastManagerFactory implements ClusterManagerFactory {
     public ClusterManager create(QWEBootConfig bootConfig) {
         System.setProperty(DeclarativeConfigUtil.SYSPROP_MEMBER_CONFIG,
                            Strings.fallback(bootConfig.getClusterConfigFile(), "classpath:default-cluster.xml"));
-        System.setProperty("hazelcast.logging.type", "slf4j");
+        System.setProperty("hazelcast.logging.type", "log4j2");
         return new HazelcastClusterManager(Config.load().setLiteMember(bootConfig.isClusterLiteMember()));
     }
 

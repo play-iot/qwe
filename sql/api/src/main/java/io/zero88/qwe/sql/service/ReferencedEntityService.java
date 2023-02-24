@@ -53,7 +53,7 @@ public interface ReferencedEntityService<CP extends CompositePojo, CM extends Co
      * @since 1.0.0
      */
     default @NonNull Logger logger() {
-        return LoggerFactory.getLogger(this.getClass());
+        return LogManager.getLogger(this.getClass());
     }
 
     /**

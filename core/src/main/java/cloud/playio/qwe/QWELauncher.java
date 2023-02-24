@@ -8,7 +8,7 @@ import cloud.playio.qwe.launcher.AboutCommand;
 public class QWELauncher extends Launcher {
 
     static {
-        System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
+        System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.Log4j2LogDelegateFactory");
     }
 
     public QWELauncher() {

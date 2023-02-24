@@ -2,10 +2,11 @@ package cloud.playio.qwe.http.server.rest.handler;
 
 import java.util.function.BiFunction;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.vertx.core.http.HttpMethod;
+
 import cloud.playio.qwe.HasLogger;
 import cloud.playio.qwe.auth.ReqAuthDefinition;
 import cloud.playio.qwe.dto.msg.RequestData;
@@ -38,7 +39,7 @@ public interface ProxyServiceDispatcher extends RequestDispatcher<RequestData, R
 
     @Override
     default Logger logger() {
-        return LoggerFactory.getLogger(ProxyServiceDispatcher.class);
+        return LogManager.getLogger(ProxyServiceDispatcher.class);
     }
 
     /**
