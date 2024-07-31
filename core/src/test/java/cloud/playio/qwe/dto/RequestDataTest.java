@@ -4,12 +4,13 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.github.zero88.jpa.Sortable.Order;
+import io.vertx.core.json.JsonObject;
+import io.zero88.jpa.Order;
+
 import cloud.playio.qwe.JsonHelper;
 import cloud.playio.qwe.dto.jpa.Pagination;
 import cloud.playio.qwe.dto.jpa.Sort;
 import cloud.playio.qwe.dto.msg.RequestData;
-import io.vertx.core.json.JsonObject;
 
 public class RequestDataTest {
 

@@ -34,11 +34,11 @@ public final class ClusterType extends AbstractEnumType implements Shareable {
     private final List<String> classes;
     private final List<String> jars;
 
-    protected ClusterType(String type) {
+    private ClusterType(String type) {
         this(type, null, null);
     }
 
-    protected ClusterType(String type, List<String> jars, List<String> classes) {
+    private ClusterType(String type, List<String> jars, List<String> classes) {
         super(type);
         this.classes = Optional.ofNullable(classes).orElseGet(ArrayList::new);
         this.jars = Optional.ofNullable(jars).orElseGet(ArrayList::new);

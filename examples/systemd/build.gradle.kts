@@ -1,15 +1,10 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id(PluginLibs.app)
+    alias(libs.plugins.app)
 }
 
 dependencies {
     api(project(":examples:shared"))
-}
-
-oss {
-    publishingInfo {
-        enabled.set(false)
-    }
 }
 
 qwe {

@@ -19,10 +19,10 @@ import io.vertx.core.cli.annotations.Summary;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.impl.VertxBuilder;
 import io.vertx.core.impl.launcher.commands.BareCommand;
-import io.vertx.core.impl.launcher.commands.ExecUtils;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.launcher.ExecutionContext;
+
 import cloud.playio.qwe.IConfig;
 import cloud.playio.qwe.QWEBootConfig;
 import cloud.playio.qwe.cluster.ClusterFactoryServiceLoader;
@@ -30,7 +30,6 @@ import cloud.playio.qwe.cluster.ClusterManagerFactory;
 import cloud.playio.qwe.cluster.ClusterNodeListener;
 import cloud.playio.qwe.cluster.ClusterNodeListenerServiceLoader;
 import cloud.playio.qwe.cluster.ClusterType;
-
 import lombok.Getter;
 
 @Summary("Creates a bare QWE instance")
@@ -116,7 +115,7 @@ public class BootCommand extends BareCommand {
 
     @Override
     public boolean isClustered() {
-        return Objects.nonNull(clusterType);
+        return Objects.nonNull(clusterType) && !ClusterType.NONE.type().equals(clusterType);
     }
 
     @Override
@@ -192,11 +191,12 @@ public class BootCommand extends BareCommand {
         //        configureFromSystemProperties(config, VERTX_OPTIONS_PROP_PREFIX);
         //        configureFromSystemProperties(config.getMetricsOptions(), METRICS_OPTIONS_PROP_PREFIX);
         conf.setClusterType(Optional.ofNullable(clusterType).orElse(conf.getClusterType().type()));
-        if (!isClustered()) {
-            log.error("Required cluster mode by passing \"-cluster-type\" in CLI option or defining property " +
-                      "in a configuration file");
-            ExecUtils.exitBecauseOfVertxInitializationIssue();
-        }
+        //        if (!isClustered()) {
+        //            log.error("Required cluster mode by passing \"-cluster-type\" in CLI option or defining
+        //            property " +
+        //                      "in a configuration file");
+        //            ExecUtils.exitBecauseOfVertxInitializationIssue();
+        //        }
         if (isClustered()) {
             if (clusterLiteMember) {
                 conf.setClusterLiteMember(true);
@@ -261,7 +261,9 @@ public class BootCommand extends BareCommand {
         if (listener != null && instance.isClustered()) {
             bootConf.getClusterManager().nodeListener(listener.setup(instance, bootConf));
         }
-        instance.getOrCreateContext().put(KEY_STORE_CONFIG, bootConf.getKeyStoreConfig());
+        if (Objects.nonNull(bootConf.getKeyStoreConfig())) {
+            instance.getOrCreateContext().put(KEY_STORE_CONFIG, bootConf.getKeyStoreConfig());
+        }
         super.afterStartingVertx(instance);
     }
 

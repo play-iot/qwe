@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":qwe-core"))
+    api(projects.core)
 
-    testImplementation(VertxLibs.junit5)
-    testImplementation(testFixtures(project(":qwe-core")))
+    testImplementation(libs.junit5Vertx)
+    testImplementation(testFixtures(projects.core))
 }

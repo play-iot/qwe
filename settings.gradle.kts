@@ -7,37 +7,58 @@
  * in the user manual at https://docs.gradle.org/6.7/userguide/multi_project_builds.html
  */
 
-rootProject.name = "qwe"
 pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
     }
 }
-//include("manifest")
-include(":qwe-core")
-project(":qwe-core").projectDir = file("core")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include("http:client", "http:server")
-include("sql")
-//include("sql:api", "sql:type")
-include("storage:json")
-
-include(
-    ":micro:micro-config",
-    ":micro:micro-metadata",
-    ":micro:circuit-breaker",
-    ":micro:discovery",
-    ":micro:rpc"
+val projectName = "qwe"
+val profile: String by settings
+val pools = mutableMapOf(
+    projectName to arrayOf(":core", ":ext"),
+    "http" to arrayOf("http:client", "http:server", "http:openapi"),
+    "sql" to arrayOf("sql" /*"sql:api", "sql:type"*/),
+    "micro" to arrayOf(
+        ":micro:config",
+        ":micro:metadata",
+        ":micro:circuit-breaker",
+        ":micro:discovery",
+        ":micro:rpc"
+    ),
+    "storage" to arrayOf("storage:json"),
+    "validator" to arrayOf("validator"),
+    "examples" to arrayOf(
+        "examples:shared",
+        "examples:systemd",
+        "examples:docker",
+        "examples:fatjar",
+        "examples:cluster-node"
+    ),
+    "integtest" to emptyArray()
 )
-project(":micro:micro-config").projectDir = file("micro/config")
-project(":micro:micro-metadata").projectDir = file("micro/metadata")
+val docs = arrayOf(":docs")
+val excludeCISonar = docs
+val excludeCIBuild = pools["examples"]!! + pools["integtest"]!! + excludeCISonar
+pools.putAll(mapOf("$projectName:docs" to pools[projectName]!!.plus(docs)))
 
-val examples = arrayOf("examples:shared", "examples:systemd", "examples:docker", "examples:fatjar", "examples:cluster-node")
+fun flatten(): List<String> = pools.values.toTypedArray().flatten()
 
-examples.forEach { include(it) }
+rootProject.name = "$projectName-parent"
+when {
+    profile.isBlank() || profile == "all" -> flatten().toTypedArray()
+    profile == "ciBuild"                  -> flatten().filter { !excludeCIBuild.contains(it) }.toTypedArray()
+    profile == "ciSonar"                  -> flatten().filter { !excludeCISonar.contains(it) }.toTypedArray()
+    else                                  -> pools.getOrElse(profile) { throw IllegalArgumentException("Not found profile[$profile]") }
+}.forEach { include(it) }
+//project(":micro:micro-config").projectDir = file("micro/config")
+//project(":micro:micro-metadata").projectDir = file("micro/metadata")
 
 if (gradle is ExtensionAware) {
     val extensions = (gradle as ExtensionAware).extensions
-    extensions.add("SKIP_PUBLISH", examples)
+    extensions.add("BASE_NAME", projectName)
+    extensions.add("PROJECT_POOL", pools.toMap())
+    extensions.add("SKIP_PUBLISH", excludeCIBuild + arrayOf(":docs", ":sample", ":integtest"))
 }

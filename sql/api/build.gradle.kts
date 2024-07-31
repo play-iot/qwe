@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":qwe-core"))
+    api(projects.core)
     api(project(":micro:micro-metadata"))
     api(project(":sql"))
     api(project(":sql:type"))

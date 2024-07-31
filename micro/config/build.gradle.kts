@@ -1,3 +1,3 @@
 dependencies {
-    api(project(":qwe-core"))
+    api(projects.core)
 }

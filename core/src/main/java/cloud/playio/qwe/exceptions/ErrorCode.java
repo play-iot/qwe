@@ -62,10 +62,12 @@ public final class ErrorCode extends AbstractEnumType implements io.github.zero8
         return code instanceof ErrorCode ? (ErrorCode) code : new ErrorCode(code.code());
     }
 
+    @Override
     public int hashCode() {
         return this.code().hashCode();
     }
 
+    @Override
     public boolean equals(final Object o) {
         if (o == this) {
             return true;

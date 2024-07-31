@@ -1,10 +1,6 @@
 dependencies {
-    api(project(":qwe-core"))
+    api(projects.core)
 
-    compileOnly(VertxLibs.codegen)
-    compileOnly(VertxLibs.rx2)
-    annotationProcessor(VertxLibs.codegen)
-
-    testImplementation(VertxLibs.junit)
-    testImplementation(testFixtures(project(":qwe-core")))
+    testImplementation(libs.junitVertx)
+    testImplementation(testFixtures(projects.core))
 }

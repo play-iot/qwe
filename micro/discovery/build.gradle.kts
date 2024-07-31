@@ -1,22 +1,26 @@
-dependencies {
-    api(project(":micro:micro-config"))
-    api(project(":micro:micro-metadata"))
-    api(project(":micro:rpc"))
-    api(project(":http:client"))
-    api(VertxLibs.serviceDiscovery)
 
-    compileOnly(VertxLibs.codegen)
-    compileOnly(VertxLibs.rx2)
-    annotationProcessor(VertxLibs.codegen)
+import cloud.playio.gradle.generator.codegen.SourceSetName
 
-    testImplementation(VertxLibs.junit)
-    testImplementation(testFixtures(project(":qwe-core")))
-    testCompileOnly(VertxLibs.codegen)
+@Suppress("DSL_SCOPE_VIOLATION")
+plugins {
+    alias(libs.plugins.codegen)
 }
 
-tasks {
-    register<JavaCodeGenTask>("annotationProcessing")
-    compileJava {
-        dependsOn(withType<JavaCodeGenTask>())
+codegen {
+    vertx {
+        version.set(libs.vertxCore.get().version)
+        sources.addAll(arrayOf(SourceSetName.MAIN))
     }
 }
+
+dependencies {
+    api(project(":micro:config"))
+    api(project(":micro:metadata"))
+    api(project(":micro:rpc"))
+    api(project(":http:client"))
+    api(libs.vertxServiceDiscovery)
+
+    testImplementation(libs.junitVertx)
+    testImplementation(testFixtures(projects.core))
+}
+

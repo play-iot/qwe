@@ -1,50 +1,53 @@
+import cloud.playio.gradle.generator.codegen.SourceSetName
+
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `java-test-fixtures`
+    alias(libs.plugins.codegen)
+}
+
+codegen {
+    vertx {
+        version.set(libs.vertxCore.get().version)
+        sources.addAll(arrayOf(SourceSetName.MAIN))
+    }
 }
 
 dependencies {
-    api(JacksonLibs.core)
-    api(JacksonLibs.databind)
-    api(JacksonLibs.datetime)
-    api(VertxLibs.core)
-    api(VertxLibs.auth)
-    api(ZeroLibs.utils)
-    api(ZeroLibs.jpaExt)
-    api(JSRLibs.annotation)
-    api(LogLibs.log4j2Api)
-    api(UtilLibs.jetbrainsAnnotations)
+    api(libs.vertxCore)
+    api(libs.vertxAuth)
+    api(libs.log4j2Api)
+    api(libs.javaxAnnotation)
+    api(libs.jacksonDatabind)
+    api(libs.jacksonDatetime)
+    api(libs.utils)
+    api(libs.jpaExt)
 
-    compileOnly(VertxLibs.hazelcast)
-    compileOnly(VertxLibs.zookeeper)
-    compileOnly(VertxLibs.ignite)
-    compileOnly(VertxLibs.infinispan)
+    compileOnly(libs.vertxHazelcast)
+    compileOnly(libs.vertxZookeeper)
+    compileOnly(libs.vertxIgnite)
+    compileOnly(libs.vertxInfinispan)
 
-    compileOnly(VertxLibs.codegen)
-    compileOnly(VertxLibs.rx2)
-    compileOnlyApi(JacksonLibs.annotations)
-    annotationProcessor(VertxLibs.codegen)
+    codeGenerator(libs.vertxRx2)
+    codeGenerator(libs.vertxRx3)
+    compileOnlyApi(libs.jacksonAnnotations)
 
-    testImplementation(VertxLibs.junit)
-    testImplementation(VertxLibs.junit5)
-    testImplementation(VertxLibs.rx2)
-    testImplementation(VertxLibs.jwt)
+    testImplementation(libs.junitVertx)
+    testImplementation(libs.junit5Vertx)
+    testImplementation(libs.vertxRx2)
+    testImplementation(libs.vertxJwt)
+    testImplementation(libs.log4j2Core)
 
-    testFixturesApi(testFixtures(ZeroLibs.utils))
-    testFixturesApi(LogLibs.log4j2Core)
-    testFixturesApi(TestLibs.junit5Api)
-    testFixturesApi(TestLibs.junit5Engine)
-    testFixturesApi(TestLibs.junit5Vintage)
-    testFixturesApi(TestLibs.jsonAssert)
-    testFixturesApi(VertxLibs.junit)
-    testFixturesApi(VertxLibs.junit5)
-    testFixturesCompileOnly(VertxLibs.rx2)
-    testFixturesCompileOnly(UtilLibs.lombok)
-    testFixturesAnnotationProcessor(UtilLibs.lombok)
-}
-
-tasks {
-    register<JavaCodeGenTask>("annotationProcessing")
-    compileJava {
-        dependsOn(withType<JavaCodeGenTask>())
-    }
+    testFixturesApi(testFixtures(libs.utils))
+    testFixturesApi(libs.log4j2Core)
+    testFixturesApi(libs.junit5Api)
+    testFixturesApi(libs.junit5Engine)
+    testFixturesApi(libs.junit5Vintage)
+    testFixturesApi(libs.jsonAssert)
+    testFixturesApi(libs.junitVertx)
+    testFixturesApi(libs.junit5Vertx)
+    testFixturesCompileOnly(libs.vertxRx2)
+    testFixturesCompileOnly(libs.lombok)
+    testFixturesCompileOnly(libs.jetbrainsAnnotations)
+    testFixturesAnnotationProcessor(libs.lombok)
 }

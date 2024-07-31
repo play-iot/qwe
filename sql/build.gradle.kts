@@ -2,46 +2,45 @@ import nu.studer.gradle.jooq.JooqGenerate
 import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.Property
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id(PluginLibs.jooq)
+    alias(libs.plugins.jooq)
 }
 
 dependencies {
-    api(project(":qwe-core"))
-    api(ZeroLibs.jooqx)
-    api(ZeroLibs.jooqxSpi)
-    api(ZeroLibs.jooqRql)
+    api(projects.core)
+    api(libs.jooqx)
+    api(libs.jooqxSpi)
+    api(libs.jooqRql)
 
-    compileOnly(VertxLibs.codegen)
+    compileOnly(libs.jdbcVertx)
+    compileOnly(libs.db2Vertx)
+    compileOnly(libs.postgresVertx)
+    compileOnly(libs.mysqlVertx)
+    compileOnly(libs.mssqlVertx)
 
-    compileOnly(VertxLibs.jdbc)
-    compileOnly(VertxLibs.db2)
-    compileOnly(VertxLibs.pgsql)
-    compileOnly(VertxLibs.mysql)
-    compileOnly(VertxLibs.mssql)
+    testImplementation(libs.junit5Vertx)
+    testImplementation(libs.jdbcVertx)
+    testImplementation(libs.db2Vertx)
+    testImplementation(libs.postgresVertx)
+    testImplementation(libs.mysqlVertx)
+    testImplementation(libs.mssqlVertx)
+    testImplementation(libs.h2Jdbc)
+    testImplementation(libs.hikariCP)
+    testImplementation(testFixtures(projects.core))
+    testImplementation(testFixtures(libs.jooqx))
+    testImplementation(libs.junit5Container)
+    testImplementation(libs.postgresContainer)
+    testImplementation(libs.jooqMeta)
 
-    testImplementation(VertxLibs.junit5)
-    testImplementation(VertxLibs.jdbc)
-    testImplementation(VertxLibs.db2)
-    testImplementation(VertxLibs.pgsql)
-    testImplementation(VertxLibs.mysql)
-    testImplementation(VertxLibs.mssql)
-    testImplementation(DatabaseLibs.h2)
-    testImplementation(DatabaseLibs.hikari)
-    testImplementation(testFixtures(project(":qwe-core")))
-    testImplementation(testFixtures(ZeroLibs.jooqx))
-    testImplementation(TestContainers.junit5)
-    testImplementation(TestContainers.pgsql)
-
-    testImplementation(DatabaseLibs.jooqMeta)
-    jooqGenerator(DatabaseLibs.h2)
-    jooqGenerator(DatabaseLibs.pgsql)
-    jooqGenerator(DatabaseLibs.jooqMetaExt)
+    jooqGenerator(libs.h2Jdbc)
+    jooqGenerator(libs.postgresJdbc)
+    jooqGenerator(libs.jooqMetaExt)
 }
 val pgHost: String? by project
 
 jooq {
-    version.set(DatabaseLibs.Version.jooq)
+    version.set(libs.versions.jooq.jdk17.get())
 
     configurations {
         create("testH2Schema") {

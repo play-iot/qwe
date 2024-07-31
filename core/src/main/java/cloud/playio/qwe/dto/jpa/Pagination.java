@@ -1,8 +1,9 @@
 package cloud.playio.qwe.dto.jpa;
 
-import io.github.zero88.jpa.Pageable;
 import cloud.playio.qwe.dto.JsonData;
 import io.github.zero88.utils.Strings;
+import io.zero88.jpa.Pageable;
+
 import cloud.playio.qwe.dto.msg.RequestFilter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,6 +22,11 @@ public final class Pagination implements Pageable, JsonData {
     private int page;
     @JsonProperty(RequestFilter.PER_PAGE)
     private int perPage;
+
+    @Override
+    public int getPageSize() {
+        return perPage;
+    }
 
     public static Pagination oneValue() {
         return Pagination.builder().perPage(1).page(1).build();

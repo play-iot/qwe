@@ -72,7 +72,7 @@ class HttpClientWrapperImpl implements HttpClientWrapperInternal {
     HttpClientWrapperImpl(HttpClient client, String userAgent) {
         this.extConfig = new HttpClientConfig().setUserAgent(userAgent);
         if (client instanceof HttpClientImpl) {
-            extConfig.setOptions(((HttpClientImpl) client).getOptions());
+            extConfig.setOptions(((HttpClientImpl) client).options());
         }
         this.id = extConfig.toJson().hashCode();
         this.userAgent = userAgent;

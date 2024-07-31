@@ -1,20 +1,17 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id(PluginLibs.app)
+    alias(libs.plugins.app)
 }
 
 dependencies {
     api(project(":examples:shared"))
-}
-
-oss {
-    publishingInfo {
-        enabled.set(false)
-    }
+    api(project(":validator"))
 }
 
 qwe {
     app {
         appVerticle.set("cloud.playio.qwe.example.fatjar.FatJarVerticle")
+        appLauncher.set("cloud.playio.qwe.QWELauncher")
         fatJar.set(true)
         logging {
             otherLoggers.set(

@@ -1,14 +1,25 @@
+import cloud.playio.gradle.NexusConfig
+import cloud.playio.gradle.NexusVersion
+
+@Suppress("DSL_SCOPE_VIOLATION") // workaround for gradle v7
 plugins {
     eclipse
     idea
-    id(PluginLibs.oss) version PluginLibs.Version.gradlePlugin
-    id(PluginLibs.root) version PluginLibs.Version.gradlePlugin
-    id(PluginLibs.jooq) version PluginLibs.Version.jooq apply false
-    id(PluginLibs.nexusPublish) version PluginLibs.Version.nexusPublish
+    alias(libs.plugins.oss)
+    alias(libs.plugins.root)
+    alias(libs.plugins.antora) apply false
+    alias(libs.plugins.codegen) apply false
+    alias(libs.plugins.docgen) apply false
+    alias(libs.plugins.app) apply false
+    alias(libs.plugins.docker) apply false
+    alias(libs.plugins.jooq) apply false
 }
 
+project.ext.set("baseName", (gradle as ExtensionAware).extensions["BASE_NAME"] as String)
+project.ext.set(NexusConfig.NEXUS_VERSION_KEY, NexusVersion.BEFORE_2021_02_24)
+
 allprojects {
-    group = "cloud.playio.qwe"
+    group = project.ext.get("projectGroup") as String
 
     repositories {
         mavenLocal()
@@ -30,47 +41,34 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = PluginLibs.oss)
+    apply(plugin = rootProject.libs.plugins.oss.get().pluginId)
 
     dependencies {
-        compileOnly(UtilLibs.lombok)
-        annotationProcessor(UtilLibs.lombok)
+        compileOnly(rootProject.libs.lombok)
+        annotationProcessor(rootProject.libs.lombok)
+        testCompileOnly(rootProject.libs.lombok)
+        testAnnotationProcessor(rootProject.libs.lombok)
 
-        testImplementation(TestLibs.junit5Api)
-        testImplementation(TestLibs.junit5Engine)
-        testImplementation(TestLibs.junit5Vintage)
-        testImplementation(TestLibs.jsonAssert)
-        testCompileOnly(UtilLibs.lombok)
-        testAnnotationProcessor(UtilLibs.lombok)
+        compileOnly(rootProject.libs.jetbrainsAnnotations)
+        testCompileOnly(rootProject.libs.jetbrainsAnnotations)
+
+        testImplementation(rootProject.libs.bundles.junit5)
+        testImplementation(rootProject.libs.junitPioneer)
+        testImplementation(rootProject.libs.jsonAssert)
     }
 
     oss {
-        zero88.set(true)
-        publishingInfo {
-            enabled.set(true)
-            homepage.set("https://github.com/zero88/qwe")
-            license {
-                name.set("The Apache License, Version 2.0")
-                url.set("https://github.com/zero88/qwe/blob/master/LICENSE")
-            }
-            scm {
-                connection.set("scm:git:git://git@github.com:zero88/qwe.git")
-                developerConnection.set("scm:git:ssh://git@github.com:zero88/qwe.git")
-                url.set("https://github.com/zero88/qwe")
-            }
-        }
+        playio.set(true)
+        github.set(true)
         testLogger {
             slowThreshold = 5000
         }
     }
-}
 
-nexusPublishing {
-    packageGroup.set("io.github.zero88")
-    repositories {
-        sonatype {
-            username.set(project.property("nexus.username") as String?)
-            password.set(project.property("nexus.password") as String?)
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(JavaVersion.current().majorVersion))
         }
     }
 }

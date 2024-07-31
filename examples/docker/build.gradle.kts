@@ -1,18 +1,12 @@
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id(PluginLibs.docker)
+    alias(libs.plugins.docker)
 }
-
 dependencies {
     api(project(":examples:shared"))
-}
-
-oss {
-    publishingInfo {
-        enabled.set(false)
-    }
 }
 
 qwe {

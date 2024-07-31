@@ -1,7 +1,7 @@
 dependencies {
-    api(project(":qwe-core"))
-    api(VertxLibs.circuitBreaker)
+    api(projects.core)
+    api(libs.vertxCircuitBreaker)
 
-    testImplementation(VertxLibs.junit)
-    testImplementation(testFixtures(project(":qwe-core")))
+    testImplementation(libs.junitVertx)
+    testImplementation(testFixtures(projects.core))
 }

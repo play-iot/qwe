@@ -8,6 +8,7 @@ import io.vertx.core.cli.annotations.Description;
 import io.vertx.core.cli.annotations.Name;
 import io.vertx.core.cli.annotations.Option;
 import io.vertx.core.cli.annotations.Summary;
+import java.nio.charset.StandardCharsets;
 
 @Name("about")
 @Summary("Show application information")
@@ -46,7 +47,7 @@ public final class AboutCommand extends VersionCommand {
             return banner;
         }
         return banner = convert("banner.txt", is -> {
-            try (Scanner scanner = new Scanner(is, "UTF-8").useDelimiter("\\A")) {
+            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A")) {
                 return scanner.hasNext() ? scanner.next().trim() : "";
             }
         });
