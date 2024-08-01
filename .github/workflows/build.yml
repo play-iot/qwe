@@ -18,7 +18,7 @@ env:
   ENABLE_SONAR: true
   ENABLE_GH_MAVEN: false
   JAVA_DIST: 'temurin'
-  JAVA_VERSION: '11'
+  JAVA_VERSION: '17'
 
 jobs:
   context:
