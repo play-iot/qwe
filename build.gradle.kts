@@ -16,7 +16,7 @@ plugins {
 }
 
 project.ext.set("baseName", (gradle as ExtensionAware).extensions["BASE_NAME"] as String)
-project.ext.set(NexusConfig.NEXUS_VERSION_KEY, NexusVersion.BEFORE_2021_02_24)
+project.ext.set(NexusConfig.NEXUS_VERSION_KEY, NexusVersion.AFTER_2021_02_24)
 
 allprojects {
     group = project.ext.get("projectGroup") as String
