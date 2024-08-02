@@ -26,8 +26,8 @@ public interface TextFileOperator extends AsyncFileOperator {
      * @param path   File path
      * @param option File option
      * @return a buffer
-     * @apiNote This methods will auto verify a give path must be existed and be a file and a file size doesn't
-     *     exceeds max size in configuration
+     * @apiNote This method will auto verify a give path must be existed and be a file and a file size doesn't
+     *     exceed max size in configuration
      * @see FileOption
      * @see #verifyFile(Path)
      */
