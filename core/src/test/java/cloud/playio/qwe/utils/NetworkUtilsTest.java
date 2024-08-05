@@ -9,7 +9,9 @@ public class NetworkUtilsTest {
 
     @Test
     public void test_get_public_ipv4() {
-        Assertions.assertNotNull(NetworkUtils.getPublicIpv4());
+        final String address = NetworkUtils.getPublicIpv4();
+        System.out.println(address);
+        Assertions.assertNotNull(address);
     }
 
     @Test
@@ -18,8 +20,8 @@ public class NetworkUtilsTest {
         Assertions.assertNotNull(address);
         Assertions.assertEquals("127.0.0.1", address.getHostName());
         Assertions.assertEquals("127.0.0.1", address.getHostString());
-        Assertions.assertEquals("127.0.0.1:9090", address.toString());
         Assertions.assertEquals(9090, address.getPort());
+        Assertions.assertEquals("127.0.0.1/<unresolved>:9090", address.toString());
     }
 
 }

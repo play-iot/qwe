@@ -6,9 +6,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.ThreadingModel;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
+
 import cloud.playio.qwe.QWEConfig.QWEDeployConfig;
 import cloud.playio.qwe.exceptions.ConfigException;
 
@@ -71,7 +73,7 @@ public class QWEConfigTest {
         Assertions.assertEquals(10, cfg.getInstances());
         Assertions.assertEquals(60000000000L, cfg.getMaxWorkerExecuteTime());
         Assertions.assertEquals(TimeUnit.NANOSECONDS, cfg.getMaxWorkerExecuteTimeUnit());
-        Assertions.assertFalse(cfg.isWorker());
+        Assertions.assertEquals(ThreadingModel.EVENT_LOOP, cfg.getThreadingModel());
     }
 
     @Test
@@ -94,10 +96,10 @@ public class QWEConfigTest {
         Assertions.assertNotNull(cfg.getAppConfig().dataDir());
         Assertions.assertTrue(cfg.getAppConfig().other().isEmpty());
         Assertions.assertNotNull(cfg.getDeployConfig());
-        JsonHelper.assertJson(new JsonObject("{\"worker\":false,\"workerPoolSize\":20," +
-                                             "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
-                                             "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}"),
-                              cfg.getDeployConfig().toJson());
+        JsonHelper.assertJson(new JsonObject(
+            "{\"worker\":false,\"workerPoolSize\":20,\"threadingModel\":\"EVENT_LOOP\"," +
+            "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
+            "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}"), cfg.getDeployConfig().toJson());
         Assertions.assertNull(cfg.getBootConfig());
     }
 
@@ -110,10 +112,10 @@ public class QWEConfigTest {
         Assertions.assertEquals(1, config.getAppConfig().other().size());
         Assertions.assertEquals(1, config.getAppConfig().lookup("hello"));
         Assertions.assertNotNull(config.getDeployConfig());
-        JsonHelper.assertJson(new JsonObject("{\"worker\":false,\"workerPoolSize\":20," +
-                                             "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
-                                             "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}"),
-                              config.getDeployConfig().toJson());
+        JsonHelper.assertJson(new JsonObject(
+            "{\"worker\":false,\"workerPoolSize\":20,\"threadingModel\":\"EVENT_LOOP\"," +
+            "\"maxWorkerExecuteTime\":60000000000,\"ha\":false,\"instances\":1," +
+            "\"maxWorkerExecuteTimeUnit\":\"NANOSECONDS\"}"), config.getDeployConfig().toJson());
         Assertions.assertNull(config.getBootConfig());
     }
 

@@ -1,6 +1,6 @@
 {
   "__system__": {
-    "eventLoopPoolSize": 32,
+    "eventLoopPoolSize": 8,
     "workerPoolSize": 20,
     "internalBlockingPoolSize": 20,
     "blockedThreadCheckInterval": 1000,
@@ -36,9 +36,8 @@
       "crlValues": [],
       "useAlpn": false,
       "enabledSecureTransportProtocols": [
-        "TLSv1",
-        "TLSv1.1",
-        "TLSv1.2"
+        "TLSv1.2",
+        "TLSv1.3"
       ],
       "tcpFastOpen": false,
       "tcpCork": false,
