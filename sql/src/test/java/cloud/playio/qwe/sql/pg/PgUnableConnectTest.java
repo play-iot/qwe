@@ -27,7 +27,7 @@ class PgUnableConnectTest extends SQLPluginFailedTest {
                                                    new SQLPluginProvider(PgEntityHandler.class),
                                                    t -> testContext.verify(() -> {
                                                        t.printStackTrace();
-                                                       Assertions.assertTrue(t instanceof RuntimeException);
+                                                       Assertions.assertInstanceOf(RuntimeException.class, t);
                                                        Assertions.assertNotNull(t.getCause());
                                                        Assertions.assertEquals(
                                                            "Connection refused: localhost/127.0.0.1:5433",
