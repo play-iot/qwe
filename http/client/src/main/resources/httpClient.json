@@ -12,9 +12,8 @@
     "crlValues": [],
     "enabledCipherSuites": [],
     "enabledSecureTransportProtocols": [
-      "TLSv1",
-      "TLSv1.1",
-      "TLSv1.2"
+      "TLSv1.2",
+      "TLSv1.3"
     ],
     "idleTimeout": 15,
     "idleTimeoutUnit": "SECONDS",
@@ -46,7 +45,7 @@
       "initialWindowSize": 65535,
       "maxConcurrentStreams": 4294967295,
       "maxFrameSize": 16384,
-      "maxHeaderListSize": 2147483647,
+      "maxHeaderListSize": 8192,
       "pushEnabled": true
     },
     "keepAlive": true,

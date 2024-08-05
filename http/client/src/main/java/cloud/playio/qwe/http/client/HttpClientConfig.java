@@ -47,8 +47,8 @@ public final class HttpClientConfig implements ExtensionConfig {
         return new JsonObject().put("userAgent", userAgent)
                                .put("http2Enabled", http2Enabled)
                                .put("options", options.toJson())
-                               .put("httpHandlers", JsonData.tryParse(this.httpHandlers).toJson(mapper))
-                               .put("webSocketHandlers", JsonData.tryParse(this.webSocketHandlers).toJson(mapper));
+                               .put("httpHandlers", JsonData.tryParse(httpHandlers).toJson(mapper))
+                               .put("webSocketHandlers", JsonData.tryParse(webSocketHandlers).toJson(mapper));
     }
 
     @JsonCreator
@@ -70,7 +70,7 @@ public final class HttpClientConfig implements ExtensionConfig {
         return new HttpClientOptions().setIdleTimeout(HTTP_IDLE_TIMEOUT_SECOND)
                                       .setIdleTimeoutUnit(TimeUnit.SECONDS)
                                       .setConnectTimeout(CONNECT_TIMEOUT_SECOND * 1000)
-                                      .setTryUseCompression(true)
+                                      .setDecompressionSupported(true)
                                       .setWebSocketCompressionLevel(6)
                                       .setWebSocketCompressionAllowClientNoContext(true)
                                       .setWebSocketCompressionRequestServerNoContext(true)

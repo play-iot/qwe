@@ -27,7 +27,7 @@ public class RestApiTest extends HttpServerPluginTestBase implements RestApiTest
     @Test
     public void test_none_api_not_found(TestContext context) {
         String path = "/abc/";
-        JsonObject expected = notFoundResponse(httpConfig.getPort(), path);
+        JsonObject expected = RestApiTestHelper.notFoundResponse(httpConfig.getPort(), path);
         startServer(context, new HttpServerRouter().registerApi(MockRestAPI.class));
         sendToApiThenAssert(context, HttpMethod.GET, path, 404, expected);
     }
@@ -35,7 +35,7 @@ public class RestApiTest extends HttpServerPluginTestBase implements RestApiTest
     @Test
     public void test_api_not_found(TestContext context) {
         String path = "/api/xx";
-        JsonObject expected = notFoundResponse(httpConfig.getPort(), path);
+        JsonObject expected = RestApiTestHelper.notFoundResponse(httpConfig.getPort(), path);
         startServer(context, new HttpServerRouter().registerApi(MockRestAPI.class));
         sendToApiThenAssert(context, HttpMethod.GET, path, 404, expected);
     }

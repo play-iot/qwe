@@ -25,7 +25,7 @@ public class UploadDownloadServerTest extends HttpServerPluginTestBase {
     public void test_default_logger_upload_listener(TestContext context) {
         JsonObject expected = new JsonObject(
             "{\"attributes\":{\"description\":\"hello\"},\"files\":[{\"charset\":\"UTF-8\",\"fileName\":\"test.txt\"," +
-            "\"extension\":\"txt\",\"transferEncoding\":\"7bit\",\"size\":14680064,\"name\":\"abc\"," +
+            "\"extension\":\"txt\",\"transferEncoding\":\"7bit\",\"size\":7340032,\"name\":\"abc\"," +
             "\"contentType\":\"text/plain\"}]}");
         Async async = context.async();
         startServer(context, new HttpServerRouter());

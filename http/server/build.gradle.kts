@@ -1,5 +1,6 @@
 dependencies {
     api(projects.core)
+    api(projects.http.shared)
     api(libs.vertxWeb)
     api(libs.javaxJaxrs)
 
@@ -24,4 +25,5 @@ dependencies {
     testImplementation(libs.vertxOauth2)
     testImplementation(libs.vertxShiro)
     testImplementation(libs.vertxWebauthn)
+    testImplementation(libs.log4j2Core)
 }

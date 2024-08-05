@@ -9,7 +9,7 @@ plugins {
 codegen {
     vertx {
         version.set(libs.vertxCore.get().version)
-        sources.addAll(arrayOf(SourceSetName.MAIN))
+        sources.addAll(arrayOf(SourceSetName.MAIN, SourceSetName.TEST))
     }
 }
 
@@ -20,7 +20,8 @@ dependencies {
     api(project(":http:client"))
     api(libs.vertxServiceDiscovery)
 
-    testImplementation(libs.junitVertx)
     testImplementation(testFixtures(projects.core))
+    testImplementation(libs.junitVertx)
+    testImplementation(libs.log4j2Core)
 }
 

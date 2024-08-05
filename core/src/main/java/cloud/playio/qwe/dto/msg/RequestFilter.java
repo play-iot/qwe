@@ -65,7 +65,7 @@ public final class RequestFilter extends JsonObject implements JsonData {
      *
      * @since 1.0.0
      */
-    public static final String PER_PAGE = "_per_page";
+    public static final String PAGE_SIZE = "_page_size";
     /**
      * For {@code audit}
      *

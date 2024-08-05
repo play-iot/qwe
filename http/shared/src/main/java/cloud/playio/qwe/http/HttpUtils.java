@@ -126,7 +126,7 @@ public final class HttpUtils {
             if (request.method() == HttpMethod.GET) {
                 return Pagination.builder()
                                  .page(request.getParam(RequestFilter.PAGE))
-                                 .perPage(request.getParam(RequestFilter.PER_PAGE))
+                                 .pageSize(request.getParam(RequestFilter.PAGE_SIZE))
                                  .build();
             }
             return null;

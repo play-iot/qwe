@@ -19,6 +19,8 @@ dependencies {
     compileOnly(libs.mysqlVertx)
     compileOnly(libs.mssqlVertx)
 
+    testImplementation(testFixtures(projects.core))
+    testImplementation(testFixtures(libs.jooqx))
     testImplementation(libs.junit5Vertx)
     testImplementation(libs.jdbcVertx)
     testImplementation(libs.db2Vertx)
@@ -27,11 +29,10 @@ dependencies {
     testImplementation(libs.mssqlVertx)
     testImplementation(libs.h2Jdbc)
     testImplementation(libs.hikariCP)
-    testImplementation(testFixtures(projects.core))
-    testImplementation(testFixtures(libs.jooqx))
     testImplementation(libs.junit5Container)
     testImplementation(libs.postgresContainer)
     testImplementation(libs.jooqMeta)
+    testImplementation(libs.log4j2Core)
 
     jooqGenerator(libs.h2Jdbc)
     jooqGenerator(libs.postgresJdbc)

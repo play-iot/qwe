@@ -6,19 +6,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import cloud.playio.qwe.eventbus.EventBusClient;
-import cloud.playio.qwe.exceptions.ErrorCode;
-import cloud.playio.qwe.http.server.HttpServerRouter;
-import cloud.playio.qwe.http.server.HttpServerPluginTestBase;
-import cloud.playio.qwe.http.server.RestApiTestHelper;
-import cloud.playio.qwe.http.server.mock.MockEventErrorListener;
-import cloud.playio.qwe.http.server.mock.MockEventSuccessListener;
-import cloud.playio.qwe.http.server.mock.MockRestEventApi;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+
+import cloud.playio.qwe.eventbus.EventBusClient;
+import cloud.playio.qwe.exceptions.ErrorCode;
+import cloud.playio.qwe.http.server.HttpServerPluginTestBase;
+import cloud.playio.qwe.http.server.HttpServerRouter;
+import cloud.playio.qwe.http.server.RestApiTestHelper;
+import cloud.playio.qwe.http.server.mock.MockEventErrorListener;
+import cloud.playio.qwe.http.server.mock.MockEventSuccessListener;
+import cloud.playio.qwe.http.server.mock.MockRestEventApi;
 
 @RunWith(VertxUnitRunner.class)
 public class RestEventApiTest extends HttpServerPluginTestBase implements RestApiTestHelper {
@@ -29,7 +30,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase implements RestAp
     @Test
     public void test_api_eventbus_not_found(TestContext context) {
         String path = "/api/test/event";
-        JsonObject expected = notFoundResponse(httpConfig.getPort(), path);
+        JsonObject expected = RestApiTestHelper.notFoundResponse(httpConfig.getPort(), path);
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
         sendToApiThenAssert(context, HttpMethod.GET, path, 404, expected);
     }
@@ -48,7 +49,8 @@ public class RestEventApiTest extends HttpServerPluginTestBase implements RestAp
     public void test_api_eventbus_error_from_server(TestContext context) {
         EventBusClient.create(createSharedData(vertx)).register("http.server.test", new MockEventErrorListener());
         String path = "/api/test/events";
-        JsonObject expected = new JsonObject().put("code", ErrorCode.ENGINE_ERROR.code()).put("message", "Engine error");
+        JsonObject expected = new JsonObject().put("code", ErrorCode.ENGINE_ERROR.code())
+                                              .put("message", "Engine error");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
         sendToApiThenAssert(context, HttpMethod.POST, path, 500, expected);
     }
@@ -65,8 +67,7 @@ public class RestEventApiTest extends HttpServerPluginTestBase implements RestAp
     @Test
     public void test_api_eventbus_no_reply(TestContext context) {
         String path = "/api/test/events/:event_id";
-        JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_UNAVAILABLE)
-                                              .put("message", "No response");
+        JsonObject expected = new JsonObject().put("code", ErrorCode.SERVICE_UNAVAILABLE).put("message", "No response");
         startServer(context, new HttpServerRouter().registerEventBusApi(MockRestEventApi.class));
         sendToApiThenAssert(context, HttpMethod.GET, path, 503, expected);
     }

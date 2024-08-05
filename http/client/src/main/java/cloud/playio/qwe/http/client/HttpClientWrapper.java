@@ -99,7 +99,7 @@ public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>
      * @see #push(ReadStream, HttpMethod)
      */
     default Future<ResponseData> upload(AsyncFile uploadFile) {
-        return this.upload(null, uploadFile);
+        return upload(null, uploadFile);
     }
 
     /**
@@ -111,7 +111,7 @@ public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>
      * @see #push(String, ReadStream, HttpMethod)
      */
     default Future<ResponseData> upload(String path, AsyncFile uploadFile) {
-        return this.push(path, uploadFile, HttpMethod.POST);
+        return push(path, uploadFile, HttpMethod.POST);
     }
 
     /**
@@ -123,7 +123,7 @@ public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>
      * @see #push(String, ReadStream, HttpMethod)
      */
     default Future<ResponseData> push(ReadStream readStream, HttpMethod method) {
-        return this.push(null, readStream, method);
+        return push(null, readStream, method);
     }
 
     /**
@@ -143,7 +143,7 @@ public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>
      * @return single async file a reference to {@code saveFile }parameter, so the API can be used fluently
      */
     default Future<AsyncFile> download(AsyncFile saveFile) {
-        return this.download(null, saveFile);
+        return download(null, saveFile);
     }
 
     /**
@@ -162,7 +162,7 @@ public interface HttpClientWrapper extends ExtensionEntrypoint<HttpClientConfig>
      * @return single {@code WriteStream} a reference to {@code saveFile }parameter, so the API can be used fluently
      */
     default Future<WriteStream> pull(WriteStream writeStream) {
-        return this.pull(null, writeStream);
+        return pull(null, writeStream);
     }
 
     /**

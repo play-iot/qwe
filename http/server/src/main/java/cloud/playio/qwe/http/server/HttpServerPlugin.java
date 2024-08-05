@@ -15,6 +15,7 @@ import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.LoggerHandler;
 import io.vertx.ext.web.handler.ResponseContentTypeHandler;
 import io.vertx.ext.web.handler.ResponseTimeHandler;
+
 import cloud.playio.qwe.PluginContext;
 import cloud.playio.qwe.PluginVerticle;
 import cloud.playio.qwe.exceptions.InitializerError;
@@ -49,13 +50,13 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
     }
 
     @Override
-    public Class<HttpServerConfig> configClass() {return HttpServerConfig.class;}
+    public Class<HttpServerConfig> configClass() { return HttpServerConfig.class; }
 
     @Override
-    public String configKey() {return HttpServerConfig.KEY;}
+    public String configKey() { return HttpServerConfig.KEY; }
 
     @Override
-    public String configFile() {return "httpServer.json";}
+    public String configFile() { return "httpServer.json"; }
 
     @Override
     public void onStart() {
@@ -122,11 +123,11 @@ public final class HttpServerPlugin extends PluginVerticle<HttpServerConfig, Htt
                                                  .maxAgeSeconds(corsOptions.getMaxAgeSeconds());
             root.allowForward(pluginConfig.getAllowForwardHeaders())
                 .route()
-                .handler(corsHandler)
                 //TODO Add LoggerHandlerProvider configuration
                 .handler(LoggerHandler.create())
-                .handler(ResponseContentTypeHandler.create())
                 .handler(ResponseTimeHandler.create())
+                .handler(ResponseContentTypeHandler.create())
+                .handler(corsHandler)
                 .failureHandler(ResponseTimeHandler.create())
                 .failureHandler(new FailureContextHandler());
             root = Stream.concat(

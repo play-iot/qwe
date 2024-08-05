@@ -24,9 +24,8 @@
     "crlValues": [],
     "enabledCipherSuites": [],
     "enabledSecureTransportProtocols": [
-      "TLSv1",
-      "TLSv1.1",
-      "TLSv1.2"
+      "TLSv1.2",
+      "TLSv1.3"
     ],
     "idleTimeout": 0,
     "idleTimeoutUnit": "SECONDS",
@@ -51,7 +50,7 @@
     "trustAll": true,
     "useAlpn": false
   },
-  "eventLoopPoolSize": 32,
+  "eventLoopPoolSize": 8,
   "fileSystemOptions": {
     "classPathResolvingEnabled": true,
     "fileCacheDir": "/tmp/qwe-cache",

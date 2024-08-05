@@ -16,6 +16,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.metrics.MetricsOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.tracing.TracingOptions;
+
 import cloud.playio.qwe.cluster.ClusterType;
 import cloud.playio.qwe.launcher.BootCommand;
 import cloud.playio.qwe.utils.NetworkUtils;
@@ -58,7 +59,7 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
     @Accessors(chain = true)
     private JsonObject keyStoreConfig;
 
-    public QWEBootConfig() {this.delegate = defVertxOpts();}
+    public QWEBootConfig() { this.delegate = defVertxOpts(); }
 
     @JsonCreator
     public QWEBootConfig(Map<String, Object> map) {
@@ -93,14 +94,15 @@ public final class QWEBootConfig extends VertxOptions implements IConfig {
     private VertxOptions defVertxOpts() {
         return new VertxOptions().setHAGroup(DEFAULT_HA_GROUP)
                                  .setEventBusOptions(defEventBusOpts())
+                                 .setEventLoopPoolSize(8)
                                  .setFileSystemOptions(defFileSysOpts());
     }
 
     @Override
-    public String configKey() {return QWEConfig.BOOT_CONF_KEY;}
+    public String configKey() { return QWEConfig.BOOT_CONF_KEY; }
 
     @Override
-    public Class<? extends IConfig> parent() {return QWEConfig.class;}
+    public Class<? extends IConfig> parent() { return QWEConfig.class; }
 
     @Override
     public JsonObject toJson() {

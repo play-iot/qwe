@@ -26,7 +26,7 @@ public class RequestDataTest {
         Assertions.assertEquals(1, requestData.pagination().getPage());
         Assertions.assertEquals(20, requestData.pagination().getPerPage());
         Assertions.assertEquals("{\"headers\":{},\"body\":{\"name\":\"hello\"},\"filter\":{\"x\":\"test\"}," +
-                                "\"pagination\":{\"_page\":1,\"_per_page\":20}}", requestData.toJson().encode());
+                                "\"pagination\":{\"_page\":1,\"_page_size\":20}}", requestData.toJson().encode());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class RequestDataTest {
 
     @Test
     public void test_from_json_1() {
-        final JsonObject pagination = new JsonObject().put("_page", 5).put("_per_page", 10);
+        final JsonObject pagination = new JsonObject().put("_page", 5).put("_page_size", 10);
         final JsonObject data = new JsonObject().put("pagination", pagination)
                                                 .put("body", new JsonObject())
                                                 .put("filter", new JsonObject());
@@ -58,7 +58,7 @@ public class RequestDataTest {
 
     @Test
     public void test_from_json_2() {
-        final JsonObject pagination = new JsonObject().put("_page", 5).put("_per_page", 10);
+        final JsonObject pagination = new JsonObject().put("_page", 5).put("_page_size", 10);
         final JsonObject data = new JsonObject().put("pagination", pagination)
                                                 .put("body", new JsonObject().put("name", "xyz"))
                                                 .put("filter", new JsonObject().put("key", "1"));
