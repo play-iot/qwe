@@ -38,7 +38,7 @@ jobs:
           token: ${{ secrets.BEEIO_CI_TOKEN }}
 
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           git_user_signingkey: true
           git_commit_gpgsign: true
@@ -70,7 +70,7 @@ jobs:
 
       - name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         if: needs.context.outputs.shouldPublish == 'true'
         with:
           git_user_signingkey: true
@@ -162,7 +162,7 @@ jobs:
 
       - name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           git_user_signingkey: true
           gpg_private_key: ${{ secrets.OSS_GPG_PRIVATE_KEY }}
