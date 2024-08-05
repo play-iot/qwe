@@ -92,11 +92,6 @@ public abstract class HttpServerPluginTestBase implements PluginDeployTest<HttpS
                                                    consumer);
     }
 
-    protected JsonObject notFoundResponse(int port, String path) {
-        return new JsonObject().put("message", "Resource not found")
-                               .put("uri", Strings.format("http://{0}:{1}{2}", DEFAULT_HOST, port, path));
-    }
-
     @Override
     public HttpServerConfig initConfig() {
         return IConfig.fromClasspath(httpConfigFile(), HttpServerConfig.class)

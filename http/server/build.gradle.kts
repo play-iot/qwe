@@ -24,4 +24,5 @@ dependencies {
     testImplementation(libs.vertxOauth2)
     testImplementation(libs.vertxShiro)
     testImplementation(libs.vertxWebauthn)
+    testImplementation(libs.log4j2Core)
 }

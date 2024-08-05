@@ -11,6 +11,7 @@ import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.VertxTestContext;
+
 import cloud.playio.qwe.JsonHelper.Junit5;
 import cloud.playio.qwe.TestHelper;
 import cloud.playio.qwe.eventbus.EBContract;
@@ -42,8 +43,8 @@ class WebSocketExtensionTest extends HttpExtensionTestBase {
         extension.entrypoint()
                  .openWebSocket(options, WebSocketClientPlan.create(LISTENER, PUBLISHER_ADDRESS))
                  .onFailure(t -> context.verify(() -> {
-                     Assertions.assertTrue(t instanceof HttpException);
-                     Assertions.assertTrue(t.getCause() instanceof UpgradeRejectedException);
+                     Assertions.assertInstanceOf(HttpException.class, t);
+                     Assertions.assertInstanceOf(UpgradeRejectedException.class, t.getCause());
                      Assertions.assertEquals(404, ((HttpException) t).getStatusCode().code());
                      cp.flag();
                  }))
@@ -57,11 +58,11 @@ class WebSocketExtensionTest extends HttpExtensionTestBase {
         extension.entrypoint()
                  .openWebSocket(options, WebSocketClientPlan.create(LISTENER, PUBLISHER_ADDRESS))
                  .onFailure(t -> context.verify(() -> {
-                     Assertions.assertTrue(t instanceof HttpException);
-                     Assertions.assertTrue(t.getCause() instanceof UnknownHostException);
-                     Assertions.assertEquals(
-                         "Search domain query failed. Original hostname: 'echo.websocket.test' Unable to create DNS Question for: [echo.websocket.test.., A(1)]",
-                         t.getCause().getMessage());
+                     Assertions.assertInstanceOf(HttpException.class, t);
+                     Assertions.assertInstanceOf(UnknownHostException.class, t.getCause());
+                     final String errorMsg = t.getCause().getMessage();
+                     Assertions.assertTrue(errorMsg.contains("Failed to resolve 'echo.websocket.test'"),
+                                           "Error: " + errorMsg);
                      cp.flag();
                  }))
                  .onSuccess(msg -> context.failNow("Failed test should not success"));
@@ -69,8 +70,8 @@ class WebSocketExtensionTest extends HttpExtensionTestBase {
 
     @Test
     @Disabled
-    //TODO need to setup simple websocket echo server: https://github.com/jmalloc/echo-server
-    //echo.websocket.org is no longer available
+        //TODO need to setup simple websocket echo server: https://github.com/jmalloc/echo-server
+        //echo.websocket.org is no longer available
     void test_connect_and_send(VertxTestContext context) {
         Checkpoint cp = context.checkpoint();
         EventBusClient eb = ((EventBusProxy) extension.entrypoint()).transporter();

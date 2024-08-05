@@ -1,6 +1,7 @@
 dependencies {
     api(projects.core)
 
-    testImplementation(libs.junitVertx)
     testImplementation(testFixtures(projects.core))
+    testImplementation(libs.junitVertx)
+    testImplementation(libs.log4j2Core)
 }

@@ -52,7 +52,7 @@ public class AcceptAndContentHeaderTest extends HttpServerPluginTestBase impleme
 
     @Test
     public void test_accept_xml_should_failed(TestContext context) {
-        JsonObject expected = notFoundResponse(httpConfig.getPort(), PATH);
+        JsonObject expected = RestApiTestHelper.notFoundResponse(httpConfig.getPort(), PATH);
         final RequestData reqData = RequestData.builder()
                                                .headers(new JsonObject().put(HttpHeaders.ACCEPT.toString(),
                                                                              XML_CONTENT_TYPE))

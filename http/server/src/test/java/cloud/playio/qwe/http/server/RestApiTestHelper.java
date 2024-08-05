@@ -1,19 +1,28 @@
 package cloud.playio.qwe.http.server;
 
+import static cloud.playio.qwe.http.server.HttpServerPluginTestBase.DEFAULT_HOST;
+
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import io.github.zero88.utils.Strings;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+
 import cloud.playio.qwe.TestHelper;
 import cloud.playio.qwe.dto.msg.RequestData;
 import cloud.playio.qwe.dto.msg.ResponseData;
 
 public interface RestApiTestHelper extends HttpServerTestHelper {
+
+    static JsonObject notFoundResponse(int port, String path) {
+        return new JsonObject().put("message", "Resource not found")
+                               .put("uri", Strings.format("http://{0}:{1}{2}", DEFAULT_HOST, port, path));
+    }
 
     default void sendToApiThenAssert(TestContext context, HttpMethod method, String path, int codeExpected,
                                      JsonObject bodyExpected, Customization... customizations) {
