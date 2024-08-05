@@ -74,8 +74,8 @@ jobs:
         if: needs.context.outputs.shouldPublish == 'true'
         with:
           git_user_signingkey: true
-          gpg_private_key: ${{ secrets.CI_GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.CI_GPG_PASSPHARSE }}
+          gpg_private_key: ${{ secrets.OSS_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.OSS_GPG_PASSPHARSE }}
 
       - name: Set up JDK
         uses: actions/setup-java@v3.9.0
