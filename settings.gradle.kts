@@ -19,7 +19,7 @@ val projectName = "qwe"
 val profile: String by settings
 val pools = mutableMapOf(
     projectName to arrayOf(":core", ":ext"),
-    "http" to arrayOf("http:client", "http:server", "http:openapi"),
+    "http" to arrayOf("http:shared", "http:client", "http:server", "http:openapi"),
     "sql" to arrayOf("sql" /*"sql:api", "sql:type"*/),
     "micro" to arrayOf(
         ":micro:config",

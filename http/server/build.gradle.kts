@@ -1,5 +1,6 @@
 dependencies {
     api(projects.core)
+    api(projects.http.shared)
     api(libs.vertxWeb)
     api(libs.javaxJaxrs)
 
