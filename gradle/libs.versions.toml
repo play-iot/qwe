@@ -27,7 +27,7 @@ jooq_jdk17 = "3.19.10"
 jooqx = "2.0.0-rc3"
 
 [libraries]
-lombok = { module = "org.projectlombok:lombok", version = "1.18.26" }
+lombok = { module = "org.projectlombok:lombok", version = "1.18.34" }
 jetbrainsAnnotations = { module = "org.jetbrains:annotations", version = "24.1.0" }
 javaUtils = { module = "io.github.zero88:java-utils", version = "2.0.0" }
 rsqlParser = { module = "io.github.zero88:rsql-parser", version = "2.2.1" }
