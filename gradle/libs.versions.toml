@@ -7,7 +7,7 @@ junit5Vertx = "4.2.5"
 junit5Container = "1.19.8"
 junitPioneer_jdk11 = "2.2.0"
 ## Json Assert
-jsonAssert = "1.5.1"
+jsonAssert = "1.5.3"
 ## Logging
 slf4j = "2.0.13"
 log4j2 = "2.23.1"
