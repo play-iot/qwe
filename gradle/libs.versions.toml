@@ -20,7 +20,7 @@ hikariCP_jdk11 = "5.1.0"
 jdbcH2 = "1.4.200"
 jdbcPostgres = "42.7.3"
 ## Vertx
-vertx = "4.5.8"
+vertx = "4.5.9"
 ## Jooq
 jooq_jdk17 = "3.19.10"
 ## Jooqx
