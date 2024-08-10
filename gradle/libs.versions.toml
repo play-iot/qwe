@@ -24,7 +24,7 @@ vertx = "4.5.9"
 ## Jooq
 jooq_jdk17 = "3.19.10"
 ## Jooqx
-jooqx = "2.0.0-rc3"
+jooqx = "2.0.0-SNAPSHOT"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version = "1.18.34" }
