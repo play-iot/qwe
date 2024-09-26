@@ -22,7 +22,7 @@ jdbcPostgres = "42.7.3"
 ## Vertx
 vertx = "4.5.9"
 ## Jooq
-jooq_jdk17 = "3.19.10"
+jooq_jdk17 = "3.19.13"
 ## Jooqx
 jooqx = "2.0.0-rc3"
 
